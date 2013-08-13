@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>deccoboard</title>
+    <meta name="viewport" content="width=1024"/>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="viewport" content = "width = device-width, initial-scale = 1, user-scalable = no" />
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="css/jquery.gridster.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+    <script src="js/head.js"></script>
+    <script type="text/javascript">
+        head.js("js/jquery.js",
+                "js/underscore.js",
+                "js/bootstrap.min.js",
+                "js/jquery.gridster.js",
+                "js/jquery.sparkline.min.js",
+                "js/raphael.2.1.0.min.js",
+                "js/justgage.1.0.1.min.js",
+                "js/dashboard.js",
+                "config.js",
+                function (){
+
+                });
+
+
+    </script>
+</head>
+<body>
+<header id="main-header">
+    <div id="admin-bar">
+        <div id="admin-menu">
+            <div id="board-tools">
+                <h1>DECCOBOARD</h1>
+                <button class="btn btn-inverse" type="button"><i class="icon-plus icon-white delete-widget"></i> Add Widget</button>
+            </div>
+            <div id="datasources">
+                <h1>DATASOURCES</h1>
+                <table class="table" id="datasources-list">
+                </table>
+            </div>
+        </div>
+    </div>
+    <a id="toggle-header" href="#" class="" style="bottom: 0px;"></a>
+</header>
+<div class="gridster">
+    <ul>
+        <!--<li data-row="1" data-col="1" data-sizex="2" data-sizey="2">
+            <header>
+                <h1>Status</h1>
+                <div class="widget-tools"><i class="icon-wrench icon-white edit-widget"></i><i class="icon-trash icon-white delete-widget"></i></div>
+            </header>
+            <section>
+                <div class="sub-section">
+                    Now
+                    <br>
+                    <div class="big-text" id="current-time" style="font-size: 45px;"></div>
+                </div>
+                <div class="sub-section">
+                    Last Telemetry Update
+                    <br>
+                    <div class="medium-text" id="last-telemetry"></div>
+                </div>
+                <div class="sub-section">
+                <div class="onoffswitch">
+                    <input id="status-on-off" type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked disabled>
+                    <label class="onoffswitch-label" for="myonoffswitch">
+                        <div class="onoffswitch-inner">
+                            <div class="onoffswitch-active"><div class="onoffswitch-switch">ON</div></div>
+                            <div class="onoffswitch-inactive"><div class="onoffswitch-switch">OFF</div></div>
+                        </div>
+                    </label>
+                </div>
+                <span class="small-text" id="status"></span> phase
+                    </div>
+            </section>
+        </li>
+        <li data-row="3" data-col="1" data-sizex="2" data-sizey="2">
+            <header>
+                <h1>Live</h1>
+            </header>
+            <section id="cam">
+
+            </section>
+        </li>
+        <li data-row="1" data-col="5" data-sizex="2" data-sizey="2">
+            <header>
+                <h1>Draw Temperatures</h1>
+            </header>
+            <section>
+                <div class="sub-section">
+                    Heads
+                    <br>
+                    <span class="medium-text" id="heads-temp"></span> &deg;F
+                    &nbsp;<span id="heads-temp-sparkline" class="sparkline-inline"></span>
+                </div>
+                <div class="sub-section">
+                    Hearts
+                    <br>
+                    <span class="medium-text" id="hearts-temp"></span> &deg;F
+                    &nbsp;<span id="hearts-temp-sparkline" class="sparkline-inline"></span>
+                </div>
+                <div class="sub-section">
+                    Tails
+                    <br>
+                    <span class="medium-text" id="tails-temp"></span> &deg;F
+                    &nbsp;<span id="tails-temp-sparkline" class="sparkline-inline"></span>
+                </div>
+                <div class="sub-section">
+                    Sump
+                    <br>
+                    <span class="medium-text" id="sump-temp"></span> &deg;F
+                    &nbsp;<span id="sump-temp-sparkline" class="sparkline-inline"></span>
+                </div>
+            </section>
+        </li>
+        <li data-row="1" data-col="3" data-sizex="2" data-sizey="1">
+            <header>
+                <h1>Pump Flow Rate</h1>
+            </header>
+            <section>
+                <span class="big-text" id="pump-flow-rate"></span> gallons / hour <img id="pump-icon" src="img/ajax-loader.gif">
+            </section>
+        </li>
+        <li data-row="2" data-col="3" data-sizex="2" data-sizey="1">
+            <header>
+                <h1>Atmosphere</h1>
+            </header>
+            <section>
+                <div class="sub-section">
+                    Barometric Pressure
+                    <br>
+                    <span class="medium-text" id="pressure"></span> Pa
+                    &nbsp;<span id="pressure-sparkline" class="sparkline-inline"></span>
+                </div>
+            </section>
+        </li>
+        <li data-row="3" data-col="3" data-sizex="2" data-sizey="2">
+            <header>
+                <h1>Pre Heater</h1>
+            </header>
+            <section class="text-center">
+                <div id="pre-heater-gauge" class="gauge-widget"></div>
+                <br>
+                <div id="pre-heater-sparkline" class="sparkline"></div>
+            </section>
+        </li>
+        <li data-row="3" data-col="5" data-sizex="2" data-sizey="2">
+            <header>
+                <h1>Main Heater</h1>
+            </header>
+            <section class="text-center">
+                <div id="main-heater-gauge" class="gauge-widget"></div>
+                <br>
+                <div id="main-heater-sparkline" class="sparkline"></div>
+            </section>
+        </li>-->
+    </ul>
+</div>
+</body>
+</html>
