@@ -7,25 +7,24 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="viewport" content = "width = device-width, initial-scale = 1, user-scalable = no" />
     <!-- Bootstrap -->
-    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <!--<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">-->
     <link href="css/jquery.gridster.min.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
     <script src="js/head.js"></script>
     <script type="text/javascript">
-        head.js("js/jquery.js",
+        head.js("js/knockout.js",
+                "js/knockout.switchcase.js",
+                "js/jquery.js",
                 "js/underscore.js",
-                "js/bootstrap.min.js",
                 "js/jquery.gridster.js",
                 "js/jquery.sparkline.min.js",
                 "js/raphael.2.1.0.min.js",
                 "js/justgage.1.0.1.min.js",
-                "js/dashboard.js",
+                "js/deccoboard.js",
                 "config.js",
                 function (){
 
                 });
-
-
     </script>
 </head>
 <body>
@@ -34,11 +33,26 @@
         <div id="admin-menu">
             <div id="board-tools">
                 <h1>DECCOBOARD</h1>
-                <button class="btn btn-inverse" type="button"><i class="icon-plus icon-white delete-widget"></i> Add Widget</button>
+                <button class="btn btn-inverse" type="button" data-bind="click: createWidget"><i class="icon-plus icon-white"></i> Add Widget</button>
             </div>
             <div id="datasources">
-                <h1>DATASOURCES</h1>
-                <table class="table" id="datasources-list">
+                <h1 class="small-text">DATASOURCES</h1>
+                <a href="javascript:void(0)" data-bind="crud: {template: 'datasource-edit-template', operation: 'add', model: 'DatasourceModel'}">Add</a>
+                <table class="table table-condensed" id="datasources-list">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Last Updated</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                    </thead>
+                    <tbody data-bind="foreach: datasources">
+                        <tr>
+                            <td><a href="#edit-datasource" data-bind="text: name, crud: {template: 'datasource-edit-template', operation: 'edit', model: 'DatasourceModel'}"></a></td>
+                            <td data-bind="text: last_updated"></td>
+                            <td><a href="#delete-datasource" class="datasource-delete-btn" data-bind="crud: {template: 'datasource-delete-template', operation: 'delete', model: 'DatasourceModel'}"><i class="icon-trash icon-white"></i></a></td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -46,118 +60,125 @@
     <a id="toggle-header" href="#" class="" style="bottom: 0px;"></a>
 </header>
 <div class="gridster">
-    <ul>
-        <!--<li data-row="1" data-col="1" data-sizex="2" data-sizey="2">
-            <header>
-                <h1>Status</h1>
-                <div class="widget-tools"><i class="icon-wrench icon-white edit-widget"></i><i class="icon-trash icon-white delete-widget"></i></div>
-            </header>
-            <section>
-                <div class="sub-section">
-                    Now
-                    <br>
-                    <div class="big-text" id="current-time" style="font-size: 45px;"></div>
-                </div>
-                <div class="sub-section">
-                    Last Telemetry Update
-                    <br>
-                    <div class="medium-text" id="last-telemetry"></div>
-                </div>
-                <div class="sub-section">
-                <div class="onoffswitch">
-                    <input id="status-on-off" type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked disabled>
-                    <label class="onoffswitch-label" for="myonoffswitch">
-                        <div class="onoffswitch-inner">
-                            <div class="onoffswitch-active"><div class="onoffswitch-switch">ON</div></div>
-                            <div class="onoffswitch-inactive"><div class="onoffswitch-switch">OFF</div></div>
-                        </div>
-                    </label>
-                </div>
-                <span class="small-text" id="status"></span> phase
-                    </div>
-            </section>
-        </li>
-        <li data-row="3" data-col="1" data-sizex="2" data-sizey="2">
-            <header>
-                <h1>Live</h1>
-            </header>
-            <section id="cam">
-
-            </section>
-        </li>
-        <li data-row="1" data-col="5" data-sizex="2" data-sizey="2">
-            <header>
-                <h1>Draw Temperatures</h1>
-            </header>
-            <section>
-                <div class="sub-section">
-                    Heads
-                    <br>
-                    <span class="medium-text" id="heads-temp"></span> &deg;F
-                    &nbsp;<span id="heads-temp-sparkline" class="sparkline-inline"></span>
-                </div>
-                <div class="sub-section">
-                    Hearts
-                    <br>
-                    <span class="medium-text" id="hearts-temp"></span> &deg;F
-                    &nbsp;<span id="hearts-temp-sparkline" class="sparkline-inline"></span>
-                </div>
-                <div class="sub-section">
-                    Tails
-                    <br>
-                    <span class="medium-text" id="tails-temp"></span> &deg;F
-                    &nbsp;<span id="tails-temp-sparkline" class="sparkline-inline"></span>
-                </div>
-                <div class="sub-section">
-                    Sump
-                    <br>
-                    <span class="medium-text" id="sump-temp"></span> &deg;F
-                    &nbsp;<span id="sump-temp-sparkline" class="sparkline-inline"></span>
-                </div>
-            </section>
-        </li>
-        <li data-row="1" data-col="3" data-sizex="2" data-sizey="1">
-            <header>
-                <h1>Pump Flow Rate</h1>
-            </header>
-            <section>
-                <span class="big-text" id="pump-flow-rate"></span> gallons / hour <img id="pump-icon" src="img/ajax-loader.gif">
-            </section>
-        </li>
-        <li data-row="2" data-col="3" data-sizex="2" data-sizey="1">
-            <header>
-                <h1>Atmosphere</h1>
-            </header>
-            <section>
-                <div class="sub-section">
-                    Barometric Pressure
-                    <br>
-                    <span class="medium-text" id="pressure"></span> Pa
-                    &nbsp;<span id="pressure-sparkline" class="sparkline-inline"></span>
-                </div>
-            </section>
-        </li>
-        <li data-row="3" data-col="3" data-sizex="2" data-sizey="2">
-            <header>
-                <h1>Pre Heater</h1>
-            </header>
-            <section class="text-center">
-                <div id="pre-heater-gauge" class="gauge-widget"></div>
-                <br>
-                <div id="pre-heater-sparkline" class="sparkline"></div>
-            </section>
-        </li>
-        <li data-row="3" data-col="5" data-sizex="2" data-sizey="2">
-            <header>
-                <h1>Main Heater</h1>
-            </header>
-            <section class="text-center">
-                <div id="main-heater-gauge" class="gauge-widget"></div>
-                <br>
-                <div id="main-heater-sparkline" class="sparkline"></div>
-            </section>
-        </li>-->
+    <ul data-bind="grid: true, template: {name: 'widget-template', foreach: widgets}">
     </ul>
 </div>
+
+<div id="crud-dialog" class="modal">
+    <div data-bind="template: { name: currentCRUDTemplate, data: currentCRUDObject }"></div>
+</div>
+
+<script type="text/html" id="widget-template">
+    <li data-bind="widget: true">
+        <header>
+            <h1 data-bind="text: title"></h1>
+            <div class="widget-tools">
+                <i class="icon-wrench icon-white edit-widget"></i><a href="javascript:void(0);" data-bind="crud: {template: 'widget-delete-template', operation: 'delete', model: 'WidgetModel'}"><i class="icon-trash icon-white delete-widget"></i></a>
+            </div>
+        </header>
+        <section data-bind="foreach: sections">
+            <div class="sub-section">
+                <h2 data-bind="text: title"></h2>
+                <!-- ko switch: type -->
+                <!-- ko case: $default -->
+                <span data-bind="html:computedValue, attr:{id:'section-' + sectionID + '-value'}"></span>
+                <span data-bind="text: units"></span>
+                <!-- /ko -->
+                <!-- ko case: "big-text" -->
+                <span class="big-text" data-bind="html:computedValue, attr:{id:'section-' + sectionID + '-value'}"></span>
+                <span data-bind="text: units"></span>
+                <!-- /ko -->
+                <!-- ko case: "sparkline" -->
+                <div class="sparkline" data-bind="attr:{id:'section-' + sectionID + '-sparkline'}"></div>
+                <!-- /ko -->
+                <!-- ko case: ["medium-text", "text-with-sparkline"] -->
+                <span class="medium-text" data-bind="html:computedValue, attr:{id:'section-' + sectionID + '-value'}"></span>
+                <span data-bind="text: units"></span>
+                <!-- ko if: type() == "text-with-sparkline" -->
+                <span class="sparkline-inline" data-bind="attr:{id:'section-' + sectionID + '-sparkline'}"></span>
+                <!-- /ko -->
+                <!-- /ko -->
+                <!-- /ko -->
+                <div data-bind="valueScript: true"></div>
+                <!--<script type="text/javascript" data-bind="text: valueScript"></script>-->
+                </div>
+        </section>
+    </li>
+</script>
+
+<!-- Modal CRUD templates --->
+
+<script type="text/html" id="empty-crud-template">
+</script>
+
+<script type="text/html" id="datasource-edit-template">
+    <header>
+        <h1>Datasource</h1>
+    </header>
+    <section>
+        <form>
+            <div class="control-group">
+                <label class="control-label" for="datasourceName">Name</label>
+
+                <div class="controls">
+                    <input type="text" id="datasourceName" data-bind="value: name">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="datasourceUrl">Url</label>
+
+                <div class="controls">
+                    <input type="text" id="datasourceUrl" data-bind="value: url">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="datasourceType">Type</label>
+
+                <div class="controls">
+                    <select id="datasourceType" data-bind="options: $root.datasourceTypes, value: type">
+                    </select>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="datasourceRefresh">Refresh Every</label>
+                <div class="controls">
+                    <input type="text" class="small align-right" id="datasourceRefresh" data-bind="value: refresh">
+                    <div class="input-suffix">seconds</div>
+                </div>
+            </div>
+        </form>
+    </section>
+    <footer>
+        <a href="javascript:void(0);" class="button modal_close" data-bind="click: $root.commitCurrentCRUD">Save</a>
+        <a href="javascript:void(0);" class="button modal_close" data-bind="click: $root.cancelCurrentCRUD">Cancel</a>
+    </footer>
+</script>
+
+<script type="text/html" id="datasource-delete-template">
+    <header>
+        <h1>Delete Datasource</h1>
+    </header>
+    <section>
+        Are you sure you want to delete this datasource?
+    </section>
+    <footer>
+        <a href="javascript:void(0);" class="button modal_close" data-bind="click: $root.commitCurrentCRUD">OK</a>
+        <a href="javascript:void(0);" class="button modal_close" data-bind="click: $root.cancelCurrentCRUD">Cancel</a>
+    </footer>
+</script>
+
+<script type="text/html" id="widget-delete-template">
+    <header>
+        <h1>Delete Widget</h1>
+    </header>
+    <section>
+        Are you sure you want to delete this widget?
+    </section>
+    <footer>
+        <a href="javascript:void(0);" class="button modal_close" data-bind="click: $root.commitCurrentCRUD">OK</a>
+        <a href="javascript:void(0);" class="button modal_close" data-bind="click: $root.cancelCurrentCRUD">Cancel</a>
+    </footer>
+</script>
+
 </body>
 </html>

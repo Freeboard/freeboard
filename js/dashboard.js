@@ -122,12 +122,12 @@ function toggleEdit()
 
 	if(!editing)
 	{
-		$("#main-header").animate({top: "-280px"}, 500);
-		$(".gridster").animate({"margin-top": "20px"}, 500);
+		$("#main-header").animate({top: "-280px"}, 250);
+		$(".gridster").animate({"margin-top": "20px"}, 250);
 		$("#main-header").data().shown = false;
 
 
-		$(".widget-tools").animate({opacity: 0.0}, 500, function(){
+		$(".widget-tools").animate({opacity: 0.0}, 250, function(){
 			$().css("display", "none");
 		});
 
@@ -135,10 +135,10 @@ function toggleEdit()
 	}
 	else
 	{
-		$("#main-header").animate({top:"0px"}, 500);
-		$(".gridster").animate({"margin-top": "300px"}, 500);
+		$("#main-header").animate({top:"0px"}, 250);
+		$(".gridster").animate({"margin-top": "300px"}, 250);
 		$("#main-header").data().shown = true;
-		$(".widget-tools").css("display", "block").animate({opacity: 1.0}, 500);
+		$(".widget-tools").css("display", "block").animate({opacity: 1.0}, 250);
 
 		grid.enable();
 	}
@@ -152,7 +152,7 @@ function updateSectionValue(section)
 	var value;
 
 	// If an error existed here before, destroy it
-	valueElement.popover('destroy');
+	//valueElement.popover('destroy');
 
 	try
 	{
@@ -161,12 +161,12 @@ function updateSectionValue(section)
 	catch(e)
 	{
 		value = "Error";
-		valueElement.popover({
+		/*valueElement.popover({
 			title: "Error",
 			content: e.toString(),
 			trigger: "hover",
 			container : "body"
-		});
+		});*/
 	}
 
 	valueElement.text(value);
@@ -251,21 +251,30 @@ function addWidget(widgetConfig)
 
 function addDatasource(datasourceConfig)
 {
-
-
-	if(_.isUndefined(datasourceConfig.refresh))
+	if(_.isUndefined(datasourceConfig.name))
 	{
 		return;
 	}
 
+	var interval = 0;
+
+	if(!_.isUndefined(datasourceConfig.refresh))
+	{
+		interval = Number(datasourceConfig.refresh);
+	}
+
 	updateDatasources[datasourceConfig.name] = {
 		last_update: Math.round(Date.now() / 1000),
-		interval   : Number(datasourceConfig.refresh),
+		interval   : interval,
 		config     : datasourceConfig,
 		sections    : []
 	};
 
 	doUpdateDatasource(updateDatasources[datasourceConfig.name]);
+
+	var datasourceTR = $('<tr id="datasource-' + datasourceConfig.name + '"></tr>');
+	datasourceTR.append("<td>" + datasourceConfig.name + "</td>")
+	$("#datasources-list").append(datasourceTR);
 }
 
 var updateSections = [];
@@ -288,12 +297,15 @@ function processUpdates()
 
 	_.each(updateDatasources, function(updateDatasource)
 	{
-		var elapsedSeconds = now - updateDatasource.last_update;
-
-		if(elapsedSeconds >= updateDatasource.interval)
+		if(updateDatasource.interval > 0)
 		{
-			updateDatasource.last_update = Math.round(Date.now() / 1000);
-			doUpdateDatasource(updateDatasource);
+			var elapsedSeconds = now - updateDatasource.last_update;
+
+			if(elapsedSeconds >= updateDatasource.interval)
+			{
+				updateDatasource.last_update = Math.round(Date.now() / 1000);
+				doUpdateDatasource(updateDatasource);
+			}
 		}
 	});
 }
