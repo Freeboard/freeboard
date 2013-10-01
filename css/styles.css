@@ -849,7 +849,7 @@ header h1
 
 .gridster section
 {
-    padding: 10px;
+    padding: 5px 10px 5px 10px;
     line-height: normal;
     bottom: 0;
     left: 0;
@@ -884,11 +884,16 @@ header h1
 	width   : 50px;
 	height  : 22px;
 	background-color: #313131;
-	bottom: -22px;
+	bottom: 0px;
 	position : absolute;
 	left: 48%;
 	border-radius: 3px;
+	text-align: center;
+}
 
+#toggle-header i
+{
+	margin-top: 3px;
 }
 
 .widget-tools
@@ -900,9 +905,22 @@ header h1
 	opacity: 0.0;
 }
 
+.sub-section-tools
+{
+    top : 15px;
+    right: 0px;
+    position: absolute;
+    display: none;
+}
+
 .widget-tools i
 {
 	padding-right: 10px;
+}
+
+.sub-section-tools .edit-widget
+{
+    padding-right: 10px;
 }
 
 table#datasources-list tbody
@@ -986,7 +1004,7 @@ table#datasources-list tbody
 .sparkline
 {
     width: 100%;
-    height: 60px;
+    height: 75px;
 }
 
 .sub-section > h2
@@ -1001,13 +1019,24 @@ table#datasources-list tbody
 .sub-section
 {
     border-bottom: solid 1px #363636;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
+	padding-bottom: 8px;
+    position: relative;
+}
+
+.sub-section-height-1
+{
+	height : 45px;
+}
+
+.sub-section-height-2
+{
+	height : 100px;
 }
 
 .sub-section:last-of-type
 {
     border-bottom: none;
-    margin-bottom: 0;
 }
 
 #pump-icon
@@ -1030,10 +1059,15 @@ table#datasources-list tbody
 
 }
 
+.section-title
+{
+	min-height: 7px;
+}
+
 .big-text
 {
     color: #d3d4d4;
-    font-size: 45px;
+    font-size: 75px;
     font-weight: 100;
     font-family: "HelveticaNeue-UltraLight", "Helvetica Neue Ultra Light", "Helvetica Neue", sans-serif;
     overflow: hidden;
@@ -1915,4 +1949,60 @@ ul, ol {
 .icon-fullscreen
 {
 	background-position : -456px -144px;
+}
+
+.form-table td
+{
+	vertical-align : top;
+}
+
+.form-table-label
+{
+	text-align    : right;
+	padding-right : 14px;
+}
+
+.form-table-value
+{
+}
+
+.table-operation
+{
+	font-size : 12px;
+	padding-left: 5px;
+}
+
+td.table-row-operation
+{
+	padding-top: 9px;
+}
+
+input.table-row-value
+{
+	width: 150px;
+	margin: 0px;
+}
+
+.sub-table
+{
+	margin-bottom: 5px;
+}
+
+.sub-table td
+{
+	border: none;
+}
+
+.form-table-value-subtable
+{
+	max-height: 110px;
+	overflow: scroll;
+	border-bottom : solid 1px #3d3d3d;
+}
+
+.datasource-list-container
+{
+	max-height : 180px;
+	overflow   : scroll;
+	border-bottom : solid 1px #3d3d3d;
 }

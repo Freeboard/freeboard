@@ -28,36 +28,39 @@
     </script>
 </head>
 <body>
-<header id="main-header">
+<header id="main-header" data-bind="if:allow_edit">
     <div id="admin-bar">
         <div id="admin-menu">
             <div id="board-tools">
                 <h1>DECCOBOARD</h1>
-                <button class="btn btn-inverse" type="button" data-bind="click: createWidget"><i class="icon-plus icon-white"></i> Add Widget</button>
+                <a href="javascript:void(0)" data-bind="click: createWidget"><i class="icon-plus icon-white"></i> Add Widget</a>
             </div>
             <div id="datasources">
                 <h1 class="small-text">DATASOURCES</h1>
-                <a href="javascript:void(0)" data-bind="crud: {template: 'datasource-edit-template', operation: 'add', model: 'DatasourceModel'}">Add</a>
-                <table class="table table-condensed" id="datasources-list">
-                    <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Last Updated</th>
-                        <th>&nbsp;</th>
-                    </tr>
-                    </thead>
-                    <tbody data-bind="foreach: datasources">
+                <div class="datasource-list-container">
+                    <table class="table table-condensed sub-table" id="datasources-list" data-bind="if: datasources().length">
+                        <thead>
                         <tr>
-                            <td><a href="#edit-datasource" data-bind="text: name, crud: {template: 'datasource-edit-template', operation: 'edit', model: 'DatasourceModel'}"></a></td>
-                            <td data-bind="text: last_updated"></td>
-                            <td><a href="#delete-datasource" class="datasource-delete-btn" data-bind="crud: {template: 'datasource-delete-template', operation: 'delete', model: 'DatasourceModel'}"><i class="icon-trash icon-white"></i></a></td>
+                            <th>Name</th>
+                            <th>Last Updated</th>
+                            <th>&nbsp;</th>
                         </tr>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody data-bind="foreach: datasources">
+                            <tr>
+                                <td><a href="javascript:void(0)" data-bind="text: name, crud: {template: 'datasource-edit-template', operation: 'edit', model: 'DatasourceModel'}"></a></td>
+                                <td data-bind="text: last_updated"></td>
+                                <td>
+                                    <a href="javascript:void(0)" class="datasource-refresh-btn" data-bind="click: update"><i class="icon-refresh icon-white"></i></a> <a href="javascript:void(0)" class="datasource-delete-btn" data-bind="crud: {template: 'datasource-delete-template', operation: 'delete', model: 'DatasourceModel'}"><i class="icon-trash icon-white"></i></a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <a href="javascript:void(0)" class="table-operation" data-bind="crud: {template: 'datasource-edit-template', operation: 'add', model: 'DatasourceModel'}">Add</a>
             </div>
         </div>
     </div>
-    <a id="toggle-header" href="#" class="" style="bottom: 0px;"></a>
+    <a id="toggle-header" href="javascript:void(0)" data-bind="click: toggleEditing"><i class="icon-wrench icon-white"></i></a>
 </header>
 <div class="gridster">
     <ul data-bind="grid: true, template: {name: 'widget-template', foreach: widgets}">
@@ -73,35 +76,33 @@
         <header>
             <h1 data-bind="text: title"></h1>
             <div class="widget-tools">
-                <i class="icon-wrench icon-white edit-widget"></i><a href="javascript:void(0);" data-bind="crud: {template: 'widget-delete-template', operation: 'delete', model: 'WidgetModel'}"><i class="icon-trash icon-white delete-widget"></i></a>
+                <a href="javascript:void(0);" data-bind="crud: {template: 'subsection-edit-template', operation: 'add', model: 'SectionModel'}"><i class="icon-plus icon-white add-widget"></i></a><a href="javascript:void(0);" data-bind="crud: {template: 'widget-edit-template', operation: 'edit', model: 'WidgetModel'}"><i class="icon-wrench icon-white edit-widget"></i></a><a href="javascript:void(0);" data-bind="crud: {template: 'widget-delete-template', operation: 'delete', model: 'WidgetModel'}"><i class="icon-trash icon-white delete-widget"></i></a>
             </div>
         </header>
         <section data-bind="foreach: sections">
-            <div class="sub-section">
-                <h2 data-bind="text: title"></h2>
+            <div class="sub-section" data-bind="section: true, css: 'sub-section-height-' + height()">
+                <h2 class="section-title" data-bind="text: title"></h2>
                 <!-- ko switch: type -->
-                <!-- ko case: $default -->
-                <span data-bind="html:computedValue, attr:{id:'section-' + sectionID + '-value'}"></span>
-                <span data-bind="text: units"></span>
-                <!-- /ko -->
                 <!-- ko case: "big-text" -->
-                <span class="big-text" data-bind="html:computedValue, attr:{id:'section-' + sectionID + '-value'}"></span>
+                <span class="big-text" data-bind="html:computedValue, attr:{id:'section-' + sectionID() + '-value'}"></span>
                 <span data-bind="text: units"></span>
                 <!-- /ko -->
                 <!-- ko case: "sparkline" -->
-                <div class="sparkline" data-bind="attr:{id:'section-' + sectionID + '-sparkline'}"></div>
+                <div class="sparkline" data-bind="attr:{id:'section-' + sectionID() + '-sparkline'}"></div>
                 <!-- /ko -->
-                <!-- ko case: ["medium-text", "text-with-sparkline"] -->
-                <span class="medium-text" data-bind="html:computedValue, attr:{id:'section-' + sectionID + '-value'}"></span>
+                <!-- ko case: $default -->
+                <span class="medium-text" data-bind="html:computedValue, attr:{id:'section-' + sectionID() + '-value'}"></span>
                 <span data-bind="text: units"></span>
                 <!-- ko if: type() == "text-with-sparkline" -->
-                <span class="sparkline-inline" data-bind="attr:{id:'section-' + sectionID + '-sparkline'}"></span>
+                <span class="sparkline-inline" data-bind="attr:{id:'section-' + sectionID() + '-sparkline'}"></span>
                 <!-- /ko -->
                 <!-- /ko -->
                 <!-- /ko -->
                 <div data-bind="valueScript: true"></div>
-                <!--<script type="text/javascript" data-bind="text: valueScript"></script>-->
+                <div class="sub-section-tools">
+                    <a href="javascript:void(0);" data-bind="crud: {template: 'subsection-edit-template', operation: 'edit', model: 'SectionModel'}"><i class="icon-wrench icon-white edit-widget"></i></a><a href="javascript:void(0);" data-bind="crud: {template: 'subsection-delete-template', operation: 'delete', model: 'SectionModel'}"><i class="icon-trash icon-white delete-widget"></i></a>
                 </div>
+            </div>
         </section>
     </li>
 </script>
@@ -116,37 +117,106 @@
         <h1>Datasource</h1>
     </header>
     <section>
-        <form>
-            <div class="control-group">
-                <label class="control-label" for="datasourceName">Name</label>
-
-                <div class="controls">
-                    <input type="text" id="datasourceName" data-bind="value: name">
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="datasourceUrl">Url</label>
-
-                <div class="controls">
-                    <input type="text" id="datasourceUrl" data-bind="value: url">
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="datasourceType">Type</label>
-
-                <div class="controls">
+        <table class="form-table">
+            <tr>
+                <td class="form-table-label"><label class="control-label" for="datasourceName">Name</label></td>
+                <td class="form-table-value"><input type="text" id="datasourceName" data-bind="value: name"></td>
+            </tr>
+            <tr>
+                <td class="form-table-label"><label class="control-label" for="datasourceType">Type</label></td>
+                <td class="form-table-value">
                     <select id="datasourceType" data-bind="options: $root.datasourceTypes, value: type">
-                    </select>
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="datasourceRefresh">Refresh Every</label>
-                <div class="controls">
-                    <input type="text" class="small align-right" id="datasourceRefresh" data-bind="value: refresh">
-                    <div class="input-suffix">seconds</div>
-                </div>
-            </div>
-        </form>
+                    </select></td>
+            </tr>
+            <tr>
+                <td class="form-table-label"><label class="control-label" for="datasourceRefresh">Refresh Every</label></td>
+                <td class="form-table-value">
+                        <input type="text" class="small align-right" id="datasourceRefresh" data-bind="value: refresh"><div class="input-suffix">seconds</div>
+                </td>
+            </tr>
+            <tr>
+                <td class="form-table-label"><label class="control-label" for="datasourceUrl">Url</label></td>
+                <td class="form-table-value"><input type="text" id="datasourceUrl" data-bind="value: url"></td>
+            </tr>
+            <tr>
+                <td class="form-table-label"><label class="control-label">Headers</label></td>
+                <td>
+                    <div class="form-table-value-subtable">
+                        <table class="table table-condensed sub-table" id="headers-list" data-bind="if: headers().length">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Value</th>
+                                <th>&nbsp;</th>
+                            </tr>
+                            </thead>
+                            <tbody data-bind="foreach: headers">
+                            <tr>
+                                <td>
+                                    <input class="table-row-value" type="text" data-bind="value: name">
+                                </td>
+                                <td>
+                                    <input class="table-row-value" type="text" data-bind="value: value">
+                                </td>
+                                <td class="table-row-operation">
+                                    <a href="javascript:void(0)" data-bind="click: $parent.deleteHeader"><i class="icon-trash icon-white"></i></a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <a href="javascript:void(0)" class="table-operation" data-bind="click: createHeader">Add</a>
+                </td>
+            </tr>
+        </table>
+    </section>
+    <footer>
+        <a href="javascript:void(0);" class="button modal_close" data-bind="click: $root.commitCurrentCRUD">Save</a>
+        <a href="javascript:void(0);" class="button modal_close" data-bind="click: $root.cancelCurrentCRUD">Cancel</a>
+    </footer>
+</script>
+
+<script type="text/html" id="widget-edit-template">
+    <header>
+        <h1>Widget</h1>
+    </header>
+    <section>
+        <table class="form-table">
+            <tr>
+                <td class="form-table-label"><label class="control-label" for="widgetTitle">Title</label></td>
+                <td class="form-table-value"><input type="text" id="widgetTitle" data-bind="value: title"></td>
+            </tr>
+        </table>
+    </section>
+    <footer>
+        <a href="javascript:void(0);" class="button modal_close" data-bind="click: $root.commitCurrentCRUD">Save</a>
+        <a href="javascript:void(0);" class="button modal_close" data-bind="click: $root.cancelCurrentCRUD">Cancel</a>
+    </footer>
+</script>
+
+<script type="text/html" id="subsection-edit-template">
+    <header>
+        <h1>Section</h1>
+    </header>
+    <section>
+        <table class="form-table">
+            <tr>
+                <td class="form-table-label"><label class="control-label" for="sectionTitle">Title</label></td>
+                <td class="form-table-value"><input type="text" id="sectionTitle" data-bind="value: title"></td>
+            </tr>
+            <tr>
+                <td class="form-table-label"><label class="control-label" for="sectionType">Type</label></td>
+                <td class="form-table-value"><select id="sectionType" data-bind="options: $root.sectionTypes, optionsText: 'description', optionsValue: 'name', value: type"></select></td>
+            </tr>
+            <tr>
+                <td class="form-table-label"><label class="control-label" for="sectionValue">Value</label></td>
+                <td class="form-table-value"><input type="text" id="sectionValue" data-bind="value: value"></td>
+            </tr>
+            <tr>
+                <td class="form-table-label"><label class="control-label" for="sectionUnits">Units</label></td>
+                <td class="form-table-value"><input type="text" id="sectionUnits" data-bind="value: units"></td>
+            </tr>
+        </table>
     </section>
     <footer>
         <a href="javascript:void(0);" class="button modal_close" data-bind="click: $root.commitCurrentCRUD">Save</a>
@@ -173,6 +243,19 @@
     </header>
     <section>
         Are you sure you want to delete this widget?
+    </section>
+    <footer>
+        <a href="javascript:void(0);" class="button modal_close" data-bind="click: $root.commitCurrentCRUD">OK</a>
+        <a href="javascript:void(0);" class="button modal_close" data-bind="click: $root.cancelCurrentCRUD">Cancel</a>
+    </footer>
+</script>
+
+<script type="text/html" id="subsection-delete-template">
+    <header>
+        <h1>Delete Section</h1>
+    </header>
+    <section>
+        Are you sure you want to delete this section from this widget?
     </section>
     <footer>
         <a href="javascript:void(0);" class="button modal_close" data-bind="click: $root.commitCurrentCRUD">OK</a>

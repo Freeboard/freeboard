@@ -1,7 +1,33 @@
+// Add support for progress even on jQuery
+(function(a)
+{
+	if(a.support.ajaxProgress = "onprogress"in a.ajaxSettings.xhr())
+	{
+		a.fn.ajaxProgress = function(a)
+		{
+			return this.bind("ajaxProgress", a)
+		};
+		a("html").bind("ajaxSend.ajaxprogress", function(a, b, d)
+		{
+			d.__jqXHR = b
+		});
+		var e = a.ajaxSettings.xhr.bind(a.ajaxSettings);
+		a.ajaxSetup({xhr: function()
+		{
+			var c = this, b = e();
+			b && b.addEventListener("progress", function(b)
+			{
+				c.global && a.event.trigger("ajaxProgress", [b, c.__jqXHR]);
+				typeof c.progress === "function" && c.progress(c.__jqXHR, b)
+			});
+			return b
+		}})
+	}
+})(jQuery);
+
 var SPARKLINE_HISTORY_LENGTH = 100;
 
 var deccoboardConfig;
-var editing = false;
 var grid;
 var updateTimer;
 
@@ -89,7 +115,7 @@ ko.bindingHandlers.grid = {
 		// Initialize our grid
 		grid = $(element).gridster({
 			widget_margins        : [10, 10],
-			widget_base_dimensions: [300, 100]
+			widget_base_dimensions: [300, 40]
 		}).data("gridster");
 
 		grid.disable();
@@ -100,21 +126,46 @@ ko.bindingHandlers.widget = {
 	init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 	{
 		grid.add_widget(element, viewModel.width(), viewModel.height(), viewModel.col(), viewModel.row());
-		showWidgetEditIcons(true);
+
+		if(bindingContext.$root.isEditing())
+		{
+			showWidgetEditIcons(true);
+		}
 	},
 	update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 	{
+		// If widget has been removed
 		if(deccoboardConfig.widgets.indexOf(viewModel) == -1)
 		{
 			grid.remove_widget(element);
+		}
+		// If section has been added or removed
+		else if($(element).attr("data-sizey") != viewModel.sections().length)
+		{
+			//var sizeY = Math.max(viewModel.sections().length, 1);
+			grid.resize_widget($(element), undefined, viewModel.height());
+		}
+
+	}
+}
+
+ko.bindingHandlers.section = {
+	update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
+	{
+		if(bindingContext.$root.isEditing())
+		{
+			attachSubSectionEditIcons(element);
 		}
 	}
 }
 
 ko.bindingHandlers.valueScript = {
-	init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
+	update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 	{
+		$(element).empty();
 		$(element).append('<script type="text/javascript">' + viewModel.valueScript() + '</script>');
+
+		viewModel.update();
 	}
 }
 
@@ -138,6 +189,7 @@ ko.bindingHandlers.crud = {
 				deccoboardConfig.currentCRUDObject(createCRUDObject(viewModel));
 			}
 
+			deccoboardConfig.currentCRUDObjectParent = viewModel;
 			deccoboardConfig.currentCRUDOperation(options.operation);
 			deccoboardConfig.currentCRUDTemplate(options.template);
 
@@ -148,11 +200,42 @@ ko.bindingHandlers.crud = {
 	}
 };
 
+var sectionTypes = [
+	{
+		name       : "text",
+		description: "Regular text",
+		height     : 1
+	},
+	{
+		name       : "big-text",
+		description: "Big text",
+		height     : 2
+	},
+	{
+		name       : "sparkline",
+		description: "Sparkline",
+		height     : 2
+	},
+	{
+		name       : "text-with-sparkline",
+		description: "Regular text with sparkline",
+		height     : 1
+	}
+];
+
+var datasourceTypes = [
+	"json",
+	"jsonp"
+];
+
 function DeccoboardModel()
 {
 	var self = this;
 
+	this.isEditing = ko.observable(false);
+	this.allow_edit = ko.observable(true);
 	this.currentCRUDTemplate = ko.observable("empty-crud-template");
+	this.currentCRUDObjectParent = undefined;
 	this.currentCRUDObject = ko.observable();
 	this.currentCRUDOperation = ko.observable();
 
@@ -160,12 +243,40 @@ function DeccoboardModel()
 	this.widgets = ko.observableArray();
 	this.datasourceData = {};
 
-	this.datasourceTypes = [
-		"json"
-	];
+	this.datasourceTypes = datasourceTypes
+
+	this.sectionTypes = sectionTypes;
+
+	this.serialize = function()
+	{
+		var widgets = [];
+
+		_.each(self.widgets(), function(widget)
+		{
+			widgets.push(widget.serialize());
+		});
+
+		var datasources = [];
+
+		_.each(self.datasources(), function(datasource)
+		{
+			datasources.push(datasource.serialize());
+		});
+
+		return {
+			allow_edit   : self.allow_edit(),
+			widgets : widgets,
+			datasources : datasources
+		};
+	}
 
 	this.deserialize = function(object)
 	{
+		if(!_.isUndefined(object.allow_edit))
+		{
+			self.allow_edit(object.allow_edit);
+		}
+
 		_.each(object.datasources, function(datasourceConfig)
 		{
 			var datasource = new DatasourceModel();
@@ -205,12 +316,18 @@ function DeccoboardModel()
 
 	this.deleteWidget = function(widget)
 	{
-		ko.utils.arrayForEach(widget.sections(), function(section)
+		widget.dispose();
+		self.widgets.remove(widget);
+	}
+
+	this.deleteSection = function(section)
+	{
+		ko.utils.arrayForEach(self.widgets(), function(widget)
 		{
-			section._dataSubscription.dispose();
+			widget.sections.remove(section);
 		});
 
-		self.widgets.remove(widget);
+		section.dispose();
 	}
 
 	this.commitCurrentCRUD = function()
@@ -223,6 +340,10 @@ function DeccoboardModel()
 			{
 				self.addDatasource(crudObject);
 			}
+			else if(crudObject instanceof SectionModel)
+			{
+				self.currentCRUDObjectParent.addSection(crudObject);
+			}
 		}
 		else if(self.currentCRUDOperation() == "delete")
 		{
@@ -234,6 +355,10 @@ function DeccoboardModel()
 			{
 				self.deleteWidget(crudObject);
 			}
+            else if(crudObject instanceof SectionModel)
+            {
+	            self.deleteSection(crudObject);
+            }
 		}
 		else
 		{
@@ -243,11 +368,41 @@ function DeccoboardModel()
 		self.cancelCurrentCRUD();
 	}
 
+	this.toggleEditing = function()
+	{
+		var editing = !self.isEditing();
+		self.isEditing(editing);
+
+		if(!editing)
+		{
+			$("#main-header").animate({top: "-280px"}, 250);
+			$(".gridster").animate({"margin-top": "20px"}, 250);
+			$("#main-header").data().shown = false;
+
+			$(".sub-section").unbind();
+
+			grid.disable();
+		}
+		else
+		{
+			$("#main-header").animate({top: "0px"}, 250);
+			$(".gridster").animate({"margin-top": "300px"}, 250);
+			$("#main-header").data().shown = true;
+
+			attachSubSectionEditIcons($(".sub-section"));
+
+			grid.enable();
+		}
+
+		showWidgetEditIcons(editing);
+	}
+
 	this.cancelCurrentCRUD = function()
 	{
 		closeCRUDModal();
 
 		self.currentCRUDObject();
+		self.currentCRUDObjectParent = undefined;
 		self.currentCRUDOperation();
 		self.currentCRUDTemplate("empty-crud-template");
 	}
@@ -263,18 +418,44 @@ function WidgetModel()
 	this.col = ko.observable(1);
 	this.sections = ko.observableArray();
 
+	this.addSection = function(section)
+	{
+		this.sections.push(section);
+	}
+
 	this.height = ko.computed({
 		read: function()
 		{
-			return Math.max(1, self.sections().length);
+			var sumHeights = _.reduce(self.sections(), function(memo, section)
+			{
+				return memo + section.height();
+			}, 0);
+
+			return Math.max(2, sumHeights + 1);
 		}
 	});
+
+	this.serialize = function()
+	{
+		var sections = [];
+
+		_.each(self.sections(), function(section){
+			sections.push(section.serialize());
+		});
+
+		return {
+			title : self.title(),
+			width : self.width(),
+			row : self.row(),
+			col : self.col(),
+			sections : sections
+		};
+	}
 
 	this.deserialize = function(object)
 	{
 		self.title(object.title);
 		self.width(object.width);
-		//self.height(object.height);
 		self.row(object.row);
 		self.col(object.col);
 
@@ -285,6 +466,14 @@ function WidgetModel()
 			self.sections.push(section);
 		});
 	}
+
+	this.dispose = function()
+	{
+		ko.utils.arrayForEach(self.sections(), function(section)
+		{
+			section.dispose();
+		});
+	}
 }
 
 var sectionID = 0;
@@ -292,11 +481,27 @@ function SectionModel()
 {
 	var self = this;
 
-	this.sectionID = ++sectionID;
+	this.sectionID = ko.observable(++sectionID);
 	this.title = ko.observable();
-	this.type = ko.observable();
+	this.type = ko.observable("text");
 	this.value = ko.observable("");
 	this.units = ko.observable();
+
+	this.height = ko.computed({
+		read: function()
+		{
+			var sectionType = _.findWhere(sectionTypes, {name: self.type()});
+
+			if(sectionType)
+			{
+				return sectionType.height;
+			}
+			else
+			{
+				return 1;
+			}
+		}
+	});
 
 	this._refreshVal = ko.observable(0);
 	this.refresh = ko.computed({
@@ -337,13 +542,13 @@ function SectionModel()
 
 		self._updateDummy();
 
-		var valueElement = $("#section-" + self.sectionID + "-value");
+		var valueElement = $("#section-" + self.sectionID() + "-value");
 		var value;
 
 		// If an error existed here before, destroy it
 		//valueElement.popover('destroy');
 
-		var valueFunction = window["getSection" + self.sectionID + "Value"];
+		var valueFunction = window["getSection" + self.sectionID() + "Value"];
 
 		if(_.isUndefined(valueFunction))
 		{
@@ -352,7 +557,18 @@ function SectionModel()
 
 		try
 		{
-			value = window["getSection" + self.sectionID + "Value"](deccoboardConfig.datasourceData);
+            var thisObject = {
+                element : valueElement,
+                current_value : self.currentComputedValue
+            };
+
+			value = window["getSection" + self.sectionID() + "Value"].call(thisObject, deccoboardConfig.datasourceData);
+            self.currentComputedValue = value;
+
+            if(self.type() == "text-with-sparkline" || self.type() == "sparkline")
+            {
+                updateSparkline("#section-" + self.sectionID() + "-sparkline", SPARKLINE_HISTORY_LENGTH, value);
+            }
 		}
 		catch(e)
 		{
@@ -363,11 +579,6 @@ function SectionModel()
 				trigger  : "hover",
 				container: "body"
 			});*/
-		}
-
-		if(self.type() == "text-with-sparkline" || self.type() == "sparkline")
-		{
-			updateSparkline("#section-" + self.sectionID + "-sparkline", SPARKLINE_HISTORY_LENGTH, value);
 		}
 
 		return value;
@@ -402,12 +613,31 @@ function SectionModel()
 			}
 		}
 
-		return 'function getSection' + sectionID + 'Value(data){ ' + script + ' }';
+		return 'function getSection' + self.sectionID() + 'Value(datasources){ ' + script + ' }';
 	});
 
 	this.update = function()
 	{
 		self._updateDummy.valueHasMutated();
+	}
+
+	this.dispose = function()
+	{
+		if(self._dataSubscription)
+		{
+			self._dataSubscription.dispose();
+		}
+	}
+
+	this.serialize = function()
+	{
+		return {
+			title : self.title(),
+			type : self.type(),
+			value : self.value(),
+			refresh : self.refresh(),
+			units : self.units()
+		};
 	}
 
 	this.deserialize = function(object)
@@ -427,9 +657,24 @@ function DatasourceModel()
 	this.name = ko.observable();
 	this.type = ko.observable("json");
 	this.url = ko.observable();
+	this.headers = ko.observableArray();
 	this.refresh = ko.observable(0);
+	this.chunked = ko.observable(false);
 	this.last_updated = ko.observable("never");
+	this.last_error = ko.observable();
 	this.data = ko.observable();
+
+	this.serialize = function()
+	{
+		return {
+			name : self.name(),
+			type : self.type(),
+			url : self.url(),
+			headers : self.headers(),
+			refresh : self.refresh(),
+			chunked : self.chunked()
+		};
+	}
 
 	this.deserialize = function(object)
 	{
@@ -437,6 +682,17 @@ function DatasourceModel()
 		self.type(object.type);
 		self.url(object.url);
 		self.refresh(object.refresh);
+		self.chunked(object.chunked);
+
+		_.each(object.headers, function(value, name)
+		{
+			var headerObject = {
+				name : ko.observable(name),
+				value: ko.observable(value)
+			};
+
+			self.headers.push(headerObject);
+		});
 	}
 
 	this.update = function()
@@ -444,19 +700,97 @@ function DatasourceModel()
 		switch (self.type())
 		{
 			case "json":
+			case "jsonp":
 			{
-				$.getJSON(self.url()).done(function(data)
+				// If the response is chunked, then it's probably keep-alive which means we shouldn't allow it to refresh
+				if(self.chunked())
 				{
-					deccoboardConfig.datasourceData[self.name()] = data;
-					self.data(data);
+					self.refresh(0);
+				}
 
-					var now = new Date();
-					self.last_updated(now.toLocaleTimeString());
+				$.ajax({
+					url: self.url(),
+					dataType: self.type(),
+					beforeSend: function(xhr)
+					{
+						try
+						{
+							ko.utils.arrayForEach(self.headers(), function(header)
+							{
+								var name = header.name();
+								var value = header.value();
+
+								if(!_.isUndefined(name) && !_.isUndefined(value))
+								{
+									xhr.setRequestHeader(name, value);
+								}
+							});
+						}
+						catch(e)
+						{
+							self.last_error(e);
+						}
+					},
+					success: self.processData,
+					progress: function(xhr, progressEvent)
+					{
+						if(self.chunked())
+						{
+							// xhr doesn't work, we'll have to use the target of the progress event
+							xhr = progressEvent.currentTarget;
+
+							var tokens = xhr.responseText.split("\r\n");
+
+							_.each(tokens, function(token)
+							{
+								try
+								{
+									var data = JSON.parse(token);
+									self.processData(data);
+								}
+								catch(e)
+								{
+								}
+							});
+
+							xhr.responseText = "";
+						}
+					},
+					error: function(xhr, status, error)
+					{
+						self.last_error(error);
+					}
 				});
 
 				break;
 			}
 		}
+	}
+
+	this.processData = function(data)
+	{
+		deccoboardConfig.datasourceData[self.name()] = data;
+		self.data(data);
+
+		var now = new Date();
+		self.last_updated(now.toLocaleTimeString());
+	}
+
+	this.createHeader = function()
+	{
+		var header = {
+			name: ko.observable(),
+			value: ko.observable()
+		};
+
+		self.headers.push(header);
+
+		return header;
+	}
+
+	this.deleteHeader = function(header)
+	{
+		self.headers.remove(header);
 	}
 }
 
@@ -467,9 +801,16 @@ function processUpdates()
 
 	ko.utils.arrayForEach(deccoboardConfig.datasources(), function(datasource)
 	{
+		var refreshInterval = datasource.refresh();
+
+		if(refreshInterval == 0)
+		{
+			return;
+		}
+
 		var elapsedSeconds = nowSeconds - (datasource.last_update_time || 0);
 
-		if(elapsedSeconds >= datasource.refresh())
+		if(elapsedSeconds >= refreshInterval)
 		{
 			datasource.last_update_time = nowSeconds;
 			datasource.update();
@@ -545,28 +886,27 @@ function showWidgetEditIcons(show)
 	}
 }
 
-function toggleEdit()
+function attachSubSectionEditIcons(element)
 {
-	editing = !editing;
+	$(element).hover(function()
+		{
+			showSubSectionEditIcons(this, true);
+		}, function()
+		{
+			showSubSectionEditIcons(this, false);
+		});
+}
 
-	if(!editing)
-	{
-		$("#main-header").animate({top: "-280px"}, 250);
-		$(".gridster").animate({"margin-top": "20px"}, 250);
-		$("#main-header").data().shown = false;
-
-		grid.disable();
-	}
-	else
-	{
-		$("#main-header").animate({top: "0px"}, 250);
-		$(".gridster").animate({"margin-top": "300px"}, 250);
-		$("#main-header").data().shown = true;
-
-		grid.enable();
-	}
-
-	showWidgetEditIcons(editing);
+function showSubSectionEditIcons(element, show)
+{
+    if(show)
+    {
+        $(element).find(".sub-section-tools").fadeIn(250);
+    }
+    else
+    {
+        $(element).find(".sub-section-tools").fadeOut(250);
+    }
 }
 
 $(function()
@@ -574,9 +914,13 @@ $(function()
 	// Load our configuration
 	deccoboardConfig = new DeccoboardModel();
 	deccoboardConfig.deserialize(gridConfig);
+
 	ko.applyBindings(deccoboardConfig);
 
-	$("#toggle-header").on("click", toggleEdit);
+	if(deccoboardConfig.allow_edit() && deccoboardConfig.widgets().length == 0)
+	{
+		deccoboardConfig.toggleEditing();
+	}
 
 	// Setup our update loop
 	processUpdates();
