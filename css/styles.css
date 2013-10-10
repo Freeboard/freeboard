@@ -1051,7 +1051,12 @@ table#datasources-list tbody
     width: 200px;
     height: 160px;
     display: inline-block;
-    text-align: center;
+}
+
+.gauge-widget-wrapper
+{
+	width: 100%;
+	text-align: center;
 }
 
 #admin-menu h1
@@ -2005,4 +2010,28 @@ input.table-row-value
 	max-height : 180px;
 	overflow   : scroll;
 	border-bottom : solid 1px #3d3d3d;
+}
+
+ul.value-dropdown
+{
+	height     : 60px;
+	position   : absolute;
+	padding    : 0px;
+	margin     : 0px;
+	background-color : #272727;
+	border           : 1px solid rgba(255, 153, 0, 0.8);
+	overflow: scroll;
+}
+
+ul.value-dropdown li
+{
+	padding: 5px;
+	cursor: pointer;
+}
+
+ul.value-dropdown li.selected
+{
+	background-color: rgba(255, 153, 0, 0.8);
+	color: #000;
+	text-shadow : none;
 }

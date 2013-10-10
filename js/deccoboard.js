@@ -149,6 +149,236 @@ ko.bindingHandlers.widget = {
 	}
 }
 
+ko.bindingHandlers.valueEditor = {
+	init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
+	{
+		var datasourceRegex = new RegExp(".*datasources[.]([^.]*)$");
+		var dropdown = null;
+		var selectedOptionIndex = 0;
+		var options;
+
+		$(element).bind("keyup mouseup", function(event){
+
+			// Ignore arrow keys and enter keys
+			if(dropdown && event.type == "keyup" && (event.keyCode == 38 || event.keyCode == 40 || event.keyCode == 13))
+			{
+				event.preventDefault();
+				return;
+			}
+
+			var inputString = $(element).val().substring(0, $(element).getCaretPosition());
+			var match = datasourceRegex.exec(inputString);
+
+			options = [];
+
+			if(match)
+			{
+				if(match[1] != "") // List partial datasources
+				{
+					_.each(deccoboardConfig.datasources(), function(datasource){
+
+						var name = datasource.name();
+
+						if(name != match[1] && name.indexOf(match[1]) == 0)
+						{
+							options.push(name);
+						}
+					});
+				}
+				else // List all datasources
+				{
+					_.each(deccoboardConfig.datasources(), function(datasource)
+					{
+						options.push(datasource.name());
+					});
+				}
+			}
+
+			if(options.length > 0)
+			{
+				if(!dropdown)
+				{
+					dropdown = $('<ul id="value-selector" class="value-dropdown"></ul>').insertAfter(element)
+						.width($(element).outerWidth() - 2)
+						.css("left", $(element).position().left)
+						.css("top", $(element).position().top + $(element).outerHeight() - 1);
+				}
+
+				dropdown.empty();
+
+				var selected = true;
+				selectedOptionIndex = 0;
+
+				var currentIndex = 0;
+
+				_.each(options, function(option)
+				{
+					var li = $('<li>' + option + '</li>')
+						.appendTo(dropdown)
+						.mouseenter(function(){
+							$(li).addClass("selected");
+							selectedOptionIndex = $(this).data("decco-optionIndex");
+						})
+						.mouseleave(function(){
+							$(li).removeClass("selected");
+							selectedOptionIndex = -1;
+						})
+						.mousedown(function(event){
+							$(this).trigger("decco-insertValue");
+							event.preventDefault();
+						})
+						.data("decco-optionIndex", currentIndex)
+						.data("decco-optionValue", option)
+						.bind("decco-insertValue", function(){
+							$(element).insertAtCaret(option + ".").triggerHandler("mouseup");
+						});
+
+					if(selected)
+					{
+						$(li).addClass("selected");
+						selected = false;
+					}
+
+					currentIndex++;
+				});
+			}
+			else
+			{
+				$(element).next("ul#value-selector").remove();
+				dropdown = null;
+				selectedOptionIndex = -1;
+			}
+		})
+		.focusout(function(){
+				$(element).next("ul#value-selector").remove();
+				dropdown = null;
+				selectedOptionIndex = -1;
+		})
+		.bind("keydown", function(event){
+
+			if(dropdown)
+			{
+				if(event.keyCode == 38 || event.keyCode == 40) // Handle Arrow keys
+				{
+					event.preventDefault();
+
+					var optionItems = $(dropdown).find("li");
+
+					$(dropdown).find("li.selected").removeClass("selected");
+
+					if(event.keyCode == 38) // Up Arrow
+					{
+						selectedOptionIndex--;
+					}
+					else if(event.keyCode == 40) // Down Arrow
+					{
+						selectedOptionIndex++;
+					}
+
+					if(selectedOptionIndex < 0)
+					{
+						selectedOptionIndex = optionItems.size() - 1;
+					}
+					else if(selectedOptionIndex >= optionItems.size())
+					{
+						selectedOptionIndex = 0;
+					}
+
+					$(optionItems).eq(selectedOptionIndex).addClass("selected");
+
+					return;
+				}
+				else if(event.keyCode == 13) // Handle enter key
+				{
+					event.preventDefault();
+
+					if(selectedOptionIndex != -1)
+					{
+						$(dropdown).find("li").eq(selectedOptionIndex).trigger("decco-insertValue");
+					}
+
+					return;
+				}
+			}
+		});
+	}
+}
+
+ko.bindingHandlers.gauge = {
+	init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
+	{
+		var gaugeID = "section-" + viewModel.sectionID() + "-gauge";
+		$(element).attr("id", gaugeID);
+
+		var gauge = new JustGage({
+			id             : gaugeID,
+			value          : viewModel.computedValue(),
+			min            : (_.isUndefined(viewModel.min()) ? 0 : viewModel.min()),
+			max            : (_.isUndefined(viewModel.max()) ? 100 : viewModel.max()),
+			label          : viewModel.units(),
+			showInnerShadow: false,
+			valueFontColor : "#d3d4d4"
+		});
+
+		$(element).data("gauge", gauge);
+	},
+	update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
+	{
+		viewModel._updateDummy();
+
+		var gauge = $(element).data("gauge");
+		gauge.refresh(viewModel.computedValue());
+	}
+}
+
+ko.bindingHandlers.sparkline = {
+	init  : function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
+	{
+		var id = "section-" + viewModel.sectionID() + "-sparkline";
+		$(element).attr("id", id);
+	},
+	update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
+	{
+		viewModel._updateDummy();
+
+		var values = $(element).data().values;
+
+		if(!values)
+		{
+			values = [];
+		}
+
+		if(values.length >= SPARKLINE_HISTORY_LENGTH)
+		{
+			values.shift();
+		}
+
+		var newValue = viewModel.computedValue();
+
+		if(_.isNumber(newValue))
+		{
+			values.push(newValue);
+
+			$(element).data().values = values;
+
+			$(element).sparkline(values, {
+				type              : "line",
+				height            : "100%",
+				width             : "100%",
+				fillColor         : false,
+				lineColor         : "#FF9900",
+				lineWidth         : 2,
+				spotRadius        : 3,
+				spotColor         : false,
+				minSpotColor      : "#78AB49",
+				maxSpotColor      : "#78AB49",
+				highlightSpotColor: "#9D3926",
+				highlightLineColor: "#9D3926"
+			});
+		}
+	}
+}
+
 ko.bindingHandlers.section = {
 	update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 	{
@@ -215,6 +445,11 @@ var sectionTypes = [
 		name       : "sparkline",
 		description: "Sparkline",
 		height     : 2
+	},
+	{
+		name       : "gauge",
+		description: "Gauge",
+		height     : 3
 	},
 	{
 		name       : "text-with-sparkline",
@@ -486,6 +721,8 @@ function SectionModel()
 	this.type = ko.observable("text");
 	this.value = ko.observable("");
 	this.units = ko.observable();
+	this.min = ko.observable();
+	this.max = ko.observable();
 
 	this.height = ko.computed({
 		read: function()
@@ -564,15 +801,11 @@ function SectionModel()
 
 			value = window["getSection" + self.sectionID() + "Value"].call(thisObject, deccoboardConfig.datasourceData);
             self.currentComputedValue = value;
-
-            if(self.type() == "text-with-sparkline" || self.type() == "sparkline")
-            {
-                updateSparkline("#section-" + self.sectionID() + "-sparkline", SPARKLINE_HISTORY_LENGTH, value);
-            }
 		}
 		catch(e)
 		{
 			value = "Error";
+			console.log(e.toString());
 			/*valueElement.popover({
 				title    : "Error",
 				content  : e.toString(),
@@ -636,7 +869,9 @@ function SectionModel()
 			type : self.type(),
 			value : self.value(),
 			refresh : self.refresh(),
-			units : self.units()
+			units : self.units(),
+			min : self.min(),
+			max : self.max()
 		};
 	}
 
@@ -647,6 +882,8 @@ function SectionModel()
 		self.value(object.value);
 		self.refresh(object.refresh);
 		self.units(object.units);
+		self.max(object.max);
+		self.min(object.min);
 	}
 }
 
@@ -834,40 +1071,6 @@ function processUpdates()
 				}
 			}
 		});
-	});
-}
-
-function updateSparkline(id, maxValues, newValue)
-{
-	var values = $(id).data().values;
-
-	if(!values)
-	{
-		values = [];
-	}
-
-	if(values.length >= maxValues)
-	{
-		values.shift();
-	}
-
-	values.push(newValue);
-
-	$(id).data().values = values;
-
-	$(id).sparkline(values, {
-		type              : "line",
-		height            : "100%",
-		width             : "100%",
-		fillColor         : false,
-		lineColor         : "#FF9900",
-		lineWidth         : 2,
-		spotRadius        : 3,
-		spotColor         : false,
-		minSpotColor      : "#78AB49",
-		maxSpotColor      : "#78AB49",
-		highlightSpotColor: "#9D3926",
-		highlightLineColor: "#9D3926"
 	});
 }
 

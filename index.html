@@ -15,11 +15,13 @@
         head.js("js/knockout.js",
                 "js/knockout.switchcase.js",
                 "js/jquery.js",
+                "js/jquery-ui.js",
                 "js/underscore.js",
                 "js/jquery.gridster.js",
                 "js/jquery.sparkline.min.js",
+                "js/jquery.caret.js",
                 "js/raphael.2.1.0.min.js",
-                "js/justgage.1.0.1.min.js",
+                "js/justgage.1.0.1.js",
                 "js/deccoboard.js",
                 "config.js",
                 function (){
@@ -88,13 +90,16 @@
                 <span data-bind="text: units"></span>
                 <!-- /ko -->
                 <!-- ko case: "sparkline" -->
-                <div class="sparkline" data-bind="attr:{id:'section-' + sectionID() + '-sparkline'}"></div>
+                <div class="sparkline" data-bind="sparkline: true"></div>
+                <!-- /ko -->
+                <!-- ko case: "gauge" -->
+                <div class="gauge-widget-wrapper"><div class="gauge-widget" data-bind="gauge: true"></div></div>
                 <!-- /ko -->
                 <!-- ko case: $default -->
                 <span class="medium-text" data-bind="html:computedValue, attr:{id:'section-' + sectionID() + '-value'}"></span>
                 <span data-bind="text: units"></span>
                 <!-- ko if: type() == "text-with-sparkline" -->
-                <span class="sparkline-inline" data-bind="attr:{id:'section-' + sectionID() + '-sparkline'}"></span>
+                <span class="sparkline-inline" data-bind="sparkline: true"></span>
                 <!-- /ko -->
                 <!-- /ko -->
                 <!-- /ko -->
@@ -210,7 +215,15 @@
             </tr>
             <tr>
                 <td class="form-table-label"><label class="control-label" for="sectionValue">Value</label></td>
-                <td class="form-table-value"><input type="text" id="sectionValue" data-bind="value: value"></td>
+                <td class="form-table-value"><input type="text" id="sectionValue" data-bind="valueEditor: true, value: value"></td>
+            </tr>
+            <tr>
+                <td class="form-table-label"><label class="control-label" for="sectionMin">Minimum</label></td>
+                <td class="form-table-value"><input type="text" id="sectionMin" data-bind="value: min"></td>
+            </tr>
+            <tr>
+                <td class="form-table-label"><label class="control-label" for="sectionMax">Maximum</label></td>
+                <td class="form-table-value"><input type="text" id="sectionMax" data-bind="value: max"></td>
             </tr>
             <tr>
                 <td class="form-table-label"><label class="control-label" for="sectionUnits">Units</label></td>
