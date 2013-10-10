@@ -2,13 +2,13 @@ var gridConfig = {
 	"allow_edit"  : true,
 	"datasources": [
         {
-            name   : "Weather1",
+            name   : "Alpha",
             type   : "jsonp",
             url    : "http://api.openweathermap.org/data/2.5/weather?q=London,uk",
             refresh: 5
         },
         {
-	        name   : "Weather2",
+	        name   : "Bravo",
 	        type   : "jsonp",
 	        url    : "http://api.openweathermap.org/data/2.5/weather?q=London,uk",
 	        refresh: 5

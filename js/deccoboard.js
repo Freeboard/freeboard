@@ -152,10 +152,10 @@ ko.bindingHandlers.widget = {
 ko.bindingHandlers.valueEditor = {
 	init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 	{
-		var datasourceRegex = new RegExp(".*datasources[.]([^.]*)$");
+		var datasourceRegex = new RegExp(".*datasources[.]([^.]*)([.][^\\s]*)?$");
 		var dropdown = null;
 		var selectedOptionIndex = 0;
-		var options;
+
 
 		$(element).bind("keyup mouseup", function(event){
 
@@ -169,28 +169,111 @@ ko.bindingHandlers.valueEditor = {
 			var inputString = $(element).val().substring(0, $(element).getCaretPosition());
 			var match = datasourceRegex.exec(inputString);
 
-			options = [];
+			var options = [];
+			var replacementString = undefined;
 
 			if(match)
 			{
-				if(match[1] != "") // List partial datasources
+				if(match[1] == "") // List all datasources
 				{
+					_.each(deccoboardConfig.datasources(), function(datasource)
+					{
+						options.push({value:datasource.name(), follow_char: "."});
+					});
+				}
+				else if(match[1] != "" && _.isUndefined(match[2])) // List partial datasources
+				{
+					replacementString = match[1];
+
 					_.each(deccoboardConfig.datasources(), function(datasource){
 
 						var name = datasource.name();
 
 						if(name != match[1] && name.indexOf(match[1]) == 0)
 						{
-							options.push(name);
+							options.push({value: name, follow_char: "."});
 						}
 					});
 				}
-				else // List all datasources
+				else
 				{
-					_.each(deccoboardConfig.datasources(), function(datasource)
-					{
-						options.push(datasource.name());
+					var datasource = _.find(deccoboardConfig.datasources(), function(datasource){
+						return (datasource.name() === match[1]);
 					});
+
+					if(!_.isUndefined(datasource))
+					{
+						var dataPath = "";
+
+						if(!_.isUndefined(match[2]))
+						{
+							dataPath = match[2];
+						}
+
+						var dataPathItems = dataPath.split(".");
+						dataPath = "data";
+
+						for(var index = 1; index < dataPathItems.length - 1; index++)
+						{
+							if(dataPathItems[index] != "")
+							{
+								dataPath = dataPath + "." + dataPathItems[index];
+							}
+						}
+
+						var lastPathObject = _.last(dataPathItems);
+
+						// If the last character is a [, then ignore it
+						if(lastPathObject.charAt(lastPathObject.length - 1) == "[")
+						{
+							lastPathObject = lastPathObject.replace(/\[+$/, "");
+							dataPath = dataPath + "." + lastPathObject;
+						}
+
+						var dataValue = datasource.getDataRepresentation(dataPath);
+
+						if(_.isArray(dataValue))
+						{
+							for(var index = 0; index < dataValue.length; index++)
+							{
+								var followChar = "]";
+
+								if(_.isObject(dataValue[index]))
+								{
+									followChar = followChar + ".";
+								}
+								else if(_.isArray(dataValue[index]))
+								{
+									followChar = followChar + "[";
+								}
+
+								options.push({value: index, follow_char: followChar});
+							}
+						}
+						else if(_.isObject(dataValue))
+						{
+							replacementString = lastPathObject;
+
+							_.each(dataValue, function(value, name){
+
+								if(name != lastPathObject && name.indexOf(lastPathObject) == 0)
+								{
+									var followChar = undefined;
+
+									if(_.isArray(value))
+									{
+										followChar = "[";
+									}
+									else if(_.isObject(value))
+									{
+										followChar = ".";
+									}
+
+									options.push({value: name, follow_char: followChar});
+								}
+							});
+						}
+					}
 				}
 			}
 
@@ -213,24 +296,46 @@ ko.bindingHandlers.valueEditor = {
 
 				_.each(options, function(option)
 				{
-					var li = $('<li>' + option + '</li>')
+					var li = $('<li>' + option.value + '</li>')
 						.appendTo(dropdown)
 						.mouseenter(function(){
-							$(li).addClass("selected");
-							selectedOptionIndex = $(this).data("decco-optionIndex");
-						})
-						.mouseleave(function(){
-							$(li).removeClass("selected");
-							selectedOptionIndex = -1;
+							$(this).trigger("decco-select");
 						})
 						.mousedown(function(event){
 							$(this).trigger("decco-insertValue");
 							event.preventDefault();
 						})
 						.data("decco-optionIndex", currentIndex)
-						.data("decco-optionValue", option)
+						.data("decco-optionValue", option.value)
 						.bind("decco-insertValue", function(){
-							$(element).insertAtCaret(option + ".").triggerHandler("mouseup");
+
+							var optionValue = option.value;
+
+							if(!_.isUndefined(option.follow_char))
+							{
+								optionValue = optionValue + option.follow_char;
+							}
+
+							if(!_.isUndefined(replacementString))
+							{
+								var replacementIndex = inputString.lastIndexOf(replacementString);
+
+								if(replacementIndex != -1)
+								{
+									$(element).replaceTextAt(replacementIndex, replacementIndex + replacementString.length, optionValue);
+								}
+							}
+							else
+							{
+								$(element).insertAtCaret(optionValue);
+							}
+
+							$(element).triggerHandler("mouseup");
+						})
+						.bind("decco-select", function(){
+							$(this).parent().find("li.selected").removeClass("selected");
+							$(this).addClass("selected");
+							selectedOptionIndex = $(this).data("decco-optionIndex");
 						});
 
 					if(selected)
@@ -264,8 +369,6 @@ ko.bindingHandlers.valueEditor = {
 
 					var optionItems = $(dropdown).find("li");
 
-					$(dropdown).find("li.selected").removeClass("selected");
-
 					if(event.keyCode == 38) // Up Arrow
 					{
 						selectedOptionIndex--;
@@ -284,9 +387,10 @@ ko.bindingHandlers.valueEditor = {
 						selectedOptionIndex = 0;
 					}
 
-					$(optionItems).eq(selectedOptionIndex).addClass("selected");
+					var optionElement = $(optionItems).eq(selectedOptionIndex);
 
-					return;
+					optionElement.trigger("decco-select");
+					$(dropdown).scrollTop($(optionElement).position().top);
 				}
 				else if(event.keyCode == 13) // Handle enter key
 				{
@@ -296,8 +400,6 @@ ko.bindingHandlers.valueEditor = {
 					{
 						$(dropdown).find("li").eq(selectedOptionIndex).trigger("decco-insertValue");
 					}
-
-					return;
 				}
 			}
 		});
@@ -930,6 +1032,12 @@ function DatasourceModel()
 
 			self.headers.push(headerObject);
 		});
+	}
+
+	this.getDataRepresentation = function(dataPath)
+	{
+		var valueFunction = new Function("data", "return " + dataPath + ";");
+		return valueFunction.call(undefined, self.data());
 	}
 
 	this.update = function()

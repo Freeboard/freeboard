@@ -49,6 +49,21 @@
 		return this;
 	}
 
+	$.fn.replaceTextAt = function(start, end, replacementText)
+	{
+		var element = $(this).get(0);
+
+		var wholeString = $(this).val();
+		var prefix = wholeString.substr(0, start);
+		var suffix = wholeString.substr(end);
+
+		$(this).val(prefix + replacementText + suffix);
+
+		var newCursorPosition = prefix.length + replacementText.length;
+
+		setCaretTo(element, newCursorPosition);
+	}
+
 	$.fn.setCaretPosition = function(start, end)
 	{
 		var element = $(this).get(0);
