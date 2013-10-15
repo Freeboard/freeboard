@@ -156,7 +156,6 @@ ko.bindingHandlers.valueEditor = {
 		var dropdown = null;
 		var selectedOptionIndex = 0;
 
-
 		$(element).bind("keyup mouseup", function(event){
 
 			// Ignore arrow keys and enter keys
@@ -323,11 +322,13 @@ ko.bindingHandlers.valueEditor = {
 								if(replacementIndex != -1)
 								{
 									$(element).replaceTextAt(replacementIndex, replacementIndex + replacementString.length, optionValue);
+									viewModel.value($(element).val());
 								}
 							}
 							else
 							{
 								$(element).insertAtCaret(optionValue);
+								viewModel.value($(element).val());
 							}
 
 							$(element).triggerHandler("mouseup");
