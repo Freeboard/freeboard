@@ -1,17 +1,20 @@
-var gridConfig = {
+deccoboard.loadConfiguration({
 	"allow_edit"  : true,
 	"datasources": [
         {
             name   : "Weather",
-            type   : "jsonp",
-            url    : "http://api.openweathermap.org/data/2.5/weather?q=London,uk",
-            refresh: 5
-        },
-        {
-	        name   : "Bravo",
-	        type   : "jsonp",
-	        url    : "http://api.openweathermap.org/data/2.5/weather?q=London,uk",
-	        refresh: 5
+            type   : "JSON",
+	        settings : {
+	            url    : "http://api.openweathermap.org/data/2.5/weather?q=London,uk",
+	            refresh: 5,
+		        is_jsonp : true,
+		        headers : [
+			        {
+				        name : "blah 1",
+				        value : "value"
+			        }
+		        ]
+	        }
         }
 	],
 	"widgets"    : [
@@ -45,4 +48,4 @@ var gridConfig = {
             ]
         }
 	]
-}
+});

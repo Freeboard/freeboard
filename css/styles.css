@@ -2035,3 +2035,8 @@ ul.value-dropdown li.selected
 	color: #000;
 	text-shadow : none;
 }
+
+td.form-table-value > input[type="checkbox"]
+{
+	height: 28px;
+}

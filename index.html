@@ -22,7 +22,9 @@
                 "js/jquery.caret.js",
                 "js/raphael.2.1.0.min.js",
                 "js/justgage.1.0.1.js",
-                "js/deccoboard.js",
+                "js/deccoboard/deccoboard.js",
+                "js/deccoboard/plugins/deccoboard.json.js",
+                "js/deccoboard/plugins/deccoboard.bugswarm.js",
                 "config.js",
                 function (){
 
@@ -58,7 +60,7 @@
                                 <td><a href="javascript:void(0)" data-bind="text: name, crud: {template: 'datasource-edit-template', operation: 'edit', model: 'DatasourceModel'}"></a></td>
                                 <td data-bind="text: last_updated"></td>
                                 <td>
-                                    <a href="javascript:void(0)" class="datasource-refresh-btn" data-bind="click: update"><i class="icon-refresh icon-white"></i></a> <a href="javascript:void(0)" class="datasource-delete-btn" data-bind="crud: {template: 'datasource-delete-template', operation: 'delete', model: 'DatasourceModel'}"><i class="icon-trash icon-white"></i></a></td>
+                                    <a href="javascript:void(0)" class="datasource-refresh-btn" data-bind="click: updateNow"><i class="icon-refresh icon-white"></i></a> <a href="javascript:void(0)" class="datasource-delete-btn" data-bind="crud: {template: 'datasource-delete-template', operation: 'delete', model: 'DatasourceModel'}"><i class="icon-trash icon-white"></i></a></td>
                             </tr>
                         </tbody>
                     </table>
@@ -134,10 +136,13 @@
             <tr>
                 <td class="form-table-label"><label class="control-label" for="datasourceType">Type</label></td>
                 <td class="form-table-value">
-                    <select id="datasourceType" data-bind="options: $root.datasourceTypes, value: type">
-                    </select></td>
+                    <select id="datasourceType" data-bind="options: $root.datasourceTypes, optionsText: 'display_name', optionsValue: 'name', value: type">
+                    </select>
+                </td>
             </tr>
-            <tr>
+            <!-- ko datasourceTypeSettings : true -->
+            <!-- /ko -->
+            <!--<tr>
                 <td class="form-table-label"><label class="control-label" for="datasourceRefresh">Refresh Every</label></td>
                 <td class="form-table-value">
                         <input type="text" class="small align-right" id="datasourceRefresh" data-bind="value: refresh"><div class="input-suffix">seconds</div>
@@ -176,7 +181,7 @@
                     </div>
                     <a href="javascript:void(0)" class="table-operation" data-bind="click: createHeader">Add</a>
                 </td>
-            </tr>
+            </tr>-->
         </table>
     </section>
     <footer>
