@@ -492,7 +492,7 @@ ko.bindingHandlers.section = {
 	}
 }
 
-ko.bindingHandlers.valueScript = {
+/*ko.bindingHandlers.valueScript = {
 	update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 	{
 		$(element).empty();
@@ -500,7 +500,7 @@ ko.bindingHandlers.valueScript = {
 
 		viewModel.update();
 	}
-}
+}*/
 
 ko.bindingHandlers.crud = {
 	init  : function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
@@ -610,6 +610,9 @@ function DeccoboardModel()
 
 	this.deserialize = function(object)
 	{
+		this.datasources.removeAll();
+		this.widgets.removeAll();
+
 		if(!_.isUndefined(object.allow_edit))
 		{
 			self.allow_edit(object.allow_edit);
@@ -628,6 +631,52 @@ function DeccoboardModel()
 			widget.deserialize(widgetConfig);
 			self.widgets.push(widget);
 		});
+	}
+
+	this.loadDashboard = function()
+	{
+		// Check for the various File API support.
+		if(window.File && window.FileReader && window.FileList && window.Blob)
+		{
+			var input = document.createElement('input');
+			input.type = "file";
+			$(input).on("change", function(event){
+				var files = event.target.files;
+
+				if(files && files.length > 0)
+				{
+					var file = files[0];
+					var reader = new FileReader();
+
+					reader.addEventListener("load", function(fileReaderEvent)
+					{
+
+						var textFile = fileReaderEvent.target;
+						var jsonObject = JSON.parse(textFile.result);
+
+						self.deserialize(jsonObject);
+					});
+
+					reader.readAsText(file);
+				}
+
+			});
+			$(input).trigger("click");
+		}
+		else
+		{
+			alert('Unable to load a file in this browser.');
+		}
+	}
+
+	this.saveDashboard = function()
+	{
+		var contentType = 'application/octet-stream';
+		var a = document.createElement('a');
+		var blob = new Blob([JSON.stringify(self.serialize())], {'type': contentType});
+		a.href = window.URL.createObjectURL(blob);
+		a.download = "dashboard.json";
+		a.click();
 	}
 
 	this.addDatasource = function(datasource)
@@ -822,7 +871,40 @@ function SectionModel()
 	this.sectionID = ko.observable(++sectionID);
 	this.title = ko.observable();
 	this.type = ko.observable("text");
+
 	this.value = ko.observable("");
+	this.value.subscribe(function(newValue)
+	{
+		var script;
+		var typeSpecIndex = newValue.indexOf("javascript:");
+
+		if(typeSpecIndex == 0)
+		{
+			script = newValue.substring(11);
+
+			// If there is no return, add one
+			if((script.match(/;/g) || []).length <= 1 && script.indexOf("return") == -1)
+			{
+				script = "return " + script;
+			}
+		}
+		else
+		{
+			typeSpecIndex = newValue.indexOf("datasource:");
+
+			if(typeSpecIndex == 0)
+			{
+				script = 'return data.' + newValue.substring(11).trim() + ";";
+			}
+			else
+			{
+				script = 'return "' + newValue + '";';
+			}
+		}
+
+		self.valueFunction = new Function("datasources", script);
+	});
+
 	this.units = ko.observable();
 	this.min = ko.observable();
 	this.max = ko.observable();
@@ -885,16 +967,6 @@ function SectionModel()
 		var valueElement = $("#section-" + self.sectionID() + "-value");
 		var value;
 
-		// If an error existed here before, destroy it
-		//valueElement.popover('destroy');
-
-		var valueFunction = window["getSection" + self.sectionID() + "Value"];
-
-		if(_.isUndefined(valueFunction))
-		{
-			return "";
-		}
-
 		try
 		{
             var thisObject = {
@@ -902,8 +974,7 @@ function SectionModel()
                 current_value : self.currentComputedValue
             };
 
-			value = window["getSection" + self.sectionID() + "Value"].call(thisObject, deccoboardConfig.datasourceData);
-            self.currentComputedValue = value;
+			value = self.currentComputedValue = self.valueFunction.call(thisObject, deccoboardConfig.datasourceData);
 		}
 		catch(e)
 		{
@@ -918,38 +989,6 @@ function SectionModel()
 		}
 
 		return value;
-	});
-
-	this.valueScript = ko.computed(function()
-	{
-		var script;
-		var typeSpecIndex = self.value().indexOf("javascript:");
-
-		if(typeSpecIndex == 0)
-		{
-			script = self.value().substring(11);
-
-			// If there is no return, add one
-			if((script.match(/;/g) || []).length <= 1 && script.indexOf("return") == -1)
-			{
-				script = "return " + script;
-			}
-		}
-		else
-		{
-			typeSpecIndex = self.value().indexOf("datasource:");
-
-			if(typeSpecIndex == 0)
-			{
-				script = 'return data.' + self.value().substring(11).trim() + ";";
-			}
-			else
-			{
-				script = 'return "' + self.value() + '";';
-			}
-		}
-
-		return 'function getSection' + self.sectionID() + 'Value(datasources){ ' + script + ' }';
 	});
 
 	this.update = function()

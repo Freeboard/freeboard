@@ -2,7 +2,7 @@ var gridConfig = {
 	"allow_edit"  : true,
 	"datasources": [
         {
-            name   : "Alpha",
+            name   : "Weather",
             type   : "jsonp",
             url    : "http://api.openweathermap.org/data/2.5/weather?q=London,uk",
             refresh: 5

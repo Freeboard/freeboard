@@ -35,6 +35,11 @@
         <div id="admin-menu">
             <div id="board-tools">
                 <h1>DECCOBOARD</h1>
+                <a href="javascript:void(0)" data-bind="click: loadDashboard"><i class="icon-upload icon-white"></i> Load Dashboard</a>
+                <br>
+                <a href="javascript:void(0)" data-bind="click: saveDashboard"><i class="icon-download icon-white"></i> Save Dashboard</a>
+                <br>
+                <br>
                 <a href="javascript:void(0)" data-bind="click: createWidget"><i class="icon-plus icon-white"></i> Add Widget</a>
             </div>
             <div id="datasources">
@@ -103,7 +108,6 @@
                 <!-- /ko -->
                 <!-- /ko -->
                 <!-- /ko -->
-                <div data-bind="valueScript: true"></div>
                 <div class="sub-section-tools">
                     <a href="javascript:void(0);" data-bind="crud: {template: 'subsection-edit-template', operation: 'edit', model: 'SectionModel'}"><i class="icon-wrench icon-white edit-widget"></i></a><a href="javascript:void(0);" data-bind="crud: {template: 'subsection-delete-template', operation: 'delete', model: 'SectionModel'}"><i class="icon-trash icon-white delete-widget"></i></a>
                 </div>
