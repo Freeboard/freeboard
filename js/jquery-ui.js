@@ -331,7 +331,7 @@ $.cleanData = function( elems ) {
 $.widget = function( name, base, prototype ) {
 	var fullName, existingConstructor, constructor, basePrototype,
 		// proxiedPrototype allows the provided prototype to remain unmodified
-		// so that it can be used as a mixin for multiple widgets (#8876)
+		// so that it can be used as a mixin for multiple panes (#8876)
 		proxiedPrototype = {},
 		namespace = name.split( "." )[ 0 ];
 
@@ -368,7 +368,7 @@ $.widget = function( name, base, prototype ) {
 		// copy the object used to create the prototype in case we need to
 		// redefine the widget later
 		_proto: $.extend( {}, prototype ),
-		// track widgets that inherit from this widget in case this widget is
+		// track panes that inherit from this widget in case this widget is
 		// redefined after a widget inherits from it
 		_childConstructors: []
 	});
@@ -410,7 +410,7 @@ $.widget = function( name, base, prototype ) {
 	constructor.prototype = $.widget.extend( basePrototype, {
 		// TODO: remove support for widgetEventPrefix
 		// always use the name + a colon as the prefix, e.g., draggable:start
-		// don't prefix for widgets that aren't DOM-based
+		// don't prefix for panes that aren't DOM-based
 		widgetEventPrefix: existingConstructor ? basePrototype.widgetEventPrefix : name
 	}, proxiedPrototype, {
 		constructor: constructor,
@@ -419,7 +419,7 @@ $.widget = function( name, base, prototype ) {
 		widgetFullName: fullName
 	});
 
-	// If this widget is being redefined then we need to find all widgets that
+	// If this widget is being redefined then we need to find all panes that
 	// are inheriting from it and redefine all of them so that they inherit from
 	// the new version of this widget. We're essentially trying to replace one
 	// level in the prototype chain.
@@ -690,7 +690,7 @@ $.Widget.prototype = {
 
 		$.each( handlers, function( event, handler ) {
 			function handlerProxy() {
-				// allow widgets to customize the disabled handling
+				// allow panes to customize the disabled handling
 				// - disabled as an array instead of boolean
 				// - disabled class as method for disabling individual parts
 				if ( !suppressDisabledCheck &&

@@ -1,90 +1,9 @@
 var deccoboard = (function()
 {
-	var SPARKLINE_HISTORY_LENGTH = 100;
-
 	var datasourcePlugins = {};
+	var widgetPlugins = {};
 	var grid;
-	var updateTimer;
 	var deccoboardModel = new DeccoboardModel();
-
-	function closeCRUDModal()
-	{
-		var modal_id = "#crud-dialog";
-		$("#lean_overlay").fadeOut(200);
-		$(modal_id).css({ 'display': 'none' });
-	}
-
-	function openCRUDModal()
-	{
-		var modal_id = "#crud-dialog";
-		var modal_width = $(modal_id).outerWidth();
-
-		$(modal_id).find(".modal_close").click(function()
-		{
-			closeCRUDModal();
-		});
-
-		/*$("#lean_overlay").click(function()
-		{
-			closeCRUDModal();
-		});*/
-
-		//$('#lean_overlay').css({ 'display': 'block', opacity: 0 });
-		//$('#lean_overlay').fadeTo(200, 0.8);
-
-		$(modal_id).css({
-
-			'display'    : 'block',
-			'position'   : 'fixed',
-			'opacity'    : 0,
-			'z-index'    : 11000,
-			'left'       : 50 + '%',
-			'margin-left': -(modal_width / 2) + "px",
-			'top'        : 120 + "px"
-
-		});
-
-		$(modal_id).fadeTo(200, 1);
-	}
-
-	function createCRUDObject(viewModel)
-	{
-		var copy = new viewModel.constructor;
-		copy.original = viewModel;
-
-		_.each(_.pairs(viewModel), function(property)
-		{
-
-			var propertyName = property[0];
-			var propertyValue = property[1];
-
-			if(ko.isObservable(propertyValue) && !ko.isComputed(propertyValue))
-			{
-				copy[propertyName](propertyValue());
-			}
-		});
-
-		return copy;
-	}
-
-	function commitCRUDObject(crudObject)
-	{
-		if(_.isUndefined(crudObject.original))
-		{
-			return;
-		}
-
-		_.each(_.pairs(crudObject), function(property)
-		{
-			var propertyName = property[0];
-			var propertyValue = property[1];
-
-			if(ko.isObservable(propertyValue) && !ko.isComputed(propertyValue))
-			{
-				crudObject.original[propertyName](propertyValue());
-			}
-		});
-	}
 
 	function createPluginEditor(title, pluginTypes, currentInstanceName, currentTypeName, currentSettingsValues, settingsSavedCallback)
 	{
@@ -327,7 +246,12 @@ var deccoboard = (function()
 			if(options.type == 'datasource')
 			{
 				types = datasourcePlugins;
-				title = "Datasources";
+				title = "Datasource";
+			}
+			else if(options.type == 'widget')
+			{
+				types = widgetPlugins;
+				title = "Widget";
 			}
 
 			$(element).click(function(event){
@@ -357,6 +281,11 @@ var deccoboard = (function()
 						{
 							viewModel = new DatasourceModel();
 							deccoboardModel.addDatasource(viewModel);
+						}
+						else if(options.type == 'widget')
+						{
+							viewModel = new WidgetModel();
+							//deccoboardModel.addDatasource(viewModel);
 						}
 					}
 
@@ -390,7 +319,7 @@ var deccoboard = (function()
 		}
 	}
 
-	ko.bindingHandlers.widget = {
+	ko.bindingHandlers.pane = {
 		init  : function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
 			if(deccoboardModel.isEditing())
@@ -402,20 +331,20 @@ var deccoboard = (function()
 
 			if(bindingContext.$root.isEditing())
 			{
-				showWidgetEditIcons(true);
+				showPaneEditIcons(true);
 			}
 		},
 		update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
-			// If widget has been removed
-			if(deccoboardModel.widgets.indexOf(viewModel) == -1)
+			// If pane has been removed
+			if(deccoboardModel.panes.indexOf(viewModel) == -1)
 			{
 				grid.remove_widget(element);
 			}
-			// If section has been added or removed
-			else if($(element).attr("data-sizey") != viewModel.sections().length)
+			// If widget has been added or removed
+			else if($(element).attr("data-sizey") != viewModel.widgets().length)
 			{
-				//var sizeY = Math.max(viewModel.sections().length, 1);
+				//var sizeY = Math.max(viewModel.widgets().length, 1);
 				grid.resize_widget($(element), undefined, viewModel.height());
 			}
 
@@ -682,7 +611,7 @@ var deccoboard = (function()
 	{
 		$(element).empty();
 
-		var gaugeID = "section-" + viewModel.sectionID() + "-gauge";
+		var gaugeID = "widget-" + viewModel.widgetID() + "-gauge";
 
 		$(element).attr("id", gaugeID);
 
@@ -724,7 +653,7 @@ var deccoboard = (function()
 	ko.bindingHandlers.sparkline = {
 		init  : function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
-			var id = "section-" + viewModel.sectionID() + "-sparkline";
+			var id = "widget-" + viewModel.widgetID() + "-sparkline";
 			$(element).attr("id", id);
 		},
 		update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
@@ -769,53 +698,29 @@ var deccoboard = (function()
 		}
 	}
 
-	ko.bindingHandlers.section = {
+	ko.bindingHandlers.widget = {
+		/*init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
+		{
+			if(!_.isUndefined(viewModel.widgetInstance))
+			{
+
+			}
+		},*/
 		update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
-			if(bindingContext.$root.isEditing())
+			$(element).empty();
+
+			if(!_.isUndefined(viewModel.widgetInstance) && _.isFunction(viewModel.widgetInstance.render))
 			{
-				attachSubSectionEditIcons(element);
+				viewModel.widgetInstance.render(element);
 			}
+			//$(element).empty();
+			/*if(bindingContext.$root.isEditing())
+			{
+				attachWidgetEditIcons(element);
+			}*/
 		}
 	}
-
-	ko.bindingHandlers.crud = {
-		init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
-		{
-			$(element).click(function(e)
-			{
-				var options = ko.unwrap(valueAccessor());
-
-				if(options.operation == 'add')
-				{
-					var newModel;
-
-					if(options.model == "SectionModel")
-					{
-						newModel = new SectionModel();
-					}
-
-					deccoboardModel.currentCRUDObject(newModel);
-				}
-				else if(options.operation == 'delete')
-				{
-					deccoboardModel.currentCRUDObject(viewModel);
-				}
-				else
-				{
-					deccoboardModel.currentCRUDObject(createCRUDObject(viewModel));
-				}
-
-				deccoboardModel.currentCRUDObjectParent = viewModel;
-				deccoboardModel.currentCRUDOperation(options.operation);
-				deccoboardModel.currentCRUDTemplate(options.template);
-
-				openCRUDModal();
-
-				e.preventDefault();
-			});
-		}
-	};
 
 	function DeccoboardModel()
 	{
@@ -823,13 +728,9 @@ var deccoboard = (function()
 
 		this.isEditing = ko.observable(false);
 		this.allow_edit = ko.observable(true);
-		this.currentCRUDTemplate = ko.observable("empty-crud-template");
-		this.currentCRUDObjectParent = undefined;
-		this.currentCRUDObject = ko.observable();
-		this.currentCRUDOperation = ko.observable();
 
 		this.datasources = ko.observableArray();
-		this.widgets = ko.observableArray();
+		this.panes = ko.observableArray();
 		this.datasourceData = {};
 		this.processDatasourceUpdate = function(datasourceModel, newData)
 		{
@@ -837,13 +738,13 @@ var deccoboard = (function()
 
 			self.datasourceData[datasourceName] = newData;
 
-			_.each(deccoboardModel.widgets(), function(widget)
+			_.each(deccoboardModel.panes(), function(pane)
 			{
-				_.each(widget.sections(), function(section)
+				_.each(pane.widgets(), function(widget)
 				{
-					if(section.refresh().indexOf(datasourceName) != -1)
+					if(widget.refresh().indexOf(datasourceName) != -1)
 					{
-						section.update();
+						widget.update();
 					}
 				});
 			});
@@ -878,41 +779,41 @@ var deccoboard = (function()
 			}
 		});
 
-		this.sectionTypes = [
+		this._widgetTypes = ko.observable();
+		this.widgetTypes = ko.computed({
+			read: function()
 			{
-				name       : "text",
-				description: "Regular text",
-				height     : 1
-			},
-			{
-				name       : "big-text",
-				description: "Big text",
-				height     : 2
-			},
-			{
-				name       : "sparkline",
-				description: "Sparkline",
-				height     : 2
-			},
-			{
-				name       : "gauge",
-				description: "Gauge",
-				height     : 3
-			},
-			{
-				name       : "text-with-sparkline",
-				description: "Regular text with sparkline",
-				height     : 1
+				self._widgetTypes();
+
+				var returnTypes = [];
+
+				_.each(widgetPlugins, function(widgetPluginType)
+				{
+					var typeName = widgetPluginType.type_name;
+					var displayName = typeName;
+
+					if(!_.isUndefined(widgetPluginType.display_name))
+					{
+						displayName = widgetPluginType.display_name;
+					}
+
+					returnTypes.push({
+							name        : typeName,
+							display_name: displayName
+						});
+				});
+
+				return returnTypes;
 			}
-		];
+		});
 
 		this.serialize = function()
 		{
-			var widgets = [];
+			var panes = [];
 
-			_.each(self.widgets(), function(widget)
+			_.each(self.panes(), function(pane)
 			{
-				widgets.push(widget.serialize());
+				panes.push(pane.serialize());
 			});
 
 			var datasources = [];
@@ -924,7 +825,7 @@ var deccoboard = (function()
 
 			return {
 				allow_edit : self.allow_edit(),
-				widgets    : widgets,
+				panes    : panes,
 				datasources: datasources
 			};
 		}
@@ -932,7 +833,7 @@ var deccoboard = (function()
 		this.deserialize = function(object)
 		{
 			this.datasources.removeAll();
-			this.widgets.removeAll();
+			this.panes.removeAll();
 
 			if(!_.isUndefined(object.allow_edit))
 			{
@@ -946,11 +847,11 @@ var deccoboard = (function()
 				self.addDatasource(datasource);
 			});
 
-			_.each(object.widgets, function(widgetConfig)
+			_.each(object.panes, function(paneConfig)
 			{
-				var widget = new WidgetModel();
-				widget.deserialize(widgetConfig);
-				self.widgets.push(widget);
+				var pane = new PaneModel();
+				pane.deserialize(paneConfig);
+				self.panes.push(pane);
 			});
 		}
 
@@ -1013,74 +914,31 @@ var deccoboard = (function()
 			self.datasources.remove(datasource);
 		}
 
-		this.createWidget = function()
+		this.createPane = function()
 		{
-			var newWidget = new WidgetModel();
-			self.addWidget(newWidget);
+			var newPane = new PaneModel();
+			self.addPane(newPane);
 		}
 
-		this.addWidget = function(widget)
+		this.addPane = function(pane)
 		{
-			self.widgets.push(widget);
+			self.panes.push(pane);
+		}
+
+		this.deletePane = function(pane)
+		{
+			pane.dispose();
+			self.panes.remove(pane);
 		}
 
 		this.deleteWidget = function(widget)
 		{
-			widget.dispose();
-			self.widgets.remove(widget);
-		}
-
-		this.deleteSection = function(section)
-		{
-			ko.utils.arrayForEach(self.widgets(), function(widget)
+			ko.utils.arrayForEach(self.panes(), function(pane)
 			{
-				widget.sections.remove(section);
+				pane.widgets.remove(widget);
 			});
 
-			section.dispose();
-		}
-
-		this.commitCurrentCRUD = function()
-		{
-			var crudObject = self.currentCRUDObject();
-
-			if(ko.isObservable(crudObject.settings) && !_.isUndefined(crudObject.newSettings))
-			{
-				crudObject.settings(crudObject.newSettings);
-			}
-
-			if(self.currentCRUDOperation() == "add")
-			{
-				if(crudObject instanceof DatasourceModel)
-				{
-					self.addDatasource(crudObject);
-				}
-				else if(crudObject instanceof SectionModel)
-				{
-					self.currentCRUDObjectParent.addSection(crudObject);
-				}
-			}
-			else if(self.currentCRUDOperation() == "delete")
-			{
-				if(crudObject instanceof DatasourceModel)
-				{
-					self.deleteDatasource(crudObject);
-				}
-				else if(crudObject instanceof WidgetModel)
-				{
-					self.deleteWidget(crudObject);
-				}
-				else if(crudObject instanceof SectionModel)
-				{
-					self.deleteSection(crudObject);
-				}
-			}
-			else
-			{
-				commitCRUDObject(crudObject);
-			}
-
-			self.cancelCurrentCRUD();
+			widget.dispose();
 		}
 
 		this.toggleEditing = function()
@@ -1106,26 +964,16 @@ var deccoboard = (function()
 				$(".gridster").animate({"margin-top": "300px"}, 250);
 				$("#main-header").data().shown = true;
 
-				attachSubSectionEditIcons($(".sub-section"));
+				attachWidgetEditIcons($(".sub-section"));
 
 				grid.enable();
 			}
 
-			showWidgetEditIcons(editing);
-		}
-
-		this.cancelCurrentCRUD = function()
-		{
-			closeCRUDModal();
-
-			self.currentCRUDObject();
-			self.currentCRUDObjectParent = undefined;
-			self.currentCRUDOperation();
-			self.currentCRUDTemplate("empty-crud-template");
+			showPaneEditIcons(editing);
 		}
 	}
 
-	function WidgetModel()
+	function PaneModel()
 	{
 		var self = this;
 
@@ -1133,19 +981,19 @@ var deccoboard = (function()
 		this.width = ko.observable(1);
 		this.row = ko.observable(1);
 		this.col = ko.observable(1);
-		this.sections = ko.observableArray();
+		this.widgets = ko.observableArray();
 
-		this.addSection = function(section)
+		this.addWidget = function(widget)
 		{
-			this.sections.push(section);
+			this.widgets.push(widget);
 		}
 
 		this.height = ko.computed({
 			read: function()
 			{
-				var sumHeights = _.reduce(self.sections(), function(memo, section)
+				var sumHeights = _.reduce(self.widgets(), function(memo, widget)
 				{
-					return memo + section.height();
+					return memo + widget.height();
 				}, 0);
 
 				return Math.max(2, sumHeights + 1);
@@ -1154,11 +1002,11 @@ var deccoboard = (function()
 
 		this.serialize = function()
 		{
-			var sections = [];
+			var widgets = [];
 
-			_.each(self.sections(), function(section)
+			_.each(self.widgets(), function(widget)
 			{
-				sections.push(section.serialize());
+				widgets.push(widget.serialize());
 			});
 
 			return {
@@ -1166,7 +1014,7 @@ var deccoboard = (function()
 				width   : self.width(),
 				row     : self.row(),
 				col     : self.col(),
-				sections: sections
+				widgets: widgets
 			};
 		}
 
@@ -1177,32 +1025,58 @@ var deccoboard = (function()
 			self.row(object.row);
 			self.col(object.col);
 
-			_.each(object.sections, function(sectionConfig)
+			_.each(object.widgets, function(widgetConfig)
 			{
-				var section = new SectionModel();
-				section.deserialize(sectionConfig);
-				self.sections.push(section);
+				var widget = new WidgetModel();
+				widget.deserialize(widgetConfig);
+				self.widgets.push(widget);
 			});
 		}
 
 		this.dispose = function()
 		{
-			ko.utils.arrayForEach(self.sections(), function(section)
+			ko.utils.arrayForEach(self.widgets(), function(widget)
 			{
-				section.dispose();
+				widget.dispose();
 			});
 		}
 	}
 
-	var sectionID = 0;
-
-	function SectionModel()
+	function WidgetModel()
 	{
+		function disposeWidgetInstance()
+		{
+			if(!_.isUndefined(self.widgetInstance))
+			{
+				if(_.isFunction(self.widgetInstance.onDispose))
+				{
+					self.widgetInstance.onDispose();
+				}
+
+				self.widgetInstance = undefined;
+			}
+		}
+
 		var self = this;
 
-		this.sectionID = ko.observable(++sectionID);
 		this.title = ko.observable();
-		this.type = ko.observable("text");
+
+		this.type = ko.observable();
+		this.type.subscribe(function(newValue)
+		{
+			disposeWidgetInstance();
+
+			if((newValue in widgetPlugins) && _.isFunction(widgetPlugins[newValue].newInstance))
+			{
+				var widgetInstance = widgetPlugins[newValue].newInstance(self.settings(), self.updateCallback);
+				self.widgetInstance = widgetInstance;
+			}
+		});
+
+		this.settings = ko.observable({});
+		this.settings.subscribe(function(newValue)
+		{
+		});
 
 		this.value = ko.observable("");
 		this.value.subscribe(function(newValue)
@@ -1256,23 +1130,15 @@ var deccoboard = (function()
 			self.refresh(refreshDatasources);
 		});
 
-		this.units = ko.observable();
-		this.min = ko.observable();
-		this.max = ko.observable();
-
 		this.height = ko.computed({
 			read: function()
 			{
-				var sectionType = _.findWhere(deccoboardModel.sectionTypes, {name: self.type()});
+				if(!_.isUndefined(self.widgetInstance) && _.isFunction(self.widgetInstance.getHeight))
+				{
+					return self.widgetInstance.getHeight();
+				}
 
-				if(sectionType)
-				{
-					return sectionType.height;
-				}
-				else
-				{
-					return 1;
-				}
+				return 1;
 			}
 		});
 
@@ -1284,17 +1150,12 @@ var deccoboard = (function()
 		{
 			self._updateDummy();
 
-			var valueElement = $("#section-" + self.sectionID() + "-value");
 			var value;
 
 			try
 			{
-				var thisObject = {
-					element      : valueElement,
-					current_value: self.currentComputedValue
-				};
 
-				value = self.currentComputedValue = self.valueFunction.call(thisObject, deccoboardModel.datasourceData);
+				value = self.currentComputedValue = self.valueFunction.call(undefined, deccoboardModel.datasourceData);
 			}
 			catch(e)
 			{
@@ -1440,7 +1301,7 @@ var deccoboard = (function()
 		}
 	}
 
-	function showWidgetEditIcons(show)
+	function showPaneEditIcons(show)
 	{
 		if(show)
 		{
@@ -1455,18 +1316,18 @@ var deccoboard = (function()
 		}
 	}
 
-	function attachSubSectionEditIcons(element)
+	function attachWidgetEditIcons(element)
 	{
 		$(element).hover(function()
 		{
-			showSubSectionEditIcons(this, true);
+			showWidgetEditIcons(this, true);
 		}, function()
 		{
-			showSubSectionEditIcons(this, false);
+			showWidgetEditIcons(this, false);
 		});
 	}
 
-	function showSubSectionEditIcons(element, show)
+	function showWidgetEditIcons(element, show)
 	{
 		if(show)
 		{
@@ -1483,14 +1344,10 @@ var deccoboard = (function()
 
 		ko.applyBindings(deccoboardModel);
 
-		if(deccoboardModel.allow_edit() && deccoboardModel.widgets().length == 0)
+		if(deccoboardModel.allow_edit() && deccoboardModel.panes().length == 0)
 		{
 			deccoboardModel.toggleEditing();
 		}
-
-		// Setup our update loop
-		//processUpdates();
-		//updateTimer = setInterval(processUpdates, 1000);
 
 		// Fade everything in
 		$(".gridster").css("opacity", 1);
@@ -1511,6 +1368,16 @@ var deccoboard = (function()
 
 			datasourcePlugins[plugin.type_name] = plugin;
 			deccoboardModel._datasourceTypes.valueHasMutated();
+		},
+		loadWidgetPlugin : function(plugin)
+		{
+			if(_.isUndefined(plugin.display_name))
+			{
+				plugin.display_name = plugin.type_name;
+			}
+
+			widgetPlugins[plugin.type_name] = plugin;
+			deccoboardModel._widgetTypes.valueHasMutated();
 		}
 	};
 }());

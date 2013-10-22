@@ -24,13 +24,13 @@ deccoboard.loadConfiguration({
 	        }
         }
 	],
-	"widgets"    : [
+	"panes"    : [
         {
             "title"   : "Status",
             "width"   : 1,
             "row"     : 1,
             "col"     : 1,
-            "sections": [
+            "widgets": [
                 {
                     "type"   : "big-text",
                     "value"  : 'javascript: datasources.Weather.wind.speed',

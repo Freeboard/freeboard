@@ -454,7 +454,7 @@
 	 * Provide start/stop/drag callbacks.
 	 *
 	 * @class Draggable
-	 * @param {HTMLElement} el The HTMLelement that contains all the widgets
+	 * @param {HTMLElement} el The HTMLelement that contains all the panes
 	 *  to be dragged.
 	 * @param {Object} [options] An Object with all options you want to
 	 *        overwrite:
@@ -856,13 +856,13 @@
 	 * @class Gridster
 	 * @uses Draggable
 	 * @uses Collision
-	 * @param {HTMLElement} el The HTMLelement that contains all the widgets.
+	 * @param {HTMLElement} el The HTMLelement that contains all the panes.
 	 * @param {Object} [options] An Object with all options you want to
 	 *        overwrite:
 	 *    @param {HTMLElement|String} [options.widget_selector] Define who will
-	 *     be the draggable widgets. Can be a CSS Selector String or a
+	 *     be the draggable panes. Can be a CSS Selector String or a
 	 *     collection of HTMLElements
-	 *    @param {Array} [options.widget_margins] Margin between widgets.
+	 *    @param {Array} [options.widget_margins] Margin between panes.
 	 *     The first index for the horizontal margin (left, right) and
 	 *     the second for the vertical margin (top, bottom).
 	 *    @param {Array} [options.widget_base_dimensions] Base widget dimensions
@@ -879,12 +879,12 @@
 	 *    @param {Number} [options.max_size_x] The maximum number of columns
 	 *     that a widget can span.
 	 *    @param {Boolean} [options.autogenerate_stylesheet] If true, all the
-	 *     CSS required to position all widgets in their respective columns
+	 *     CSS required to position all panes in their respective columns
 	 *     and rows will be generated automatically and injected to the
 	 *     `<head>` of the document. You can set this to false, and write
 	 *     your own CSS targeting rows and cols via data-attributes like so:
 	 *     `[data-col="1"] { left: 10px; }`
-	 *    @param {Boolean} [options.avoid_overlapped_widgets] Avoid that widgets loaded
+	 *    @param {Boolean} [options.avoid_overlapped_widgets] Avoid that panes loaded
 	 *     from the DOM can be overlapped. It is helpful if the positions were
 	 *     bad stored in the database or if there was any conflict.
 	 *    @param {Function} [options.serialize_params] Return the data you want
@@ -906,7 +906,7 @@
 		this.$el = $(el);
 		this.$wrapper = this.$el.parent();
 		this.$widgets = this.$el.children(this.options.widget_selector).addClass('gs_w');
-		this.widgets = [];
+		this.panes = [];
 		this.$changed = $([]);
 		this.wrapper_width = this.$wrapper.width();
 		this.min_widget_width = (this.options.widget_margins[0] * 2) + this.options.widget_base_dimensions[0];
@@ -1164,7 +1164,7 @@
 	};
 
 	/**
-	 * Move down widgets in cells represented by the arguments col, row, size_x,
+	 * Move down panes in cells represented by the arguments col, row, size_x,
 	 * size_y
 	 *
 	 * @method empty_cells
@@ -1174,7 +1174,7 @@
 	 * occupy.
 	 * @param {Number} size_y The number of rows that the group of cells
 	 * occupy.
-	 * @param {HTMLElement} $exclude Exclude widgets from being moved.
+	 * @param {HTMLElement} $exclude Exclude panes from being moved.
 	 * @return {Class} Returns the instance of the Gridster Class.
 	 */
 	fn.empty_cells = function(col, row, size_x, size_y, $exclude)
@@ -1204,7 +1204,7 @@
 
 
 	/**
-	 * Move up widgets below cells represented by the arguments col, row, size_x,
+	 * Move up panes below cells represented by the arguments col, row, size_x,
 	 * size_y.
 	 *
 	 * @method remove_empty_cells
@@ -1214,7 +1214,7 @@
 	 * occupy.
 	 * @param {Number} size_y The number of rows that the group of cells
 	 * occupy.
-	 * @param {HTMLElement} exclude Exclude widgets from being moved.
+	 * @param {HTMLElement} exclude Exclude panes from being moved.
 	 * @return {Class} Returns the instance of the Gridster Class.
 	 */
 	fn.remove_empty_cells = function(col, row, size_x, size_y, exclude)
@@ -1290,7 +1290,7 @@
 	 *
 	 * @method remove_widget
 	 * @param {HTMLElement} el The jQuery wrapped HTMLElement you want to remove.
-	 * @param {Boolean|Function} silent If true, widgets below the removed one
+	 * @param {Boolean|Function} silent If true, panes below the removed one
 	 * will not move up. If a Function is passed it will be used as callback.
 	 * @param {Function} callback Function executed when the widget is removed.
 	 * @return {Class} Returns the instance of the Gridster Class.
@@ -1337,7 +1337,7 @@
 
 
 	/**
-	 * Remove all widgets from the grid.
+	 * Remove all panes from the grid.
 	 *
 	 * @method remove_all_widgets
 	 * @param {Function} callback Function executed for each widget removed.
@@ -1355,11 +1355,11 @@
 
 
 	/**
-	 * Returns a serialized array of the widgets in the grid.
+	 * Returns a serialized array of the panes in the grid.
 	 *
 	 * @method serialize
 	 * @param {HTMLElement} [$widgets] The collection of jQuery wrapped
-	 *  HTMLElements you want to serialize. If no argument is passed all widgets
+	 *  HTMLElements you want to serialize. If no argument is passed all panes
 	 *  will be serialized.
 	 * @return {Array} Returns an Array of Objects with the data specified in
 	 *  the serialize_params option.
@@ -1378,7 +1378,7 @@
 
 
 	/**
-	 * Returns a serialized array of the widgets that have changed their
+	 * Returns a serialized array of the panes that have changed their
 	 *  position.
 	 *
 	 * @method serialize_changed
@@ -1499,7 +1499,7 @@
 
 
 	/**
-	 * Make widgets draggable.
+	 * Make panes draggable.
 	 *
 	 * @uses Draggable
 	 * @method draggable
@@ -1804,7 +1804,7 @@
 		this.manage_movements(constraints.can_go_up, to_col, to_row);
 		this.manage_movements(constraints.can_not_go_up, to_col, to_row);
 
-		/* if there is not widgets overlapping in the new player position,
+		/* if there is not panes overlapping in the new player position,
 		 * update the new placeholder position. */
 		if(!$overlapped_widgets.length)
 		{
@@ -1824,7 +1824,7 @@
 
 
 	/**
-	 * See which of the widgets in the $widgets param collection can go to
+	 * See which of the panes in the $panes param collection can go to
 	 * a upper row and which not.
 	 *
 	 * @method widgets_contraints
@@ -1967,9 +1967,9 @@
 	 *
 	 * @method manage_movements
 	 * @param {jQuery} $widgets A jQuery collection of HTMLElements
-	 *  representing the widgets you want to move.
-	 * @param {Number} to_col The column to which we want to move the widgets.
-	 * @param {Number} to_row The row to which we want to move the widgets.
+	 *  representing the panes you want to move.
+	 * @param {Number} to_col The column to which we want to move the panes.
+	 * @param {Number} to_row The row to which we want to move the panes.
 	 * @return {Class} Returns the instance of the Gridster Class.
 	 */
 	fn.manage_movements = function($widgets, to_col, to_row)
@@ -2018,7 +2018,7 @@
 	 * @method is_player
 	 * @param {Number|HTMLElement} col_or_el A jQuery wrapped collection of
 	 * HTMLElements.
-	 * @param {Number} [row] The column to which we want to move the widgets.
+	 * @param {Number} [row] The column to which we want to move the panes.
 	 * @return {Boolean} Returns true or false.
 	 */
 	fn.is_player = function(col_or_el, row)
@@ -2170,7 +2170,7 @@
 
 
 	/**
-	 * Get widgets overlapping with the player or with the object passed
+	 * Get panes overlapping with the player or with the object passed
 	 * representing the grid cells.
 	 *
 	 * @method get_widgets_under_player
@@ -2216,7 +2216,7 @@
 			size_x: phgd.size_x
 		});
 
-		// Prevents widgets go out of the grid
+		// Prevents panes go out of the grid
 		var right_col = (col + phgd.size_x - 1);
 		if(right_col > this.cols)
 		{
@@ -2478,7 +2478,7 @@
 
 
 	/**
-	 * Get widgets overlapping with the player.
+	 * Get panes overlapping with the player.
 	 *
 	 * @method get_widgets_overlapped
 	 * @return {jQuery} Returns a jQuery collection of HTMLElements.
@@ -2584,7 +2584,7 @@
 
 	/**
 	 * Move a widget to a specific row. The cell or cells must be empty.
-	 * If the widget has widgets below, all of these widgets will be moved also
+	 * If the widget has panes below, all of these panes will be moved also
 	 * if they can.
 	 *
 	 * @method move_widget_to
@@ -2843,7 +2843,7 @@
 
 
 	/**
-	 * Get widgets below a widget.
+	 * Get panes below a widget.
 	 *
 	 * @method widgets_below
 	 * @param {HTMLElement} $el The jQuery wrapped HTMLElement.
@@ -2958,7 +2958,7 @@
 		};
 		var result = true;
 
-		//Prevents widgets go out of the grid
+		//Prevents panes go out of the grid
 		var right_col = col + widget_grid_data.size_x - 1;
 		if(right_col > this.cols)
 		{
@@ -3294,7 +3294,7 @@
 
 
 	/**
-	 * It generates the neccessary styles to position the widgets.
+	 * It generates the neccessary styles to position the panes.
 	 *
 	 * @method generate_stylesheet
 	 * @param {Number} rows Number of columns.
@@ -3544,7 +3544,7 @@
 
 
 	/**
-	 * Get all widgets in the DOM and register them.
+	 * Get all panes in the DOM and register them.
 	 *
 	 * @method get_widgets_from_DOM
 	 * @return {Object} Returns the instance of the Gridster class.
@@ -3584,7 +3584,7 @@
 
 		var min_cols = Math.max.apply(Math, actual_cols);
 
-		// get all rows that could be occupied by the current widgets
+		// get all rows that could be occupied by the current panes
 		var max_rows = this.options.extra_rows;
 		this.$widgets.each(function(i, w)
 		{
