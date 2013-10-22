@@ -1,5 +1,5 @@
 deccoboard.loadConfiguration({
-	"allow_edit"  : true,
+	/*"allow_edit"  : true,
 	"datasources": [
         {
             name   : "Weather",
@@ -15,6 +15,13 @@ deccoboard.loadConfiguration({
 			        }
 		        ]
 	        }
+        },
+        {
+	        name    : "RL78",
+	        type    : "rl78",
+	        settings: {
+				device_resource_id : "b3273d7585fa85642140749a63ebc02fcc142ace"
+	        }
         }
 	],
 	"widgets"    : [
@@ -27,25 +34,25 @@ deccoboard.loadConfiguration({
                 {
                     "type"   : "big-text",
                     "value"  : 'javascript: datasources.Weather.wind.speed',
-                    "refresh": "Weather",
+                    "refresh": ["Weather"],
                     "units"  : "MPH"
                 },
                 {
 	                "type"   : "text-with-sparkline",
 	                "value"  : 'javascript: datasources.Weather.wind.speed',
-	                "refresh": "Weather",
+	                "refresh": ["Weather"],
 	                "units"  : "MPH"
                 },
                 {
 	                "title"  : "Power",
 	                "type"   : "gauge",
 	                "value"  : 'javascript: datasources.Weather.wind.speed',
-	                "refresh": "Weather",
+	                "refresh": ["Weather"],
 	                "units"  : "MPH",
 	                "min" : 0,
 	                "max" : 200
                 }
             ]
         }
-	]
+	]*/
 });

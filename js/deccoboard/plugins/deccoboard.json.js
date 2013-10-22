@@ -21,7 +21,6 @@ deccoboard.loadDatasourcePlugin((function()
 
 		updateRefresh(currentSettings.refresh * 1000);
 
-
 		this.updateNow = function()
 		{
 			$.ajax({
@@ -56,10 +55,16 @@ deccoboard.loadDatasourcePlugin((function()
 			});
 		}
 
-		this.dispose = function()
+		this.onDispose = function()
 		{
 			clearInterval(updateTimer);
 			updateTimer = null;
+		}
+
+		this.onSettingsChanged = function(newSettings)
+		{
+			currentSettings = newSettings;
+			updateRefresh(currentSettings.refresh * 1000);
 		}
 	};
 

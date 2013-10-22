@@ -24,7 +24,7 @@
                 "js/justgage.1.0.1.js",
                 "js/deccoboard/deccoboard.js",
                 "js/deccoboard/plugins/deccoboard.json.js",
-                "js/deccoboard/plugins/deccoboard.bugswarm.js",
+                "js/deccoboard/plugins/deccoboard.rl78.js",
                 "config.js",
                 function (){
 
@@ -57,7 +57,7 @@
                         </thead>
                         <tbody data-bind="foreach: datasources">
                             <tr>
-                                <td><a href="javascript:void(0)" data-bind="text: name, crud: {template: 'datasource-edit-template', operation: 'edit', model: 'DatasourceModel'}"></a></td>
+                                <td><a href="javascript:void(0)" data-bind="text: name, pluginEditor: {operation: 'edit', type: 'datasource'}"></a></td>
                                 <td data-bind="text: last_updated"></td>
                                 <td>
                                     <a href="javascript:void(0)" class="datasource-refresh-btn" data-bind="click: updateNow"><i class="icon-refresh icon-white"></i></a> <a href="javascript:void(0)" class="datasource-delete-btn" data-bind="crud: {template: 'datasource-delete-template', operation: 'delete', model: 'DatasourceModel'}"><i class="icon-trash icon-white"></i></a></td>
@@ -65,7 +65,7 @@
                         </tbody>
                     </table>
                 </div>
-                <a href="javascript:void(0)" class="table-operation" data-bind="crud: {template: 'datasource-edit-template', operation: 'add', model: 'DatasourceModel'}">Add</a>
+                <a href="javascript:void(0)" class="table-operation" data-bind="pluginEditor: {operation: 'add', type: 'datasource'}">Add</a>
             </div>
         </div>
     </div>

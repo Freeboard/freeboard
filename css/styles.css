@@ -487,10 +487,11 @@ body
 
 .modal footer .button
 {
-	display: inline-block;
 	line-height : 40px;
 	padding-left: 15px;
 	padding-right: 15px;
+	color: #0088cc;
+	cursor: pointer;
 }
 
 .modal section
@@ -796,7 +797,7 @@ a:focus
 	outline-offset : -2px;
 }
 
-#lean_overlay
+#modal_overlay
 {
 	position   : fixed;
 	z-index    : 100;
@@ -1131,7 +1132,6 @@ ul, ol {
 
 .gridster .gs_w {
     background: #2a2a2a;
-    cursor: pointer;
     -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.3);
     box-shadow: 0 0 5px rgba(0,0,0,0.3);
     padding: 0px;
@@ -2039,4 +2039,9 @@ ul.value-dropdown li.selected
 td.form-table-value > input[type="checkbox"]
 {
 	height: 28px;
+}
+
+.table-row-operation > i
+{
+	cursor: pointer;
 }

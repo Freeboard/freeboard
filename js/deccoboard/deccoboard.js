@@ -24,13 +24,13 @@ var deccoboard = (function()
 			closeCRUDModal();
 		});
 
-		$("#lean_overlay").click(function()
+		/*$("#lean_overlay").click(function()
 		{
 			closeCRUDModal();
-		});
+		});*/
 
-		$('#lean_overlay').css({ 'display': 'block', opacity: 0 });
-		$('#lean_overlay').fadeTo(200, 0.8);
+		//$('#lean_overlay').css({ 'display': 'block', opacity: 0 });
+		//$('#lean_overlay').fadeTo(200, 0.8);
 
 		$(modal_id).css({
 
@@ -86,133 +86,285 @@ var deccoboard = (function()
 		});
 	}
 
-	function processPluginSettings(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext, settingValues)
+	function createPluginEditor(title, pluginTypes, currentInstanceName, currentTypeName, currentSettingsValues, settingsSavedCallback)
 	{
-		if(!_.isUndefined(bindingContext.currentDatasourceType) && bindingContext.currentDatasourceType === viewModel.type())
+		var newSettings = {
+			name : currentInstanceName,
+			type : currentTypeName,
+			settings : {}
+		};
+
+		function createSettingRow(displayName)
 		{
-			// Don't bother doing anything if our datasource type hasn't changed
-			return;
+			var tr = $("<tr></tr>").appendTo(form);
+
+			tr.append('<td class="form-table-label"><label class="control-label">' + displayName + '</label></td>');
+			return $('<td class="form-table-value"></td>').appendTo(tr);
 		}
 
-		bindingContext.currentDatasourceType = viewModel.type();
-
-		var datasourcePlugin = datasourcePlugins[viewModel.type()];
-
-		if(!_.isUndefined(datasourcePlugin))
+		function closeModal()
 		{
-			var datasourcePluginSettings = datasourcePlugin.settings;
-
-			if(!_.isUndefined(datasourcePluginSettings))
+			overlay.fadeTo(200, 0.0, function()
 			{
-				var childNodes = [];
+				$(this).remove();
+			});
+			modalDialog.fadeTo(200, 0.0, function()
+			{
+				$(this).remove();
+			});
+		}
 
-				_.each(datasourcePluginSettings, function(setting)
+		var modal_width = 800;
+
+		// Initialize our modal overlay
+		var overlay = $('<div id="modal_overlay"></div>')
+			.css({ 'display': 'block', opacity: 0 });
+
+		var modalDialog = $('<div class="modal"></div>')
+			.css({
+
+				'display'    : 'block',
+				'position'   : 'fixed',
+				'opacity'    : 0,
+				'z-index'    : 11000,
+				'left'       : 50 + '%',
+				'margin-left': -(modal_width / 2) + "px",
+				'top'        : 120 + "px"
+
+			});
+
+		// Create our header
+		modalDialog.append("<header><h1>" + title + "</h1></header>");
+
+		var form = $('<table class="form-table"></table>');
+		$('<section></section>').appendTo(modalDialog).append(form);
+
+		// Create our body
+		createSettingRow("Name").append(
+			$('<input type="text">')
+				.val(currentInstanceName)
+				.change(function(){
+					newSettings.name = $(this).val();
+				})
+		);
+
+		var typeRow = createSettingRow("Type");
+		var typeSelect = $('<select></select>').appendTo(typeRow).change(function(){
+			newSettings.type = $(this).val();
+			newSettings.settings = {};
+		});
+
+		_.each(pluginTypes, function(pluginType){
+			typeSelect.append($("<option></option>").text(pluginType.display_name).attr("value", pluginType.type_name));
+		});
+
+		typeSelect.on("change", function(event){
+
+			// Remove all the previous settings
+			typeRow.parent().nextAll().remove();
+
+			var currentType = pluginTypes[typeSelect.val()];
+
+			_.each(currentType.settings, function(setting)
+			{
+				var displayName = setting.name;
+
+				if(!_.isUndefined(setting.display_name))
 				{
-					var displayName = setting.name;
+					displayName = setting.display_name;
+				}
 
-					if(!_.isUndefined(setting.display_name))
+				var valueCell = createSettingRow(displayName);
+
+				switch (setting.type)
+				{
+					case "array":
 					{
-						displayName = setting.display_name;
-					}
+						var subTableDiv = $('<div class="form-table-value-subtable"></div>').appendTo(valueCell);
 
-					var settingID = "datasourceSetting" + setting.name;
+						$('<a class="table-operation">Add</a>').appendTo(valueCell);
 
-					var row = $("<tr></tr>");
-					$('<td class="form-table-label"><label class="control-label" for="' + settingID + '">' + displayName + '</label></td>').appendTo(row);
-
-					var valueCell = $('<td class="form-table-value"></td>').appendTo(row);
-
-					switch (setting.type)
-					{
-						case "array":
+						if(setting.name in currentSettingsValues)
 						{
-							var subTableDiv = $('<div class="form-table-value-subtable"></div>').appendTo(valueCell);
+							var subSettings = currentSettingsValues[setting.name];
 
-							$('<a class="table-operation">Add</a>').appendTo(valueCell);
-
-							if(setting.name in settingValues)
+							if(_.isArray(setting.settings) && _.isArray(subSettings) && subSettings.length > 0)
 							{
-								var subSettings = settingValues[setting.name];
+								newSettings.settings[setting.name] = [];
 
-								if(_.isArray(setting.settings) && _.isArray(subSettings) && subSettings.length > 0)
+								var subTable = $('<table class="table table-condensed sub-table"></table>').appendTo(subTableDiv);
+								var subTableHead = $("<thead></thead>").appendTo(subTable);
+								subTableHead = $("<tr></tr>").appendTo(subTableHead);
+
+								// Create our headers
+								_.each(setting.settings, function(subSettingDef)
 								{
-									var subTable = $('<table class="table table-condensed sub-table"></table>').appendTo(subTableDiv);
-									var subTableHead = $("<thead></thead>").appendTo(subTable);
-									subTableHead = $("<tr></tr>").appendTo(subTableHead);
+									var subsettingDisplayName = subSettingDef.name;
 
-									// Create our headers
-									_.each(setting.settings, function(subSettingDef){
+									if(!_.isUndefined(subSettingDef.display_name))
+									{
+										subsettingDisplayName = subSettingDef.display_name;
+									}
 
-										var subsettingDisplayName = subSettingDef.name;
+									$('<th>' + subsettingDisplayName + '</th>').appendTo(subTableHead);
+								});
 
-										if(!_.isUndefined(subSettingDef.display_name))
+								var subTableBody = $('<tbody></tbody>').appendTo(subTable);
+
+								// Create our rows
+								_.each(subSettings, function(subSetting, subSettingIndex)
+								{
+									var subsettingRow = $('<tr></tr>').appendTo(subTableBody);
+
+									var newSetting = {};
+									newSettings.settings[setting.name].push(newSetting);
+
+									_.each(setting.settings, function(subSettingDef)
+									{
+										var subsettingCol = $('<td></td>').appendTo(subsettingRow);
+										var subsettingValue = "";
+
+										if(!_.isUndefined(subSetting[subSettingDef.name]))
 										{
-											subsettingDisplayName = subSettingDef.display_name;
+											subsettingValue = subSetting[subSettingDef.name];
 										}
 
-										$('<th>' + subsettingDisplayName + '</th>').appendTo(subTableHead);
-									});
+										newSetting[subSettingDef.name] = subsettingValue;
 
-									var subTableBody = $('<tbody></tbody>').appendTo(subTable);
-
-									// Create our rows
-									_.each(subSettings, function(subSetting)
-									{
-										var subsettingRow = $('<tr></tr>').appendTo(subTableBody);
-
-										_.each(setting.settings, function(subSettingDef)
-										{
-											var subsettingCol = $('<td></td>').appendTo(subsettingRow);
-											var subsettingValue = "";
-
-											if(!_.isUndefined(subSetting[subSettingDef.name]))
-											{
-												subsettingValue = subSetting[subSettingDef.name];
-											}
-
-											$('<input class="table-row-value" type="text">').appendTo(subsettingCol).val(subsettingValue);
+										$('<input class="table-row-value" type="text">').appendTo(subsettingCol).val(subsettingValue).change(function(){
+											newSetting[subSettingDef.name] = $(this).val();
 										});
 									});
-								}
-							}
 
-							break;
+									subsettingRow.append($('<td class="table-row-operation"></td>').append($('<i class="icon-trash icon-white"></i>').click(function()
+										{
+											newSettings.settings[setting.name].splice(subSettingIndex, 1);
+											subsettingRow.remove();
+										})));
+								});
+							}
 						}
-						case "boolean":
+
+						break;
+					}
+					case "boolean":
+					{
+						newSettings.settings[setting.name] = currentSettingsValues[setting.name];
+
+						var input = $('<input type="checkbox">').appendTo(valueCell).change(function(){
+							newSettings.settings[setting.name] = this.checked;
+						});
+
+						if(setting.name in currentSettingsValues)
 						{
-							var input = $('<input type="checkbox" id="' + settingID + '">').appendTo(valueCell);
-
-							if(setting.name in settingValues)
-							{
-								input.prop("checked", settingValues[setting.name]);
-							}
-
-							break;
+							input.prop("checked", currentSettingsValues[setting.name]);
 						}
-						default:
+
+						break;
+					}
+					default:
+					{
+						newSettings.settings[setting.name] = currentSettingsValues[setting.name];
+
+						var input = $('<input type="text">').appendTo(valueCell).change(function(){
+							newSettings.settings[setting.name] = $(this).val();
+						});
+
+						if(!_.isUndefined(setting.suffix))
 						{
-							var input = $('<input type="text" id="' + settingID + '">').appendTo(valueCell);
+							input.addClass("small align-right");
+							$('<div class="input-suffix">' + setting.suffix + '</div>').appendTo(valueCell);
+						}
 
-							if(!_.isUndefined(setting.suffix))
-							{
-								input.addClass("small align-right");
-								$('<div class="input-suffix">' + setting.suffix + '</div>').appendTo(valueCell);
-							}
+						if(setting.name in currentSettingsValues)
+						{
+							input.val(currentSettingsValues[setting.name]);
+						}
 
-							if(setting.name in settingValues)
-							{
-								input.val(settingValues[setting.name]);
-							}
+						break;
+					}
+				}
+			});
 
-							break;
+		});
+
+		typeSelect.val(currentTypeName).trigger("change");
+
+		// Create our footer
+		var footer = $('<footer></footer>').appendTo(modalDialog);
+		$('<span class="button">Save</span>')
+			.appendTo(footer)
+			.click(function(){
+				if(_.isFunction(settingsSavedCallback))
+				{
+					settingsSavedCallback(newSettings);
+				}
+
+				closeModal();
+			});
+
+		$('<span class="button">Cancel</span>')
+			.appendTo(footer)
+			.click(function(){
+				closeModal();
+			});
+
+		$("body").append([overlay, modalDialog]);
+
+		overlay.fadeTo(200, 0.8);
+		modalDialog.fadeTo(200, 1);
+	}
+
+	ko.bindingHandlers.pluginEditor = {
+		init : function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
+		{
+			var options = ko.unwrap(valueAccessor());
+
+			var types = {};
+			var settings = undefined;
+			var title = "";
+
+			if(options.type == 'datasource')
+			{
+				types = datasourcePlugins;
+				title = "Datasources";
+			}
+
+			$(element).click(function(event){
+
+				var instanceName = "";
+				var instanceType = _.keys(types)[0];
+
+				if(options.operation == 'add')
+				{
+					settings = {};
+				}
+				else if(options.operation == 'delete')
+				{
+				}
+				else
+				{
+					instanceName = viewModel.name();
+					instanceType = viewModel.type();
+					settings = viewModel.settings();
+				}
+
+				createPluginEditor(title, types, instanceName, instanceType, settings, function(newSettings)
+				{
+					if(options.operation == 'add')
+					{
+						if(options.type == 'datasource')
+						{
+							viewModel = new DatasourceModel();
+							deccoboardModel.addDatasource(viewModel);
 						}
 					}
 
-					childNodes.push(row.get(0));
+					viewModel.settings(newSettings.settings);
+					viewModel.name(newSettings.name);
+					viewModel.type(newSettings.type);
 				});
-
-				ko.virtualElements.setDomNodeChildren(element, childNodes);
-			}
+			});
 		}
 	}
 
@@ -221,7 +373,7 @@ var deccoboard = (function()
 	{
 		update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
-			processPluginSettings(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext, viewModel.settings());
+			processPluginSettings(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
 		}
 	}
 
@@ -241,6 +393,11 @@ var deccoboard = (function()
 	ko.bindingHandlers.widget = {
 		init  : function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
+			if(deccoboardModel.isEditing())
+			{
+				$(element).css({cursor: "pointer"});
+			}
+
 			grid.add_widget(element, viewModel.width(), viewModel.height(), viewModel.col(), viewModel.row());
 
 			if(bindingContext.$root.isEditing())
@@ -521,29 +678,45 @@ var deccoboard = (function()
 		}
 	}
 
+	function createGauge(element, viewModel)
+	{
+		$(element).empty();
+
+		var gaugeID = "section-" + viewModel.sectionID() + "-gauge";
+
+		$(element).attr("id", gaugeID);
+
+		var gauge = new JustGage({
+			id             : gaugeID,
+			value          : viewModel.computedValue(),
+			min            : (_.isUndefined(viewModel.min()) ? 0 : viewModel.min()),
+			max            : (_.isUndefined(viewModel.max()) ? 100 : viewModel.max()),
+			label          : viewModel.units(),
+			showInnerShadow: false,
+			valueFontColor : "#d3d4d4"
+		});
+
+		$(element).data("gauge", gauge);
+
+		return gauge;
+	}
+
 	ko.bindingHandlers.gauge = {
 		init  : function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
-			var gaugeID = "section-" + viewModel.sectionID() + "-gauge";
-			$(element).attr("id", gaugeID);
-
-			var gauge = new JustGage({
-				id             : gaugeID,
-				value          : viewModel.computedValue(),
-				min            : (_.isUndefined(viewModel.min()) ? 0 : viewModel.min()),
-				max            : (_.isUndefined(viewModel.max()) ? 100 : viewModel.max()),
-				label          : viewModel.units(),
-				showInnerShadow: false,
-				valueFontColor : "#d3d4d4"
-			});
-
-			$(element).data("gauge", gauge);
+			createGauge(element, viewModel);
 		},
 		update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
 			viewModel._updateDummy();
 
 			var gauge = $(element).data("gauge");
+
+			if(viewModel.min() != gauge.config.min || viewModel.max() != gauge.config.max || viewModel.units() != gauge.config.label)
+			{
+				gauge = createGauge(element, viewModel);
+			}
+
 			gauge.refresh(viewModel.computedValue());
 		}
 	}
@@ -606,16 +779,6 @@ var deccoboard = (function()
 		}
 	}
 
-	/*ko.bindingHandlers.valueScript = {
-	 update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
-	 {
-	 $(element).empty();
-	 $(element).append('<script type="text/javascript">' + viewModel.valueScript() + '</script>');
-
-	 viewModel.update();
-	 }
-	 }*/
-
 	ko.bindingHandlers.crud = {
 		init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
@@ -625,7 +788,14 @@ var deccoboard = (function()
 
 				if(options.operation == 'add')
 				{
-					deccoboardModel.currentCRUDObject(new window[options.model]);
+					var newModel;
+
+					if(options.model == "SectionModel")
+					{
+						newModel = new SectionModel();
+					}
+
+					deccoboardModel.currentCRUDObject(newModel);
 				}
 				else if(options.operation == 'delete')
 				{
@@ -646,34 +816,6 @@ var deccoboard = (function()
 			});
 		}
 	};
-
-	var sectionTypes = [
-		{
-			name       : "text",
-			description: "Regular text",
-			height     : 1
-		},
-		{
-			name       : "big-text",
-			description: "Big text",
-			height     : 2
-		},
-		{
-			name       : "sparkline",
-			description: "Sparkline",
-			height     : 2
-		},
-		{
-			name       : "gauge",
-			description: "Gauge",
-			height     : 3
-		},
-		{
-			name       : "text-with-sparkline",
-			description: "Regular text with sparkline",
-			height     : 1
-		}
-	];
 
 	function DeccoboardModel()
 	{
@@ -699,7 +841,7 @@ var deccoboard = (function()
 			{
 				_.each(widget.sections(), function(section)
 				{
-					if(section.refresh() === datasourceName)
+					if(section.refresh().indexOf(datasourceName) != -1)
 					{
 						section.update();
 					}
@@ -736,7 +878,33 @@ var deccoboard = (function()
 			}
 		});
 
-		this.sectionTypes = sectionTypes;
+		this.sectionTypes = [
+			{
+				name       : "text",
+				description: "Regular text",
+				height     : 1
+			},
+			{
+				name       : "big-text",
+				description: "Big text",
+				height     : 2
+			},
+			{
+				name       : "sparkline",
+				description: "Sparkline",
+				height     : 2
+			},
+			{
+				name       : "gauge",
+				description: "Gauge",
+				height     : 3
+			},
+			{
+				name       : "text-with-sparkline",
+				description: "Regular text with sparkline",
+				height     : 1
+			}
+		];
 
 		this.serialize = function()
 		{
@@ -841,6 +1009,7 @@ var deccoboard = (function()
 		this.deleteDatasource = function(datasource)
 		{
 			delete self.datasourceData[datasource.name()];
+			datasource.dispose();
 			self.datasources.remove(datasource);
 		}
 
@@ -874,6 +1043,11 @@ var deccoboard = (function()
 		this.commitCurrentCRUD = function()
 		{
 			var crudObject = self.currentCRUDObject();
+
+			if(ko.isObservable(crudObject.settings) && !_.isUndefined(crudObject.newSettings))
+			{
+				crudObject.settings(crudObject.newSettings);
+			}
 
 			if(self.currentCRUDOperation() == "add")
 			{
@@ -916,6 +1090,7 @@ var deccoboard = (function()
 
 			if(!editing)
 			{
+				$(".gridster .gs_w").css({cursor: "default"});
 				$("#main-header").animate({top: "-280px"}, 250);
 				$(".gridster").animate({"margin-top": "20px"}, 250);
 				$("#main-header").data().shown = false;
@@ -926,6 +1101,7 @@ var deccoboard = (function()
 			}
 			else
 			{
+				$(".gridster .gs_w").css({cursor: "pointer"});
 				$("#main-header").animate({top: "0px"}, 250);
 				$(".gridster").animate({"margin-top": "300px"}, 250);
 				$("#main-header").data().shown = true;
@@ -1058,7 +1234,26 @@ var deccoboard = (function()
 				}
 			}
 
-			self.valueFunction = new Function("datasources", script);
+			try
+			{
+				self.valueFunction = new Function("datasources", script);
+			}
+			catch(e)
+			{
+			}
+
+			// Find any references to datasources, and show that we want to be notified when they refresh
+			var refreshDatasources = [];
+
+			var datasourceRegex = new RegExp("datasources.(\\w+)", "g");
+			var matches;
+
+			while(matches = datasourceRegex.exec(newValue))
+			{
+				refreshDatasources.push(matches[1]);
+			}
+
+			self.refresh(refreshDatasources);
 		});
 
 		this.units = ko.observable();
@@ -1068,7 +1263,7 @@ var deccoboard = (function()
 		this.height = ko.computed({
 			read: function()
 			{
-				var sectionType = _.findWhere(sectionTypes, {name: self.type()});
+				var sectionType = _.findWhere(deccoboardModel.sectionTypes, {name: self.type()});
 
 				if(sectionType)
 				{
@@ -1081,7 +1276,7 @@ var deccoboard = (function()
 			}
 		});
 
-		this.refresh = ko.observable();
+		this.refresh = ko.observableArray();
 
 		this._updateDummy = ko.observable();
 
@@ -1103,7 +1298,7 @@ var deccoboard = (function()
 			}
 			catch(e)
 			{
-				value = "Error";
+				value = "";
 				console.log(e.toString());
 				/*valueElement.popover({
 				 title    : "Error",
@@ -1158,12 +1353,35 @@ var deccoboard = (function()
 	{
 		var self = this;
 
+		function disposeDatasourceInstance()
+		{
+			if(!_.isUndefined(self.datasourceInstance))
+			{
+				if(_.isFunction(self.datasourceInstance.onDispose))
+				{
+					self.datasourceInstance.onDispose();
+				}
+
+				self.datasourceInstance = undefined;
+			}
+		}
+
 		this.name = ko.observable();
+		this.latestData = ko.observable();
 		this.settings = ko.observable({});
+		this.settings.subscribe(function(newValue)
+		{
+			if(!_.isUndefined(self.datasourceInstance) && _.isFunction(self.datasourceInstance.onSettingsChanged))
+			{
+				self.datasourceInstance.onSettingsChanged(newValue);
+			}
+		});
 
 		this.updateCallback = function(newData)
 		{
 			deccoboardModel.processDatasourceUpdate(self, newData);
+
+			self.latestData(newData);
 
 			var now = new Date();
 			self.last_updated(now.toLocaleTimeString());
@@ -1172,15 +1390,7 @@ var deccoboard = (function()
 		this.type = ko.observable();
 		this.type.subscribe(function(newValue)
 		{
-			if(!_.isUndefined(self.datasourceInstance))
-			{
-				if(_.isFunction(self.datasourceInstance.dispose))
-				{
-					self.datasourceInstance.dispose();
-				}
-
-				self.datasourceInstance = undefined;
-			}
+			disposeDatasourceInstance();
 
 			if((newValue in datasourcePlugins) && _.isFunction(datasourcePlugins[newValue].newInstance))
 			{
@@ -1213,7 +1423,7 @@ var deccoboard = (function()
 		this.getDataRepresentation = function(dataPath)
 		{
 			var valueFunction = new Function("data", "return " + dataPath + ";");
-			return valueFunction.call(undefined, self.data());
+			return valueFunction.call(undefined, self.latestData());
 		}
 
 		this.updateNow = function()
@@ -1222,6 +1432,11 @@ var deccoboard = (function()
 			{
 				self.datasourceInstance.updateNow();
 			}
+		}
+
+		this.dispose = function()
+		{
+			disposeDatasourceInstance();
 		}
 	}
 
@@ -1277,10 +1492,6 @@ var deccoboard = (function()
 		//processUpdates();
 		//updateTimer = setInterval(processUpdates, 1000);
 
-		// Initialize our modal overlay
-		var overlay = $("<div id='lean_overlay'></div>");
-		$("body").append(overlay);
-
 		// Fade everything in
 		$(".gridster").css("opacity", 1);
 	});
@@ -1293,6 +1504,11 @@ var deccoboard = (function()
 		},
 		loadDatasourcePlugin : function(plugin)
 		{
+			if(_.isUndefined(plugin.display_name))
+			{
+				plugin.display_name = plugin.type_name;
+			}
+
 			datasourcePlugins[plugin.type_name] = plugin;
 			deccoboardModel._datasourceTypes.valueHasMutated();
 		}
