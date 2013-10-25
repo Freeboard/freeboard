@@ -6,7 +6,7 @@ deccoboard.loadWidgetPlugin((function()
 
 		this.render = function(element)
 		{
-
+			$(element).append($('<h2 class="section-title">' + settings.title + '</h2>'));
 		}
 
 		this.dispose = function()
@@ -24,6 +24,11 @@ deccoboard.loadWidgetPlugin((function()
 		type_name  : "text_widget",
 		display_name : "Text",
 		settings   : [
+			{
+				name        : "title",
+				display_name: "Title",
+				type        : "text"
+			},
 			{
 				name        : "value",
 				display_name: "Value",

@@ -59,13 +59,16 @@ var deccoboard = (function()
 		$('<section></section>').appendTo(modalDialog).append(form);
 
 		// Create our body
-		createSettingRow("Name").append(
-			$('<input type="text">')
-				.val(currentInstanceName)
-				.change(function(){
-					newSettings.name = $(this).val();
-				})
-		);
+		if(!_.isUndefined(currentInstanceName))
+		{
+			createSettingRow("Name").append(
+				$('<input type="text">')
+					.val(currentInstanceName)
+					.change(function(){
+						newSettings.name = $(this).val();
+					})
+			);
+		}
 
 		var typeRow = createSettingRow("Type");
 		var typeSelect = $('<select></select>').appendTo(typeRow).change(function(){
@@ -256,21 +259,40 @@ var deccoboard = (function()
 
 			$(element).click(function(event){
 
-				var instanceName = "";
+				var instanceName = undefined;
 				var instanceType = _.keys(types)[0];
 
-				if(options.operation == 'add')
+				if(options.type == 'datasource')
 				{
-					settings = {};
+					if(options.operation == 'add')
+					{
+						settings = {};
+						instanceName = "";
+					}
+					else if(options.operation == 'delete')
+					{
+					}
+					else
+					{
+						instanceName = viewModel.name();
+						instanceType = viewModel.type();
+						settings = viewModel.settings();
+					}
 				}
-				else if(options.operation == 'delete')
+				else if(options.type == 'widget')
 				{
-				}
-				else
-				{
-					instanceName = viewModel.name();
-					instanceType = viewModel.type();
-					settings = viewModel.settings();
+					if(options.operation == 'add')
+					{
+						settings = {};
+					}
+					else if(options.operation == 'delete')
+					{
+					}
+					else
+					{
+						instanceType = viewModel.type();
+						settings = viewModel.settings();
+					}
 				}
 
 				createPluginEditor(title, types, instanceName, instanceType, settings, function(newSettings)
@@ -279,19 +301,22 @@ var deccoboard = (function()
 					{
 						if(options.type == 'datasource')
 						{
-							viewModel = new DatasourceModel();
-							deccoboardModel.addDatasource(viewModel);
+							var newViewModel = new DatasourceModel();
+							deccoboardModel.addDatasource(newViewModel);
+
+							newViewModel.settings(newSettings.settings);
+							newViewModel.name(newSettings.name);
+							newViewModel.type(newSettings.type);
 						}
 						else if(options.type == 'widget')
 						{
-							viewModel = new WidgetModel();
-							//deccoboardModel.addDatasource(viewModel);
+							var newViewModel = new WidgetModel();
+							newViewModel.settings(newSettings.settings);
+							newViewModel.type(newSettings.type);
+
+							viewModel.widgets.push(newViewModel);
 						}
 					}
-
-					viewModel.settings(newSettings.settings);
-					viewModel.name(newSettings.name);
-					viewModel.type(newSettings.type);
 				});
 			});
 		}
@@ -709,16 +734,7 @@ var deccoboard = (function()
 		update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
 			$(element).empty();
-
-			if(!_.isUndefined(viewModel.widgetInstance) && _.isFunction(viewModel.widgetInstance.render))
-			{
-				viewModel.widgetInstance.render(element);
-			}
-			//$(element).empty();
-			/*if(bindingContext.$root.isEditing())
-			{
-				attachWidgetEditIcons(element);
-			}*/
+			viewModel.render(element);
 		}
 	}
 
@@ -1141,6 +1157,14 @@ var deccoboard = (function()
 				return 1;
 			}
 		});
+
+		this.render = function(element)
+		{
+			if(!_.isUndefined(self.widgetInstance) && _.isFunction(self.widgetInstance.render))
+			{
+				self.widgetInstance.render(element);
+			}
+		}
 
 		this.refresh = ko.observableArray();
 

@@ -1008,7 +1008,7 @@ table#datasources-list tbody
     height: 75px;
 }
 
-.sub-section > h2
+.sub-section h2
 {
 	font-size: 14px;
 	font-weight: normal;
