@@ -343,6 +343,7 @@ var deccoboard = (function()
 			return $('<td class="form-table-value"></td>').appendTo(tr);
 		}
 
+
 		var form = $('<table class="form-table"></table>');
 
 		// Create our body
@@ -357,203 +358,215 @@ var deccoboard = (function()
 			);
 		}
 
-		var typeRow = createSettingRow("Type");
-		var typeSelect = $('<select></select>').appendTo(typeRow).change(function(){
-			newSettings.type = $(this).val();
-			newSettings.settings = {};
-		});
+        function createSettingsFromDefinition(settingsDefs)
+        {
+            _.each(settingsDefs, function(settingDef)
+            {
+                // Set a default value if one doesn't exist
+                if(!_.isUndefined(settingDef.default_value) && _.isUndefined(currentSettingsValues[settingDef.name]))
+                {
+                    currentSettingsValues[settingDef.name] = settingDef.default_value;
+                }
 
-		_.each(pluginTypes, function(pluginType){
-			typeSelect.append($("<option></option>").text(pluginType.display_name).attr("value", pluginType.type_name));
-		});
+                var displayName = settingDef.name;
 
-		typeSelect.on("change", function(event){
+                if(!_.isUndefined(settingDef.display_name))
+                {
+                    displayName = settingDef.display_name;
+                }
 
-			// Remove all the previous settings
-			typeRow.parent().nextAll().remove();
+                var valueCell = createSettingRow(displayName);
 
-			var currentType = pluginTypes[typeSelect.val()];
+                switch (settingDef.type)
+                {
+                    case "array":
+                    {
+                        var subTableDiv = $('<div class="form-table-value-subtable"></div>').appendTo(valueCell);
 
-			_.each(currentType.settings, function(settingDef)
-			{
-				// Set a default value if one doesn't exist
-				if(!_.isUndefined(settingDef.default_value) && _.isUndefined(currentSettingsValues[settingDef.name]))
-				{
-					currentSettingsValues[settingDef.name] = settingDef.default_value;
-				}
+                        $('<a class="table-operation">Add</a>').appendTo(valueCell);
 
-				var displayName = settingDef.name;
+                        if(settingDef.name in currentSettingsValues)
+                        {
+                            var subSettings = currentSettingsValues[settingDef.name];
 
-				if(!_.isUndefined(settingDef.display_name))
-				{
-					displayName = settingDef.display_name;
-				}
+                            if(_.isArray(settingDef.settings) && _.isArray(subSettings) && subSettings.length > 0)
+                            {
+                                newSettings.settings[settingDef.name] = [];
 
-				var valueCell = createSettingRow(displayName);
+                                var subTable = $('<table class="table table-condensed sub-table"></table>').appendTo(subTableDiv);
+                                var subTableHead = $("<thead></thead>").appendTo(subTable);
+                                subTableHead = $("<tr></tr>").appendTo(subTableHead);
 
-				switch (settingDef.type)
-				{
-					case "array":
-					{
-						var subTableDiv = $('<div class="form-table-value-subtable"></div>').appendTo(valueCell);
+                                // Create our headers
+                                _.each(settingDef.settings, function(subSettingDef)
+                                {
+                                    var subsettingDisplayName = subSettingDef.name;
 
-						$('<a class="table-operation">Add</a>').appendTo(valueCell);
+                                    if(!_.isUndefined(subSettingDef.display_name))
+                                    {
+                                        subsettingDisplayName = subSettingDef.display_name;
+                                    }
 
-						if(settingDef.name in currentSettingsValues)
-						{
-							var subSettings = currentSettingsValues[settingDef.name];
+                                    $('<th>' + subsettingDisplayName + '</th>').appendTo(subTableHead);
+                                });
 
-							if(_.isArray(settingDef.settings) && _.isArray(subSettings) && subSettings.length > 0)
-							{
-								newSettings.settings[settingDef.name] = [];
+                                var subTableBody = $('<tbody></tbody>').appendTo(subTable);
 
-								var subTable = $('<table class="table table-condensed sub-table"></table>').appendTo(subTableDiv);
-								var subTableHead = $("<thead></thead>").appendTo(subTable);
-								subTableHead = $("<tr></tr>").appendTo(subTableHead);
+                                // Create our rows
+                                _.each(subSettings, function(subSetting, subSettingIndex)
+                                {
+                                    var subsettingRow = $('<tr></tr>').appendTo(subTableBody);
 
-								// Create our headers
-								_.each(settingDef.settings, function(subSettingDef)
-								{
-									var subsettingDisplayName = subSettingDef.name;
+                                    var newSetting = {};
+                                    newSettings.settings[settingDef.name].push(newSetting);
 
-									if(!_.isUndefined(subSettingDef.display_name))
-									{
-										subsettingDisplayName = subSettingDef.display_name;
-									}
+                                    _.each(settingDef.settings, function(subSettingDef)
+                                    {
+                                        var subsettingCol = $('<td></td>').appendTo(subsettingRow);
+                                        var subsettingValue = "";
 
-									$('<th>' + subsettingDisplayName + '</th>').appendTo(subTableHead);
-								});
+                                        if(!_.isUndefined(subSetting[subSettingDef.name]))
+                                        {
+                                            subsettingValue = subSetting[subSettingDef.name];
+                                        }
 
-								var subTableBody = $('<tbody></tbody>').appendTo(subTable);
+                                        newSetting[subSettingDef.name] = subsettingValue;
 
-								// Create our rows
-								_.each(subSettings, function(subSetting, subSettingIndex)
-								{
-									var subsettingRow = $('<tr></tr>').appendTo(subTableBody);
+                                        $('<input class="table-row-value" type="text">').appendTo(subsettingCol).val(subsettingValue).change(function(){
+                                            newSetting[subSettingDef.name] = $(this).val();
+                                        });
+                                    });
 
-									var newSetting = {};
-									newSettings.settings[settingDef.name].push(newSetting);
+                                    subsettingRow.append($('<td class="table-row-operation"></td>').append($('<i class="icon-trash icon-white"></i>').click(function()
+                                    {
+                                        newSettings.settings[settingDef.name].splice(subSettingIndex, 1);
+                                        subsettingRow.remove();
+                                    })));
+                                });
+                            }
+                        }
 
-									_.each(settingDef.settings, function(subSettingDef)
-									{
-										var subsettingCol = $('<td></td>').appendTo(subsettingRow);
-										var subsettingValue = "";
+                        break;
+                    }
+                    case "boolean":
+                    {
+                        newSettings.settings[settingDef.name] = currentSettingsValues[settingDef.name];
 
-										if(!_.isUndefined(subSetting[subSettingDef.name]))
-										{
-											subsettingValue = subSetting[subSettingDef.name];
-										}
+                        var input = $('<input type="checkbox">').appendTo(valueCell).change(function(){
+                            newSettings.settings[settingDef.name] = this.checked;
+                        });
 
-										newSetting[subSettingDef.name] = subsettingValue;
+                        if(settingDef.name in currentSettingsValues)
+                        {
+                            input.prop("checked", currentSettingsValues[settingDef.name]);
+                        }
 
-										$('<input class="table-row-value" type="text">').appendTo(subsettingCol).val(subsettingValue).change(function(){
-											newSetting[subSettingDef.name] = $(this).val();
-										});
-									});
+                        break;
+                    }
+                    case "option":
+                    {
+                        var defaultValue = currentSettingsValues[settingDef.name];
 
-									subsettingRow.append($('<td class="table-row-operation"></td>').append($('<i class="icon-trash icon-white"></i>').click(function()
-										{
-											newSettings.settings[settingDef.name].splice(subSettingIndex, 1);
-											subsettingRow.remove();
-										})));
-								});
-							}
-						}
+                        var input = $('<select></select>').appendTo(valueCell).change(function(){
+                            newSettings.settings[settingDef.name] = $(this).val();
+                        });
 
-						break;
-					}
-					case "boolean":
-					{
-						newSettings.settings[settingDef.name] = currentSettingsValues[settingDef.name];
+                        _.each(settingDef.options, function(option){
 
-						var input = $('<input type="checkbox">').appendTo(valueCell).change(function(){
-							newSettings.settings[settingDef.name] = this.checked;
-						});
+                            var optionName;
+                            var optionValue;
 
-						if(settingDef.name in currentSettingsValues)
-						{
-							input.prop("checked", currentSettingsValues[settingDef.name]);
-						}
+                            if(_.isObject(option))
+                            {
+                                optionName = option.name;
+                                optionValue = option.value;
+                            }
+                            else
+                            {
+                                optionName = option;
+                            }
 
-						break;
-					}
-					case "option":
-					{
-						var defaultValue = currentSettingsValues[settingDef.name];
+                            if(_.isUndefined(optionValue))
+                            {
+                                optionValue = optionName;
+                            }
 
-						var input = $('<select></select>').appendTo(valueCell).change(function(){
-							newSettings.settings[settingDef.name] = $(this).val();
-						});
+                            if(_.isUndefined(defaultValue))
+                            {
+                                defaultValue = optionValue;
+                            }
 
-						_.each(settingDef.options, function(option){
+                            $("<option></option>").text(optionName).attr("value", optionValue).appendTo(input);
+                        });
 
-							var optionName;
-							var optionValue;
+                        newSettings.settings[settingDef.name] = defaultValue;
 
-							if(_.isObject(option))
-							{
-								optionName = option.name;
-								optionValue = option.value;
-							}
-							else
-							{
-								optionName = option;
-							}
+                        if(settingDef.name in currentSettingsValues)
+                        {
+                            input.val(currentSettingsValues[settingDef.name]);
+                        }
 
-							if(_.isUndefined(optionValue))
-							{
-								optionValue = optionName;
-							}
+                        break;
+                    }
+                    default:
+                    {
+                        newSettings.settings[settingDef.name] = currentSettingsValues[settingDef.name];
 
-							if(_.isUndefined(defaultValue))
-							{
-								defaultValue = optionValue;
-							}
+                        var input = $('<input type="text">').appendTo(valueCell).change(function(){
+                            newSettings.settings[settingDef.name] = $(this).val();
+                        });
 
-							$("<option></option>").text(optionName).attr("value", optionValue).appendTo(input);
-						});
+                        if(!_.isUndefined(settingDef.suffix))
+                        {
+                            input.addClass("small align-right");
+                            $('<div class="input-suffix">' + settingDef.suffix + '</div>').appendTo(valueCell);
+                        }
 
-						newSettings.settings[settingDef.name] = defaultValue;
+                        if(settingDef.name in currentSettingsValues)
+                        {
+                            input.val(currentSettingsValues[settingDef.name]);
+                        }
 
-						if(settingDef.name in currentSettingsValues)
-						{
-							input.val(currentSettingsValues[settingDef.name]);
-						}
+                        if(settingDef.type == "calculated")
+                        {
+                            createValueEditor(input);
+                        }
 
-						break;
-					}
-					default:
-					{
-						newSettings.settings[settingDef.name] = currentSettingsValues[settingDef.name];
+                        break;
+                    }
+                }
+            });
+        }
 
-						var input = $('<input type="text">').appendTo(valueCell).change(function(){
-							newSettings.settings[settingDef.name] = $(this).val();
-						});
+        if(_.keys(pluginTypes).length > 1)
+        {
+            var typeRow = createSettingRow("Type");
+            var typeSelect = $('<select></select>').appendTo(typeRow).change(function(){
+                newSettings.type = $(this).val();
+                newSettings.settings = {};
+            });
 
-						if(!_.isUndefined(settingDef.suffix))
-						{
-							input.addClass("small align-right");
-							$('<div class="input-suffix">' + settingDef.suffix + '</div>').appendTo(valueCell);
-						}
+            _.each(pluginTypes, function(pluginType){
+                typeSelect.append($("<option></option>").text(pluginType.display_name).attr("value", pluginType.type_name));
+            });
 
-						if(settingDef.name in currentSettingsValues)
-						{
-							input.val(currentSettingsValues[settingDef.name]);
-						}
+            typeSelect.on("change", function(event){
 
-						if(settingDef.type == "calculated")
-						{
-							createValueEditor(input);
-						}
+                // Remove all the previous settings
+                typeRow.parent().nextAll().remove();
 
-						break;
-					}
-				}
-			});
+                var currentType = pluginTypes[typeSelect.val()];
 
-		});
+                createSettingsFromDefinition(currentType.settings);
 
-		typeSelect.val(currentTypeName).trigger("change");
+            });
+
+            typeSelect.val(currentTypeName).trigger("change");
+        }
+        else
+        {
+            createSettingsFromDefinition(pluginTypes.settings);
+        }
 
         createDialogBox(form, title, "Save", "Cancel", function(){
             if(_.isFunction(settingsSavedCallback))
@@ -640,6 +653,25 @@ var deccoboard = (function()
                             settings = viewModel.settings();
                         }
                     }
+                    else if(options.type == 'pane')
+                    {
+                        settings = {};
+
+                        if(options.operation == 'edit')
+                        {
+                            settings.title = viewModel.title();
+                        }
+
+                        types = {
+                            settings : [
+                                {
+                                    name        : "title",
+                                    display_name: "Title",
+                                    type        : "text"
+                                }
+                            ]
+                        }
+                    }
 
                     createPluginEditor(title, types, instanceName, instanceType, settings, function(newSettings)
                     {
@@ -667,7 +699,14 @@ var deccoboard = (function()
                         }
                         else if(options.operation == 'edit')
                         {
-                            viewModel.settings(newSettings.settings);
+                            if(options.type == 'pane')
+                            {
+                                viewModel.title(newSettings.settings.title);
+                            }
+                            else
+                            {
+                                viewModel.settings(newSettings.settings);
+                            }
                         }
                     });
                 }
