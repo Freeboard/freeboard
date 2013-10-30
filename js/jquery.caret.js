@@ -46,6 +46,8 @@
 			element.value = text + element.value;
 		}
 
+		$(this).change();
+
 		return this;
 	}
 
@@ -62,6 +64,10 @@
 		var newCursorPosition = prefix.length + replacementText.length;
 
 		setCaretTo(element, newCursorPosition);
+
+		$(this).change();
+
+		return this;
 	}
 
 	$.fn.setCaretPosition = function(start, end)

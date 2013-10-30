@@ -60,8 +60,7 @@
                             <tr>
                                 <td><a href="javascript:void(0)" data-bind="text: name, pluginEditor: {operation: 'edit', type: 'datasource'}"></a></td>
                                 <td data-bind="text: last_updated"></td>
-                                <td>
-                                    <a href="javascript:void(0)" class="datasource-refresh-btn" data-bind="click: updateNow"><i class="icon-refresh icon-white"></i></a> <a href="javascript:void(0)" class="datasource-delete-btn"><i class="icon-trash icon-white"></i></a></td>
+                                <td><i class="icon-refresh icon-white action-icon" data-bind="click: updateNow"></i><i class="icon-trash icon-white action-icon" data-bind="pluginEditor: {operation: 'delete', type: 'datasource'}"></i></td>
                             </tr>
                         </tbody>
                     </table>
@@ -70,7 +69,7 @@
             </div>
         </div>
     </div>
-    <a id="toggle-header" href="javascript:void(0)" data-bind="click: toggleEditing"><i class="icon-wrench icon-white"></i></a>
+    <div id="toggle-header" data-bind="click: toggleEditing" ><i class="icon-wrench icon-white"></i></div>
 </header>
 <div class="gridster">
     <ul data-bind="grid: true, template: {name: 'pane-template', foreach: panes}">
@@ -82,14 +81,14 @@
         <header>
             <h1 data-bind="text: title"></h1>
             <div class="widget-tools">
-                <a href="javascript:void(0);" data-bind="pluginEditor: {operation: 'add', type: 'widget'}"><i class="icon-plus icon-white add-widget"></i></a><a href="javascript:void(0);"><i class="icon-wrench icon-white edit-widget"></i></a><a href="javascript:void(0);"><i class="icon-trash icon-white delete-widget"></i></a>
+                <i class="icon-plus icon-white action-icon" data-bind="pluginEditor: {operation: 'add', type: 'widget'}"></i><i class="icon-wrench icon-white action-icon" data-bind="pluginEditor: {operation: 'edit', type: 'pane'}"></i><i class="icon-trash icon-white action-icon" data-bind="pluginEditor: {operation: 'delete', type: 'pane'}"></i></a>
             </div>
         </header>
         <section data-bind="foreach: widgets">
             <div class="sub-section" data-bind="css: 'sub-section-height-' + height()">
                 <div data-bind="widget: true"></div>
                 <div class="sub-section-tools">
-                    <a href="javascript:void(0);"><i class="icon-wrench icon-white edit-widget"></i></a><a href="javascript:void(0);"><i class="icon-trash icon-white delete-widget"></i></a>
+                    <i class="icon-wrench icon-white action-icon" data-bind="pluginEditor: {operation: 'edit', type: 'widget'}"></i><i class="icon-trash icon-white action-icon" data-bind="pluginEditor: {operation: 'delete', type: 'widget'}"></i>
                 </div>
             </div>
         </section>

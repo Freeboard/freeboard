@@ -80,7 +80,8 @@ deccoboard.loadDatasourcePlugin((function()
 				name : "refresh",
 				display_name : "Refresh Every",
 				type : "number",
-				suffix : "seconds"
+				suffix : "seconds",
+				default_value : 5
 			},
 			{
 				name : "is_jsonp",

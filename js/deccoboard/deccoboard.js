@@ -4,6 +4,328 @@ var deccoboard = (function()
 	var widgetPlugins = {};
 	var grid;
 	var deccoboardModel = new DeccoboardModel();
+	var currentStyle = {
+		values : {
+			"font-family" : '"HelveticaNeue-UltraLight", "Helvetica Neue Ultra Light", "Helvetica Neue", sans-serif',
+			"color" : "#d3d4d4",
+			"font-weight" : 100
+		}
+	};
+
+	var veDatasourceRegex = new RegExp(".*datasources[.]([^.]*)([.][^\\s]*)?$");
+	function createValueEditor(element)
+	{
+		var dropdown = null;
+		var selectedOptionIndex = 0;
+
+		$(element).bind("keyup mouseup",function(event)
+		{
+
+			// Ignore arrow keys and enter keys
+			if(dropdown && event.type == "keyup" && (event.keyCode == 38 || event.keyCode == 40 || event.keyCode == 13))
+			{
+				event.preventDefault();
+				return;
+			}
+
+			var inputString = $(element).val().substring(0, $(element).getCaretPosition());
+			var match = veDatasourceRegex.exec(inputString);
+
+			var options = [];
+			var replacementString = undefined;
+
+			if(match)
+			{
+				if(match[1] == "") // List all datasources
+				{
+					_.each(deccoboardModel.datasources(), function(datasource)
+					{
+						options.push({value: datasource.name(), follow_char: "."});
+					});
+				}
+				else if(match[1] != "" && _.isUndefined(match[2])) // List partial datasources
+				{
+					replacementString = match[1];
+
+					_.each(deccoboardModel.datasources(), function(datasource)
+					{
+
+						var name = datasource.name();
+
+						if(name != match[1] && name.indexOf(match[1]) == 0)
+						{
+							options.push({value: name, follow_char: "."});
+						}
+					});
+				}
+				else
+				{
+					var datasource = _.find(deccoboardModel.datasources(), function(datasource)
+					{
+						return (datasource.name() === match[1]);
+					});
+
+					if(!_.isUndefined(datasource))
+					{
+						var dataPath = "";
+
+						if(!_.isUndefined(match[2]))
+						{
+							dataPath = match[2];
+						}
+
+						var dataPathItems = dataPath.split(".");
+						dataPath = "data";
+
+						for(var index = 1; index < dataPathItems.length - 1; index++)
+						{
+							if(dataPathItems[index] != "")
+							{
+								dataPath = dataPath + "." + dataPathItems[index];
+							}
+						}
+
+						var lastPathObject = _.last(dataPathItems);
+
+						// If the last character is a [, then ignore it
+						if(lastPathObject.charAt(lastPathObject.length - 1) == "[")
+						{
+							lastPathObject = lastPathObject.replace(/\[+$/, "");
+							dataPath = dataPath + "." + lastPathObject;
+						}
+
+						var dataValue = datasource.getDataRepresentation(dataPath);
+
+						if(_.isArray(dataValue))
+						{
+							for(var index = 0; index < dataValue.length; index++)
+							{
+								var followChar = "]";
+
+								if(_.isObject(dataValue[index]))
+								{
+									followChar = followChar + ".";
+								}
+								else if(_.isArray(dataValue[index]))
+								{
+									followChar = followChar + "[";
+								}
+
+								options.push({value: index, follow_char: followChar});
+							}
+						}
+						else if(_.isObject(dataValue))
+						{
+							replacementString = lastPathObject;
+
+							_.each(dataValue, function(value, name)
+							{
+
+								if(name != lastPathObject && name.indexOf(lastPathObject) == 0)
+								{
+									var followChar = undefined;
+
+									if(_.isArray(value))
+									{
+										followChar = "[";
+									}
+									else if(_.isObject(value))
+									{
+										followChar = ".";
+									}
+
+									options.push({value: name, follow_char: followChar});
+								}
+							});
+						}
+					}
+				}
+			}
+
+			if(options.length > 0)
+			{
+				if(!dropdown)
+				{
+					dropdown = $('<ul id="value-selector" class="value-dropdown"></ul>').insertAfter(element).width($(element).outerWidth() - 2).css("left", $(element).position().left).css("top", $(element).position().top + $(element).outerHeight() - 1);
+				}
+
+				dropdown.empty();
+				dropdown.scrollTop(0);
+
+				var selected = true;
+				selectedOptionIndex = 0;
+
+				var currentIndex = 0;
+
+				_.each(options, function(option)
+				{
+					var li = $('<li>' + option.value + '</li>').appendTo(dropdown).mouseenter(function()
+					{
+						$(this).trigger("decco-select");
+					}).mousedown(function(event)
+						{
+							$(this).trigger("decco-insertValue");
+							event.preventDefault();
+						}).data("decco-optionIndex", currentIndex).data("decco-optionValue", option.value).bind("decco-insertValue",function()
+						{
+							var optionValue = option.value;
+
+							if(!_.isUndefined(option.follow_char))
+							{
+								optionValue = optionValue + option.follow_char;
+							}
+
+							if(!_.isUndefined(replacementString))
+							{
+								var replacementIndex = inputString.lastIndexOf(replacementString);
+
+								if(replacementIndex != -1)
+								{
+									$(element).replaceTextAt(replacementIndex, replacementIndex + replacementString.length, optionValue);
+								}
+							}
+							else
+							{
+								$(element).insertAtCaret(optionValue);
+							}
+
+							$(element).triggerHandler("mouseup");
+						}).bind("decco-select", function()
+						{
+							$(this).parent().find("li.selected").removeClass("selected");
+							$(this).addClass("selected");
+							selectedOptionIndex = $(this).data("decco-optionIndex");
+						});
+
+					if(selected)
+					{
+						$(li).addClass("selected");
+						selected = false;
+					}
+
+					currentIndex++;
+				});
+			}
+			else
+			{
+				$(element).next("ul#value-selector").remove();
+				dropdown = null;
+				selectedOptionIndex = -1;
+			}
+		}).focusout(function()
+			{
+				$(element).next("ul#value-selector").remove();
+				dropdown = null;
+				selectedOptionIndex = -1;
+			}).bind("keydown", function(event)
+			{
+
+				if(dropdown)
+				{
+					if(event.keyCode == 38 || event.keyCode == 40) // Handle Arrow keys
+					{
+						event.preventDefault();
+
+						var optionItems = $(dropdown).find("li");
+
+						if(event.keyCode == 38) // Up Arrow
+						{
+							selectedOptionIndex--;
+						}
+						else if(event.keyCode == 40) // Down Arrow
+						{
+							selectedOptionIndex++;
+						}
+
+						if(selectedOptionIndex < 0)
+						{
+							selectedOptionIndex = optionItems.size() - 1;
+						}
+						else if(selectedOptionIndex >= optionItems.size())
+						{
+							selectedOptionIndex = 0;
+						}
+
+						var optionElement = $(optionItems).eq(selectedOptionIndex);
+
+						optionElement.trigger("decco-select");
+						$(dropdown).scrollTop($(optionElement).position().top);
+					}
+					else if(event.keyCode == 13) // Handle enter key
+					{
+						event.preventDefault();
+
+						if(selectedOptionIndex != -1)
+						{
+							$(dropdown).find("li").eq(selectedOptionIndex).trigger("decco-insertValue");
+						}
+					}
+				}
+			});
+	}
+
+    function createDialogBox(contentElement, title, okTitle, cancelTitle, okCallback)
+    {
+        var modal_width = 800;
+
+        // Initialize our modal overlay
+        var overlay = $('<div id="modal_overlay"></div>')
+            .css({ 'display': 'block', opacity: 0 });
+
+        var modalDialog = $('<div class="modal"></div>')
+            .css({
+
+                'display'    : 'block',
+                'position'   : 'fixed',
+                'opacity'    : 0,
+                'z-index'    : 11000,
+                'left'       : 50 + '%',
+                'margin-left': -(modal_width / 2) + "px",
+                'top'        : 120 + "px"
+
+            });
+
+        function closeModal()
+        {
+            overlay.fadeTo(200, 0.0, function()
+            {
+                $(this).remove();
+            });
+            modalDialog.fadeTo(200, 0.0, function()
+            {
+                $(this).remove();
+            });
+        }
+
+        // Create our header
+        modalDialog.append("<header><h1>" + title + "</h1></header>");
+
+        $('<section></section>').appendTo(modalDialog).append(contentElement);
+
+        // Create our footer
+        var footer = $('<footer></footer>').appendTo(modalDialog);
+        $('<span class="button">' + okTitle + '</span>')
+            .appendTo(footer)
+            .click(function(){
+                if(_.isFunction(okCallback))
+                {
+                    okCallback();
+                }
+
+                closeModal();
+            });
+
+        $('<span class="button">' + cancelTitle  + '</span>')
+            .appendTo(footer)
+            .click(function(){
+                closeModal();
+            });
+
+        $("body").append([overlay, modalDialog]);
+
+        overlay.fadeTo(200, 0.8);
+        modalDialog.fadeTo(200, 1);
+    }
 
 	function createPluginEditor(title, pluginTypes, currentInstanceName, currentTypeName, currentSettingsValues, settingsSavedCallback)
 	{
@@ -21,42 +343,7 @@ var deccoboard = (function()
 			return $('<td class="form-table-value"></td>').appendTo(tr);
 		}
 
-		function closeModal()
-		{
-			overlay.fadeTo(200, 0.0, function()
-			{
-				$(this).remove();
-			});
-			modalDialog.fadeTo(200, 0.0, function()
-			{
-				$(this).remove();
-			});
-		}
-
-		var modal_width = 800;
-
-		// Initialize our modal overlay
-		var overlay = $('<div id="modal_overlay"></div>')
-			.css({ 'display': 'block', opacity: 0 });
-
-		var modalDialog = $('<div class="modal"></div>')
-			.css({
-
-				'display'    : 'block',
-				'position'   : 'fixed',
-				'opacity'    : 0,
-				'z-index'    : 11000,
-				'left'       : 50 + '%',
-				'margin-left': -(modal_width / 2) + "px",
-				'top'        : 120 + "px"
-
-			});
-
-		// Create our header
-		modalDialog.append("<header><h1>" + title + "</h1></header>");
-
 		var form = $('<table class="form-table"></table>');
-		$('<section></section>').appendTo(modalDialog).append(form);
 
 		// Create our body
 		if(!_.isUndefined(currentInstanceName))
@@ -87,18 +374,24 @@ var deccoboard = (function()
 
 			var currentType = pluginTypes[typeSelect.val()];
 
-			_.each(currentType.settings, function(setting)
+			_.each(currentType.settings, function(settingDef)
 			{
-				var displayName = setting.name;
-
-				if(!_.isUndefined(setting.display_name))
+				// Set a default value if one doesn't exist
+				if(!_.isUndefined(settingDef.default_value) && _.isUndefined(currentSettingsValues[settingDef.name]))
 				{
-					displayName = setting.display_name;
+					currentSettingsValues[settingDef.name] = settingDef.default_value;
+				}
+
+				var displayName = settingDef.name;
+
+				if(!_.isUndefined(settingDef.display_name))
+				{
+					displayName = settingDef.display_name;
 				}
 
 				var valueCell = createSettingRow(displayName);
 
-				switch (setting.type)
+				switch (settingDef.type)
 				{
 					case "array":
 					{
@@ -106,20 +399,20 @@ var deccoboard = (function()
 
 						$('<a class="table-operation">Add</a>').appendTo(valueCell);
 
-						if(setting.name in currentSettingsValues)
+						if(settingDef.name in currentSettingsValues)
 						{
-							var subSettings = currentSettingsValues[setting.name];
+							var subSettings = currentSettingsValues[settingDef.name];
 
-							if(_.isArray(setting.settings) && _.isArray(subSettings) && subSettings.length > 0)
+							if(_.isArray(settingDef.settings) && _.isArray(subSettings) && subSettings.length > 0)
 							{
-								newSettings.settings[setting.name] = [];
+								newSettings.settings[settingDef.name] = [];
 
 								var subTable = $('<table class="table table-condensed sub-table"></table>').appendTo(subTableDiv);
 								var subTableHead = $("<thead></thead>").appendTo(subTable);
 								subTableHead = $("<tr></tr>").appendTo(subTableHead);
 
 								// Create our headers
-								_.each(setting.settings, function(subSettingDef)
+								_.each(settingDef.settings, function(subSettingDef)
 								{
 									var subsettingDisplayName = subSettingDef.name;
 
@@ -139,9 +432,9 @@ var deccoboard = (function()
 									var subsettingRow = $('<tr></tr>').appendTo(subTableBody);
 
 									var newSetting = {};
-									newSettings.settings[setting.name].push(newSetting);
+									newSettings.settings[settingDef.name].push(newSetting);
 
-									_.each(setting.settings, function(subSettingDef)
+									_.each(settingDef.settings, function(subSettingDef)
 									{
 										var subsettingCol = $('<td></td>').appendTo(subsettingRow);
 										var subsettingValue = "";
@@ -160,7 +453,7 @@ var deccoboard = (function()
 
 									subsettingRow.append($('<td class="table-row-operation"></td>').append($('<i class="icon-trash icon-white"></i>').click(function()
 										{
-											newSettings.settings[setting.name].splice(subSettingIndex, 1);
+											newSettings.settings[settingDef.name].splice(subSettingIndex, 1);
 											subsettingRow.remove();
 										})));
 								});
@@ -171,36 +464,86 @@ var deccoboard = (function()
 					}
 					case "boolean":
 					{
-						newSettings.settings[setting.name] = currentSettingsValues[setting.name];
+						newSettings.settings[settingDef.name] = currentSettingsValues[settingDef.name];
 
 						var input = $('<input type="checkbox">').appendTo(valueCell).change(function(){
-							newSettings.settings[setting.name] = this.checked;
+							newSettings.settings[settingDef.name] = this.checked;
 						});
 
-						if(setting.name in currentSettingsValues)
+						if(settingDef.name in currentSettingsValues)
 						{
-							input.prop("checked", currentSettingsValues[setting.name]);
+							input.prop("checked", currentSettingsValues[settingDef.name]);
+						}
+
+						break;
+					}
+					case "option":
+					{
+						var defaultValue = currentSettingsValues[settingDef.name];
+
+						var input = $('<select></select>').appendTo(valueCell).change(function(){
+							newSettings.settings[settingDef.name] = $(this).val();
+						});
+
+						_.each(settingDef.options, function(option){
+
+							var optionName;
+							var optionValue;
+
+							if(_.isObject(option))
+							{
+								optionName = option.name;
+								optionValue = option.value;
+							}
+							else
+							{
+								optionName = option;
+							}
+
+							if(_.isUndefined(optionValue))
+							{
+								optionValue = optionName;
+							}
+
+							if(_.isUndefined(defaultValue))
+							{
+								defaultValue = optionValue;
+							}
+
+							$("<option></option>").text(optionName).attr("value", optionValue).appendTo(input);
+						});
+
+						newSettings.settings[settingDef.name] = defaultValue;
+
+						if(settingDef.name in currentSettingsValues)
+						{
+							input.val(currentSettingsValues[settingDef.name]);
 						}
 
 						break;
 					}
 					default:
 					{
-						newSettings.settings[setting.name] = currentSettingsValues[setting.name];
+						newSettings.settings[settingDef.name] = currentSettingsValues[settingDef.name];
 
 						var input = $('<input type="text">').appendTo(valueCell).change(function(){
-							newSettings.settings[setting.name] = $(this).val();
+							newSettings.settings[settingDef.name] = $(this).val();
 						});
 
-						if(!_.isUndefined(setting.suffix))
+						if(!_.isUndefined(settingDef.suffix))
 						{
 							input.addClass("small align-right");
-							$('<div class="input-suffix">' + setting.suffix + '</div>').appendTo(valueCell);
+							$('<div class="input-suffix">' + settingDef.suffix + '</div>').appendTo(valueCell);
 						}
 
-						if(setting.name in currentSettingsValues)
+						if(settingDef.name in currentSettingsValues)
 						{
-							input.val(currentSettingsValues[setting.name]);
+							input.val(currentSettingsValues[settingDef.name]);
+						}
+
+						if(settingDef.type == "calculated")
+						{
+							createValueEditor(input);
 						}
 
 						break;
@@ -212,29 +555,12 @@ var deccoboard = (function()
 
 		typeSelect.val(currentTypeName).trigger("change");
 
-		// Create our footer
-		var footer = $('<footer></footer>').appendTo(modalDialog);
-		$('<span class="button">Save</span>')
-			.appendTo(footer)
-			.click(function(){
-				if(_.isFunction(settingsSavedCallback))
-				{
-					settingsSavedCallback(newSettings);
-				}
-
-				closeModal();
-			});
-
-		$('<span class="button">Cancel</span>')
-			.appendTo(footer)
-			.click(function(){
-				closeModal();
-			});
-
-		$("body").append([overlay, modalDialog]);
-
-		overlay.fadeTo(200, 0.8);
-		modalDialog.fadeTo(200, 1);
+        createDialogBox(form, title, "Save", "Cancel", function(){
+            if(_.isFunction(settingsSavedCallback))
+            {
+                settingsSavedCallback(newSettings);
+            }
+        });
 	}
 
 	ko.bindingHandlers.pluginEditor = {
@@ -256,68 +582,95 @@ var deccoboard = (function()
 				types = widgetPlugins;
 				title = "Widget";
 			}
+            else if(options.type == 'pane')
+            {
+                title = "Pane";
+            }
 
-			$(element).click(function(event){
+			$(element).click(function(event)
+            {
+                if(options.operation == 'delete')
+                {
+                    var phraseElement = $('<p>Are you sure you want to delete this ' + title  + '?</p>');
+                    createDialogBox(phraseElement, "Confirm Delete", "Yes", "No", function(){
 
-				var instanceName = undefined;
-				var instanceType = _.keys(types)[0];
+                        if(options.type == 'datasource')
+                        {
+                            deccoboardModel.deleteDatasource(viewModel);
+                        }
+                        else if(options.type == 'widget')
+                        {
+                            deccoboardModel.deleteWidget(viewModel);
+                        }
+                        else if(options.type == 'pane')
+                        {
+                            deccoboardModel.deletePane(viewModel);
+                        }
 
-				if(options.type == 'datasource')
-				{
-					if(options.operation == 'add')
-					{
-						settings = {};
-						instanceName = "";
-					}
-					else if(options.operation == 'delete')
-					{
-					}
-					else
-					{
-						instanceName = viewModel.name();
-						instanceType = viewModel.type();
-						settings = viewModel.settings();
-					}
-				}
-				else if(options.type == 'widget')
-				{
-					if(options.operation == 'add')
-					{
-						settings = {};
-					}
-					else if(options.operation == 'delete')
-					{
-					}
-					else
-					{
-						instanceType = viewModel.type();
-						settings = viewModel.settings();
-					}
-				}
+                    });
+                }
+                else
+                {
+                    var instanceName = undefined;
+                    var instanceType = _.keys(types)[0];
 
-				createPluginEditor(title, types, instanceName, instanceType, settings, function(newSettings)
-				{
-					if(options.operation == 'add')
-					{
-						if(options.type == 'datasource')
-						{
-							var newViewModel = new DatasourceModel();
-							deccoboardModel.addDatasource(newViewModel);
+                    if(options.type == 'datasource')
+                    {
+                        if(options.operation == 'add')
+                        {
+                            settings = {};
+                            instanceName = "";
+                        }
+                        else
+                        {
+                            instanceName = viewModel.name();
+                            instanceType = viewModel.type();
+                            settings = viewModel.settings();
+                        }
+                    }
+                    else if(options.type == 'widget')
+                    {
+                        if(options.operation == 'add')
+                        {
+                            settings = {};
+                        }
+                        else
+                        {
+                            instanceType = viewModel.type();
+                            settings = viewModel.settings();
+                        }
+                    }
 
-							newViewModel.settings(newSettings.settings);
-							newViewModel.name(newSettings.name);
-							newViewModel.type(newSettings.type);
-						}
-						else if(options.type == 'widget')
-						{
-							var newViewModel = new WidgetModel();
-							newViewModel.settings(newSettings.settings);
-							newViewModel.type(newSettings.type);
+                    createPluginEditor(title, types, instanceName, instanceType, settings, function(newSettings)
+                    {
+                        if(options.operation == 'add')
+                        {
+                            if(options.type == 'datasource')
+                            {
+                                var newViewModel = new DatasourceModel();
+                                deccoboardModel.addDatasource(newViewModel);
 
-							viewModel.widgets.push(newViewModel);
-						}
-					}
-				});
+                                newViewModel.settings(newSettings.settings);
+                                newViewModel.name(newSettings.name);
+                                newViewModel.type(newSettings.type);
+                            }
+                            else if(options.type == 'widget')
+                            {
+                                var newViewModel = new WidgetModel();
+                                newViewModel.settings(newSettings.settings);
+                                newViewModel.type(newSettings.type);
+
+                                viewModel.widgets.push(newViewModel);
+
+                                attachWidgetEditIcons(element);
+                            }
+                        }
+                        else if(options.operation == 'edit')
+                        {
+                            viewModel.settings(newSettings.settings);
+                        }
+                    });
+                }
 			});
 		}
 	}
@@ -372,308 +725,10 @@ var deccoboard = (function()
 				//var sizeY = Math.max(viewModel.widgets().length, 1);
 				grid.resize_widget($(element), undefined, viewModel.height());
 			}
-
 		}
 	}
 
-	ko.bindingHandlers.valueEditor = {
-		init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
-		{
-			var datasourceRegex = new RegExp(".*datasources[.]([^.]*)([.][^\\s]*)?$");
-			var dropdown = null;
-			var selectedOptionIndex = 0;
-
-			$(element).bind("keyup mouseup", function(event)
-			{
-
-				// Ignore arrow keys and enter keys
-				if(dropdown && event.type == "keyup" && (event.keyCode == 38 || event.keyCode == 40 || event.keyCode == 13))
-				{
-					event.preventDefault();
-					return;
-				}
-
-				var inputString = $(element).val().substring(0, $(element).getCaretPosition());
-				var match = datasourceRegex.exec(inputString);
-
-				var options = [];
-				var replacementString = undefined;
-
-				if(match)
-				{
-					if(match[1] == "") // List all datasources
-					{
-						_.each(deccoboardModel.datasources(), function(datasource)
-						{
-							options.push({value: datasource.name(), follow_char: "."});
-						});
-					}
-					else if(match[1] != "" && _.isUndefined(match[2])) // List partial datasources
-					{
-						replacementString = match[1];
-
-						_.each(deccoboardModel.datasources(), function(datasource)
-						{
-
-							var name = datasource.name();
-
-							if(name != match[1] && name.indexOf(match[1]) == 0)
-							{
-								options.push({value: name, follow_char: "."});
-							}
-						});
-					}
-					else
-					{
-						var datasource = _.find(deccoboardModel.datasources(), function(datasource)
-						{
-							return (datasource.name() === match[1]);
-						});
-
-						if(!_.isUndefined(datasource))
-						{
-							var dataPath = "";
-
-							if(!_.isUndefined(match[2]))
-							{
-								dataPath = match[2];
-							}
-
-							var dataPathItems = dataPath.split(".");
-							dataPath = "data";
-
-							for(var index = 1; index < dataPathItems.length - 1; index++)
-							{
-								if(dataPathItems[index] != "")
-								{
-									dataPath = dataPath + "." + dataPathItems[index];
-								}
-							}
-
-							var lastPathObject = _.last(dataPathItems);
-
-							// If the last character is a [, then ignore it
-							if(lastPathObject.charAt(lastPathObject.length - 1) == "[")
-							{
-								lastPathObject = lastPathObject.replace(/\[+$/, "");
-								dataPath = dataPath + "." + lastPathObject;
-							}
-
-							var dataValue = datasource.getDataRepresentation(dataPath);
-
-							if(_.isArray(dataValue))
-							{
-								for(var index = 0; index < dataValue.length; index++)
-								{
-									var followChar = "]";
-
-									if(_.isObject(dataValue[index]))
-									{
-										followChar = followChar + ".";
-									}
-									else if(_.isArray(dataValue[index]))
-									{
-										followChar = followChar + "[";
-									}
-
-									options.push({value: index, follow_char: followChar});
-								}
-							}
-							else if(_.isObject(dataValue))
-							{
-								replacementString = lastPathObject;
-
-								_.each(dataValue, function(value, name)
-								{
-
-									if(name != lastPathObject && name.indexOf(lastPathObject) == 0)
-									{
-										var followChar = undefined;
-
-										if(_.isArray(value))
-										{
-											followChar = "[";
-										}
-										else if(_.isObject(value))
-										{
-											followChar = ".";
-										}
-
-										options.push({value: name, follow_char: followChar});
-									}
-								});
-							}
-						}
-					}
-				}
-
-				if(options.length > 0)
-				{
-					if(!dropdown)
-					{
-						dropdown = $('<ul id="value-selector" class="value-dropdown"></ul>').insertAfter(element).width($(element).outerWidth() - 2).css("left", $(element).position().left).css("top", $(element).position().top + $(element).outerHeight() - 1);
-					}
-
-					dropdown.empty();
-
-					var selected = true;
-					selectedOptionIndex = 0;
-
-					var currentIndex = 0;
-
-					_.each(options, function(option)
-					{
-						var li = $('<li>' + option.value + '</li>').appendTo(dropdown).mouseenter(function()
-							{
-								$(this).trigger("decco-select");
-							}).mousedown(function(event)
-							{
-								$(this).trigger("decco-insertValue");
-								event.preventDefault();
-							}).data("decco-optionIndex", currentIndex).data("decco-optionValue", option.value).bind("decco-insertValue", function()
-							{
-
-								var optionValue = option.value;
-
-								if(!_.isUndefined(option.follow_char))
-								{
-									optionValue = optionValue + option.follow_char;
-								}
-
-								if(!_.isUndefined(replacementString))
-								{
-									var replacementIndex = inputString.lastIndexOf(replacementString);
-
-									if(replacementIndex != -1)
-									{
-										$(element).replaceTextAt(replacementIndex, replacementIndex + replacementString.length, optionValue);
-										viewModel.value($(element).val());
-									}
-								}
-								else
-								{
-									$(element).insertAtCaret(optionValue);
-									viewModel.value($(element).val());
-								}
-
-								$(element).triggerHandler("mouseup");
-							}).bind("decco-select", function()
-							{
-								$(this).parent().find("li.selected").removeClass("selected");
-								$(this).addClass("selected");
-								selectedOptionIndex = $(this).data("decco-optionIndex");
-							});
-
-						if(selected)
-						{
-							$(li).addClass("selected");
-							selected = false;
-						}
-
-						currentIndex++;
-					});
-				}
-				else
-				{
-					$(element).next("ul#value-selector").remove();
-					dropdown = null;
-					selectedOptionIndex = -1;
-				}
-			}).focusout(function()
-				{
-					$(element).next("ul#value-selector").remove();
-					dropdown = null;
-					selectedOptionIndex = -1;
-				}).bind("keydown", function(event)
-				{
-
-					if(dropdown)
-					{
-						if(event.keyCode == 38 || event.keyCode == 40) // Handle Arrow keys
-						{
-							event.preventDefault();
-
-							var optionItems = $(dropdown).find("li");
-
-							if(event.keyCode == 38) // Up Arrow
-							{
-								selectedOptionIndex--;
-							}
-							else if(event.keyCode == 40) // Down Arrow
-							{
-								selectedOptionIndex++;
-							}
-
-							if(selectedOptionIndex < 0)
-							{
-								selectedOptionIndex = optionItems.size() - 1;
-							}
-							else if(selectedOptionIndex >= optionItems.size())
-							{
-								selectedOptionIndex = 0;
-							}
-
-							var optionElement = $(optionItems).eq(selectedOptionIndex);
-
-							optionElement.trigger("decco-select");
-							$(dropdown).scrollTop($(optionElement).position().top);
-						}
-						else if(event.keyCode == 13) // Handle enter key
-						{
-							event.preventDefault();
-
-							if(selectedOptionIndex != -1)
-							{
-								$(dropdown).find("li").eq(selectedOptionIndex).trigger("decco-insertValue");
-							}
-						}
-					}
-				});
-		}
-	}
-
-	function createGauge(element, viewModel)
-	{
-		$(element).empty();
-
-		var gaugeID = "widget-" + viewModel.widgetID() + "-gauge";
-
-		$(element).attr("id", gaugeID);
-
-		var gauge = new JustGage({
-			id             : gaugeID,
-			value          : viewModel.computedValue(),
-			min            : (_.isUndefined(viewModel.min()) ? 0 : viewModel.min()),
-			max            : (_.isUndefined(viewModel.max()) ? 100 : viewModel.max()),
-			label          : viewModel.units(),
-			showInnerShadow: false,
-			valueFontColor : "#d3d4d4"
-		});
-
-		$(element).data("gauge", gauge);
-
-		return gauge;
-	}
-
-	ko.bindingHandlers.gauge = {
-		init  : function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
-		{
-			createGauge(element, viewModel);
-		},
-		update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
-		{
-			viewModel._updateDummy();
-
-			var gauge = $(element).data("gauge");
-
-			if(viewModel.min() != gauge.config.min || viewModel.max() != gauge.config.max || viewModel.units() != gauge.config.label)
-			{
-				gauge = createGauge(element, viewModel);
-			}
-
-			gauge.refresh(viewModel.computedValue());
-		}
-	}
+	/*
 
 	ko.bindingHandlers.sparkline = {
 		init  : function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
@@ -721,16 +776,16 @@ var deccoboard = (function()
 				});
 			}
 		}
-	}
+	}*/
 
 	ko.bindingHandlers.widget = {
-		/*init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
+		init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
-			if(!_.isUndefined(viewModel.widgetInstance))
+			if(deccoboardModel.isEditing())
 			{
-
+				attachWidgetEditIcons($(element).parent());
 			}
-		},*/
+		},
 		update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
 			$(element).empty();
@@ -758,10 +813,7 @@ var deccoboard = (function()
 			{
 				_.each(pane.widgets(), function(widget)
 				{
-					if(widget.refresh().indexOf(datasourceName) != -1)
-					{
-						widget.update();
-					}
+					widget.processDatasourceUpdate(datasourceName);
 				});
 			});
 		}
@@ -1075,6 +1127,9 @@ var deccoboard = (function()
 
 		var self = this;
 
+		this.datasourceRefreshNotifications = {};
+		this.calculatedSettingScripts = {};
+
 		this.title = ko.observable();
 
 		this.type = ko.observable();
@@ -1087,68 +1142,132 @@ var deccoboard = (function()
 				var widgetInstance = widgetPlugins[newValue].newInstance(self.settings(), self.updateCallback);
 				self.widgetInstance = widgetInstance;
 			}
+
+			//self.updateCalculatedSettings();
+			self._heightUpdate.valueHasMutated();
 		});
 
 		this.settings = ko.observable({});
 		this.settings.subscribe(function(newValue)
 		{
+			if(!_.isUndefined(self.widgetInstance) && _.isFunction(self.widgetInstance.onSettingsChanged))
+			{
+				self.widgetInstance.onSettingsChanged(newValue);
+			}
+
+			self.updateCalculatedSettings();
+			self._heightUpdate.valueHasMutated();
 		});
 
-		this.value = ko.observable("");
-		this.value.subscribe(function(newValue)
+		this.processDatasourceUpdate = function(datasourceName)
 		{
-			var script;
-			var typeSpecIndex = newValue.indexOf("javascript:");
+			var refreshSettingNames = self.datasourceRefreshNotifications[datasourceName];
 
-			if(typeSpecIndex == 0)
+			if(_.isArray(refreshSettingNames))
 			{
-				script = newValue.substring(11);
+				_.each(refreshSettingNames, function(settingName){
+					self.processCalculatedSetting(settingName);
+				});
+			}
+		}
 
-				// If there is no return, add one
-				if((script.match(/;/g) || []).length <= 1 && script.indexOf("return") == -1)
+		this.callValueFunction = function(theFunction)
+		{
+			return theFunction.call(undefined, deccoboardModel.datasourceData);
+		}
+
+		this.processCalculatedSetting = function(settingName)
+		{
+			if(_.isFunction(self.calculatedSettingScripts[settingName]))
+			{
+				try
 				{
-					script = "return " + script;
+					var returnValue = self.callValueFunction(self.calculatedSettingScripts[settingName]);
+
+					if(!_.isUndefined(self.widgetInstance) && _.isFunction(self.widgetInstance.onCalculatedValueChanged))
+					{
+						self.widgetInstance.onCalculatedValueChanged(settingName, returnValue);
+					}
+				}
+				catch(e)
+				{
+					console.log(e.toString());
 				}
 			}
-			else
-			{
-				typeSpecIndex = newValue.indexOf("datasource:");
+		}
 
-				if(typeSpecIndex == 0)
-				{
-					script = 'return data.' + newValue.substring(11).trim() + ";";
-				}
-				else
-				{
-					script = 'return "' + newValue + '";';
-				}
+		this.updateCalculatedSettings = function()
+		{
+			self.datasourceRefreshNotifications = {};
+			self.calculatedSettingScripts = {};
+
+			if(_.isUndefined(self.type()))
+			{
+				return;
 			}
 
-			try
-			{
-				self.valueFunction = new Function("datasources", script);
-			}
-			catch(e)
-			{
-			}
-
-			// Find any references to datasources, and show that we want to be notified when they refresh
-			var refreshDatasources = [];
-
+			// Check for any calculated settings
+			var settingsDefs = widgetPlugins[self.type()].settings;
 			var datasourceRegex = new RegExp("datasources.(\\w+)", "g");
-			var matches;
+			var currentSettings = self.settings();
 
-			while(matches = datasourceRegex.exec(newValue))
+			_.each(settingsDefs, function(settingDef)
 			{
-				refreshDatasources.push(matches[1]);
-			}
+				if(settingDef.type == "calculated")
+				{
+					var script = currentSettings[settingDef.name];
 
-			self.refresh(refreshDatasources);
-		});
+					if(!_.isUndefined(script))
+					{
+						// If there is no return, add one
+						if((script.match(/;/g) || []).length <= 1 && script.indexOf("return") == -1)
+						{
+							script = "return " + script;
+						}
 
+						var valueFunction;
+
+						try
+						{
+							valueFunction = new Function("datasources", script);
+						}
+						catch(e)
+						{
+							var literalText = currentSettings[settingDef.name].replace(/"/g, '\\"');
+
+							// If the value function cannot be created, then go ahead and treat it as literal text
+							valueFunction = new Function("datasources", "return \"" + literalText + "\";");
+						}
+
+						self.calculatedSettingScripts[settingDef.name] = valueFunction;
+						self.processCalculatedSetting(settingDef.name);
+
+						// Are there any datasources we need to be subscribed to?
+						var matches;
+
+						while(matches = datasourceRegex.exec(script))
+						{
+							var refreshSettingNames = self.datasourceRefreshNotifications[matches[1]];
+
+							if(_.isUndefined(refreshSettingNames))
+							{
+								refreshSettingNames = [];
+								self.datasourceRefreshNotifications[matches[1]] = refreshSettingNames;
+							}
+
+							refreshSettingNames.push(settingDef.name);
+						}
+					}
+				}
+			});
+		}
+
+		this._heightUpdate = ko.observable();
 		this.height = ko.computed({
 			read: function()
 			{
+				self._heightUpdate();
+
 				if(!_.isUndefined(self.widgetInstance) && _.isFunction(self.widgetInstance.getHeight))
 				{
 					return self.widgetInstance.getHeight();
@@ -1163,50 +1282,13 @@ var deccoboard = (function()
 			if(!_.isUndefined(self.widgetInstance) && _.isFunction(self.widgetInstance.render))
 			{
 				self.widgetInstance.render(element);
+				self.updateCalculatedSettings();
 			}
-		}
-
-		this.refresh = ko.observableArray();
-
-		this._updateDummy = ko.observable();
-
-		this.computedValue = ko.computed(function()
-		{
-			self._updateDummy();
-
-			var value;
-
-			try
-			{
-
-				value = self.currentComputedValue = self.valueFunction.call(undefined, deccoboardModel.datasourceData);
-			}
-			catch(e)
-			{
-				value = "";
-				console.log(e.toString());
-				/*valueElement.popover({
-				 title    : "Error",
-				 content  : e.toString(),
-				 trigger  : "hover",
-				 container: "body"
-				 });*/
-			}
-
-			return value;
-		});
-
-		this.update = function()
-		{
-			self._updateDummy.valueHasMutated();
 		}
 
 		this.dispose = function()
 		{
-			if(self._dataSubscription)
-			{
-				self._dataSubscription.dispose();
-			}
+
 		}
 
 		this.serialize = function()
@@ -1214,11 +1296,7 @@ var deccoboard = (function()
 			return {
 				title  : self.title(),
 				type   : self.type(),
-				value  : self.value(),
-				refresh: self.refresh(),
-				units  : self.units(),
-				min    : self.min(),
-				max    : self.max()
+				settings : self.settings()
 			};
 		}
 
@@ -1226,11 +1304,7 @@ var deccoboard = (function()
 		{
 			self.title(object.title);
 			self.type(object.type);
-			self.value(object.value);
-			self.refresh(object.refresh);
-			self.units(object.units);
-			self.max(object.max);
-			self.min(object.min);
+			self.settings(object.settings);
 		}
 	}
 
@@ -1402,6 +1476,20 @@ var deccoboard = (function()
 
 			widgetPlugins[plugin.type_name] = plugin;
 			deccoboardModel._widgetTypes.valueHasMutated();
+		},
+		getStyleString : function(name)
+		{
+			var returnString = "";
+
+			_.each(currentStyle[name], function(value, name){
+				returnString = returnString + name + ":" + value + ";";
+			});
+
+			return returnString;
+		},
+		getStyleObject : function(name)
+		{
+			return currentStyle[name];
 		}
 	};
 }());

@@ -890,6 +890,7 @@ header h1
 	left: 48%;
 	border-radius: 3px;
 	text-align: center;
+    cursor: pointer;
 }
 
 #toggle-header i
@@ -899,8 +900,9 @@ header h1
 
 .widget-tools
 {
-	top : 10px;
+	top : 8px;
 	right: 0px;
+    padding-right: 10px;
 	position: absolute;
 	display: none;
 	opacity: 0.0;
@@ -912,11 +914,6 @@ header h1
     right: 0px;
     position: absolute;
     display: none;
-}
-
-.widget-tools i
-{
-	padding-right: 10px;
 }
 
 .sub-section-tools .edit-widget
@@ -1047,19 +1044,6 @@ table#datasources-list tbody
     display: none;
 }
 
-.gauge-widget
-{
-    width: 200px;
-    height: 160px;
-    display: inline-block;
-}
-
-.gauge-widget-wrapper
-{
-	width: 100%;
-	text-align: center;
-}
-
 #admin-menu h1
 {
 
@@ -1068,26 +1052,6 @@ table#datasources-list tbody
 .section-title
 {
 	min-height: 7px;
-}
-
-.big-text
-{
-    color: #d3d4d4;
-    font-size: 75px;
-    font-weight: 100;
-    font-family: "HelveticaNeue-UltraLight", "Helvetica Neue Ultra Light", "Helvetica Neue", sans-serif;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.medium-text
-{
-    color: #d3d4d4;
-    font-size: 30px;
-    font-weight: 100;
-    font-family: "HelveticaNeue-UltraLight", "Helvetica Neue Ultra Light", "Helvetica Neue", sans-serif;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .small-text
@@ -2044,4 +2008,11 @@ td.form-table-value > input[type="checkbox"]
 .table-row-operation > i
 {
 	cursor: pointer;
+}
+
+.action-icon
+{
+    cursor: pointer;
+    margin: 3px 0px 3px 10px;
+
 }

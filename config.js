@@ -1,5 +1,5 @@
 deccoboard.loadConfiguration({
-	/*"allow_edit"  : true,
+	"allow_edit"  : true,
 	"datasources": [
         {
             name   : "Weather",
@@ -15,15 +15,15 @@ deccoboard.loadConfiguration({
 			        }
 		        ]
 	        }
-        },
+        }/*,
         {
 	        name    : "RL78",
 	        type    : "rl78",
 	        settings: {
 				device_resource_id : "b3273d7585fa85642140749a63ebc02fcc142ace"
 	        }
-        }
-	],
+        }*/
+	]/*,
 	"panes"    : [
         {
             "title"   : "Status",
