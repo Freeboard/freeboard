@@ -183,11 +183,17 @@
 		var gaugeElement = $('<div class="gauge-widget" id="' + thisGaugeID + '"></div>');
 
 		var gaugeObject;
+		var rendered = false;
 
 		var currentSettings = settings;
 
 		function createGauge()
 		{
+			if(!rendered)
+			{
+				return;
+			}
+
 			gaugeElement.empty();
 
 			gaugeObject = new JustGage({
@@ -203,6 +209,7 @@
 
 		this.render = function(element)
 		{
+			rendered = true;
 			$(element).append($('<div class="gauge-widget-wrapper"></div>').append(gaugeElement));
 			createGauge();
 		}
