@@ -2026,3 +2026,9 @@ td.form-table-value > input[type="checkbox"]
     margin-left : 10px;
     margin-bottom: 10px;
 }
+
+.value-editor-ds
+{
+	color : #0088cc;
+	cursor: pointer;
+}
