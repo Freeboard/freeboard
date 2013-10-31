@@ -761,11 +761,10 @@ var deccoboard = (function()
 				grid.remove_widget(element);
 			}
 			// If widget has been added or removed
-			//else if(Number($(element).attr("data-sizey")) + 1 != viewModel.widgets().length)
-			//{
-				//var sizeY = Math.max(viewModel.widgets().length, 1);
+			else
+            {
 				grid.resize_widget($(element), undefined, viewModel.getCalculatedHeight());
-			//}
+			}
 		}
 	}
 
