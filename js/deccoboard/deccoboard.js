@@ -5,22 +5,22 @@ var deccoboard = (function()
 	var grid;
 	var deccoboardModel = new DeccoboardModel();
 	var currentStyle = {
-		values : {
-			"font-family" : '"HelveticaNeue-UltraLight", "Helvetica Neue Ultra Light", "Helvetica Neue", sans-serif',
-			"color" : "#d3d4d4",
-			"font-weight" : 100
+		values: {
+			"font-family": '"HelveticaNeue-UltraLight", "Helvetica Neue Ultra Light", "Helvetica Neue", sans-serif',
+			"color"      : "#d3d4d4",
+			"font-weight": 100
 		}
 	};
 
 	var veDatasourceRegex = new RegExp(".*datasources[.]([^.]*)([.][^\\s]*)?$");
+
 	function createValueEditor(element)
 	{
 		var dropdown = null;
 		var selectedOptionIndex = 0;
 
-		$(element).bind("keyup mouseup",function(event)
+		$(element).bind("keyup mouseup decco-eval",function(event)
 		{
-
 			// Ignore arrow keys and enter keys
 			if(dropdown && event.type == "keyup" && (event.keyCode == 38 || event.keyCode == 40 || event.keyCode == 13))
 			{
@@ -118,27 +118,27 @@ var deccoboard = (function()
 						{
 							replacementString = lastPathObject;
 
-                            if(_.keys(dataValue).indexOf(replacementString) == -1)
-                            {
-                                _.each(dataValue, function(value, name)
-                                {
-                                    if(name != lastPathObject && name.indexOf(lastPathObject) == 0)
-                                    {
-                                        var followChar = undefined;
+							if(_.keys(dataValue).indexOf(replacementString) == -1)
+							{
+								_.each(dataValue, function(value, name)
+								{
+									if(name != lastPathObject && name.indexOf(lastPathObject) == 0)
+									{
+										var followChar = undefined;
 
-                                        if(_.isArray(value))
-                                        {
-                                            followChar = "[";
-                                        }
-                                        else if(_.isObject(value))
-                                        {
-                                            followChar = ".";
-                                        }
+										if(_.isArray(value))
+										{
+											followChar = "[";
+										}
+										else if(_.isObject(value))
+										{
+											followChar = ".";
+										}
 
-                                        options.push({value: name, follow_char: followChar});
-                                    }
-                                });
-                            }
+										options.push({value: name, follow_char: followChar});
+									}
+								});
+							}
 						}
 					}
 				}
@@ -266,75 +266,71 @@ var deccoboard = (function()
 			});
 	}
 
-    function createDialogBox(contentElement, title, okTitle, cancelTitle, okCallback)
-    {
-        var modal_width = 800;
+	function createDialogBox(contentElement, title, okTitle, cancelTitle, okCallback)
+	{
+		var modal_width = 800;
 
-        // Initialize our modal overlay
-        var overlay = $('<div id="modal_overlay"></div>')
-            .css({ 'display': 'block', opacity: 0 });
+		// Initialize our modal overlay
+		var overlay = $('<div id="modal_overlay"></div>').css({ 'display': 'block', opacity: 0 });
 
-        var modalDialog = $('<div class="modal"></div>')
-            .css({
+		var modalDialog = $('<div class="modal"></div>').css({
 
-                'display'    : 'block',
-                'position'   : 'fixed',
-                'opacity'    : 0,
-                'z-index'    : 11000,
-                'left'       : 50 + '%',
-                'margin-left': -(modal_width / 2) + "px",
-                'top'        : 120 + "px"
+				'display'    : 'block',
+				'position'   : 'fixed',
+				'opacity'    : 0,
+				'z-index'    : 11000,
+				'left'       : 50 + '%',
+				'margin-left': -(modal_width / 2) + "px",
+				'top'        : 120 + "px"
 
-            });
+			});
 
-        function closeModal()
-        {
-            overlay.fadeTo(200, 0.0, function()
-            {
-                $(this).remove();
-            });
-            modalDialog.fadeTo(200, 0.0, function()
-            {
-                $(this).remove();
-            });
-        }
+		function closeModal()
+		{
+			overlay.fadeTo(200, 0.0, function()
+			{
+				$(this).remove();
+			});
+			modalDialog.fadeTo(200, 0.0, function()
+			{
+				$(this).remove();
+			});
+		}
 
-        // Create our header
-        modalDialog.append("<header><h1>" + title + "</h1></header>");
+		// Create our header
+		modalDialog.append("<header><h1>" + title + "</h1></header>");
 
-        $('<section></section>').appendTo(modalDialog).append(contentElement);
+		$('<section></section>').appendTo(modalDialog).append(contentElement);
 
-        // Create our footer
-        var footer = $('<footer></footer>').appendTo(modalDialog);
-        $('<span class="button">' + okTitle + '</span>')
-            .appendTo(footer)
-            .click(function(){
-                if(_.isFunction(okCallback))
-                {
-                    okCallback();
-                }
+		// Create our footer
+		var footer = $('<footer></footer>').appendTo(modalDialog);
+		$('<span class="button">' + okTitle + '</span>').appendTo(footer).click(function()
+			{
+				if(_.isFunction(okCallback))
+				{
+					okCallback();
+				}
 
-                closeModal();
-            });
+				closeModal();
+			});
 
-        $('<span class="button">' + cancelTitle  + '</span>')
-            .appendTo(footer)
-            .click(function(){
-                closeModal();
-            });
+		$('<span class="button">' + cancelTitle + '</span>').appendTo(footer).click(function()
+			{
+				closeModal();
+			});
 
-        $("body").append([overlay, modalDialog]);
+		$("body").append([overlay, modalDialog]);
 
-        overlay.fadeTo(200, 0.8);
-        modalDialog.fadeTo(200, 1);
-    }
+		overlay.fadeTo(200, 0.8);
+		modalDialog.fadeTo(200, 1);
+	}
 
 	function createPluginEditor(title, pluginTypes, currentInstanceName, currentTypeName, currentSettingsValues, settingsSavedCallback)
 	{
 		var newSettings = {
-			name : currentInstanceName,
-			type : currentTypeName,
-			settings : {}
+			name    : currentInstanceName,
+			type    : currentTypeName,
+			settings: {}
 		};
 
 		function createSettingRow(displayName)
@@ -351,236 +347,249 @@ var deccoboard = (function()
 		// Create our body
 		if(!_.isUndefined(currentInstanceName))
 		{
-			createSettingRow("Name").append(
-				$('<input type="text">')
-					.val(currentInstanceName)
-					.change(function(){
-						newSettings.name = $(this).val();
-					})
-			);
+			createSettingRow("Name").append($('<input type="text">').val(currentInstanceName).change(function()
+				{
+					newSettings.name = $(this).val();
+				}));
 		}
 
-        function createSettingsFromDefinition(settingsDefs)
-        {
-            _.each(settingsDefs, function(settingDef)
-            {
-                // Set a default value if one doesn't exist
-                if(!_.isUndefined(settingDef.default_value) && _.isUndefined(currentSettingsValues[settingDef.name]))
-                {
-                    currentSettingsValues[settingDef.name] = settingDef.default_value;
-                }
+		function createSettingsFromDefinition(settingsDefs)
+		{
+			_.each(settingsDefs, function(settingDef)
+			{
+				// Set a default value if one doesn't exist
+				if(!_.isUndefined(settingDef.default_value) && _.isUndefined(currentSettingsValues[settingDef.name]))
+				{
+					currentSettingsValues[settingDef.name] = settingDef.default_value;
+				}
 
-                var displayName = settingDef.name;
+				var displayName = settingDef.name;
 
-                if(!_.isUndefined(settingDef.display_name))
-                {
-                    displayName = settingDef.display_name;
-                }
+				if(!_.isUndefined(settingDef.display_name))
+				{
+					displayName = settingDef.display_name;
+				}
 
-                var valueCell = createSettingRow(displayName);
+				var valueCell = createSettingRow(displayName);
 
-                switch (settingDef.type)
-                {
-                    case "array":
-                    {
-                        var subTableDiv = $('<div class="form-table-value-subtable"></div>').appendTo(valueCell);
+				switch (settingDef.type)
+				{
+					case "array":
+					{
+						var subTableDiv = $('<div class="form-table-value-subtable"></div>').appendTo(valueCell);
 
-                        $('<a class="table-operation">Add</a>').appendTo(valueCell);
+						$('<a class="table-operation">Add</a>').appendTo(valueCell);
 
-                        if(settingDef.name in currentSettingsValues)
-                        {
-                            var subSettings = currentSettingsValues[settingDef.name];
+						if(settingDef.name in currentSettingsValues)
+						{
+							var subSettings = currentSettingsValues[settingDef.name];
 
-                            if(_.isArray(settingDef.settings) && _.isArray(subSettings) && subSettings.length > 0)
-                            {
-                                newSettings.settings[settingDef.name] = [];
+							if(_.isArray(settingDef.settings) && _.isArray(subSettings) && subSettings.length > 0)
+							{
+								newSettings.settings[settingDef.name] = [];
 
-                                var subTable = $('<table class="table table-condensed sub-table"></table>').appendTo(subTableDiv);
-                                var subTableHead = $("<thead></thead>").appendTo(subTable);
-                                subTableHead = $("<tr></tr>").appendTo(subTableHead);
+								var subTable = $('<table class="table table-condensed sub-table"></table>').appendTo(subTableDiv);
+								var subTableHead = $("<thead></thead>").appendTo(subTable);
+								subTableHead = $("<tr></tr>").appendTo(subTableHead);
 
-                                // Create our headers
-                                _.each(settingDef.settings, function(subSettingDef)
-                                {
-                                    var subsettingDisplayName = subSettingDef.name;
+								// Create our headers
+								_.each(settingDef.settings, function(subSettingDef)
+								{
+									var subsettingDisplayName = subSettingDef.name;
 
-                                    if(!_.isUndefined(subSettingDef.display_name))
-                                    {
-                                        subsettingDisplayName = subSettingDef.display_name;
-                                    }
+									if(!_.isUndefined(subSettingDef.display_name))
+									{
+										subsettingDisplayName = subSettingDef.display_name;
+									}
 
-                                    $('<th>' + subsettingDisplayName + '</th>').appendTo(subTableHead);
-                                });
+									$('<th>' + subsettingDisplayName + '</th>').appendTo(subTableHead);
+								});
 
-                                var subTableBody = $('<tbody></tbody>').appendTo(subTable);
+								var subTableBody = $('<tbody></tbody>').appendTo(subTable);
 
-                                // Create our rows
-                                _.each(subSettings, function(subSetting, subSettingIndex)
-                                {
-                                    var subsettingRow = $('<tr></tr>').appendTo(subTableBody);
+								// Create our rows
+								_.each(subSettings, function(subSetting, subSettingIndex)
+								{
+									var subsettingRow = $('<tr></tr>').appendTo(subTableBody);
 
-                                    var newSetting = {};
-                                    newSettings.settings[settingDef.name].push(newSetting);
+									var newSetting = {};
+									newSettings.settings[settingDef.name].push(newSetting);
 
-                                    _.each(settingDef.settings, function(subSettingDef)
-                                    {
-                                        var subsettingCol = $('<td></td>').appendTo(subsettingRow);
-                                        var subsettingValue = "";
+									_.each(settingDef.settings, function(subSettingDef)
+									{
+										var subsettingCol = $('<td></td>').appendTo(subsettingRow);
+										var subsettingValue = "";
 
-                                        if(!_.isUndefined(subSetting[subSettingDef.name]))
-                                        {
-                                            subsettingValue = subSetting[subSettingDef.name];
-                                        }
+										if(!_.isUndefined(subSetting[subSettingDef.name]))
+										{
+											subsettingValue = subSetting[subSettingDef.name];
+										}
 
-                                        newSetting[subSettingDef.name] = subsettingValue;
+										newSetting[subSettingDef.name] = subsettingValue;
 
-                                        $('<input class="table-row-value" type="text">').appendTo(subsettingCol).val(subsettingValue).change(function(){
-                                            newSetting[subSettingDef.name] = $(this).val();
-                                        });
-                                    });
+										$('<input class="table-row-value" type="text">').appendTo(subsettingCol).val(subsettingValue).change(function()
+										{
+											newSetting[subSettingDef.name] = $(this).val();
+										});
+									});
 
-                                    subsettingRow.append($('<td class="table-row-operation"></td>').append($('<i class="icon-trash icon-white"></i>').click(function()
-                                    {
-                                        newSettings.settings[settingDef.name].splice(subSettingIndex, 1);
-                                        subsettingRow.remove();
-                                    })));
-                                });
-                            }
-                        }
+									subsettingRow.append($('<td class="table-row-operation"></td>').append($('<i class="icon-trash icon-white"></i>').click(function()
+									{
+										newSettings.settings[settingDef.name].splice(subSettingIndex, 1);
+										subsettingRow.remove();
+									})));
+								});
+							}
+						}
 
-                        break;
-                    }
-                    case "boolean":
-                    {
-                        newSettings.settings[settingDef.name] = currentSettingsValues[settingDef.name];
+						break;
+					}
+					case "boolean":
+					{
+						newSettings.settings[settingDef.name] = currentSettingsValues[settingDef.name];
 
-                        var input = $('<input type="checkbox">').appendTo(valueCell).change(function(){
-                            newSettings.settings[settingDef.name] = this.checked;
-                        });
+						var input = $('<input type="checkbox">').appendTo(valueCell).change(function()
+						{
+							newSettings.settings[settingDef.name] = this.checked;
+						});
 
-                        if(settingDef.name in currentSettingsValues)
-                        {
-                            input.prop("checked", currentSettingsValues[settingDef.name]);
-                        }
+						if(settingDef.name in currentSettingsValues)
+						{
+							input.prop("checked", currentSettingsValues[settingDef.name]);
+						}
 
-                        break;
-                    }
-                    case "option":
-                    {
-                        var defaultValue = currentSettingsValues[settingDef.name];
+						break;
+					}
+					case "option":
+					{
+						var defaultValue = currentSettingsValues[settingDef.name];
 
-                        var input = $('<select></select>').appendTo(valueCell).change(function(){
-                            newSettings.settings[settingDef.name] = $(this).val();
-                        });
+						var input = $('<select></select>').appendTo(valueCell).change(function()
+						{
+							newSettings.settings[settingDef.name] = $(this).val();
+						});
 
-                        _.each(settingDef.options, function(option){
+						_.each(settingDef.options, function(option)
+						{
 
-                            var optionName;
-                            var optionValue;
+							var optionName;
+							var optionValue;
 
-                            if(_.isObject(option))
-                            {
-                                optionName = option.name;
-                                optionValue = option.value;
-                            }
-                            else
-                            {
-                                optionName = option;
-                            }
+							if(_.isObject(option))
+							{
+								optionName = option.name;
+								optionValue = option.value;
+							}
+							else
+							{
+								optionName = option;
+							}
 
-                            if(_.isUndefined(optionValue))
-                            {
-                                optionValue = optionName;
-                            }
+							if(_.isUndefined(optionValue))
+							{
+								optionValue = optionName;
+							}
 
-                            if(_.isUndefined(defaultValue))
-                            {
-                                defaultValue = optionValue;
-                            }
+							if(_.isUndefined(defaultValue))
+							{
+								defaultValue = optionValue;
+							}
 
-                            $("<option></option>").text(optionName).attr("value", optionValue).appendTo(input);
-                        });
+							$("<option></option>").text(optionName).attr("value", optionValue).appendTo(input);
+						});
 
-                        newSettings.settings[settingDef.name] = defaultValue;
+						newSettings.settings[settingDef.name] = defaultValue;
 
-                        if(settingDef.name in currentSettingsValues)
-                        {
-                            input.val(currentSettingsValues[settingDef.name]);
-                        }
+						if(settingDef.name in currentSettingsValues)
+						{
+							input.val(currentSettingsValues[settingDef.name]);
+						}
 
-                        break;
-                    }
-                    default:
-                    {
-                        newSettings.settings[settingDef.name] = currentSettingsValues[settingDef.name];
+						break;
+					}
+					default:
+					{
+						newSettings.settings[settingDef.name] = currentSettingsValues[settingDef.name];
 
-                        var input = $('<input type="text">').appendTo(valueCell).change(function(){
-                            newSettings.settings[settingDef.name] = $(this).val();
-                        });
+						var input = $('<input type="text">').appendTo(valueCell).change(function()
+						{
+							newSettings.settings[settingDef.name] = $(this).val();
+						});
 
-                        if(!_.isUndefined(settingDef.suffix))
-                        {
-                            input.addClass("small align-right");
-                            $('<div class="input-suffix">' + settingDef.suffix + '</div>').appendTo(valueCell);
-                        }
+						if(!_.isUndefined(settingDef.suffix))
+						{
+							input.addClass("small align-right");
+							$('<div class="input-suffix">' + settingDef.suffix + '</div>').appendTo(valueCell);
+						}
 
-                        if(settingDef.name in currentSettingsValues)
-                        {
-                            input.val(currentSettingsValues[settingDef.name]);
-                        }
+						if(settingDef.name in currentSettingsValues)
+						{
+							input.val(currentSettingsValues[settingDef.name]);
+						}
 
-                        if(settingDef.type == "calculated")
-                        {
-                            createValueEditor(input);
-                        }
+						if(settingDef.type == "calculated")
+						{
+							createValueEditor(input);
 
-                        break;
-                    }
-                }
-            });
-        }
+							$(valueCell).append($('<div class="input-suffix value-editor-ds">+ Datasource</div>').mousedown(function(e)
+								{
+									e.preventDefault();
+									$(input).focus();
+									$(input).insertAtCaret("datasources.");
+									$(input).trigger("decco-eval");
+								}));
+						}
 
-        if(_.keys(pluginTypes).length > 1)
-        {
-            var typeRow = createSettingRow("Type");
-            var typeSelect = $('<select></select>').appendTo(typeRow);
+						break;
+					}
+				}
+			});
+		}
 
-            _.each(pluginTypes, function(pluginType){
-                typeSelect.append($("<option></option>").text(pluginType.display_name).attr("value", pluginType.type_name));
-            });
+		if(_.keys(pluginTypes).length > 1)
+		{
+			var typeRow = createSettingRow("Type");
+			var typeSelect = $('<select></select>').appendTo(typeRow);
 
-            typeSelect.change(function(){
+			_.each(pluginTypes, function(pluginType)
+			{
+				typeSelect.append($("<option></option>").text(pluginType.display_name).attr("value", pluginType.type_name));
+			});
 
-                newSettings.type = $(this).val();
-                newSettings.settings = {};
+			typeSelect.change(function()
+			{
 
-                // Remove all the previous settings
-                typeRow.parent().nextAll().remove();
+				newSettings.type = $(this).val();
+				newSettings.settings = {};
 
-                var currentType = pluginTypes[typeSelect.val()];
+				// Remove all the previous settings
+				typeRow.parent().nextAll().remove();
+
+				var currentType = pluginTypes[typeSelect.val()];
 
 
-                createSettingsFromDefinition(currentType.settings);
+				createSettingsFromDefinition(currentType.settings);
 
-            });
+			});
 
-            typeSelect.val(currentTypeName).trigger("change");
-        }
-        else
-        {
-            createSettingsFromDefinition(pluginTypes.settings);
-        }
+			typeSelect.val(currentTypeName).trigger("change");
+		}
+		else
+		{
+			createSettingsFromDefinition(pluginTypes.settings);
+		}
 
-        createDialogBox(form, title, "Save", "Cancel", function(){
-            if(_.isFunction(settingsSavedCallback))
-            {
-                settingsSavedCallback(newSettings);
-            }
-        });
+		createDialogBox(form, title, "Save", "Cancel", function()
+		{
+			if(_.isFunction(settingsSavedCallback))
+			{
+				settingsSavedCallback(newSettings);
+			}
+		});
 	}
 
 	ko.bindingHandlers.pluginEditor = {
-		init : function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
+		init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
 			var options = ko.unwrap(valueAccessor());
 
@@ -598,129 +607,129 @@ var deccoboard = (function()
 				types = widgetPlugins;
 				title = "Widget";
 			}
-            else if(options.type == 'pane')
-            {
-                title = "Pane";
-            }
+			else if(options.type == 'pane')
+			{
+				title = "Pane";
+			}
 
 			$(element).click(function(event)
-            {
-                if(options.operation == 'delete')
-                {
-                    var phraseElement = $('<p>Are you sure you want to delete this ' + title  + '?</p>');
-                    createDialogBox(phraseElement, "Confirm Delete", "Yes", "No", function(){
+			{
+				if(options.operation == 'delete')
+				{
+					var phraseElement = $('<p>Are you sure you want to delete this ' + title + '?</p>');
+					createDialogBox(phraseElement, "Confirm Delete", "Yes", "No", function()
+					{
 
-                        if(options.type == 'datasource')
-                        {
-                            deccoboardModel.deleteDatasource(viewModel);
-                        }
-                        else if(options.type == 'widget')
-                        {
-                            deccoboardModel.deleteWidget(viewModel);
-                        }
-                        else if(options.type == 'pane')
-                        {
-                            deccoboardModel.deletePane(viewModel);
-                        }
+						if(options.type == 'datasource')
+						{
+							deccoboardModel.deleteDatasource(viewModel);
+						}
+						else if(options.type == 'widget')
+						{
+							deccoboardModel.deleteWidget(viewModel);
+						}
+						else if(options.type == 'pane')
+						{
+							deccoboardModel.deletePane(viewModel);
+						}
 
-                    });
-                }
-                else
-                {
-                    var instanceName = undefined;
-                    var instanceType = _.keys(types)[0];
+					});
+				}
+				else
+				{
+					var instanceName = undefined;
+					var instanceType = _.keys(types)[0];
 
-                    if(options.type == 'datasource')
-                    {
-                        if(options.operation == 'add')
-                        {
-                            settings = {};
-                            instanceName = "";
-                        }
-                        else
-                        {
-                            instanceName = viewModel.name();
-                            instanceType = viewModel.type();
-                            settings = viewModel.settings();
-                        }
-                    }
-                    else if(options.type == 'widget')
-                    {
-                        if(options.operation == 'add')
-                        {
-                            settings = {};
-                        }
-                        else
-                        {
-                            instanceType = viewModel.type();
-                            settings = viewModel.settings();
-                        }
-                    }
-                    else if(options.type == 'pane')
-                    {
-                        settings = {};
+					if(options.type == 'datasource')
+					{
+						if(options.operation == 'add')
+						{
+							settings = {};
+							instanceName = "";
+						}
+						else
+						{
+							instanceName = viewModel.name();
+							instanceType = viewModel.type();
+							settings = viewModel.settings();
+						}
+					}
+					else if(options.type == 'widget')
+					{
+						if(options.operation == 'add')
+						{
+							settings = {};
+						}
+						else
+						{
+							instanceType = viewModel.type();
+							settings = viewModel.settings();
+						}
+					}
+					else if(options.type == 'pane')
+					{
+						settings = {};
 
-                        if(options.operation == 'edit')
-                        {
-                            settings.title = viewModel.title();
-                        }
+						if(options.operation == 'edit')
+						{
+							settings.title = viewModel.title();
+						}
 
-                        types = {
-                            settings : [
-                                {
-                                    name        : "title",
-                                    display_name: "Title",
-                                    type        : "text"
-                                }
-                            ]
-                        }
-                    }
+						types = {
+							settings: [
+								{
+									name        : "title",
+									display_name: "Title",
+									type        : "text"
+								}
+							]
+						}
+					}
 
-                    createPluginEditor(title, types, instanceName, instanceType, settings, function(newSettings)
-                    {
-                        if(options.operation == 'add')
-                        {
-                            if(options.type == 'datasource')
-                            {
-                                var newViewModel = new DatasourceModel();
-                                deccoboardModel.addDatasource(newViewModel);
+					createPluginEditor(title, types, instanceName, instanceType, settings, function(newSettings)
+					{
+						if(options.operation == 'add')
+						{
+							if(options.type == 'datasource')
+							{
+								var newViewModel = new DatasourceModel();
+								deccoboardModel.addDatasource(newViewModel);
 
-                                newViewModel.settings(newSettings.settings);
-                                newViewModel.name(newSettings.name);
-                                newViewModel.type(newSettings.type);
-                            }
-                            else if(options.type == 'widget')
-                            {
-                                var newViewModel = new WidgetModel();
-                                newViewModel.settings(newSettings.settings);
-                                newViewModel.type(newSettings.type);
+								newViewModel.settings(newSettings.settings);
+								newViewModel.name(newSettings.name);
+								newViewModel.type(newSettings.type);
+							}
+							else if(options.type == 'widget')
+							{
+								var newViewModel = new WidgetModel();
+								newViewModel.settings(newSettings.settings);
+								newViewModel.type(newSettings.type);
 
-                                viewModel.widgets.push(newViewModel);
+								viewModel.widgets.push(newViewModel);
 
-                                attachWidgetEditIcons(element);
-                            }
-                        }
-                        else if(options.operation == 'edit')
-                        {
-                            if(options.type == 'pane')
-                            {
-                                viewModel.title(newSettings.settings.title);
-                            }
-                            else
-                            {
-                                viewModel.type(newSettings.type);
-                                viewModel.settings(newSettings.settings);
-                            }
-                        }
-                    });
-                }
+								attachWidgetEditIcons(element);
+							}
+						}
+						else if(options.operation == 'edit')
+						{
+							if(options.type == 'pane')
+							{
+								viewModel.title(newSettings.settings.title);
+							}
+							else
+							{
+								viewModel.type(newSettings.type);
+								viewModel.settings(newSettings.settings);
+							}
+						}
+					});
+				}
 			});
 		}
 	}
 
 	ko.virtualElements.allowedBindings.datasourceTypeSettings = true;
-	ko.bindingHandlers.datasourceTypeSettings =
-	{
+	ko.bindingHandlers.datasourceTypeSettings = {
 		update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
 			processPluginSettings(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
@@ -764,14 +773,14 @@ var deccoboard = (function()
 			}
 			// If widget has been added or removed
 			else
-            {
+			{
 				grid.resize_widget($(element), undefined, viewModel.getCalculatedHeight());
 			}
 		}
 	}
 
 	ko.bindingHandlers.widget = {
-		init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
+		init  : function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
 			if(deccoboardModel.isEditing())
 			{
@@ -780,11 +789,11 @@ var deccoboard = (function()
 		},
 		update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
-            if(viewModel.shouldRender())
-            {
-			    $(element).empty();
-			    viewModel.render(element);
-            }
+			if(viewModel.shouldRender())
+			{
+				$(element).empty();
+				viewModel.render(element);
+			}
 		}
 	}
 
@@ -821,7 +830,8 @@ var deccoboard = (function()
 
 				var returnTypes = [];
 
-				_.each(datasourcePlugins, function(datasourcePluginType){
+				_.each(datasourcePlugins, function(datasourcePluginType)
+				{
 					var typeName = datasourcePluginType.type_name;
 					var displayName = typeName;
 
@@ -830,12 +840,10 @@ var deccoboard = (function()
 						displayName = datasourcePluginType.display_name;
 					}
 
-					returnTypes.push(
-						{
-							name : typeName,
-							display_name : displayName
-						}
-					);
+					returnTypes.push({
+							name        : typeName,
+							display_name: displayName
+						});
 				});
 
 				return returnTypes;
@@ -861,9 +869,9 @@ var deccoboard = (function()
 					}
 
 					returnTypes.push({
-							name        : typeName,
-							display_name: displayName
-						});
+						name        : typeName,
+						display_name: displayName
+					});
 				});
 
 				return returnTypes;
@@ -888,7 +896,7 @@ var deccoboard = (function()
 
 			return {
 				allow_edit : self.allow_edit(),
-				panes    : panes,
+				panes      : panes,
 				datasources: datasources
 			};
 		}
@@ -1051,15 +1059,15 @@ var deccoboard = (function()
 			this.widgets.push(widget);
 		}
 
-        this.getCalculatedHeight = function()
-        {
-            var sumHeights = _.reduce(self.widgets(), function(memo, widget)
-            {
-                return memo + widget.height();
-            }, 0);
+		this.getCalculatedHeight = function()
+		{
+			var sumHeights = _.reduce(self.widgets(), function(memo, widget)
+			{
+				return memo + widget.height();
+			}, 0);
 
-            return Math.max(2, sumHeights + 1);
-        }
+			return Math.max(2, sumHeights + 1);
+		}
 
 		this.serialize = function()
 		{
@@ -1071,10 +1079,10 @@ var deccoboard = (function()
 			});
 
 			return {
-				title   : self.title(),
-				width   : self.width(),
-				row     : self.row(),
-				col     : self.col(),
+				title  : self.title(),
+				width  : self.width(),
+				row    : self.row(),
+				col    : self.col(),
 				widgets: widgets
 			};
 		}
@@ -1134,7 +1142,7 @@ var deccoboard = (function()
 			{
 				var widgetInstance = widgetPlugins[newValue].newInstance(self.settings(), self.updateCallback);
 				self.widgetInstance = widgetInstance;
-                self.shouldRender(true);
+				self.shouldRender(true);
 			}
 
 			//self.updateCalculatedSettings();
@@ -1159,7 +1167,8 @@ var deccoboard = (function()
 
 			if(_.isArray(refreshSettingNames))
 			{
-				_.each(refreshSettingNames, function(settingName){
+				_.each(refreshSettingNames, function(settingName)
+				{
 					self.processCalculatedSetting(settingName);
 				});
 			}
@@ -1271,10 +1280,10 @@ var deccoboard = (function()
 			}
 		});
 
-        this.shouldRender = ko.observable(false);
+		this.shouldRender = ko.observable(false);
 		this.render = function(element)
 		{
-            self.shouldRender(false);
+			self.shouldRender(false);
 			if(!_.isUndefined(self.widgetInstance) && _.isFunction(self.widgetInstance.render))
 			{
 				self.widgetInstance.render(element);
@@ -1290,9 +1299,9 @@ var deccoboard = (function()
 		this.serialize = function()
 		{
 			return {
-				title  : self.title(),
-				type   : self.type(),
-				settings : self.settings()
+				title   : self.title(),
+				type    : self.type(),
+				settings: self.settings()
 			};
 		}
 
@@ -1362,9 +1371,9 @@ var deccoboard = (function()
 		this.serialize = function()
 		{
 			return {
-				name   : self.name(),
-				type   : self.type(),
-				settings : self.settings()
+				name    : self.name(),
+				type    : self.type(),
+				settings: self.settings()
 			};
 		}
 
@@ -1449,11 +1458,11 @@ var deccoboard = (function()
 
 	// PUBLIC FUNCTIONS
 	return {
-		loadConfiguration : function(configuration)
+		loadConfiguration   : function(configuration)
 		{
 			deccoboardModel.deserialize(configuration);
 		},
-		loadDatasourcePlugin : function(plugin)
+		loadDatasourcePlugin: function(plugin)
 		{
 			if(_.isUndefined(plugin.display_name))
 			{
@@ -1463,7 +1472,7 @@ var deccoboard = (function()
 			datasourcePlugins[plugin.type_name] = plugin;
 			deccoboardModel._datasourceTypes.valueHasMutated();
 		},
-		loadWidgetPlugin : function(plugin)
+		loadWidgetPlugin    : function(plugin)
 		{
 			if(_.isUndefined(plugin.display_name))
 			{
@@ -1473,17 +1482,18 @@ var deccoboard = (function()
 			widgetPlugins[plugin.type_name] = plugin;
 			deccoboardModel._widgetTypes.valueHasMutated();
 		},
-		getStyleString : function(name)
+		getStyleString      : function(name)
 		{
 			var returnString = "";
 
-			_.each(currentStyle[name], function(value, name){
+			_.each(currentStyle[name], function(value, name)
+			{
 				returnString = returnString + name + ":" + value + ";";
 			});
 
 			return returnString;
 		},
-		getStyleObject : function(name)
+		getStyleObject      : function(name)
 		{
 			return currentStyle[name];
 		}
