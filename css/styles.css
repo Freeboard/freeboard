@@ -992,19 +992,6 @@ table#datasources-list tbody
 	font-family : "HelveticaNeue-UltraLight", "Helvetica Neue Ultra Light", "Helvetica Neue", sans-serif;
 }
 
-.sparkline-inline
-{
-    width: 50%;
-    float: right;
-    height: 30px;
-}
-
-.sparkline
-{
-    width: 100%;
-    height: 75px;
-}
-
 .sub-section h2
 {
 	font-size: 14px;
@@ -1030,6 +1017,16 @@ table#datasources-list tbody
 .sub-section-height-2
 {
 	height : 100px;
+}
+
+.sub-section-height-3
+{
+    height : 155px;
+}
+
+.sub-section-height-4
+{
+    height : 210px;
 }
 
 .sub-section:last-of-type

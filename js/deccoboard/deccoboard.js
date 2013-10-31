@@ -541,21 +541,22 @@ var deccoboard = (function()
         if(_.keys(pluginTypes).length > 1)
         {
             var typeRow = createSettingRow("Type");
-            var typeSelect = $('<select></select>').appendTo(typeRow).change(function(){
-                newSettings.type = $(this).val();
-                newSettings.settings = {};
-            });
+            var typeSelect = $('<select></select>').appendTo(typeRow);
 
             _.each(pluginTypes, function(pluginType){
                 typeSelect.append($("<option></option>").text(pluginType.display_name).attr("value", pluginType.type_name));
             });
 
-            typeSelect.on("change", function(event){
+            typeSelect.change(function(){
+
+                newSettings.type = $(this).val();
+                newSettings.settings = {};
 
                 // Remove all the previous settings
                 typeRow.parent().nextAll().remove();
 
                 var currentType = pluginTypes[typeSelect.val()];
+
 
                 createSettingsFromDefinition(currentType.settings);
 
@@ -705,6 +706,7 @@ var deccoboard = (function()
                             }
                             else
                             {
+                                viewModel.type(newSettings.type);
                                 viewModel.settings(newSettings.settings);
                             }
                         }
@@ -744,7 +746,7 @@ var deccoboard = (function()
 				$(element).css({cursor: "pointer"});
 			}
 
-			grid.add_widget(element, viewModel.width(), viewModel.height(), viewModel.col(), viewModel.row());
+			grid.add_widget(element, viewModel.width(), viewModel.getCalculatedHeight(), viewModel.col(), viewModel.row());
 
 			if(bindingContext.$root.isEditing())
 			{
@@ -759,63 +761,13 @@ var deccoboard = (function()
 				grid.remove_widget(element);
 			}
 			// If widget has been added or removed
-			else if($(element).attr("data-sizey") != viewModel.widgets().length)
-			{
+			//else if(Number($(element).attr("data-sizey")) + 1 != viewModel.widgets().length)
+			//{
 				//var sizeY = Math.max(viewModel.widgets().length, 1);
-				grid.resize_widget($(element), undefined, viewModel.height());
-			}
+				grid.resize_widget($(element), undefined, viewModel.getCalculatedHeight());
+			//}
 		}
 	}
-
-	/*
-
-	ko.bindingHandlers.sparkline = {
-		init  : function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
-		{
-			var id = "widget-" + viewModel.widgetID() + "-sparkline";
-			$(element).attr("id", id);
-		},
-		update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
-		{
-			viewModel._updateDummy();
-
-			var values = $(element).data().values;
-
-			if(!values)
-			{
-				values = [];
-			}
-
-			if(values.length >= SPARKLINE_HISTORY_LENGTH)
-			{
-				values.shift();
-			}
-
-			var newValue = viewModel.computedValue();
-
-			if(_.isNumber(newValue))
-			{
-				values.push(newValue);
-
-				$(element).data().values = values;
-
-				$(element).sparkline(values, {
-					type              : "line",
-					height            : "100%",
-					width             : "100%",
-					fillColor         : false,
-					lineColor         : "#FF9900",
-					lineWidth         : 2,
-					spotRadius        : 3,
-					spotColor         : false,
-					minSpotColor      : "#78AB49",
-					maxSpotColor      : "#78AB49",
-					highlightSpotColor: "#9D3926",
-					highlightLineColor: "#9D3926"
-				});
-			}
-		}
-	}*/
 
 	ko.bindingHandlers.widget = {
 		init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
@@ -827,8 +779,11 @@ var deccoboard = (function()
 		},
 		update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
-			$(element).empty();
-			viewModel.render(element);
+            if(viewModel.shouldRender())
+            {
+			    $(element).empty();
+			    viewModel.render(element);
+            }
 		}
 	}
 
@@ -1095,17 +1050,15 @@ var deccoboard = (function()
 			this.widgets.push(widget);
 		}
 
-		this.height = ko.computed({
-			read: function()
-			{
-				var sumHeights = _.reduce(self.widgets(), function(memo, widget)
-				{
-					return memo + widget.height();
-				}, 0);
+        this.getCalculatedHeight = function()
+        {
+            var sumHeights = _.reduce(self.widgets(), function(memo, widget)
+            {
+                return memo + widget.height();
+            }, 0);
 
-				return Math.max(2, sumHeights + 1);
-			}
-		});
+            return Math.max(2, sumHeights + 1);
+        }
 
 		this.serialize = function()
 		{
@@ -1180,6 +1133,7 @@ var deccoboard = (function()
 			{
 				var widgetInstance = widgetPlugins[newValue].newInstance(self.settings(), self.updateCallback);
 				self.widgetInstance = widgetInstance;
+                self.shouldRender(true);
 			}
 
 			//self.updateCalculatedSettings();
@@ -1316,8 +1270,10 @@ var deccoboard = (function()
 			}
 		});
 
+        this.shouldRender = ko.observable(false);
 		this.render = function(element)
 		{
+            self.shouldRender(false);
 			if(!_.isUndefined(self.widgetInstance) && _.isFunction(self.widgetInstance.render))
 			{
 				self.widgetInstance.render(element);
