@@ -118,25 +118,27 @@ var deccoboard = (function()
 						{
 							replacementString = lastPathObject;
 
-							_.each(dataValue, function(value, name)
-							{
+                            if(_.keys(dataValue).indexOf(replacementString) == -1)
+                            {
+                                _.each(dataValue, function(value, name)
+                                {
+                                    if(name != lastPathObject && name.indexOf(lastPathObject) == 0)
+                                    {
+                                        var followChar = undefined;
 
-								if(name != lastPathObject && name.indexOf(lastPathObject) == 0)
-								{
-									var followChar = undefined;
+                                        if(_.isArray(value))
+                                        {
+                                            followChar = "[";
+                                        }
+                                        else if(_.isObject(value))
+                                        {
+                                            followChar = ".";
+                                        }
 
-									if(_.isArray(value))
-									{
-										followChar = "[";
-									}
-									else if(_.isObject(value))
-									{
-										followChar = ".";
-									}
-
-									options.push({value: name, follow_char: followChar});
-								}
-							});
+                                        options.push({value: name, follow_char: followChar});
+                                    }
+                                });
+                            }
 						}
 					}
 				}
