@@ -2013,3 +2013,16 @@ td.form-table-value > input[type="checkbox"]
     margin: 3px 0px 3px 10px;
 
 }
+
+#main-logo
+{
+    display: block;
+    margin-bottom: 20px;
+}
+
+#dash-logo
+{
+    display       : block;
+    margin-left : 10px;
+    margin-bottom: 10px;
+}

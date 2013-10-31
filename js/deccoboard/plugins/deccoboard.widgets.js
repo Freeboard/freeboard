@@ -33,9 +33,9 @@
             values.shift();
         }
 
-        if(_.isNumber(value))
-        {
-            values.push(value);
+        //if(_.isNumber(value))
+        //{
+            values.push(Number(value));
 
             $(element).data().values = values;
 
@@ -53,7 +53,7 @@
                 highlightSpotColor: "#9D3926",
                 highlightLineColor: "#9D3926"
             });
-        }
+        //}
     }
 
 	var textWidget = function(settings)

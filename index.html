@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>BUGBOARD</title>
+    <title>FREEBOARD</title>
     <meta name="viewport" content="width=1024"/>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
@@ -37,7 +37,7 @@
     <div id="admin-bar">
         <div id="admin-menu">
             <div id="board-tools">
-                <h1>BUGBOARD</h1>
+                <img id="main-logo" src="img/main-logo.png">
                 <a href="javascript:void(0)" data-bind="click: loadDashboard"><i class="icon-upload icon-white"></i> Load Dashboard</a>
                 <br>
                 <a href="javascript:void(0)" data-bind="click: saveDashboard"><i class="icon-download icon-white"></i> Save Dashboard</a>
@@ -72,6 +72,7 @@
     <div id="toggle-header" data-bind="click: toggleEditing" ><i class="icon-wrench icon-white"></i></div>
 </header>
 <div class="gridster">
+    <img id="dash-logo" src="img/dash-logo.png">
     <ul data-bind="grid: true, template: {name: 'pane-template', foreach: panes}">
     </ul>
 </div>
