@@ -378,19 +378,25 @@ var deccoboard = (function()
 					{
 						var subTableDiv = $('<div class="form-table-value-subtable"></div>').appendTo(valueCell);
 
-						$('<a class="table-operation">Add</a>').appendTo(valueCell);
+						var subTable = $('<table class="table table-condensed sub-table"></table>').appendTo(subTableDiv);
+						var subTableHead = $("<thead></thead>").appendTo(subTable);
+						subTableHead = $("<tr></tr>").appendTo(subTableHead);
+						var subTableBody = $('<tbody></tbody>').appendTo(subTable);
+						var headerCreated = false;
+
+						var currentSubSettingValues = [];
 
 						if(settingDef.name in currentSettingsValues)
 						{
-							var subSettings = currentSettingsValues[settingDef.name];
+							currentSubSettingValues = currentSettingsValues[settingDef.name];
+						}
 
-							if(_.isArray(settingDef.settings) && _.isArray(subSettings) && subSettings.length > 0)
+						function createSubsettingRow(subsettingValue)
+						{
+							// If this is the first time we're being called, create our headers
+							if(!headerCreated)
 							{
-								newSettings.settings[settingDef.name] = [];
-
-								var subTable = $('<table class="table table-condensed sub-table"></table>').appendTo(subTableDiv);
-								var subTableHead = $("<thead></thead>").appendTo(subTable);
-								subTableHead = $("<tr></tr>").appendTo(subTableHead);
+								headerCreated = true;
 
 								// Create our headers
 								_.each(settingDef.settings, function(subSettingDef)
@@ -404,43 +410,66 @@ var deccoboard = (function()
 
 									$('<th>' + subsettingDisplayName + '</th>').appendTo(subTableHead);
 								});
-
-								var subTableBody = $('<tbody></tbody>').appendTo(subTable);
-
-								// Create our rows
-								_.each(subSettings, function(subSetting, subSettingIndex)
-								{
-									var subsettingRow = $('<tr></tr>').appendTo(subTableBody);
-
-									var newSetting = {};
-									newSettings.settings[settingDef.name].push(newSetting);
-
-									_.each(settingDef.settings, function(subSettingDef)
-									{
-										var subsettingCol = $('<td></td>').appendTo(subsettingRow);
-										var subsettingValue = "";
-
-										if(!_.isUndefined(subSetting[subSettingDef.name]))
-										{
-											subsettingValue = subSetting[subSettingDef.name];
-										}
-
-										newSetting[subSettingDef.name] = subsettingValue;
-
-										$('<input class="table-row-value" type="text">').appendTo(subsettingCol).val(subsettingValue).change(function()
-										{
-											newSetting[subSettingDef.name] = $(this).val();
-										});
-									});
-
-									subsettingRow.append($('<td class="table-row-operation"></td>').append($('<i class="icon-trash icon-white"></i>').click(function()
-									{
-										newSettings.settings[settingDef.name].splice(subSettingIndex, 1);
-										subsettingRow.remove();
-									})));
-								});
 							}
+
+							var subsettingRow = $('<tr></tr>').appendTo(subTableBody);
+
+							var newSetting = {};
+
+							if(!_.isArray(newSettings.settings[settingDef.name]))
+							{
+								newSettings.settings[settingDef.name] = [];
+							}
+
+							newSettings.settings[settingDef.name].push(newSetting);
+
+							_.each(settingDef.settings, function(subSettingDef)
+							{
+								var subsettingCol = $('<td></td>').appendTo(subsettingRow);
+								var subsettingValueString = "";
+
+								if(!_.isUndefined(subsettingValue[subSettingDef.name]))
+								{
+									subsettingValueString = subsettingValue[subSettingDef.name];
+								}
+
+								newSetting[subSettingDef.name] = subsettingValueString;
+
+								$('<input class="table-row-value" type="text">').appendTo(subsettingCol).val(subsettingValueString).change(function()
+								{
+									newSetting[subSettingDef.name] = $(this).val();
+								});
+							});
+
+							subsettingRow.append($('<td class="table-row-operation"></td>').append($('<i class="icon-trash icon-white action-icon"></i>').click(function()
+							{
+								var subSettingIndex = newSettings.settings[settingDef.name].indexOf(newSetting);
+
+								if(subSettingIndex != -1)
+								{
+									newSettings.settings[settingDef.name].splice(subSettingIndex, 1);
+									subsettingRow.remove();
+								}
+							})));
+
+							subTableDiv.scrollTop(subTableDiv[0].scrollHeight);
 						}
+
+						$('<a class="table-operation">Add</a>').appendTo(valueCell).click(function(){
+							var newSubsettingValue = {};
+
+							_.each(settingDef.settings, function(subSettingDef){
+								newSubsettingValue[subSettingDef.name] = "";
+							});
+
+							createSubsettingRow(newSubsettingValue);
+						});
+
+						// Create our rows
+						_.each(currentSubSettingValues, function(currentSubSettingValue, subSettingIndex)
+						{
+							createSubsettingRow(currentSubSettingValue);
+						});
 
 						break;
 					}
@@ -742,7 +771,28 @@ var deccoboard = (function()
 			// Initialize our grid
 			grid = $(element).gridster({
 				widget_margins        : [10, 10],
-				widget_base_dimensions: [300, 40]
+				widget_base_dimensions: [300, 40],
+				draggable : {
+					stop : function(event, ui)
+					{
+						var paneElement = event.target;
+
+						while(_.isUndefined($(paneElement).attr("data-col")))
+						{
+							paneElement = $(paneElement).parent();
+
+							if(_.isUndefined(paneElement))
+							{
+								return;
+							}
+						}
+
+						var paneModel = $(paneElement).data("deccoPaneModel");
+
+						paneModel.row($(paneElement).data("row"));
+						paneModel.col($(paneElement).data("col"));
+					}
+				}
 			}).data("gridster");
 
 			grid.disable();
@@ -763,6 +813,8 @@ var deccoboard = (function()
 			{
 				showPaneEditIcons(true);
 			}
+
+			$(element).data("deccoPaneModel", viewModel);
 		},
 		update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
@@ -1183,18 +1235,26 @@ var deccoboard = (function()
 		{
 			if(_.isFunction(self.calculatedSettingScripts[settingName]))
 			{
+				var returnValue = undefined;
+
 				try
 				{
-					var returnValue = self.callValueFunction(self.calculatedSettingScripts[settingName]);
-
-					if(!_.isUndefined(self.widgetInstance) && _.isFunction(self.widgetInstance.onCalculatedValueChanged))
-					{
-						self.widgetInstance.onCalculatedValueChanged(settingName, returnValue);
-					}
+					returnValue = self.callValueFunction(self.calculatedSettingScripts[settingName]);
 				}
 				catch(e)
 				{
-					console.log(e.toString());
+					var rawValue = self.settings()[settingName];
+
+					// If there is a reference error and the value just contains letters and numbers, then
+					if(e instanceof ReferenceError && (/^\w+$/).test(rawValue))
+					{
+						returnValue = rawValue;
+					}
+				}
+
+				if(!_.isUndefined(self.widgetInstance) && _.isFunction(self.widgetInstance.onCalculatedValueChanged) && !_.isUndefined(returnValue))
+				{
+					self.widgetInstance.onCalculatedValueChanged(settingName, returnValue);
 				}
 			}
 		}
