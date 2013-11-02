@@ -19,6 +19,47 @@
     document.styleSheets[0].addRule('.sparkline', "width:100%;height: 75px;");
     document.styleSheets[0].addRule('.sparkline-inline', "width:50%;float:right;height:30px;");
 
+	function easeTransitionText(currentValue, newValue, textElement, duration)
+	{
+		if(currentValue == newValue)
+			return;
+
+		if($.isNumeric(newValue) && $.isNumeric(currentValue))
+		{
+			var numParts = newValue.toString().split('.');
+			var endingPrecision = 0;
+
+			if(numParts.length > 1)
+			{
+				endingPrecision = numParts[1].length;
+			}
+
+			numParts = currentValue.toString().split('.');
+			var startingPrecision = 0;
+
+			if(numParts.length > 1)
+			{
+				startingPrecision = numParts[1].length;
+			}
+
+			jQuery({transitionValue: Number(currentValue), precisionValue: startingPrecision}).animate({transitionValue: Number(newValue), precisionValue: endingPrecision}, {
+				duration: duration,
+				step    : function()
+				{
+					$(textElement).text(this.transitionValue.toFixed(this.precisionValue));
+				},
+				done    : function()
+				{
+					$(textElement).text(newValue);
+				}
+			});
+		}
+		else
+		{
+			$(textElement).text(newValue);
+		}
+	}
+
     function addValueToSparkline(element, value)
     {
         var values = $(element).data().values;
@@ -65,6 +106,7 @@
 		var valueElement = $('<div></div>');
 		var unitsElement = $('<div class="text-widget-unit"></div>');
         var sparklineElement = $('<span class="sparkline-inline"></span>');
+		var currentValue;
 
 		this.render = function(element)
 		{
@@ -98,12 +140,21 @@
 		{
 			if(settingName == "value")
 			{
-				valueElement.text(newValue);
+				if(currentSettings.animate)
+				{
+					easeTransitionText(currentValue, newValue, valueElement, 500);
+				}
+				else
+				{
+					valueElement.text(newValue);
+				}
 
                 if(currentSettings.sparkline)
                 {
                     addValueToSparkline(sparklineElement, newValue);
                 }
+
+				currentValue = newValue;
 			}
 		}
 
@@ -160,6 +211,12 @@
                 name        : "sparkline",
                 display_name: "Include Sparkline",
                 type        : "boolean"
+            },
+            {
+	            name        : "animate",
+	            display_name: "Animate Value Changes",
+	            type        : "boolean",
+	            default_value:true
             },
 			{
 				name        : "units",
@@ -336,6 +393,103 @@
             return new sparklineWidget(settings);
         }
     });
+
+	var pointerWidget = function(settings)
+	{
+		var self = this;
+		var paper;
+		var strokeWidth = 3;
+		var triangle;
+		var width, height;
+		var currentValue = 0;
+
+		function polygonPath(points)
+		{
+			if(!points || points.length < 2)
+				return [];
+			var path = []; //will use path object type
+			path.push(['m', points[0], points[1]]);
+			for(var i = 2; i < points.length; i += 2)
+			{
+				path.push(['l', points[i], points[i + 1]]);
+			}
+			path.push(['z']);
+			return path;
+		}
+
+		this.render = function(element)
+		{
+			width = $(element).width();
+			height = $(element).height();
+
+			var radius = Math.min(width, height) / 2 - strokeWidth * 2;
+
+			paper = Raphael($(element).get()[0], width, height);
+			var circle = paper.circle(width / 2, height / 2, radius);
+			circle.attr("stroke", "#FF9900");
+			circle.attr("stroke-width", strokeWidth);
+
+			triangle = paper.path(polygonPath([width / 2, 0, 15, 20, -30, 0]));
+			triangle.attr("stroke-width", 0);
+			triangle.attr("fill", "#fff");
+		}
+
+		this.onSettingsChanged = function(newSettings)
+		{
+		}
+
+		this.onCalculatedValueChanged = function(settingName, newValue)
+		{
+			if(!_.isUndefined(triangle))
+			{
+				var direction = "r";
+
+				/*var oppositeCurrent = currentValue + 180;
+
+				if(oppositeCurrent > 360)
+				{
+					oppositeCurrent = oppositeCurrent - 360;
+				}
+
+				if(oppositeCurrent < newValue)
+				{
+					direction = "l";
+				}*/
+
+				triangle.animate({transform: "r" + newValue + "," + (width / 2) + "," + (height / 2)}, 250, "bounce");
+			}
+
+			currentValue = newValue;
+		}
+
+		this.onDispose = function()
+		{
+		}
+
+		this.getHeight = function()
+		{
+			return 4;
+		}
+
+		this.onSettingsChanged(settings);
+	};
+
+	deccoboard.loadWidgetPlugin({
+		type_name   : "pointer",
+		display_name: "Pointer",
+		settings    : [
+			{
+				name        : "direction",
+				display_name: "Direction",
+				type        : "calculated",
+				suffix : "degrees"
+			}
+		],
+		newInstance : function(settings)
+		{
+			return new pointerWidget(settings);
+		}
+	});
 
     var pictureWidget = function(settings)
     {

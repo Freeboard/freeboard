@@ -450,8 +450,6 @@ body
 .modal
 {
 	display: none;
-	max-width: 900px;
-	width: 100%;
 	background-color: #2a2a2a;
 }
 
@@ -485,13 +483,12 @@ body
 	text-align: right;
 }
 
-.modal footer .button
+.modal footer .text-button
 {
 	line-height : 40px;
 	padding-left: 15px;
 	padding-right: 15px;
-	color: #0088cc;
-	cursor: pointer;
+	display : inline-block;
 }
 
 .modal section
@@ -896,6 +893,12 @@ header h1
 #toggle-header i
 {
 	margin-top: 3px;
+}
+
+.widget
+{
+	width: 100%;
+	height: 100%;
 }
 
 .widget-tools
@@ -1926,6 +1929,7 @@ ul, ol {
 {
 	text-align    : right;
 	padding-right : 14px;
+	height : 42px;
 }
 
 .form-table-value
@@ -1934,7 +1938,7 @@ ul, ol {
 
 .table-operation
 {
-	font-size : 12px;
+	font-size : 11px;
 	padding-left: 5px;
 }
 
@@ -1951,7 +1955,7 @@ input.table-row-value
 
 .sub-table
 {
-	margin-bottom: 5px;
+	margin-bottom: 3px;
 }
 
 .sub-table td
@@ -2031,4 +2035,49 @@ td.form-table-value > input[type="checkbox"]
 {
 	color : #0088cc;
 	cursor: pointer;
+}
+
+.text-button
+{
+	color  : #0088cc;
+	cursor : pointer;
+}
+
+.text-button::before,
+.text-button::after
+{
+	display            : inline-block;
+	opacity            : 0;
+	-webkit-transition : -webkit-transform 0.3s, opacity 0.2s;
+	-moz-transition    : -moz-transform 0.3s, opacity 0.2s;
+	transition         : transform 0.3s, opacity 0.2s;
+}
+
+.text-button::before
+{
+	margin-right      : 5px;
+	content           : '[';
+	-webkit-transform : translateX(10px);
+	-moz-transform    : translateX(10px);
+	transform         : translateX(10px);
+}
+
+.text-button::after
+{
+	margin-left       : 5px;
+	content           : ']';
+	-webkit-transform : translateX(-10px);
+	-moz-transform    : translateX(-10px);
+	transform         : translateX(-10px);
+}
+
+.text-button:hover::before,
+.text-button:hover::after,
+.text-button:focus::before,
+.text-button:focus::after
+{
+	opacity           : 1;
+	-webkit-transform : translateX(0px);
+	-moz-transform    : translateX(0px);
+	transform         : translateX(0px);
 }

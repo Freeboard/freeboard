@@ -35,12 +35,12 @@
         <div id="admin-menu">
             <div id="board-tools">
                 <img id="main-logo" src="img/main-logo.png">
-                <a href="javascript:void(0)" data-bind="click: loadDashboard"><i class="icon-upload icon-white"></i> Load Dashboard</a>
+                <span class="text-button" data-bind="click: loadDashboard"><i class="icon-upload icon-white"></i> Load Dashboard</span>
                 <br>
-                <a href="javascript:void(0)" data-bind="click: saveDashboard"><i class="icon-download icon-white"></i> Save Dashboard</a>
+                <span class="text-button" data-bind="click: saveDashboard"><i class="icon-download icon-white"></i> Save Dashboard</span>
                 <br>
                 <br>
-                <a href="javascript:void(0)" data-bind="click: createPane"><i class="icon-plus icon-white"></i> Add Pane</a>
+                <span class="text-button" data-bind="click: createPane"><i class="icon-plus icon-white"></i> Add Pane</span>
             </div>
             <div id="datasources">
                 <h1 class="small-text">DATASOURCES</h1>
@@ -55,14 +55,14 @@
                         </thead>
                         <tbody data-bind="foreach: datasources">
                             <tr>
-                                <td><a href="javascript:void(0)" data-bind="text: name, pluginEditor: {operation: 'edit', type: 'datasource'}"></a></td>
+                                <td><span class="text-button" data-bind="text: name, pluginEditor: {operation: 'edit', type: 'datasource'}"></span></td>
                                 <td data-bind="text: last_updated"></td>
                                 <td><i class="icon-refresh icon-white action-icon" data-bind="click: updateNow"></i><i class="icon-trash icon-white action-icon" data-bind="pluginEditor: {operation: 'delete', type: 'datasource'}"></i></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <a href="javascript:void(0)" class="table-operation" data-bind="pluginEditor: {operation: 'add', type: 'datasource'}">Add</a>
+                <span class="text-button table-operation" data-bind="pluginEditor: {operation: 'add', type: 'datasource'}">ADD</span>
             </div>
         </div>
     </div>
@@ -84,7 +84,7 @@
         </header>
         <section data-bind="foreach: widgets">
             <div class="sub-section" data-bind="css: 'sub-section-height-' + height()">
-                <div data-bind="widget: true"></div>
+                <div class="widget" data-bind="widget: true"></div>
                 <div class="sub-section-tools">
                     <i class="icon-wrench icon-white action-icon" data-bind="pluginEditor: {operation: 'edit', type: 'widget'}"></i><i class="icon-trash icon-white action-icon" data-bind="pluginEditor: {operation: 'delete', type: 'widget'}"></i>
                 </div>

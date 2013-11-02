@@ -268,7 +268,7 @@ var deccoboard = (function()
 
 	function createDialogBox(contentElement, title, okTitle, cancelTitle, okCallback)
 	{
-		var modal_width = 800;
+		var modal_width = 900;
 
 		// Initialize our modal overlay
 		var overlay = $('<div id="modal_overlay"></div>').css({ 'display': 'block', opacity: 0 });
@@ -278,6 +278,7 @@ var deccoboard = (function()
 				'display'    : 'block',
 				'position'   : 'fixed',
 				'opacity'    : 0,
+				'width'      : modal_width,
 				'z-index'    : 11000,
 				'left'       : 50 + '%',
 				'margin-left': -(modal_width / 2) + "px",
@@ -304,7 +305,7 @@ var deccoboard = (function()
 
 		// Create our footer
 		var footer = $('<footer></footer>').appendTo(modalDialog);
-		$('<span class="button">' + okTitle + '</span>').appendTo(footer).click(function()
+		$('<span class="text-button">' + okTitle + '</span>').appendTo(footer).click(function()
 			{
 				if(_.isFunction(okCallback))
 				{
@@ -314,7 +315,7 @@ var deccoboard = (function()
 				closeModal();
 			});
 
-		$('<span class="button">' + cancelTitle + '</span>').appendTo(footer).click(function()
+		$('<span class="text-button">' + cancelTitle + '</span>').appendTo(footer).click(function()
 			{
 				closeModal();
 			});
@@ -379,39 +380,44 @@ var deccoboard = (function()
 						var subTableDiv = $('<div class="form-table-value-subtable"></div>').appendTo(valueCell);
 
 						var subTable = $('<table class="table table-condensed sub-table"></table>').appendTo(subTableDiv);
-						var subTableHead = $("<thead></thead>").appendTo(subTable);
-						subTableHead = $("<tr></tr>").appendTo(subTableHead);
+						var subTableHead = $("<thead></thead>").hide().appendTo(subTable);
+						var subTableHeadRow = $("<tr></tr>").appendTo(subTableHead);
 						var subTableBody = $('<tbody></tbody>').appendTo(subTable);
-						var headerCreated = false;
 
 						var currentSubSettingValues = [];
+
+						// Create our headers
+						_.each(settingDef.settings, function(subSettingDef)
+						{
+							var subsettingDisplayName = subSettingDef.name;
+
+							if(!_.isUndefined(subSettingDef.display_name))
+							{
+								subsettingDisplayName = subSettingDef.display_name;
+							}
+
+							$('<th>' + subsettingDisplayName + '</th>').appendTo(subTableHeadRow);
+						});
 
 						if(settingDef.name in currentSettingsValues)
 						{
 							currentSubSettingValues = currentSettingsValues[settingDef.name];
 						}
 
+						function processHeaderVisibility()
+						{
+							if(newSettings.settings[settingDef.name].length > 0)
+							{
+								subTableHead.show();
+							}
+							else
+							{
+								subTableHead.hide();
+							}
+						}
+
 						function createSubsettingRow(subsettingValue)
 						{
-							// If this is the first time we're being called, create our headers
-							if(!headerCreated)
-							{
-								headerCreated = true;
-
-								// Create our headers
-								_.each(settingDef.settings, function(subSettingDef)
-								{
-									var subsettingDisplayName = subSettingDef.name;
-
-									if(!_.isUndefined(subSettingDef.display_name))
-									{
-										subsettingDisplayName = subSettingDef.display_name;
-									}
-
-									$('<th>' + subsettingDisplayName + '</th>').appendTo(subTableHead);
-								});
-							}
-
 							var subsettingRow = $('<tr></tr>').appendTo(subTableBody);
 
 							var newSetting = {};
@@ -449,13 +455,16 @@ var deccoboard = (function()
 								{
 									newSettings.settings[settingDef.name].splice(subSettingIndex, 1);
 									subsettingRow.remove();
+									processHeaderVisibility();
 								}
 							})));
 
 							subTableDiv.scrollTop(subTableDiv[0].scrollHeight);
+
+							processHeaderVisibility();
 						}
 
-						$('<a class="table-operation">Add</a>').appendTo(valueCell).click(function(){
+						$('<span class="table-operation text-button">ADD</span>').appendTo(valueCell).click(function(){
 							var newSubsettingValue = {};
 
 							_.each(settingDef.settings, function(subSettingDef){
@@ -560,7 +569,7 @@ var deccoboard = (function()
 						{
 							createValueEditor(input);
 
-							$(valueCell).append($('<div class="input-suffix value-editor-ds">+ Datasource</div>').mousedown(function(e)
+							$(valueCell).append($('<div class="input-suffix text-button">+ Datasource</div>').mousedown(function(e)
 								{
 									e.preventDefault();
 									$(input).focus();
