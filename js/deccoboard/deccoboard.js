@@ -305,7 +305,7 @@ var deccoboard = (function()
 
 		// Create our footer
 		var footer = $('<footer></footer>').appendTo(modalDialog);
-		$('<span class="text-button">' + okTitle + '</span>').appendTo(footer).click(function()
+		$('<span id="dialog-ok" class="text-button">' + okTitle + '</span>').appendTo(footer).click(function()
 			{
 				if(_.isFunction(okCallback))
 				{
@@ -315,7 +315,7 @@ var deccoboard = (function()
 				closeModal();
 			});
 
-		$('<span class="text-button">' + cancelTitle + '</span>').appendTo(footer).click(function()
+		$('<span id="dialog-cancel" class="text-button">' + cancelTitle + '</span>').appendTo(footer).click(function()
 			{
 				closeModal();
 			});
@@ -584,10 +584,20 @@ var deccoboard = (function()
 			});
 		}
 
+		createDialogBox(form, title, "Save", "Cancel", function()
+		{
+			if(_.isFunction(settingsSavedCallback))
+			{
+				settingsSavedCallback(newSettings);
+			}
+		});
+
 		if(_.keys(pluginTypes).length > 1)
 		{
 			var typeRow = createSettingRow("Type");
 			var typeSelect = $('<select></select>').appendTo(typeRow);
+
+			typeSelect.append($("<option>Select a type...</option>").attr("value", "undefined"));
 
 			_.each(pluginTypes, function(pluginType)
 			{
@@ -596,7 +606,6 @@ var deccoboard = (function()
 
 			typeSelect.change(function()
 			{
-
 				newSettings.type = $(this).val();
 				newSettings.settings = {};
 
@@ -605,25 +614,33 @@ var deccoboard = (function()
 
 				var currentType = pluginTypes[typeSelect.val()];
 
-
-				createSettingsFromDefinition(currentType.settings);
-
+				if(_.isUndefined(currentType))
+				{
+					$("#dialog-ok").hide();
+				}
+				else
+				{
+					$("#dialog-ok").show();
+					createSettingsFromDefinition(currentType.settings);
+				}
 			});
 
-			typeSelect.val(currentTypeName).trigger("change");
+			if(_.isUndefined(currentTypeName))
+			{
+				$("#dialog-ok").hide();
+			}
+			else
+			{
+				$("#dialog-ok").show();
+				typeSelect.val(currentTypeName).trigger("change");
+			}
 		}
 		else
 		{
 			createSettingsFromDefinition(pluginTypes.settings);
 		}
 
-		createDialogBox(form, title, "Save", "Cancel", function()
-		{
-			if(_.isFunction(settingsSavedCallback))
-			{
-				settingsSavedCallback(newSettings);
-			}
-		});
+
 	}
 
 	ko.bindingHandlers.pluginEditor = {
@@ -676,7 +693,7 @@ var deccoboard = (function()
 				else
 				{
 					var instanceName = undefined;
-					var instanceType = _.keys(types)[0];
+					var instanceType = undefined;
 
 					if(options.type == 'datasource')
 					{
