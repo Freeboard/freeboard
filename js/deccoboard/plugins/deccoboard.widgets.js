@@ -19,6 +19,12 @@
     document.styleSheets[0].addRule('.sparkline', "width:100%;height: 75px;");
     document.styleSheets[0].addRule('.sparkline-inline', "width:50%;float:right;height:30px;");
 
+	document.styleSheets[0].addRule('.indicator-light', "border-radius:50%;width:22px;height:22px;border:2px solid #3d3d3d;margin-top:5px;float:left;background-color:#222;margin-right:10px;");
+	document.styleSheets[0].addRule('.indicator-light.on', "background-color:#FFC773;box-shadow: 0px 0px 15px #FF9900;border-color:#FDF1DF;");
+	document.styleSheets[0].addRule('.indicator-text', "margin-top:10px;");
+
+	document.styleSheets[0].addRule('div.pointer-value', "position:absolute;height:95px;margin: auto;top: 0px;bottom: 0px;width: 100%;text-align:center;");
+
 	function easeTransitionText(currentValue, newValue, textElement, duration)
 	{
 		if(currentValue == newValue)
@@ -237,6 +243,7 @@
 		var self = this;
 
 		var thisGaugeID = "gauge-" + gaugeID++;
+		var titleElement = $('<h2 class="section-title"></h2>');
 		var gaugeElement = $('<div class="gauge-widget" id="' + thisGaugeID + '"></div>');
 
 		var gaugeObject;
@@ -267,7 +274,7 @@
 		this.render = function(element)
 		{
 			rendered = true;
-			$(element).append($('<div class="gauge-widget-wrapper"></div>').append(gaugeElement));
+			$(element).append(titleElement).append($('<div class="gauge-widget-wrapper"></div>').append(gaugeElement));
 			createGauge();
 		}
 
@@ -282,6 +289,8 @@
 			{
 				currentSettings = newSettings;
 			}
+
+			titleElement.html(newSettings.title);
 		}
 
 		this.onCalculatedValueChanged = function(settingName, newValue)
@@ -402,6 +411,8 @@
 		var triangle;
 		var width, height;
 		var currentValue = 0;
+		var valueDiv = $('<div class="text-widget-big-value"></div>');
+		var unitsDiv = $('<div></div>');
 
 		function polygonPath(points)
 		{
@@ -429,37 +440,42 @@
 			circle.attr("stroke", "#FF9900");
 			circle.attr("stroke-width", strokeWidth);
 
-			triangle = paper.path(polygonPath([width / 2, 0, 15, 20, -30, 0]));
+			triangle = paper.path(polygonPath([width / 2, (height / 2) - radius + strokeWidth, 15, 20, -30, 0]));
 			triangle.attr("stroke-width", 0);
 			triangle.attr("fill", "#fff");
+
+			$(element).append($('<div class="pointer-value"></div>').append(valueDiv).append(unitsDiv));
 		}
 
 		this.onSettingsChanged = function(newSettings)
 		{
+			unitsDiv.html(newSettings.units);
 		}
 
 		this.onCalculatedValueChanged = function(settingName, newValue)
 		{
-			if(!_.isUndefined(triangle))
+			if(settingName == "direction")
 			{
-				var direction = "r";
-
-				/*var oppositeCurrent = currentValue + 180;
-
-				if(oppositeCurrent > 360)
+				if(!_.isUndefined(triangle))
 				{
-					oppositeCurrent = oppositeCurrent - 360;
+					var direction = "r";
+
+					var oppositeCurrent = currentValue + 180;
+
+					if(oppositeCurrent < newValue)
+					{
+						//direction = "l";
+					}
+
+					triangle.animate({transform: "r" + newValue + "," + (width / 2) + "," + (height / 2)}, 250, "bounce");
 				}
 
-				if(oppositeCurrent < newValue)
-				{
-					direction = "l";
-				}*/
-
-				triangle.animate({transform: "r" + newValue + "," + (width / 2) + "," + (height / 2)}, 250, "bounce");
+				currentValue = newValue;
 			}
-
-			currentValue = newValue;
+			else if(settingName == "value_text")
+			{
+				valueDiv.html(newValue);
+			}
 		}
 
 		this.onDispose = function()
@@ -483,6 +499,16 @@
 				display_name: "Direction",
 				type        : "calculated",
 				suffix : "degrees"
+			},
+			{
+				name        : "value_text",
+				display_name: "Value Text",
+				type        : "calculated"
+			},
+			{
+				name        : "units",
+				display_name: "Units",
+				type        : "text"
 			}
 		],
 		newInstance : function(settings)
@@ -545,5 +571,93 @@
             return new pictureWidget(settings);
         }
     });
+
+	var indicatorWidget = function(settings)
+	{
+		var self = this;
+		var titleElement = $('<h2 class="section-title"></h2>');
+		var stateElement = $('<div class="indicator-text"></div>');
+		var indicatorElement = $('<div class="indicator-light"></div>');
+		var currentSettings = settings;
+		var isOn = false;
+
+		function updateState()
+		{
+			indicatorElement.toggleClass("on", isOn);
+
+			if(isOn)
+			{
+				stateElement.text((_.isUndefined(currentSettings.on_text) ? "" : currentSettings.on_text));
+			}
+			else
+			{
+				stateElement.text((_.isUndefined(currentSettings.off_text) ? "" : currentSettings.off_text));
+			}
+		}
+
+		this.render = function(element)
+		{
+			$(element).append(titleElement).append(indicatorElement).append(stateElement);
+		}
+
+		this.onSettingsChanged = function(newSettings)
+		{
+			currentSettings = newSettings;
+			titleElement.html((_.isUndefined(newSettings.title) ? "" : newSettings.title));
+			updateState();
+		}
+
+		this.onCalculatedValueChanged = function(settingName, newValue)
+		{
+			if(settingName == "value")
+			{
+				isOn = Boolean(newValue);
+			}
+
+			updateState();
+		}
+
+		this.onDispose = function()
+		{
+		}
+
+		this.getHeight = function()
+		{
+			return 1;
+		}
+
+		this.onSettingsChanged(settings);
+	};
+
+	deccoboard.loadWidgetPlugin({
+		type_name   : "indicator",
+		display_name: "Indicator Light",
+		settings    : [
+			{
+				name        : "title",
+				display_name: "Title",
+				type        : "text"
+			},
+			{
+				name        : "value",
+				display_name: "Value",
+				type        : "calculated"
+			},
+			{
+				name        : "on_text",
+				display_name: "On Text",
+				type        : "calculated"
+			},
+			{
+				name        : "off_text",
+				display_name: "Off Text",
+				type        : "calculated"
+			}
+		],
+		newInstance : function(settings)
+		{
+			return new indicatorWidget(settings);
+		}
+	});
 
 }());
