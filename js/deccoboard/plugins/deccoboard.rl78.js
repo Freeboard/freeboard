@@ -22,7 +22,7 @@ function onMessage(message)
 
 function onError(error)
 {
-	console.log('error! -> ' + JSON.stringify(error));
+	console.log('Bugswarm error! -> ' + JSON.stringify(error));
 }
 
 function onConnect()
@@ -96,9 +96,52 @@ deccoboard.loadDatasourcePlugin((function()
 				var sensorName = message.payload.name;
 				var sensorValue = message.payload.feed;
 
-				deviceState[sensorName] = sensorValue;
+				if(!_.isUndefined(sensorName) && !_.isUndefined(sensorValue))
+				{
+					switch(sensorName)
+					{
+						case "Acceleration":
+						{
+							deviceState["Acceleration_X"] = sensorValue["x"];
+							deviceState["Acceleration_Y"] = sensorValue["y"];
+							deviceState["Acceleration_Z"] = sensorValue["z"];
+							break;
+						}
+						case "Button":
+						{
+							deviceState["Button_1"] = sensorValue["b1"];
+							deviceState["Button_2"] = sensorValue["b2"];
+							deviceState["Button_3"] = sensorValue["b3"];
+							break;
+						}
+						case "Light":
+						{
+							deviceState["Light"] = sensorValue["Value"];
+							break;
+						}
+						case "Potentiometer":
+						{
+							deviceState["Potentiometer"] = sensorValue["Raw"];
+							break;
+						}
+						case "Sound Level":
+						{
+							deviceState["Sound"] = sensorValue["Raw"];
+							break;
+						}
+						case "Temperature":
+						{
+							deviceState["Temperature"] = sensorValue["TempF"];
+							break;
+						}
+						default:
+						{
+							deviceState[sensorName] = sensorValue;
+						}
+					}
 
-				updateCallback(deviceState);
+					updateCallback(deviceState);
+				}
 			}
 		}
 
