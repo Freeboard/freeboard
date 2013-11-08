@@ -1,5 +1,5 @@
 {
-	"header_image" : "file:///Users/jheising/Dropbox/Development/deccoboard/img/dash-logo.png",
+	"header_image" : "",
 	"allow_edit"   : true, "panes": [
 	{
 		"title"  : "Wind",
