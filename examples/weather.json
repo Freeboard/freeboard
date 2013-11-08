@@ -1,0 +1,163 @@
+{
+	"header_image" : "file:///Users/jheising/Dropbox/Development/deccoboard/img/dash-logo.png",
+	"allow_edit"   : true, "panes": [
+	{
+		"title"  : "Wind",
+		"width"  : 1,
+		"row"    : "1",
+		"col"    : "2",
+		"widgets": [
+			{
+				"type"    : "pointer",
+				"settings": {
+					"direction" : "datasources.Weather.wind_direction",
+					"value_text": "var dir = datasources.Weather.wind_direction;\n\nif(dir <= 22.5)\nreturn \"N\";\nelse if(dir <= 67.5)\nreturn \"NE\";\nelse if(dir <= 112.5)\nreturn \"E\";\nelse if(dir <= 157.5)\nreturn \"SE\";\nelse if(dir <= 202.5)\nreturn \"S\";\nelse if(dir <= 247.5)\nreturn \"SW\";\nelse if(dir <= 292.5)\nreturn \"W\";\nelse if(dir <= 337.5)\nreturn \"NW\";\nelse if(dir <= 360)\nreturn \"N\";"
+				}
+			},
+			{
+				"type"    : "text_widget",
+				"settings": {
+					"size"     : "regular",
+					"value"    : "datasources.Weather.wind_speed",
+					"sparkline": true,
+					"animate"  : true,
+					"units"    : "MPH"
+				}
+			}
+		]
+	},
+	{
+		"width"  : 1,
+		"row"    : "5",
+		"col"    : "3",
+		"widgets": [
+			{
+				"type"    : "text_widget",
+				"settings": {
+					"title"  : "Sunrise",
+					"size"   : "regular",
+					"value"  : "datasources.Weather.sunrise",
+					"animate": true
+				}
+			},
+			{
+				"type"    : "text_widget",
+				"settings": {
+					"title"  : "Sunset",
+					"size"   : "regular",
+					"value"  : "datasources.Weather.sunset",
+					"animate": true
+				}
+			}
+		]
+	},
+	{
+		"title"  : "Temperature",
+		"width"  : 1,
+		"row"    : "4",
+		"col"    : "1",
+		"widgets": [
+			{
+				"type"    : "text_widget",
+				"settings": {
+					"title"  : "Current",
+					"size"   : "big",
+					"value"  : "datasources.Weather.current_temp",
+					"animate": true,
+					"units"  : "&deg;F"
+				}
+			},
+			{
+				"type"    : "text_widget",
+				"settings": {
+					"title"  : "High",
+					"size"   : "regular",
+					"value"  : "datasources.Weather.high_temp",
+					"animate": true,
+					"units"  : "&deg;F"
+				}
+			},
+			{
+				"type"    : "text_widget",
+				"settings": {
+					"title"  : "Low",
+					"size"   : "regular",
+					"value"  : "datasources.Weather.low_temp",
+					"animate": true,
+					"units"  : "&deg;F"
+				}
+			}
+		]
+	},
+	{
+		"title"  : "Info",
+		"width"  : 1,
+		"row"    : "1",
+		"col"    : "1",
+		"widgets": [
+			{
+				"type"    : "text_widget",
+				"settings": {
+					"title"  : "City",
+					"size"   : "regular",
+					"value"  : "datasources.Weather.place_name",
+					"animate": true
+				}
+			},
+			{
+				"type"    : "text_widget",
+				"settings": {
+					"title"  : "Conditions",
+					"size"   : "regular",
+					"value"  : "datasources.Weather.conditions",
+					"animate": true
+				}
+			}
+		]
+	},
+	{
+		"title"  : "Humidity",
+		"width"  : 1,
+		"row"    : "1",
+		"col"    : "3",
+		"widgets": [
+			{
+				"type"    : "gauge",
+				"settings": {
+					"value"    : "datasources.Weather.humidity",
+					"units"    : "%",
+					"min_value": 0,
+					"max_value": 100
+				}
+			}
+		]
+	},
+	{
+		"title"  : "Pressure",
+		"width"  : 1,
+		"row"    : "7",
+		"col"    : "2",
+		"widgets": [
+			{
+				"type"    : "text_widget",
+				"settings": {
+					"size"     : "regular",
+					"value"    : "datasources.Weather.pressure",
+					"sparkline": true,
+					"animate"  : true,
+					"units"    : "mb"
+				}
+			}
+		]
+	}
+], "datasources": [
+	{
+		"name"    : "Weather",
+		"type"    : "openweathermap",
+		"settings": {
+			"location": "New York, NY",
+			"units"   : "imperial",
+			"refresh" : 5
+		}
+	}
+]}
