@@ -1,1 +1,164 @@
-{"allow_edit":true,"panes":[{"title":"Tilt","width":1,"row":"1","col":"1","widgets":[{"type":"pointer","settings":{"direction":"datasources.RL78.Acceleration_X * -90","value_text":"(datasources.RL78.Acceleration_X * -90).toFixed(0)","units":"degrees"}},{"type":"text_widget","settings":{"title":"Y","size":"regular","value":"(datasources.RL78.Acceleration_Y * 90).toFixed(0)","sparkline":true,"animate":true,"units":"&deg;"}},{"type":"text_widget","settings":{"title":"Z","size":"regular","value":"(datasources.RL78.Acceleration_Z * -90).toFixed(0)","sparkline":true,"animate":true,"units":"&deg;"}}]},{"title":"Buttons","width":1,"row":"5","col":"3","widgets":[{"type":"indicator","settings":{"value":"datasources.RL78.Button_1","on_text":"Button 1 is ON","off_text":"Button 1 is OFF"}},{"type":"indicator","settings":{"value":"datasources.RL78.Button_2","on_text":"Button 2 is ON","off_text":"Button 2 is OFF"}},{"type":"indicator","settings":{"value":"datasources.RL78.Button_3","on_text":"Button 3 is ON","off_text":"Button 3 is OFF"}}]},{"title":"Temperature","width":1,"row":"1","col":"2","widgets":[{"type":"text_widget","settings":{"title":"Indoor","size":"big","value":"datasources.RL78.Temperature","sparkline":false,"animate":true,"units":"&deg;F"}},{"type":"text_widget","settings":{"title":"Outdoor","size":"big","value":"((datasources.Weather.main.temp - 273.15) * 1.8 + 32).toFixed(2)","animate":true,"units":"&deg;F"}}]},{"title":"Potentiometer","width":1,"row":"1","col":"3","widgets":[{"type":"gauge","settings":{"title":"","value":"datasources.RL78.Potentiometer","units":"Ω","min_value":0,"max_value":"1000"}}]},{"title":"Miscellaneous","width":1,"row":"6","col":"2","widgets":[{"type":"text_widget","settings":{"title":"Light","size":"regular","value":"datasources.RL78.Light","sparkline":true,"animate":true}},{"type":"text_widget","settings":{"title":"Sound","size":"regular","value":"datasources.RL78.Sound","sparkline":true,"animate":true}}]}],"datasources":[{"name":"RL78","type":"rl78","settings":{"device_resource_id":"b3273d7585fa85642140749a63ebc02fcc142ace"}},{"name":"Weather","type":"JSON","settings":{"url":"http://api.openweathermap.org/data/2.5/weather?q=Seattle,WA","refresh":5,"is_jsonp":true}}]}
+{"allow_edit"   : true, "panes": [
+	{
+		"title"  : "Tilt",
+		"width"  : 1,
+		"row"    : "1",
+		"col"    : "1",
+		"widgets": [
+			{
+				"type"    : "pointer",
+				"settings": {
+					"direction" : "datasources.RL78.Acceleration_X * -90",
+					"value_text": "(datasources.RL78.Acceleration_X * -90).toFixed(0)",
+					"units"     : "degrees"
+				}
+			},
+			{
+				"type"    : "text_widget",
+				"settings": {
+					"title"    : "Y",
+					"size"     : "regular",
+					"value"    : "(datasources.RL78.Acceleration_Y * 90).toFixed(0)",
+					"sparkline": true,
+					"animate"  : true,
+					"units"    : "&deg;"
+				}
+			},
+			{
+				"type"    : "text_widget",
+				"settings": {
+					"title"    : "Z",
+					"size"     : "regular",
+					"value"    : "(datasources.RL78.Acceleration_Z * -90).toFixed(0)",
+					"sparkline": true,
+					"animate"  : true,
+					"units"    : "&deg;"
+				}
+			}
+		]
+	},
+	{
+		"title"  : "Buttons",
+		"width"  : 1,
+		"row"    : "5",
+		"col"    : "3",
+		"widgets": [
+			{
+				"type"    : "indicator",
+				"settings": {
+					"value"   : "datasources.RL78.Button_1",
+					"on_text" : "Button 1 is ON",
+					"off_text": "Button 1 is OFF"
+				}
+			},
+			{
+				"type"    : "indicator",
+				"settings": {
+					"value"   : "datasources.RL78.Button_2",
+					"on_text" : "Button 2 is ON",
+					"off_text": "Button 2 is OFF"
+				}
+			},
+			{
+				"type"    : "indicator",
+				"settings": {
+					"value"   : "datasources.RL78.Button_3",
+					"on_text" : "Button 3 is ON",
+					"off_text": "Button 3 is OFF"
+				}
+			}
+		]
+	},
+	{
+		"title"  : "Temperature",
+		"width"  : 1,
+		"row"    : "1",
+		"col"    : "2",
+		"widgets": [
+			{
+				"type"    : "text_widget",
+				"settings": {
+					"title"    : "Indoor",
+					"size"     : "big",
+					"value"    : "datasources.RL78.Temperature",
+					"sparkline": false,
+					"animate"  : true,
+					"units"    : "&deg;F"
+				}
+			},
+			{
+				"type"    : "text_widget",
+				"settings": {
+					"title"  : "Outdoor",
+					"size"   : "big",
+					"value"  : "((datasources.Weather.main.temp - 273.15) * 1.8 + 32).toFixed(2)",
+					"animate": true,
+					"units"  : "&deg;F"
+				}
+			}
+		]
+	},
+	{
+		"title"  : "Potentiometer",
+		"width"  : 1,
+		"row"    : "1",
+		"col"    : "3",
+		"widgets": [
+			{
+				"type"    : "gauge",
+				"settings": {
+					"title"    : "",
+					"value"    : "datasources.RL78.Potentiometer",
+					"units"    : "Ω",
+					"min_value": 0,
+					"max_value": "1000"
+				}
+			}
+		]
+	},
+	{
+		"title"  : "Miscellaneous",
+		"width"  : 1,
+		"row"    : "6",
+		"col"    : "2",
+		"widgets": [
+			{
+				"type"    : "text_widget",
+				"settings": {
+					"title"    : "Light",
+					"size"     : "regular",
+					"value"    : "datasources.RL78.Light",
+					"sparkline": true,
+					"animate"  : true
+				}
+			},
+			{
+				"type"    : "text_widget",
+				"settings": {
+					"title"    : "Sound",
+					"size"     : "regular",
+					"value"    : "datasources.RL78.Sound",
+					"sparkline": true,
+					"animate"  : true
+				}
+			}
+		]
+	}
+], "datasources": [
+	{
+		"name"    : "RL78",
+		"type"    : "rl78",
+		"settings": {
+			"device_resource_id": "b3273d7585fa85642140749a63ebc02fcc142ace"
+		}
+	},
+	{
+		"name"    : "Weather",
+		"type"    : "JSON",
+		"settings": {
+			"url"     : "http://api.openweathermap.org/data/2.5/weather?q=Seattle,WA",
+			"refresh" : 5,
+			"is_jsonp": true
+		}
+	}
+]}

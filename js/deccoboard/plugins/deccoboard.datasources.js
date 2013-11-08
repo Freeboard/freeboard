@@ -296,6 +296,14 @@
 			}, refreshTime);
 		}
 
+		function toTitleCase(str)
+		{
+			return str.replace(/\w\S*/g, function(txt)
+			{
+				return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+			});
+		}
+
 		updateRefresh(currentSettings.refresh * 1000);
 
 		this.updateNow = function()
@@ -307,9 +315,10 @@
 				{
 					// Rejigger our data into something easier to understand
 					var newData = {
+						place_name      : data.name,
 						sunrise         : (new Date(data.sys.sunrise * 1000)).toLocaleTimeString(),
 						sunset          : (new Date(data.sys.sunset * 1000)).toLocaleTimeString(),
-						conditions      : data.weather.description,
+						conditions      : toTitleCase(data.weather[0].description),
 						current_temp    : data.main.temp,
 						high_temp       : data.main.temp_max,
 						low_temp        : data.main.temp_min,

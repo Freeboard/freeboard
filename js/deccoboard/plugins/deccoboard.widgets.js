@@ -295,7 +295,10 @@
 
 		this.onCalculatedValueChanged = function(settingName, newValue)
 		{
-			gaugeObject.refresh(Number(newValue));
+			if(!_.isUndefined(gaugeObject))
+			{
+				gaugeObject.refresh(Number(newValue));
+			}
 		}
 
 		this.onDispose = function()
@@ -498,7 +501,7 @@
 				name        : "direction",
 				display_name: "Direction",
 				type        : "calculated",
-				suffix : "degrees"
+				description : "In degrees"
 			},
 			{
 				name        : "value_text",

@@ -20,8 +20,7 @@
                 "js/raphael.2.1.0.min.js",
                 "js/justgage.1.0.1.js",
                 "js/deccoboard/deccoboard.js",
-                "js/deccoboard/plugins/deccoboard.json.js",
-                "js/deccoboard/plugins/deccoboard.rl78.js",
+                "js/deccoboard/plugins/deccoboard.datasources.js",
                 "js/deccoboard/plugins/deccoboard.widgets.js",
                 "config.js",
                 function (){
@@ -34,10 +33,10 @@
     <div id="admin-bar">
         <div id="admin-menu">
             <div id="board-tools">
-                <img id="main-logo" src="img/main-logo.png">
-                <span class="text-button" data-bind="click: loadDashboard"><i class="icon-upload icon-white"></i> Load Dashboard</span>
+                <a href="http://www.buglabs.net" target="_blank"><img id="main-logo" src="img/main-logo.png"></a>
+                <span class="text-button" data-bind="click: loadDashboard"><i class="icon-folder-open icon-white"></i> Load Dashboard</span>
                 <br>
-                <span class="text-button" data-bind="click: saveDashboard"><i class="icon-download icon-white"></i> Save Dashboard</span>
+                <span class="text-button" data-bind="click: saveDashboard"><i class="icon-download-alt icon-white"></i> Save Dashboard</span>
                 <br>
                 <br>
                 <span class="text-button" data-bind="click: createPane"><i class="icon-plus icon-white"></i> Add Pane</span>
@@ -69,7 +68,7 @@
     <div id="toggle-header" data-bind="click: toggleEditing" ><i class="icon-wrench icon-white"></i></div>
 </header>
 <div class="gridster">
-    <img id="dash-logo" src="img/dash-logo.png">
+    <img id="dash-logo" data-bind="attr:{src: header_image}">
     <ul data-bind="grid: true, template: {name: 'pane-template', foreach: panes}">
     </ul>
 </div>

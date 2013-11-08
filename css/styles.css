@@ -540,7 +540,6 @@ body
 	display        : inline-block;
 	height         : 22px;
 	padding        : 4px 10px;
-	margin-bottom  : 10px;
 	line-height    : 23px;
 	vertical-align : middle;
 	background-color: #3d3d3d;
@@ -583,7 +582,6 @@ input[type="color"],
 	display               : inline-block;
 	height                : 20px;
 	padding               : 4px 6px;
-	margin-bottom         : 10px;
 	font-size             : 14px;
 	line-height           : 20px;
 	color                 : #d3d4d4;
@@ -2003,7 +2001,8 @@ ul.value-dropdown li.selected
 
 td.form-table-value > input[type="checkbox"]
 {
-	height: 28px;
+	height: 15px;
+	margin-top: 7px;
 }
 
 .table-row-operation > i
@@ -2080,4 +2079,36 @@ td.form-table-value > input[type="checkbox"]
 	-webkit-transform : translateX(0px);
 	-moz-transform    : translateX(0px);
 	transform         : translateX(0px);
+}
+
+.setting-description
+{
+	font-size   : 10px;
+	text-shadow : none;
+	color: #6F6F6F;
+	margin-bottom: 5px;
+}
+
+textarea.calculated-value-input
+{
+	position: absolute;
+	width: 400px;
+	height: 20px;
+	resize : none;
+	white-space : nowrap;
+	overflow    : auto;
+}
+
+.datasource-input-suffix
+{
+	display          : inline-block;
+	height           : 22px;
+	padding          : 4px 10px;
+	line-height      : 23px;
+	vertical-align   : middle;
+	background-color : #3d3d3d;
+	text-transform   : uppercase;
+	font-size        : 11px;
+	min-width        : 16px;
+	margin-left: 413px;
 }
