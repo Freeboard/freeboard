@@ -681,7 +681,7 @@ var deccoboard = (function()
 					{
 						var defaultValue = currentSettingsValues[settingDef.name];
 
-						var input = $('<select></select>').appendTo(valueCell).change(function()
+						var input = $('<select></select>').appendTo($('<div class="styled-select"></div>').appendTo(valueCell)).change(function()
 						{
 							newSettings.settings[settingDef.name] = $(this).val();
 						});
@@ -787,7 +787,7 @@ var deccoboard = (function()
 		if(_.keys(pluginTypes).length > 1)
 		{
 			var typeRow = createSettingRow("Type");
-			var typeSelect = $('<select></select>').appendTo(typeRow);
+			var typeSelect = $('<select></select>').appendTo($('<div class="styled-select"></div>').appendTo(typeRow));
 
 			typeSelect.append($("<option>Select a type...</option>").attr("value", "undefined"));
 

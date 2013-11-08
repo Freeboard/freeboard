@@ -2112,3 +2112,12 @@ textarea.calculated-value-input
 	min-width        : 16px;
 	margin-left: 413px;
 }
+
+.styled-select select
+{
+	width              : 414px;
+	height             : 30px;
+	-webkit-appearance : none;
+	border           : 1px solid #3d3d3d;
+	background : url(../img/dropdown-arrow.png) no-repeat right #272727;
+}
