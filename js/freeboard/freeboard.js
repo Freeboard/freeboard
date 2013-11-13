@@ -784,7 +784,9 @@ var freeboard = (function()
 			}
 		});
 
-		if(_.keys(pluginTypes).length > 1)
+		var pluginTypeNames = _.keys(pluginTypes);
+
+		if(pluginTypeNames.length > 1)
 		{
 			var typeRow = createSettingRow("Type");
 			var typeSelect = $('<select></select>').appendTo($('<div class="styled-select"></div>').appendTo(typeRow));
@@ -827,9 +829,9 @@ var freeboard = (function()
 				typeSelect.val(currentTypeName).trigger("change");
 			}
 		}
-		else
+		else if(pluginTypeNames.length == 1)
 		{
-			createSettingsFromDefinition(pluginTypes.settings);
+			createSettingsFromDefinition(pluginTypes[pluginTypeNames[0]].settings);
 		}
 
 
