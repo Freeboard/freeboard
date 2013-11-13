@@ -1,7 +1,7 @@
 (function()
 {
     var SPARKLINE_HISTORY_LENGTH = 100;
-	var valueStyle = deccoboard.getStyleString("values");
+	var valueStyle = freeboard.getStyleString("values");
 
 	valueStyle +=
 		"overflow: hidden;" +
@@ -184,7 +184,7 @@
 		this.onSettingsChanged(settings);
 	};
 
-	deccoboard.loadWidgetPlugin({
+	freeboard.loadWidgetPlugin({
 		type_name   : "text_widget",
 		display_name: "Text",
 		settings    : [
@@ -313,7 +313,7 @@
 		this.onSettingsChanged(settings);
 	};
 
-	deccoboard.loadWidgetPlugin({
+	freeboard.loadWidgetPlugin({
 		type_name   : "gauge",
 		display_name: "Gauge",
 		settings    : [
@@ -385,7 +385,7 @@
         this.onSettingsChanged(settings);
     };
 
-    deccoboard.loadWidgetPlugin({
+    freeboard.loadWidgetPlugin({
         type_name   : "sparkline",
         display_name: "Sparkline",
         settings    : [
@@ -493,7 +493,7 @@
 		this.onSettingsChanged(settings);
 	};
 
-	deccoboard.loadWidgetPlugin({
+	freeboard.loadWidgetPlugin({
 		type_name   : "pointer",
 		display_name: "Pointer",
 		settings    : [
@@ -559,7 +559,7 @@
         this.onSettingsChanged(settings);
     };
 
-    deccoboard.loadWidgetPlugin({
+    freeboard.loadWidgetPlugin({
         type_name   : "picture",
         display_name: "Picture",
         settings    : [
@@ -632,7 +632,7 @@
 		this.onSettingsChanged(settings);
 	};
 
-	deccoboard.loadWidgetPlugin({
+	freeboard.loadWidgetPlugin({
 		type_name   : "indicator",
 		display_name: "Indicator Light",
 		settings    : [

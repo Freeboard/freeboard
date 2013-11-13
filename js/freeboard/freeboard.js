@@ -162,12 +162,12 @@
 	}
 })(jQuery);
 
-var deccoboard = (function()
+var freeboard = (function()
 {
 	var datasourcePlugins = {};
 	var widgetPlugins = {};
 	var grid;
-	var deccoboardModel = new DeccoboardModel();
+	var freeboardModel = new freeboardModel();
 	var currentStyle = {
 		values: {
 			"font-family": '"HelveticaNeue-UltraLight", "Helvetica Neue Ultra Light", "Helvetica Neue", sans-serif',
@@ -192,7 +192,7 @@ var deccoboard = (function()
 		var dropdown = null;
 		var selectedOptionIndex = 0;
 
-		$(element).addClass("calculated-value-input").bind("keyup mouseup decco-eval",function(event)
+		$(element).addClass("calculated-value-input").bind("keyup mouseup freeboard-eval",function(event)
 			{
 				// Ignore arrow keys and enter keys
 				if(dropdown && event.type == "keyup" && (event.keyCode == 38 || event.keyCode == 40 || event.keyCode == 13))
@@ -211,7 +211,7 @@ var deccoboard = (function()
 				{
 					if(match[1] == "") // List all datasources
 					{
-						_.each(deccoboardModel.datasources(), function(datasource)
+						_.each(freeboardModel.datasources(), function(datasource)
 						{
 							options.push({value: datasource.name(), follow_char: "."});
 						});
@@ -220,7 +220,7 @@ var deccoboard = (function()
 					{
 						replacementString = match[1];
 
-						_.each(deccoboardModel.datasources(), function(datasource)
+						_.each(freeboardModel.datasources(), function(datasource)
 						{
 
 							var name = datasource.name();
@@ -233,7 +233,7 @@ var deccoboard = (function()
 					}
 					else
 					{
-						var datasource = _.find(deccoboardModel.datasources(), function(datasource)
+						var datasource = _.find(freeboardModel.datasources(), function(datasource)
 						{
 							return (datasource.name() === match[1]);
 						});
@@ -336,12 +336,12 @@ var deccoboard = (function()
 					{
 						var li = $('<li>' + option.value + '</li>').appendTo(dropdown).mouseenter(function()
 						{
-							$(this).trigger("decco-select");
+							$(this).trigger("freeboard-select");
 						}).mousedown(function(event)
 							{
-								$(this).trigger("decco-insertValue");
+								$(this).trigger("freeboard-insertValue");
 								event.preventDefault();
-							}).data("decco-optionIndex", currentIndex).data("decco-optionValue", option.value).bind("decco-insertValue",function()
+							}).data("freeboard-optionIndex", currentIndex).data("freeboard-optionValue", option.value).bind("freeboard-insertValue",function()
 							{
 								var optionValue = option.value;
 
@@ -365,11 +365,11 @@ var deccoboard = (function()
 								}
 
 								$(element).triggerHandler("mouseup");
-							}).bind("decco-select", function()
+							}).bind("freeboard-select", function()
 							{
 								$(this).parent().find("li.selected").removeClass("selected");
 								$(this).addClass("selected");
-								selectedOptionIndex = $(this).data("decco-optionIndex");
+								selectedOptionIndex = $(this).data("freeboard-optionIndex");
 							});
 
 						if(selected)
@@ -427,7 +427,7 @@ var deccoboard = (function()
 
 						var optionElement = $(optionItems).eq(selectedOptionIndex);
 
-						optionElement.trigger("decco-select");
+						optionElement.trigger("freeboard-select");
 						$(dropdown).scrollTop($(optionElement).position().top);
 					}
 					else if(event.keyCode == 13) // Handle enter key
@@ -436,7 +436,7 @@ var deccoboard = (function()
 
 						if(selectedOptionIndex != -1)
 						{
-							$(dropdown).find("li").eq(selectedOptionIndex).trigger("decco-insertValue");
+							$(dropdown).find("li").eq(selectedOptionIndex).trigger("freeboard-insertValue");
 						}
 					}
 				}
@@ -749,7 +749,7 @@ var deccoboard = (function()
 								e.preventDefault();
 								$(input).focus();
 								$(input).insertAtCaret("datasources.");
-								$(input).trigger("decco-eval");
+								$(input).trigger("freeboard-eval");
 							}));
 						}
 						else
@@ -869,15 +869,15 @@ var deccoboard = (function()
 
 						if(options.type == 'datasource')
 						{
-							deccoboardModel.deleteDatasource(viewModel);
+							freeboardModel.deleteDatasource(viewModel);
 						}
 						else if(options.type == 'widget')
 						{
-							deccoboardModel.deleteWidget(viewModel);
+							freeboardModel.deleteWidget(viewModel);
 						}
 						else if(options.type == 'pane')
 						{
-							deccoboardModel.deletePane(viewModel);
+							freeboardModel.deletePane(viewModel);
 						}
 
 					});
@@ -940,7 +940,7 @@ var deccoboard = (function()
 							if(options.type == 'datasource')
 							{
 								var newViewModel = new DatasourceModel();
-								deccoboardModel.addDatasource(newViewModel);
+								freeboardModel.addDatasource(newViewModel);
 
 								newViewModel.settings(newSettings.settings);
 								newViewModel.name(newSettings.name);
@@ -999,7 +999,7 @@ var deccoboard = (function()
 	ko.bindingHandlers.pane = {
 		init  : function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
-			if(deccoboardModel.isEditing())
+			if(freeboardModel.isEditing())
 			{
 				$(element).css({cursor: "pointer"});
 			}
@@ -1011,7 +1011,7 @@ var deccoboard = (function()
 				showPaneEditIcons(true);
 			}
 
-			$(element).data("deccoPaneModel", viewModel);
+			$(element).data("freeboardPaneModel", viewModel);
 
 			$(element).attrchange({
 				trackValues: true,
@@ -1031,7 +1031,7 @@ var deccoboard = (function()
 		update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
 			// If pane has been removed
-			if(deccoboardModel.panes.indexOf(viewModel) == -1)
+			if(freeboardModel.panes.indexOf(viewModel) == -1)
 			{
 				grid.remove_widget(element);
 			}
@@ -1046,7 +1046,7 @@ var deccoboard = (function()
 	ko.bindingHandlers.widget = {
 		init  : function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
-			if(deccoboardModel.isEditing())
+			if(freeboardModel.isEditing())
 			{
 				attachWidgetEditIcons($(element).parent());
 			}
@@ -1061,7 +1061,7 @@ var deccoboard = (function()
 		}
 	}
 
-	function DeccoboardModel()
+	function freeboardModel()
 	{
 		var self = this;
 
@@ -1078,7 +1078,7 @@ var deccoboard = (function()
 
 			self.datasourceData[datasourceName] = newData;
 
-			_.each(deccoboardModel.panes(), function(pane)
+			_.each(freeboardModel.panes(), function(pane)
 			{
 				_.each(pane.widgets(), function(widget)
 				{
@@ -1465,7 +1465,7 @@ var deccoboard = (function()
 
 		this.callValueFunction = function(theFunction)
 		{
-			return theFunction.call(undefined, deccoboardModel.datasourceData);
+			return theFunction.call(undefined, freeboardModel.datasourceData);
 		}
 
 		this.processCalculatedSetting = function(settingName)
@@ -1647,7 +1647,7 @@ var deccoboard = (function()
 
 		this.updateCallback = function(newData)
 		{
-			deccoboardModel.processDatasourceUpdate(self, newData);
+			freeboardModel.processDatasourceUpdate(self, newData);
 
 			self.latestData(newData);
 
@@ -1749,11 +1749,11 @@ var deccoboard = (function()
 	$(function()
 	{ //DOM Ready
 
-		ko.applyBindings(deccoboardModel);
+		ko.applyBindings(freeboardModel);
 
-		if(deccoboardModel.allow_edit() && deccoboardModel.panes().length == 0)
+		if(freeboardModel.allow_edit() && freeboardModel.panes().length == 0)
 		{
-			deccoboardModel.toggleEditing();
+			freeboardModel.toggleEditing();
 		}
 
 		// Fade everything in
@@ -1764,7 +1764,7 @@ var deccoboard = (function()
 	return {
 		loadConfiguration   : function(configuration)
 		{
-			deccoboardModel.deserialize(configuration);
+			freeboardModel.deserialize(configuration);
 		},
 		loadDatasourcePlugin: function(plugin)
 		{
@@ -1774,7 +1774,7 @@ var deccoboard = (function()
 			}
 
 			datasourcePlugins[plugin.type_name] = plugin;
-			deccoboardModel._datasourceTypes.valueHasMutated();
+			freeboardModel._datasourceTypes.valueHasMutated();
 		},
 		loadWidgetPlugin    : function(plugin)
 		{
@@ -1784,7 +1784,7 @@ var deccoboard = (function()
 			}
 
 			widgetPlugins[plugin.type_name] = plugin;
-			deccoboardModel._widgetTypes.valueHasMutated();
+			freeboardModel._widgetTypes.valueHasMutated();
 		},
 		getStyleString      : function(name)
 		{

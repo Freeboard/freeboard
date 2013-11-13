@@ -149,7 +149,7 @@
 		processStartup(self);
 	};
 
-	deccoboard.loadDatasourcePlugin({
+	freeboard.loadDatasourcePlugin({
 		type_name   : "rl78",
 		display_name: "RL78",
 		settings    : [
@@ -233,7 +233,7 @@
 		}
 	};
 
-	deccoboard.loadDatasourcePlugin({
+	freeboard.loadDatasourcePlugin({
 		type_name  : "JSON",
 		settings   : [
 			{
@@ -349,7 +349,7 @@
 		}
 	};
 
-	deccoboard.loadDatasourcePlugin({
+	freeboard.loadDatasourcePlugin({
 		type_name  : "openweathermap",
 		display_name: "Open Weather Map API",
 		settings   : [
