@@ -1063,17 +1063,6 @@ table#datasources-list tbody
 	letter-spacing: 1px;
 }
 
-.modal header h1
-{
-	color          : #d3d4d4;
-	font-size      : 20px;
-	font-weight    : 100;
-	font-family    : "HelveticaNeue-UltraLight", "Helvetica Neue Ultra Light", "Helvetica Neue", sans-serif;
-	overflow       : hidden;
-	text-overflow  : ellipsis;
-	letter-spacing : 1px;
-}
-
 ul, ol {
     list-style: none;
 }
@@ -2120,4 +2109,39 @@ textarea.calculated-value-input
 	-webkit-appearance : none;
 	border           : 1px solid #3d3d3d;
 	background : url(../img/dropdown-arrow.png) no-repeat right #272727;
+}
+
+.title
+{
+	font-family : montserrat, sans-serif;
+	text-transform : uppercase;
+	vertical-align : baseline;
+	-webkit-font-smoothing : antialiased;
+	font-style  : normal;
+	font-weight : bold;
+	color : #d3d4d4;
+}
+
+.title.bordered
+{
+	border : solid 3px #d3d4d4;
+	display : inline-block;
+	padding : 5px 20px;
+	line-height : 39px;
+}
+
+h1.title
+{
+	margin-bottom: 20px;
+	font-size : 23px;
+	letter-spacing : 2px;
+}
+
+h2.title
+{
+	font-size : 15px;
+	line-height: 20px;
+	margin : 0px;
+	padding-top: 10px;
+	padding-bottom: 10px;
 }

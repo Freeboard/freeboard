@@ -453,7 +453,7 @@ var deccoboard = (function()
 		var modalDialog = $('<div class="modal"></div>').css({
 
 			'display'    : 'block',
-			'position'   : 'fixed',
+			'position'   : 'absolute',
 			'opacity'    : 0,
 			'width'      : modal_width,
 			'z-index'    : 11000,
@@ -476,7 +476,7 @@ var deccoboard = (function()
 		}
 
 		// Create our header
-		modalDialog.append("<header><h1>" + title + "</h1></header>");
+		modalDialog.append('<header><h2 class="title">' + title + "</h2></header>");
 
 		$('<section></section>').appendTo(modalDialog).append(contentElement);
 
