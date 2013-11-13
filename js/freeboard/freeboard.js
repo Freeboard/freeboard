@@ -1217,7 +1217,12 @@ var freeboard = (function()
 			self.panes.removeAll();
 		}
 
-		this.loadDashboard = function()
+		this.loadDashboard = function(dashboardData)
+		{
+			self.deserialize(dashboardData);
+		}
+
+		this.loadDashboardFromLocalFile = function()
 		{
 			// Check for the various File API support.
 			if(window.File && window.FileReader && window.FileList && window.Blob)
@@ -1239,7 +1244,7 @@ var freeboard = (function()
 							var textFile = fileReaderEvent.target;
 							var jsonObject = JSON.parse(textFile.result);
 
-							self.deserialize(jsonObject);
+							self.loadDashboard(jsonObject);
 						});
 
 						reader.readAsText(file);
@@ -1748,10 +1753,30 @@ var freeboard = (function()
 		}
 	}
 
+	function getParameterByName(name)
+	{
+		name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+		var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"), results = regex.exec(location.search);
+		return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+	}
+
 	$(function()
 	{ //DOM Ready
-
 		ko.applyBindings(freeboardModel);
+
+		// Check to see if we have a query param called load. If so, we should load that dashboard initially
+		var freeboardLocation = getParameterByName("load");
+
+		if(!_.isUndefined(freeboardLocation))
+		{
+			$.ajax({
+				url    : freeboardLocation,
+				success: function(data)
+				{
+					freeboardModel.loadDashboard(data);
+				}
+			});
+		}
 
 		if(freeboardModel.allow_edit() && freeboardModel.panes().length == 0)
 		{
