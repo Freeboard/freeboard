@@ -922,11 +922,6 @@ header h1
     padding-right: 10px;
 }
 
-table#datasources-list tbody
-{
-	height: 300px;
-}
-
 .datasource-edit-btn
 {
 	padding: 5px;
@@ -2118,7 +2113,6 @@ textarea.calculated-value-input
 	vertical-align : baseline;
 	-webkit-font-smoothing : antialiased;
 	font-style  : normal;
-	font-weight : bold;
 	color : #d3d4d4;
 }
 

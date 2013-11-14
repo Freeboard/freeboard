@@ -9,21 +9,21 @@
 		"display: inline;";
 
 	// Add some styles to our sheet
-	document.styleSheets[0].addRule('.text-widget-unit', 'padding-left: 5px;display:inline;');
-	document.styleSheets[0].addRule('.text-widget-regular-value', valueStyle + "font-size:30px;");
-	document.styleSheets[0].addRule('.text-widget-big-value', valueStyle + "font-size:75px;");
+	freeboard.addStyle('.text-widget-unit', 'padding-left: 5px;display:inline;');
+	freeboard.addStyle('.text-widget-regular-value', valueStyle + "font-size:30px;");
+	freeboard.addStyle('.text-widget-big-value', valueStyle + "font-size:75px;");
 
-	document.styleSheets[0].addRule('.gauge-widget-wrapper', "width: 100%;text-align: center;");
-	document.styleSheets[0].addRule('.gauge-widget', "width:200px;height:160px;display:inline-block;");
+	freeboard.addStyle('.gauge-widget-wrapper', "width: 100%;text-align: center;");
+	freeboard.addStyle('.gauge-widget', "width:200px;height:160px;display:inline-block;");
 
-    document.styleSheets[0].addRule('.sparkline', "width:100%;height: 75px;");
-    document.styleSheets[0].addRule('.sparkline-inline', "width:50%;float:right;height:30px;");
+	freeboard.addStyle('.sparkline', "width:100%;height: 75px;");
+	freeboard.addStyle('.sparkline-inline', "width:50%;float:right;height:30px;");
 
-	document.styleSheets[0].addRule('.indicator-light', "border-radius:50%;width:22px;height:22px;border:2px solid #3d3d3d;margin-top:5px;float:left;background-color:#222;margin-right:10px;");
-	document.styleSheets[0].addRule('.indicator-light.on', "background-color:#FFC773;box-shadow: 0px 0px 15px #FF9900;border-color:#FDF1DF;");
-	document.styleSheets[0].addRule('.indicator-text', "margin-top:10px;");
+	freeboard.addStyle('.indicator-light', "border-radius:50%;width:22px;height:22px;border:2px solid #3d3d3d;margin-top:5px;float:left;background-color:#222;margin-right:10px;");
+	freeboard.addStyle('.indicator-light.on', "background-color:#FFC773;box-shadow: 0px 0px 15px #FF9900;border-color:#FDF1DF;");
+	freeboard.addStyle('.indicator-text', "margin-top:10px;");
 
-	document.styleSheets[0].addRule('div.pointer-value', "position:absolute;height:95px;margin: auto;top: 0px;bottom: 0px;width: 100%;text-align:center;");
+	freeboard.addStyle('div.pointer-value', "position:absolute;height:95px;margin: auto;top: 0px;bottom: 0px;width: 100%;text-align:center;");
 
 	function easeTransitionText(currentValue, newValue, textElement, duration)
 	{

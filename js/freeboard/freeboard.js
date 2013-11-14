@@ -1813,6 +1813,38 @@ var freeboard = (function()
 			widgetPlugins[plugin.type_name] = plugin;
 			freeboardModel._widgetTypes.valueHasMutated();
 		},
+		addStyle : function(selector, rules)
+		{
+			var context = document, stylesheet;
+
+			if(typeof context.styleSheets == 'object')
+			{
+				if(context.styleSheets.length)
+				{
+					stylesheet = context.styleSheets[context.styleSheets.length - 1];
+				}
+				if(context.styleSheets.length)
+				{
+					if(context.createStyleSheet)
+					{
+						stylesheet = context.createStyleSheet();
+					}
+					else
+					{
+						context.getElementsByTagName('head')[0].appendChild(context.createElement('style'));
+						stylesheet = context.styleSheets[context.styleSheets.length - 1];
+					}
+				}
+				if(stylesheet.addRule)
+				{
+					stylesheet.addRule(selector, rules);
+				}
+				else
+				{
+					stylesheet.insertRule(selector + '{' + rules + '}', stylesheet.cssRules.length);
+				}
+			}
+		},
 		getStyleString      : function(name)
 		{
 			var returnString = "";
