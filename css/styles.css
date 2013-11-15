@@ -2165,8 +2165,18 @@ h2.title
 	padding-top    : 1px;
 }
 
+#add-pane
+{
+	padding-top: 20px;
+}
+
 @media screen and (max-width : 960px)
 {
+	#add-pane
+	{
+		padding-top : 10px;
+	}
+
 	.text-button
 	{
 		font-size: 14px;
