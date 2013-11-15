@@ -2255,6 +2255,7 @@ h2.title
 	{
 		width: 100%;
 		padding-bottom: 10px;
+		float: none;
 	}
 
 	.control-label
@@ -2264,9 +2265,15 @@ h2.title
 
 	.modal section
 	{
-		padding-bottom: 0px;
+		padding-bottom: 10px;
 		padding-top: 10px;
-		margin-bottom: 54px;
+	}
+
+	.datasource-input-suffix
+	{
+		font-size: 11px;
+		margin: 0px;
+		padding: 0px;
 	}
 
 	textarea, input[type="text"]
@@ -2287,5 +2294,11 @@ h2.title
 	.table-operation
 	{
 		font-size: 11px;
+	}
+
+	textarea.calculated-value-input
+	{
+		position: inherit;
+		width: 95%;
 	}
 }

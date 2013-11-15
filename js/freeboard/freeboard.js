@@ -1002,7 +1002,16 @@ var freeboard = (function()
 				$(element).css({cursor: "pointer"});
 			}
 
-			grid.add_widget(element, viewModel.width(), viewModel.getCalculatedHeight(), viewModel.col(), viewModel.row());
+			var col = viewModel.col();
+			var row = viewModel.row();
+
+			if(col > grid.cols)
+			{
+				col = grid.cols;
+				row = undefined;
+			}
+
+			grid.add_widget(element, viewModel.width(), viewModel.getCalculatedHeight(), col, row);
 
 			if(bindingContext.$root.isEditing())
 			{
@@ -1391,7 +1400,7 @@ var freeboard = (function()
 			self.title(object.title);
 			self.width(object.width);
 			self.row(object.row);
-			self.col(Math.min(grid.cols, object.col));
+			self.col(object.col);
 
 			_.each(object.widgets, function(widgetConfig)
 			{
