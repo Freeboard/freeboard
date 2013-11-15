@@ -2,7 +2,6 @@
 <html>
 <head>
     <title>FREEBOARD</title>
-    <meta name="viewport" content="width=1024"/>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="viewport" content = "width = device-width, initial-scale = 1, user-scalable = no" />
@@ -33,15 +32,18 @@
     <div id="admin-bar">
         <div id="admin-menu">
             <div id="board-tools">
-                <h1 class="title bordered">FREEBOARD</h1>
-                <br/>
-                <!--<a href="http://www.buglabs.net" target="_blank"><img id="main-logo" src="img/main-logo.png"></a>-->
-                <span class="text-button" data-bind="click: loadDashboardFromLocalFile"><i class="icon-folder-open icon-white"></i> Load Freeboard</span>
-                <br/>
-                <span class="text-button" data-bind="click: saveDashboard"><i class="icon-download-alt icon-white"></i> Save Freeboard</span>
-                <br/>
-                <br/>
-                <span class="text-button" data-bind="click: createPane"><i class="icon-plus icon-white"></i> Add Pane</span>
+                <h1 id="board-logo" class="title bordered">FREEBOARD</h1>
+                <div id="board-actions">
+                    <div class="text-button" data-bind="click: loadDashboardFromLocalFile">
+                        <i class="icon-folder-open icon-white"></i> Load Freeboard
+                    </div>
+                    <div class="text-button" data-bind="click: saveDashboard">
+                        <i class="icon-download-alt icon-white"></i> Save Freeboard
+                    </div>
+                    <div class="text-button" data-bind="click: createPane">
+                        <i class="icon-plus icon-white"></i> Add Pane
+                    </div>
+                </div>
             </div>
             <div id="datasources">
                 <h2 class="title">DATASOURCES</h2>

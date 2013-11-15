@@ -451,6 +451,11 @@ body
 {
 	display: none;
 	background-color: #2a2a2a;
+	top: 120px;
+	width: 900px;
+	margin : auto;
+	right  : 0px;
+	left   : 0px;
 }
 
 .modal.small
@@ -476,6 +481,7 @@ body
 	margin           : 0;
 	color            : #8b8b8b;
 	text-transform   : uppercase;
+	clear :	both;
 }
 
 .modal footer
@@ -494,6 +500,7 @@ body
 .modal section
 {
 	padding: 25px;
+	padding-bottom : 54px;
 }
 
 .control-group:last-child
@@ -521,8 +528,6 @@ body
 
 .control-label
 {
-	float       : left;
-	width       : 160px;
 	padding-top : 5px;
 	text-align  : right;
 	text-transform: uppercase;
@@ -882,10 +887,12 @@ header h1
 	background-color: #313131;
 	bottom: 0px;
 	position : absolute;
-	left: 48%;
 	border-radius: 3px;
 	text-align: center;
     cursor: pointer;
+	right  : 0px;
+	left   : 0px;
+	margin : auto;
 }
 
 #toggle-header i
@@ -976,6 +983,7 @@ header h1
 	top: 30px;
 	margin: 0px auto;
 	padding-left: 20px;
+	padding-right: 20px;
 	position: absolute;
 }
 
@@ -1907,21 +1915,24 @@ ul, ol {
 	vertical-align : top;
 }
 
-.form-table-label
+.form-label
 {
 	text-align    : right;
 	padding-right : 14px;
 	height : 42px;
+	float: left;
+	width : 160px;
+	padding-top: 4px;
 }
 
-.form-table-value
+.form-value
 {
+	float: left;
 }
 
-.table-operation
+.form-row
 {
-	font-size : 11px;
-	padding-left: 5px;
+	clear: both;
 }
 
 td.table-row-operation
@@ -1950,6 +1961,7 @@ input.table-row-value
 	max-height: 110px;
 	overflow: scroll;
 	border-bottom : solid 1px #3d3d3d;
+	width: 414px;
 }
 
 .datasource-list-container
@@ -2138,4 +2150,142 @@ h2.title
 	margin : 0px;
 	padding-top: 10px;
 	padding-bottom: 10px;
+}
+
+.form-value input[type="checkbox"]
+{
+	margin-top: 8px;
+}
+
+.table-operation
+{
+	font-size      : 11px;
+	padding-left   : 5px;
+	padding-bottom : 5px;
+	padding-top    : 1px;
+}
+
+@media screen and (max-width : 960px)
+{
+	.text-button
+	{
+		font-size: 14px;
+		line-height: 22px;
+	}
+
+	h1.title
+	{
+		margin-bottom  : 0px;
+		font-size      : 13px;
+		letter-spacing : 2px;
+	}
+
+	.title.bordered
+	{
+		padding     : 1px 8px;
+		line-height : 25px;
+	}
+
+	#admin-menu
+	{
+		width        : 100%;
+	}
+
+	#main-header
+	{
+		position: absolute;
+	}
+
+	h2.title
+	{
+		font-size : 10px;
+		padding-top    : 5px;
+		padding-bottom : 5px;
+	}
+
+	#board-tools
+	{
+		width: 100%;
+		float: none;
+	}
+
+	#datasources
+	{
+		width : 100%;
+		float : none;
+	}
+
+	#board-actions
+	{
+		float: left;
+	}
+
+	#board-logo
+	{
+		float: left;
+	}
+
+	.modal header
+	{
+		height: 30px;
+	}
+
+	.modal
+	{
+		width: 100%;
+		top: 0px;
+		left: 0px;
+	}
+
+	.datasource-list-container
+	{
+		max-height : 135px;
+	}
+
+	.form-label
+	{
+		float: none;
+		height: auto;
+		width: auto;
+		text-align: left;
+		padding-top: 0px;
+	}
+
+	.form-value
+	{
+		width: 100%;
+		padding-bottom: 10px;
+	}
+
+	.control-label
+	{
+		width: auto;
+	}
+
+	.modal section
+	{
+		padding-bottom: 0px;
+		padding-top: 10px;
+		margin-bottom: 54px;
+	}
+
+	textarea, input[type="text"]
+	{
+		width: 95%;
+	}
+
+	.styled-select select
+	{
+		width: 100%;
+	}
+
+	.form-table-value-subtable
+	{
+		width: 100%;
+	}
+
+	.table-operation
+	{
+		font-size: 11px;
+	}
 }

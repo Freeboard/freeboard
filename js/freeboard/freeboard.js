@@ -455,11 +455,7 @@ var freeboard = (function()
 			'display'    : 'block',
 			'position'   : 'absolute',
 			'opacity'    : 0,
-			'width'      : modal_width,
-			'z-index'    : 11000,
-			'left'       : 50 + '%',
-			'margin-left': -(modal_width / 2) + "px",
-			'top'        : 120 + "px"
+			'z-index'    : 11000
 
 		});
 
@@ -513,14 +509,14 @@ var freeboard = (function()
 
 		function createSettingRow(displayName)
 		{
-			var tr = $("<tr></tr>").appendTo(form);
+			var tr = $('<div class="form-row"></div>').appendTo(form);
 
-			tr.append('<td class="form-table-label"><label class="control-label">' + displayName + '</label></td>');
-			return $('<td class="form-table-value"></td>').appendTo(tr);
+			tr.append('<div class="form-label"><label class="control-label">' + displayName + '</label></div>');
+			return $('<div class="form-value"></td>').appendTo(tr);
 		}
 
 
-		var form = $('<table class="form-table"></table>');
+		var form = $('<div></div>');
 
 		// Create our body
 		if(!_.isUndefined(currentInstanceName))
@@ -641,7 +637,7 @@ var freeboard = (function()
 							processHeaderVisibility();
 						}
 
-						$('<span class="table-operation text-button">ADD</span>').appendTo(valueCell).click(function()
+						$('<div class="table-operation text-button">ADD</div>').appendTo(valueCell).click(function()
 						{
 							var newSubsettingValue = {};
 
@@ -1395,7 +1391,7 @@ var freeboard = (function()
 			self.title(object.title);
 			self.width(object.width);
 			self.row(object.row);
-			self.col(object.col);
+			self.col(Math.min(grid.cols, object.col));
 
 			_.each(object.widgets, function(widgetConfig)
 			{
