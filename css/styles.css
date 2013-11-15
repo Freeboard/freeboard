@@ -966,7 +966,6 @@ header h1
 	width: 50%;
 	float: right;
 	height     : 100%;
-	overflow-y : scroll;
 }
 
 #cam
