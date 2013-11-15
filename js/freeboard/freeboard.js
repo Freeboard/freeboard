@@ -1244,7 +1244,9 @@ var freeboard = (function()
 							var textFile = fileReaderEvent.target;
 							var jsonObject = JSON.parse(textFile.result);
 
+
 							self.loadDashboard(jsonObject);
+							self.setEditing(false);
 						});
 
 						reader.readAsText(file);
@@ -1308,9 +1310,8 @@ var freeboard = (function()
 			widget.dispose();
 		}
 
-		this.toggleEditing = function()
+		this.setEditing = function(editing)
 		{
-			var editing = !self.isEditing();
 			self.isEditing(editing);
 
 			if(!editing)
@@ -1337,6 +1338,12 @@ var freeboard = (function()
 			}
 
 			showPaneEditIcons(editing);
+		}
+
+		this.toggleEditing = function()
+		{
+			var editing = !self.isEditing();
+			self.setEditing(editing);
 		}
 	}
 

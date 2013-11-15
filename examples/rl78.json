@@ -1,4 +1,7 @@
-{"allow_edit"   : true, "panes": [
+{
+	"allow_edit"   : true,
+	"header_image" : "https://raw.github.com/Freeboard/branding/master/renesas/renesas_logo.png",
+	"panes": [
 	{
 		"title"  : "Tilt",
 		"width"  : 1,
@@ -144,7 +147,8 @@
 			}
 		]
 	}
-], "datasources": [
+],
+	"datasources": [
 	{
 		"name"    : "RL78",
 		"type"    : "rl78",
