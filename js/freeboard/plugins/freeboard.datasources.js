@@ -160,7 +160,7 @@
 
 	freeboard.loadDatasourcePlugin({
 		type_name   : "rl78",
-		display_name: "RL78",
+		display_name: "Renesas RL78",
 		settings    : [
 			{
 				name        : "device_resource_id",
