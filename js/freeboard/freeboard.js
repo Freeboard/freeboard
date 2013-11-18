@@ -1462,7 +1462,6 @@ var freeboard = (function()
 				self.shouldRender(true);
 			}
 
-			//self.updateCalculatedSettings();
 			self._heightUpdate.valueHasMutated();
 		});
 
@@ -1640,8 +1639,8 @@ var freeboard = (function()
 		this.deserialize = function(object)
 		{
 			self.title(object.title);
-			self.type(object.type);
 			self.settings(object.settings);
+			self.type(object.type);
 		}
 	}
 
