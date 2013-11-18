@@ -1013,14 +1013,23 @@ var freeboard = (function()
 
 			var col = viewModel.col();
 			var row = viewModel.row();
+			var width = viewModel.width();
+			var height = viewModel.getCalculatedHeight();
 
 			if(col > grid.cols)
 			{
 				col = grid.cols;
-				row = undefined;
+				row = 1;
 			}
 
-			grid.add_widget(element, viewModel.width(), viewModel.getCalculatedHeight(), col, row);
+			while(grid.is_occupied(col, row))
+			{
+				row++;
+			}
+
+			grid.add_widget(element, width, height, col, row);
+			viewModel.col(col);
+			viewModel.row(row);
 
 			if(bindingContext.$root.isEditing())
 			{

@@ -2222,6 +2222,7 @@ h2.title
 	{
 		width : 100%;
 		float : none;
+		clear : both;
 	}
 
 	#board-actions
