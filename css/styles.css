@@ -1979,6 +1979,7 @@ ul.value-dropdown
 	background-color : #272727;
 	border           : 1px solid rgba(255, 153, 0, 0.8);
 	overflow: scroll;
+	z-index: 200;
 }
 
 ul.value-dropdown li
