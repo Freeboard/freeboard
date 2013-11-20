@@ -2038,6 +2038,11 @@ td.form-table-value > input[type="checkbox"]
 	cursor : pointer;
 }
 
+.text-button > i
+{
+	margin-right: 10px;
+}
+
 .text-button::before,
 .text-button::after
 {
