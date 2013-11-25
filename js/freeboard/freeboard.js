@@ -1242,9 +1242,11 @@ var freeboard = (function()
 
 		this.loadDashboard = function(dashboardData)
 		{
-			$(".gridster").animate({opacity:0.0}, 250, function(){
+			var fadeOutTime = (self.panes().length > 0) ? 1000 : 0;
+
+			$(".gridster").animate({opacity:0.0}, fadeOutTime, function(){
 				self.deserialize(dashboardData);
-				$(".gridster").animate({opacity:1.0}, 250);
+				$(".gridster").animate({opacity:1.0}, 1000);
 			});
 		}
 
@@ -1799,7 +1801,7 @@ var freeboard = (function()
 		// Check to see if we have a query param called load. If so, we should load that dashboard initially
 		var freeboardLocation = getParameterByName("load");
 
-		if(!_.isUndefined(freeboardLocation))
+		if(freeboardLocation != "")
 		{
 			$.ajax({
 				url    : freeboardLocation,
@@ -1818,9 +1820,9 @@ var freeboard = (function()
 
 	// PUBLIC FUNCTIONS
 	return {
-		loadConfiguration   : function(configuration)
+		loadDashboard   : function(configuration)
 		{
-			freeboardModel.deserialize(configuration);
+			freeboardModel.loadDashboard(configuration);
 		},
 		loadDatasourcePlugin: function(plugin)
 		{
