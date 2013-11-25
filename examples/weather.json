@@ -1,6 +1,7 @@
 {
 	"header_image" : "",
-	"allow_edit"   : true, "panes": [
+	"allow_edit"   : true,
+	"panes": [
 	{
 		"title"  : "Wind",
 		"width"  : 1,

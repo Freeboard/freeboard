@@ -1242,7 +1242,10 @@ var freeboard = (function()
 
 		this.loadDashboard = function(dashboardData)
 		{
-			self.deserialize(dashboardData);
+			$(".gridster").animate({opacity:0.0}, 250, function(){
+				self.deserialize(dashboardData);
+				$(".gridster").animate({opacity:1.0}, 250);
+			});
 		}
 
 		this.loadDashboardFromLocalFile = function()
@@ -1809,11 +1812,8 @@ var freeboard = (function()
 
 		if(freeboardModel.allow_edit() && freeboardModel.panes().length == 0)
 		{
-			freeboardModel.toggleEditing();
+			freeboardModel.setEditing(true);
 		}
-
-		// Fade everything in
-		$(".gridster").css("opacity", 1);
 	});
 
 	// PUBLIC FUNCTIONS
