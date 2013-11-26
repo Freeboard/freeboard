@@ -868,6 +868,7 @@ header h1
 	width: 100%;
 	z-index : 50;
 	top: -280px;
+	display : none;
 }
 
 #admin-bar
@@ -2029,6 +2030,12 @@ td.form-table-value > input[type="checkbox"]
 {
 	color  : #0088cc;
 	cursor : pointer;
+}
+
+a:hover.text-button, a:focus.text-button
+{
+	color           : #0088cc;
+	text-decoration : none;
 }
 
 .text-button > i

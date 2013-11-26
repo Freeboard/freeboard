@@ -23,7 +23,10 @@
                 "js/freeboard/plugins/freeboard.datasources.js",
                 "js/freeboard/plugins/freeboard.widgets.js",
                 function (){
-
+                    $(function()
+                    { //DOM Ready
+                        freeboard.newDashboard();
+                    });
                 });
     </script>
 </head>
