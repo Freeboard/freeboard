@@ -176,7 +176,7 @@ var freeboard = (function()
 	var datasourcePlugins = {};
 	var widgetPlugins = {};
 	var grid;
-	var freeboardModel = new freeboardModel();
+	var theFreeboardModel = new freeboardModel();
 	var currentStyle = {
 		values: {
 			"font-family": '"HelveticaNeue-UltraLight", "Helvetica Neue Ultra Light", "Helvetica Neue", sans-serif',
@@ -220,7 +220,7 @@ var freeboard = (function()
 				{
 					if(match[1] == "") // List all datasources
 					{
-						_.each(freeboardModel.datasources(), function(datasource)
+						_.each(theFreeboardModel.datasources(), function(datasource)
 						{
 							options.push({value: datasource.name(), follow_char: "."});
 						});
@@ -229,7 +229,7 @@ var freeboard = (function()
 					{
 						replacementString = match[1];
 
-						_.each(freeboardModel.datasources(), function(datasource)
+						_.each(theFreeboardModel.datasources(), function(datasource)
 						{
 
 							var name = datasource.name();
@@ -242,7 +242,7 @@ var freeboard = (function()
 					}
 					else
 					{
-						var datasource = _.find(freeboardModel.datasources(), function(datasource)
+						var datasource = _.find(theFreeboardModel.datasources(), function(datasource)
 						{
 							return (datasource.name() === match[1]);
 						});
@@ -876,15 +876,15 @@ var freeboard = (function()
 
 						if(options.type == 'datasource')
 						{
-							freeboardModel.deleteDatasource(viewModel);
+							theFreeboardModel.deleteDatasource(viewModel);
 						}
 						else if(options.type == 'widget')
 						{
-							freeboardModel.deleteWidget(viewModel);
+							theFreeboardModel.deleteWidget(viewModel);
 						}
 						else if(options.type == 'pane')
 						{
-							freeboardModel.deletePane(viewModel);
+							theFreeboardModel.deletePane(viewModel);
 						}
 
 					});
@@ -947,7 +947,7 @@ var freeboard = (function()
 							if(options.type == 'datasource')
 							{
 								var newViewModel = new DatasourceModel();
-								freeboardModel.addDatasource(newViewModel);
+								theFreeboardModel.addDatasource(newViewModel);
 
 								newViewModel.settings(newSettings.settings);
 								newViewModel.name(newSettings.name);
@@ -1006,7 +1006,7 @@ var freeboard = (function()
 	ko.bindingHandlers.pane = {
 		init  : function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
-			if(freeboardModel.isEditing())
+			if(theFreeboardModel.isEditing())
 			{
 				$(element).css({cursor: "pointer"});
 			}
@@ -1056,7 +1056,7 @@ var freeboard = (function()
 		update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
 			// If pane has been removed
-			if(freeboardModel.panes.indexOf(viewModel) == -1)
+			if(theFreeboardModel.panes.indexOf(viewModel) == -1)
 			{
 				grid.remove_widget(element);
 			}
@@ -1071,7 +1071,7 @@ var freeboard = (function()
 	ko.bindingHandlers.widget = {
 		init  : function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
-			if(freeboardModel.isEditing())
+			if(theFreeboardModel.isEditing())
 			{
 				attachWidgetEditIcons($(element).parent());
 			}
@@ -1091,7 +1091,19 @@ var freeboard = (function()
 		var self = this;
 
 		this.isEditing = ko.observable(false);
-		this.allow_edit = ko.observable(true);
+		this.allow_edit = ko.observable(false);
+		this.allow_edit.subscribe(function(newValue)
+		{
+			if(newValue)
+			{
+				$("#main-header").show();
+			}
+			else
+			{
+				$("#main-header").hide();
+			}
+		});
+
 		this.header_image = ko.observable();
 
 		this.datasources = ko.observableArray();
@@ -1103,7 +1115,7 @@ var freeboard = (function()
 
 			self.datasourceData[datasourceName] = newData;
 
-			_.each(freeboardModel.panes(), function(pane)
+			_.each(theFreeboardModel.panes(), function(pane)
 			{
 				_.each(pane.widgets(), function(widget)
 				{
@@ -1220,6 +1232,11 @@ var freeboard = (function()
 				pane.deserialize(paneConfig);
 				self.panes.push(pane);
 			});
+
+			if(self.allow_edit() && self.panes().length == 0)
+			{
+				self.setEditing(true);
+			}
 		}
 
 		this.clearDashboard = function()
@@ -1338,15 +1355,22 @@ var freeboard = (function()
 			widget.dispose();
 		}
 
-		this.setEditing = function(editing)
+		this.setEditing = function(editing, animate)
 		{
 			self.isEditing(editing);
+
+			if(_.isUndefined(animate))
+			{
+				animate = true;
+			}
+
+			var animateLength = (animate) ? 250 : 0;
 
 			if(!editing)
 			{
 				$(".gridster .gs_w").css({cursor: "default"});
-				$("#main-header").animate({top: "-280px"}, 250);
-				$(".gridster").animate({"margin-top": "20px"}, 250);
+				$("#main-header").animate({top: "-280px"}, animateLength);
+				$(".gridster").animate({"margin-top": "20px"}, animateLength);
 				$("#main-header").data().shown = false;
 
 				$(".sub-section").unbind();
@@ -1356,8 +1380,8 @@ var freeboard = (function()
 			else
 			{
 				$(".gridster .gs_w").css({cursor: "pointer"});
-				$("#main-header").animate({top: "0px"}, 250);
-				$(".gridster").animate({"margin-top": "300px"}, 250);
+				$("#main-header").animate({top: "0px"}, animateLength);
+				$(".gridster").animate({"margin-top": "300px"}, animateLength);
 				$("#main-header").data().shown = true;
 
 				attachWidgetEditIcons($(".sub-section"));
@@ -1365,7 +1389,7 @@ var freeboard = (function()
 				grid.enable();
 			}
 
-			showPaneEditIcons(editing);
+			showPaneEditIcons(editing, animate);
 		}
 
 		this.toggleEditing = function()
@@ -1506,7 +1530,7 @@ var freeboard = (function()
 
 		this.callValueFunction = function(theFunction)
 		{
-			return theFunction.call(undefined, freeboardModel.datasourceData);
+			return theFunction.call(undefined, theFreeboardModel.datasourceData);
 		}
 
 		this.processCalculatedSetting = function(settingName)
@@ -1688,7 +1712,7 @@ var freeboard = (function()
 
 		this.updateCallback = function(newData)
 		{
-			freeboardModel.processDatasourceUpdate(self, newData);
+			theFreeboardModel.processDatasourceUpdate(self, newData);
 
 			self.latestData(newData);
 
@@ -1749,15 +1773,22 @@ var freeboard = (function()
 		}
 	}
 
-	function showPaneEditIcons(show)
+	function showPaneEditIcons(show, animate)
 	{
+		if(_.isUndefined(animate))
+		{
+			animate = true;
+		}
+
+		var animateLength = (animate) ? 250 : 0;
+
 		if(show)
 		{
-			$(".widget-tools").css("display", "block").animate({opacity: 1.0}, 250);
+			$(".widget-tools").css("display", "block").animate({opacity: 1.0}, animateLength);
 		}
 		else
 		{
-			$(".widget-tools").animate({opacity: 0.0}, 250, function()
+			$(".widget-tools").animate({opacity: 0.0}, animateLength, function()
 			{
 				$().css("display", "none");
 			});
@@ -1796,7 +1827,7 @@ var freeboard = (function()
 
 	$(function()
 	{ //DOM Ready
-		ko.applyBindings(freeboardModel);
+		ko.applyBindings(theFreeboardModel);
 
 		// Check to see if we have a query param called load. If so, we should load that dashboard initially
 		var freeboardLocation = getParameterByName("load");
@@ -1807,22 +1838,21 @@ var freeboard = (function()
 				url    : freeboardLocation,
 				success: function(data)
 				{
-					freeboardModel.loadDashboard(data);
+					theFreeboardModel.loadDashboard(data);
 				}
 			});
-		}
-
-		if(freeboardModel.allow_edit() && freeboardModel.panes().length == 0)
-		{
-			freeboardModel.setEditing(true);
 		}
 	});
 
 	// PUBLIC FUNCTIONS
 	return {
+		newDashboard : function()
+		{
+			theFreeboardModel.loadDashboard({allow_edit : true});
+		},
 		loadDashboard   : function(configuration)
 		{
-			freeboardModel.loadDashboard(configuration);
+			theFreeboardModel.loadDashboard(configuration);
 		},
 		loadDatasourcePlugin: function(plugin)
 		{
@@ -1832,7 +1862,15 @@ var freeboard = (function()
 			}
 
 			datasourcePlugins[plugin.type_name] = plugin;
-			freeboardModel._datasourceTypes.valueHasMutated();
+			theFreeboardModel._datasourceTypes.valueHasMutated();
+		},
+		serialize : function()
+		{
+			return theFreeboardModel.serialize();
+		},
+		isEditing : function()
+		{
+			return theFreeboardModel.isEditing();
 		},
 		loadWidgetPlugin    : function(plugin)
 		{
@@ -1842,7 +1880,7 @@ var freeboard = (function()
 			}
 
 			widgetPlugins[plugin.type_name] = plugin;
-			freeboardModel._widgetTypes.valueHasMutated();
+			theFreeboardModel._widgetTypes.valueHasMutated();
 		},
 		addStyle : function(selector, rules)
 		{
