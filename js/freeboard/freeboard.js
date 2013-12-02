@@ -1056,12 +1056,14 @@ var freeboard = (function()
 		update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
 			// If pane has been removed
-			if(theFreeboardModel.panes.indexOf(viewModel) == -1)
+			/*if(theFreeboardModel.panes.indexOf(viewModel) == -1)
 			{
+				console.log("Removed");
 				grid.remove_widget(element);
-			}
+			}*/
+
 			// If widget has been added or removed
-			else
+			if(viewModel.getCalculatedHeight() != Number($(element).attr("data-sizey")))
 			{
 				grid.resize_widget($(element), undefined, viewModel.getCalculatedHeight());
 			}

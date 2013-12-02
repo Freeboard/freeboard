@@ -14,10 +14,9 @@
 	var swarmAvailable = false;
 
 	// Load the bugswarm API javascript if it's not already loaded
-	head.js({bugswarm: "http://cdn.buglabs.net/swarm/swarm-v0.4.0.js"}, function()
+	head.js({bugswarm: "http://cdn.buglabs.net/swarm/swarm-v0.6.0.js"}, function()
 	{
 		swarmAvailable = true;
-		processStartup();
 	});
 
 	function onPresence(presence)
