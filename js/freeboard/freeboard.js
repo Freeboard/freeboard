@@ -173,6 +173,8 @@
 
 var freeboard = (function()
 {
+	var loadingIndicator = $('<div class="wrapperloading"><div class="loading up" > </div><div class="loading down"></div></div>');
+
 	var datasourcePlugins = {};
 	var widgetPlugins = {};
 	var grid;
@@ -194,6 +196,18 @@ var freeboard = (function()
 		var newHeight = Math.min(200, 20 * (lineBreakCount + 1));
 
 		$(element).css({height:newHeight + "px"});
+	}
+
+	function showLoadingIndicator(show)
+	{
+		if(show)
+		{
+			loadingIndicator.hide().appendTo("body").fadeIn(500);
+		}
+		else
+		{
+			loadingIndicator.fadeOut(500).remove();
+		}
 	}
 
 	function createValueEditor(element)
@@ -1262,10 +1276,16 @@ var freeboard = (function()
 		{
 			var fadeOutTime = (self.panes().length > 0) ? 1000 : 0;
 
+			//showLoadingIndicator(true);
+
+			//
+
 			$(".gridster").animate({opacity:0.0}, fadeOutTime, function(){
 				self.deserialize(dashboardData);
 				$(".gridster").animate({opacity:1.0}, 1000);
 			});
+
+			//showLoadingIndicator(false);
 		}
 
 		this.loadDashboardFromLocalFile = function()
@@ -1840,10 +1860,18 @@ var freeboard = (function()
 				success: function(data)
 				{
 					theFreeboardModel.loadDashboard(data);
+					showLoadingIndicator(false);
 				}
 			});
 		}
+		else
+		{
+			showLoadingIndicator(false);
+		}
 	});
+
+	// Show the loading indicator when we first load
+	showLoadingIndicator(true);
 
 	// PUBLIC FUNCTIONS
 	return {
