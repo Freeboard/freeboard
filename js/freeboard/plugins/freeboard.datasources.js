@@ -353,6 +353,7 @@
 		this.onSettingsChanged = function(newSettings)
 		{
 			currentSettings = newSettings;
+            self.updateNow();
 			updateRefresh(currentSettings.refresh * 1000);
 		}
 	};

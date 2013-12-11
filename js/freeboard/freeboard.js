@@ -476,7 +476,7 @@ var freeboard = (function()
 		var modalDialog = $('<div class="modal"></div>').css({
 
 			'display'    : 'block',
-			'position'   : 'absolute',
+			'position'   : 'fixed',
 			'opacity'    : 0,
 			'z-index'    : 11000
 
@@ -1277,8 +1277,6 @@ var freeboard = (function()
 			var fadeOutTime = (self.panes().length > 0) ? 1000 : 0;
 
 			//showLoadingIndicator(true);
-
-			//
 
 			$(".gridster").animate({opacity:0.0}, fadeOutTime, function(){
 				self.deserialize(dashboardData);
