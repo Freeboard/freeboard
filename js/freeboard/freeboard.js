@@ -1120,7 +1120,7 @@ var freeboard = (function()
 		});
 
 		this.header_image = ko.observable();
-
+		this.plugins = ko.observableArray();
 		this.datasources = ko.observableArray();
 		this.panes = ko.observableArray();
 		this.datasourceData = {};
@@ -1214,6 +1214,7 @@ var freeboard = (function()
 			return {
 				header_image : self.header_image(),
 				allow_edit : self.allow_edit(),
+				plugins : self.plugins(),
 				panes      : panes,
 				datasources: datasources
 			};
@@ -1223,34 +1224,54 @@ var freeboard = (function()
 		{
 			self.clearDashboard();
 
-			if(!_.isUndefined(object.allow_edit))
+			function finishLoad()
 			{
-				self.allow_edit(object.allow_edit);
+				if(!_.isUndefined(object.allow_edit))
+				{
+					self.allow_edit(object.allow_edit);
+				}
+				else
+				{
+					self.allow_edit(true);
+				}
+
+				self.header_image(object.header_image);
+
+				_.each(object.datasources, function(datasourceConfig)
+				{
+					var datasource = new DatasourceModel();
+					datasource.deserialize(datasourceConfig);
+					self.addDatasource(datasource);
+				});
+
+				_.each(object.panes, function(paneConfig)
+				{
+					var pane = new PaneModel();
+					pane.deserialize(paneConfig);
+					self.panes.push(pane);
+				});
+
+				if(self.allow_edit() && self.panes().length == 0)
+				{
+					self.setEditing(true);
+				}
+			}
+
+			// This could have been self.plugins(object.plugins), but for some weird reason head.js was causing a function to be added to the list of plugins.
+			_.each(object.plugins, function(plugin){
+				self.plugins.push(plugin);
+			});
+
+			// Load any plugins referenced in this definition
+			if(_.isArray(object.plugins))
+			{
+				head.js(object.plugins, function(){
+					finishLoad();
+				});
 			}
 			else
 			{
-				self.allow_edit(true);
-			}
-
-			self.header_image(object.header_image);
-
-			_.each(object.datasources, function(datasourceConfig)
-			{
-				var datasource = new DatasourceModel();
-				datasource.deserialize(datasourceConfig);
-				self.addDatasource(datasource);
-			});
-
-			_.each(object.panes, function(paneConfig)
-			{
-				var pane = new PaneModel();
-				pane.deserialize(paneConfig);
-				self.panes.push(pane);
-			});
-
-			if(self.allow_edit() && self.panes().length == 0)
-			{
-				self.setEditing(true);
+				finishLoad();
 			}
 		}
 
@@ -1268,22 +1289,26 @@ var freeboard = (function()
 				pane.dispose();
 			});
 
+			self.plugins.removeAll();
 			self.datasources.removeAll();
 			self.panes.removeAll();
 		}
 
-		this.loadDashboard = function(dashboardData)
+		this.loadDashboard = function(dashboardData, callback)
 		{
 			var fadeOutTime = (self.panes().length > 0) ? 1000 : 0;
 
-			//showLoadingIndicator(true);
-
 			$(".gridster").animate({opacity:0.0}, fadeOutTime, function(){
 				self.deserialize(dashboardData);
-				$(".gridster").animate({opacity:1.0}, 1000);
-			});
+				$(".gridster").animate({opacity:1.0}, 1000, function(){
+					showLoadingIndicator(false);
 
-			//showLoadingIndicator(false);
+					if(_.isFunction(callback))
+					{
+						callback();
+					}
+				});
+			});
 		}
 
 		this.loadDashboardFromLocalFile = function()
@@ -1858,13 +1883,8 @@ var freeboard = (function()
 				success: function(data)
 				{
 					theFreeboardModel.loadDashboard(data);
-					showLoadingIndicator(false);
 				}
 			});
-		}
-		else
-		{
-			showLoadingIndicator(false);
 		}
 	});
 
@@ -1877,9 +1897,9 @@ var freeboard = (function()
 		{
 			theFreeboardModel.loadDashboard({allow_edit : true});
 		},
-		loadDashboard   : function(configuration)
+		loadDashboard   : function(configuration, callback)
 		{
-			theFreeboardModel.loadDashboard(configuration);
+			theFreeboardModel.loadDashboard(configuration, callback);
 		},
 		loadDatasourcePlugin: function(plugin)
 		{
