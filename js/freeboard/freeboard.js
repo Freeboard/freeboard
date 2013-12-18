@@ -195,7 +195,7 @@ var freeboard = (function()
 
 		var newHeight = Math.min(200, 20 * (lineBreakCount + 1));
 
-		$(element).css({height:newHeight + "px"});
+		$(element).css({height: newHeight + "px"});
 	}
 
 	function showLoadingIndicator(show)
@@ -216,204 +216,204 @@ var freeboard = (function()
 		var selectedOptionIndex = 0;
 
 		$(element).addClass("calculated-value-input").bind("keyup mouseup freeboard-eval",function(event)
+		{
+			// Ignore arrow keys and enter keys
+			if(dropdown && event.type == "keyup" && (event.keyCode == 38 || event.keyCode == 40 || event.keyCode == 13))
 			{
-				// Ignore arrow keys and enter keys
-				if(dropdown && event.type == "keyup" && (event.keyCode == 38 || event.keyCode == 40 || event.keyCode == 13))
+				event.preventDefault();
+				return;
+			}
+
+			var inputString = $(element).val().substring(0, $(element).getCaretPosition());
+			var match = veDatasourceRegex.exec(inputString);
+
+			var options = [];
+			var replacementString = undefined;
+
+			if(match)
+			{
+				if(match[1] == "") // List all datasources
 				{
-					event.preventDefault();
-					return;
+					_.each(theFreeboardModel.datasources(), function(datasource)
+					{
+						options.push({value: datasource.name(), follow_char: "."});
+					});
 				}
-
-				var inputString = $(element).val().substring(0, $(element).getCaretPosition());
-				var match = veDatasourceRegex.exec(inputString);
-
-				var options = [];
-				var replacementString = undefined;
-
-				if(match)
+				else if(match[1] != "" && _.isUndefined(match[2])) // List partial datasources
 				{
-					if(match[1] == "") // List all datasources
+					replacementString = match[1];
+
+					_.each(theFreeboardModel.datasources(), function(datasource)
 					{
-						_.each(theFreeboardModel.datasources(), function(datasource)
+
+						var name = datasource.name();
+
+						if(name != match[1] && name.indexOf(match[1]) == 0)
 						{
-							options.push({value: datasource.name(), follow_char: "."});
-						});
-					}
-					else if(match[1] != "" && _.isUndefined(match[2])) // List partial datasources
-					{
-						replacementString = match[1];
-
-						_.each(theFreeboardModel.datasources(), function(datasource)
-						{
-
-							var name = datasource.name();
-
-							if(name != match[1] && name.indexOf(match[1]) == 0)
-							{
-								options.push({value: name, follow_char: "."});
-							}
-						});
-					}
-					else
-					{
-						var datasource = _.find(theFreeboardModel.datasources(), function(datasource)
-						{
-							return (datasource.name() === match[1]);
-						});
-
-						if(!_.isUndefined(datasource))
-						{
-							var dataPath = "";
-
-							if(!_.isUndefined(match[2]))
-							{
-								dataPath = match[2];
-							}
-
-							var dataPathItems = dataPath.split(".");
-							dataPath = "data";
-
-							for(var index = 1; index < dataPathItems.length - 1; index++)
-							{
-								if(dataPathItems[index] != "")
-								{
-									dataPath = dataPath + "." + dataPathItems[index];
-								}
-							}
-
-							var lastPathObject = _.last(dataPathItems);
-
-							// If the last character is a [, then ignore it
-							if(lastPathObject.charAt(lastPathObject.length - 1) == "[")
-							{
-								lastPathObject = lastPathObject.replace(/\[+$/, "");
-								dataPath = dataPath + "." + lastPathObject;
-							}
-
-							var dataValue = datasource.getDataRepresentation(dataPath);
-
-							if(_.isArray(dataValue))
-							{
-								for(var index = 0; index < dataValue.length; index++)
-								{
-									var followChar = "]";
-
-									if(_.isObject(dataValue[index]))
-									{
-										followChar = followChar + ".";
-									}
-									else if(_.isArray(dataValue[index]))
-									{
-										followChar = followChar + "[";
-									}
-
-									options.push({value: index, follow_char: followChar});
-								}
-							}
-							else if(_.isObject(dataValue))
-							{
-								replacementString = lastPathObject;
-
-								if(_.keys(dataValue).indexOf(replacementString) == -1)
-								{
-									_.each(dataValue, function(value, name)
-									{
-										if(name != lastPathObject && name.indexOf(lastPathObject) == 0)
-										{
-											var followChar = undefined;
-
-											if(_.isArray(value))
-											{
-												followChar = "[";
-											}
-											else if(_.isObject(value))
-											{
-												followChar = ".";
-											}
-
-											options.push({value: name, follow_char: followChar});
-										}
-									});
-								}
-							}
+							options.push({value: name, follow_char: "."});
 						}
-					}
-				}
-
-				if(options.length > 0)
-				{
-					if(!dropdown)
-					{
-						dropdown = $('<ul id="value-selector" class="value-dropdown"></ul>').insertAfter(element).width($(element).outerWidth() - 2).css("left", $(element).position().left).css("top", $(element).position().top + $(element).outerHeight() - 1);
-					}
-
-					dropdown.empty();
-					dropdown.scrollTop(0);
-
-					var selected = true;
-					selectedOptionIndex = 0;
-
-					var currentIndex = 0;
-
-					_.each(options, function(option)
-					{
-						var li = $('<li>' + option.value + '</li>').appendTo(dropdown).mouseenter(function()
-						{
-							$(this).trigger("freeboard-select");
-						}).mousedown(function(event)
-							{
-								$(this).trigger("freeboard-insertValue");
-								event.preventDefault();
-							}).data("freeboard-optionIndex", currentIndex).data("freeboard-optionValue", option.value).bind("freeboard-insertValue",function()
-							{
-								var optionValue = option.value;
-
-								if(!_.isUndefined(option.follow_char))
-								{
-									optionValue = optionValue + option.follow_char;
-								}
-
-								if(!_.isUndefined(replacementString))
-								{
-									var replacementIndex = inputString.lastIndexOf(replacementString);
-
-									if(replacementIndex != -1)
-									{
-										$(element).replaceTextAt(replacementIndex, replacementIndex + replacementString.length, optionValue);
-									}
-								}
-								else
-								{
-									$(element).insertAtCaret(optionValue);
-								}
-
-								$(element).triggerHandler("mouseup");
-							}).bind("freeboard-select", function()
-							{
-								$(this).parent().find("li.selected").removeClass("selected");
-								$(this).addClass("selected");
-								selectedOptionIndex = $(this).data("freeboard-optionIndex");
-							});
-
-						if(selected)
-						{
-							$(li).addClass("selected");
-							selected = false;
-						}
-
-						currentIndex++;
 					});
 				}
 				else
 				{
-					$(element).next("ul#value-selector").remove();
-					dropdown = null;
-					selectedOptionIndex = -1;
+					var datasource = _.find(theFreeboardModel.datasources(), function(datasource)
+					{
+						return (datasource.name() === match[1]);
+					});
+
+					if(!_.isUndefined(datasource))
+					{
+						var dataPath = "";
+
+						if(!_.isUndefined(match[2]))
+						{
+							dataPath = match[2];
+						}
+
+						var dataPathItems = dataPath.split(".");
+						dataPath = "data";
+
+						for(var index = 1; index < dataPathItems.length - 1; index++)
+						{
+							if(dataPathItems[index] != "")
+							{
+								dataPath = dataPath + "." + dataPathItems[index];
+							}
+						}
+
+						var lastPathObject = _.last(dataPathItems);
+
+						// If the last character is a [, then ignore it
+						if(lastPathObject.charAt(lastPathObject.length - 1) == "[")
+						{
+							lastPathObject = lastPathObject.replace(/\[+$/, "");
+							dataPath = dataPath + "." + lastPathObject;
+						}
+
+						var dataValue = datasource.getDataRepresentation(dataPath);
+
+						if(_.isArray(dataValue))
+						{
+							for(var index = 0; index < dataValue.length; index++)
+							{
+								var followChar = "]";
+
+								if(_.isObject(dataValue[index]))
+								{
+									followChar = followChar + ".";
+								}
+								else if(_.isArray(dataValue[index]))
+								{
+									followChar = followChar + "[";
+								}
+
+								options.push({value: index, follow_char: followChar});
+							}
+						}
+						else if(_.isObject(dataValue))
+						{
+							replacementString = lastPathObject;
+
+							if(_.keys(dataValue).indexOf(replacementString) == -1)
+							{
+								_.each(dataValue, function(value, name)
+								{
+									if(name != lastPathObject && name.indexOf(lastPathObject) == 0)
+									{
+										var followChar = undefined;
+
+										if(_.isArray(value))
+										{
+											followChar = "[";
+										}
+										else if(_.isObject(value))
+										{
+											followChar = ".";
+										}
+
+										options.push({value: name, follow_char: followChar});
+									}
+								});
+							}
+						}
+					}
 				}
-			}).focus(function(){
+			}
+
+			if(options.length > 0)
+			{
+				if(!dropdown)
+				{
+					dropdown = $('<ul id="value-selector" class="value-dropdown"></ul>').insertAfter(element).width($(element).outerWidth() - 2).css("left", $(element).position().left).css("top", $(element).position().top + $(element).outerHeight() - 1);
+				}
+
+				dropdown.empty();
+				dropdown.scrollTop(0);
+
+				var selected = true;
+				selectedOptionIndex = 0;
+
+				var currentIndex = 0;
+
+				_.each(options, function(option)
+				{
+					var li = $('<li>' + option.value + '</li>').appendTo(dropdown).mouseenter(function()
+					{
+						$(this).trigger("freeboard-select");
+					}).mousedown(function(event)
+						{
+							$(this).trigger("freeboard-insertValue");
+							event.preventDefault();
+						}).data("freeboard-optionIndex", currentIndex).data("freeboard-optionValue", option.value).bind("freeboard-insertValue",function()
+						{
+							var optionValue = option.value;
+
+							if(!_.isUndefined(option.follow_char))
+							{
+								optionValue = optionValue + option.follow_char;
+							}
+
+							if(!_.isUndefined(replacementString))
+							{
+								var replacementIndex = inputString.lastIndexOf(replacementString);
+
+								if(replacementIndex != -1)
+								{
+									$(element).replaceTextAt(replacementIndex, replacementIndex + replacementString.length, optionValue);
+								}
+							}
+							else
+							{
+								$(element).insertAtCaret(optionValue);
+							}
+
+							$(element).triggerHandler("mouseup");
+						}).bind("freeboard-select", function()
+						{
+							$(this).parent().find("li.selected").removeClass("selected");
+							$(this).addClass("selected");
+							selectedOptionIndex = $(this).data("freeboard-optionIndex");
+						});
+
+					if(selected)
+					{
+						$(li).addClass("selected");
+						selected = false;
+					}
+
+					currentIndex++;
+				});
+			}
+			else
+			{
+				$(element).next("ul#value-selector").remove();
+				dropdown = null;
+				selectedOptionIndex = -1;
+			}
+		}).focus(function()
+			{
 				resizeValueEditor(element);
-			})
-			.focusout(function()
+			}).focusout(function()
 			{
 				$(element).css({height: ""});
 				$(element).next("ul#value-selector").remove();
@@ -475,10 +475,10 @@ var freeboard = (function()
 
 		var modalDialog = $('<div class="modal"></div>').css({
 
-			'display'    : 'block',
-			'position'   : 'fixed',
-			'opacity'    : 0,
-			'z-index'    : 11000
+			'display' : 'block',
+			'position': 'fixed',
+			'opacity' : 0,
+			'z-index' : 11000
 
 		});
 
@@ -746,7 +746,6 @@ var freeboard = (function()
 					default:
 					{
 						newSettings.settings[settingDef.name] = currentSettingsValues[settingDef.name];
-
 
 
 						if(settingDef.type == "calculated")
@@ -1212,12 +1211,33 @@ var freeboard = (function()
 			});
 
 			return {
-				header_image : self.header_image(),
-				allow_edit : self.allow_edit(),
-				plugins : self.plugins(),
-				panes      : panes,
-				datasources: datasources
+				header_image: self.header_image(),
+				allow_edit  : self.allow_edit(),
+				plugins     : self.plugins(),
+				panes       : panes,
+				datasources : datasources
 			};
+		}
+
+		this.loadPluginScriptURLs = function(scriptURLs, finishedCallback)
+		{
+			head.js(scriptURLs, function()
+			{
+				if(!_.isArray(scriptURLs))
+				{
+					scriptURLs = [scriptURLs];
+				}
+
+				_.each(scriptURLs, function(scriptURL)
+				{
+					if(self.plugins.indexOf(scriptURL) == -1)
+					{
+						self.plugins.push(scriptURL);
+					}
+				});
+
+				finishedCallback();
+			});
 		}
 
 		this.deserialize = function(object)
@@ -1258,16 +1278,14 @@ var freeboard = (function()
 			}
 
 			// This could have been self.plugins(object.plugins), but for some weird reason head.js was causing a function to be added to the list of plugins.
-			_.each(object.plugins, function(plugin){
-				self.plugins.push(plugin);
-			});
+			/*_.each(object.plugins, function(plugin){
+			 self.plugins.push(plugin);
+			 });*/
 
 			// Load any plugins referenced in this definition
 			if(_.isArray(object.plugins))
 			{
-				head.js(object.plugins, function(){
-					finishLoad();
-				});
+				self.loadPluginScriptURLs(object.plugins, finishLoad);
 			}
 			else
 			{
@@ -1298,9 +1316,11 @@ var freeboard = (function()
 		{
 			var fadeOutTime = (self.panes().length > 0) ? 1000 : 0;
 
-			$(".gridster").animate({opacity:0.0}, fadeOutTime, function(){
+			$(".gridster").animate({opacity: 0.0}, fadeOutTime, function()
+			{
 				self.deserialize(dashboardData);
-				$(".gridster").animate({opacity:1.0}, 1000, function(){
+				$(".gridster").animate({opacity: 1.0}, 1000, function()
+				{
 					showLoadingIndicator(false);
 
 					if(_.isFunction(callback))
@@ -1510,6 +1530,34 @@ var freeboard = (function()
 		}
 	}
 
+	function construct(constructor, args)
+	{
+		function F()
+		{
+			return constructor.apply(this, args);
+		}
+
+		F.prototype = constructor.prototype;
+		return new F();
+	}
+
+	function processNewPluginInstance(typeName, newInstanceResponse, newInstanceArguments, callback)
+	{
+		if(_.isFunction(newInstanceResponse))
+		{
+			var newInstance = newInstanceResponse.apply(undefined, newInstanceArguments);
+			callback(newInstance);
+		}
+		else if(_.isString(newInstanceResponse))
+		{
+			theFreeboardModel.loadPluginScriptURLs(newInstanceResponse, function()
+			{
+				var newInstance = construct(window[typeName], newInstanceArguments);
+				callback(newInstance);
+			});
+		}
+	}
+
 	function WidgetModel()
 	{
 		function disposeWidgetInstance()
@@ -1537,14 +1585,16 @@ var freeboard = (function()
 		{
 			disposeWidgetInstance();
 
-			if((newValue in widgetPlugins) && _.isFunction(widgetPlugins[newValue].newInstance))
+			if((newValue in widgetPlugins))
 			{
-				var widgetInstance = widgetPlugins[newValue].newInstance(self.settings(), self.updateCallback);
-				self.widgetInstance = widgetInstance;
-				self.shouldRender(true);
+				processNewPluginInstance(newValue, widgetPlugins[newValue].newInstance, [self.settings()
+				], function(newInstance)
+				{
+					self.widgetInstance = newInstance;
+					self.shouldRender(true);
+					self._heightUpdate.valueHasMutated();
+				});
 			}
-
-			self._heightUpdate.valueHasMutated();
 		});
 
 		this.settings = ko.observable({});
@@ -1769,11 +1819,15 @@ var freeboard = (function()
 		{
 			disposeDatasourceInstance();
 
-			if((newValue in datasourcePlugins) && _.isFunction(datasourcePlugins[newValue].newInstance))
+			if((newValue in datasourcePlugins))
 			{
-				var datasourceInstance = datasourcePlugins[newValue].newInstance(self.settings(), self.updateCallback);
-				self.datasourceInstance = datasourceInstance;
-				datasourceInstance.updateNow();
+				processNewPluginInstance(newValue, datasourcePlugins[newValue].newInstance, [self.settings(),
+				                                                                             self.updateCallback
+				], function(newInstance)
+				{
+					self.datasourceInstance = newInstance;
+					self.datasourceInstance.updateNow();
+				});
 			}
 		});
 
@@ -1893,13 +1947,21 @@ var freeboard = (function()
 
 	// PUBLIC FUNCTIONS
 	return {
-		newDashboard : function()
+		newDashboard        : function()
 		{
-			theFreeboardModel.loadDashboard({allow_edit : true});
+			theFreeboardModel.loadDashboard({allow_edit: true});
 		},
-		loadDashboard   : function(configuration, callback)
+		loadDashboard       : function(configuration, callback)
 		{
 			theFreeboardModel.loadDashboard(configuration, callback);
+		},
+		serialize           : function()
+		{
+			return theFreeboardModel.serialize();
+		},
+		isEditing           : function()
+		{
+			return theFreeboardModel.isEditing();
 		},
 		loadDatasourcePlugin: function(plugin)
 		{
@@ -1911,14 +1973,6 @@ var freeboard = (function()
 			datasourcePlugins[plugin.type_name] = plugin;
 			theFreeboardModel._datasourceTypes.valueHasMutated();
 		},
-		serialize : function()
-		{
-			return theFreeboardModel.serialize();
-		},
-		isEditing : function()
-		{
-			return theFreeboardModel.isEditing();
-		},
 		loadWidgetPlugin    : function(plugin)
 		{
 			if(_.isUndefined(plugin.display_name))
@@ -1929,7 +1983,7 @@ var freeboard = (function()
 			widgetPlugins[plugin.type_name] = plugin;
 			theFreeboardModel._widgetTypes.valueHasMutated();
 		},
-		addStyle : function(selector, rules)
+		addStyle            : function(selector, rules)
 		{
 			var context = document, stylesheet;
 
