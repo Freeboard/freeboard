@@ -2175,6 +2175,11 @@ h2.title
 	padding-top: 20px;
 }
 
+#pane-holding-pen
+{
+	display : none;
+}
+
 @media screen and (max-width : 960px)
 {
 	#add-pane

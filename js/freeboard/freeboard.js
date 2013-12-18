@@ -1194,6 +1194,14 @@ var freeboard = (function()
 			}
 		});
 
+		this.addPluginSource = function(pluginSource)
+		{
+			if(pluginSource && self.plugins.indexOf(pluginSource) == -1)
+			{
+				self.plugins.push(pluginSource);
+			}
+		}
+
 		this.serialize = function()
 		{
 			var panes = [];
@@ -1219,28 +1227,7 @@ var freeboard = (function()
 			};
 		}
 
-		this.loadPluginScriptURLs = function(scriptURLs, finishedCallback)
-		{
-			head.js(scriptURLs, function()
-			{
-				if(!_.isArray(scriptURLs))
-				{
-					scriptURLs = [scriptURLs];
-				}
-
-				_.each(scriptURLs, function(scriptURL)
-				{
-					if(self.plugins.indexOf(scriptURL) == -1)
-					{
-						self.plugins.push(scriptURL);
-					}
-				});
-
-				finishedCallback();
-			});
-		}
-
-		this.deserialize = function(object)
+		this.deserialize = function(object, finishedCallback)
 		{
 			self.clearDashboard();
 
@@ -1275,17 +1262,26 @@ var freeboard = (function()
 				{
 					self.setEditing(true);
 				}
+
+				if(_.isFunction(finishedCallback))
+				{
+					finishedCallback();
+				}
 			}
 
 			// This could have been self.plugins(object.plugins), but for some weird reason head.js was causing a function to be added to the list of plugins.
-			/*_.each(object.plugins, function(plugin){
-			 self.plugins.push(plugin);
-			 });*/
+			_.each(object.plugins, function(plugin)
+			{
+				self.addPluginSource(plugin);
+			});
 
 			// Load any plugins referenced in this definition
 			if(_.isArray(object.plugins))
 			{
-				self.loadPluginScriptURLs(object.plugins, finishLoad);
+				head.js(object.plugins, function()
+				{
+					finishLoad();
+				});
 			}
 			else
 			{
@@ -1314,21 +1310,26 @@ var freeboard = (function()
 
 		this.loadDashboard = function(dashboardData, callback)
 		{
-			var fadeOutTime = (self.panes().length > 0) ? 1000 : 0;
+			/*var fadeOutTime = (self.panes().length > 0) ? 1000 : 0;
 
 			$(".gridster").animate({opacity: 0.0}, fadeOutTime, function()
-			{
-				self.deserialize(dashboardData);
-				$(".gridster").animate({opacity: 1.0}, 1000, function()
-				{
+			{*/
+			showLoadingIndicator(true);
+				self.deserialize(dashboardData, function(){
+
 					showLoadingIndicator(false);
 
 					if(_.isFunction(callback))
 					{
 						callback();
 					}
+
 				});
-			});
+				//$(".gridster").animate({opacity: 1.0}, 1000, function()
+				//{
+
+				//});
+			//});*/
 		}
 
 		this.loadDashboardFromLocalFile = function()
@@ -1523,37 +1524,9 @@ var freeboard = (function()
 
 		this.dispose = function()
 		{
-			ko.utils.arrayForEach(self.widgets(), function(widget)
+			_.each(self.widgets(), function(widget)
 			{
 				widget.dispose();
-			});
-		}
-	}
-
-	function construct(constructor, args)
-	{
-		function F()
-		{
-			return constructor.apply(this, args);
-		}
-
-		F.prototype = constructor.prototype;
-		return new F();
-	}
-
-	function processNewPluginInstance(typeName, newInstanceResponse, newInstanceArguments, callback)
-	{
-		if(_.isFunction(newInstanceResponse))
-		{
-			var newInstance = newInstanceResponse.apply(undefined, newInstanceArguments);
-			callback(newInstance);
-		}
-		else if(_.isString(newInstanceResponse))
-		{
-			theFreeboardModel.loadPluginScriptURLs(newInstanceResponse, function()
-			{
-				var newInstance = construct(window[typeName], newInstanceArguments);
-				callback(newInstance);
 			});
 		}
 	}
@@ -1585,14 +1558,14 @@ var freeboard = (function()
 		{
 			disposeWidgetInstance();
 
-			if((newValue in widgetPlugins))
+			if((newValue in widgetPlugins) && _.isFunction(widgetPlugins[newValue].newInstance))
 			{
-				processNewPluginInstance(newValue, widgetPlugins[newValue].newInstance, [self.settings()
-				], function(newInstance)
-				{
-					self.widgetInstance = newInstance;
+				widgetPlugins[newValue].newInstance(self.settings(), function(widgetInstance){
+
+					self.widgetInstance = widgetInstance;
 					self.shouldRender(true);
 					self._heightUpdate.valueHasMutated();
+
 				});
 			}
 		});
@@ -1819,15 +1792,14 @@ var freeboard = (function()
 		{
 			disposeDatasourceInstance();
 
-			if((newValue in datasourcePlugins))
+			if((newValue in datasourcePlugins) && _.isFunction(datasourcePlugins[newValue].newInstance))
 			{
-				processNewPluginInstance(newValue, datasourcePlugins[newValue].newInstance, [self.settings(),
-				                                                                             self.updateCallback
-				], function(newInstance)
-				{
-					self.datasourceInstance = newInstance;
-					self.datasourceInstance.updateNow();
-				});
+				datasourcePlugins[newValue].newInstance(self.settings(), function(datasourceInstance){
+
+					self.datasourceInstance = datasourceInstance;
+					datasourceInstance.updateNow();
+
+				}, self.updateCallback);
 			}
 		});
 
@@ -1925,28 +1897,46 @@ var freeboard = (function()
 
 	$(function()
 	{ //DOM Ready
-		ko.applyBindings(theFreeboardModel);
-
-		// Check to see if we have a query param called load. If so, we should load that dashboard initially
-		var freeboardLocation = getParameterByName("load");
-
-		if(freeboardLocation != "")
-		{
-			$.ajax({
-				url    : freeboardLocation,
-				success: function(data)
-				{
-					theFreeboardModel.loadDashboard(data);
-				}
-			});
-		}
+		// Show the loading indicator when we first load
+		showLoadingIndicator(true);
 	});
-
-	// Show the loading indicator when we first load
-	showLoadingIndicator(true);
 
 	// PUBLIC FUNCTIONS
 	return {
+		initialize : function(allowEdit, finishedCallback)
+		{
+			ko.applyBindings(theFreeboardModel);
+
+			// Check to see if we have a query param called load. If so, we should load that dashboard initially
+			var freeboardLocation = getParameterByName("load");
+
+			if(freeboardLocation != "")
+			{
+				$.ajax({
+					url    : freeboardLocation,
+					success: function(data)
+					{
+						theFreeboardModel.loadDashboard(data);
+
+						if(_.isFunction(finishedCallback))
+						{
+							finishedCallback();
+						}
+					}
+				});
+			}
+			else
+			{
+				theFreeboardModel.allow_edit(allowEdit);
+				theFreeboardModel.setEditing(allowEdit);
+
+				showLoadingIndicator(false);
+				if(_.isFunction(finishedCallback))
+				{
+					finishedCallback();
+				}
+			}
+		},
 		newDashboard        : function()
 		{
 			theFreeboardModel.loadDashboard({allow_edit: true});
@@ -1970,6 +1960,7 @@ var freeboard = (function()
 				plugin.display_name = plugin.type_name;
 			}
 
+			theFreeboardModel.addPluginSource(plugin.source);
 			datasourcePlugins[plugin.type_name] = plugin;
 			theFreeboardModel._datasourceTypes.valueHasMutated();
 		},
@@ -1980,6 +1971,7 @@ var freeboard = (function()
 				plugin.display_name = plugin.type_name;
 			}
 
+			theFreeboardModel.addPluginSource(plugin.source);
 			widgetPlugins[plugin.type_name] = plugin;
 			theFreeboardModel._widgetTypes.valueHasMutated();
 		},

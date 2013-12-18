@@ -239,9 +239,9 @@
 				type        : "text"
 			}
 		],
-		newInstance : function(settings)
+		newInstance : function(settings, newInstanceCallback)
 		{
-			return new textWidget(settings);
+			newInstanceCallback( new textWidget(settings));
 		}
 	});
 
@@ -354,9 +354,9 @@
 				default_value: 100
 			}
 		],
-		newInstance : function(settings)
+		newInstance : function(settings, newInstanceCallback)
 		{
-			return new gaugeWidget(settings);
+			newInstanceCallback( new gaugeWidget(settings));
 		}
 	});
 
@@ -409,9 +409,9 @@
                 type        : "calculated"
             }
         ],
-        newInstance : function(settings)
+        newInstance : function(settings, newInstanceCallback)
         {
-            return new sparklineWidget(settings);
+	        newInstanceCallback( new sparklineWidget(settings));
         }
     });
 
@@ -523,9 +523,9 @@
 				type        : "text"
 			}
 		],
-		newInstance : function(settings)
+		newInstance : function(settings, newInstanceCallback)
 		{
-			return new pointerWidget(settings);
+			newInstanceCallback( new pointerWidget(settings));
 		}
 	});
 
@@ -578,9 +578,9 @@
                 type        : "calculated"
             }
         ],
-        newInstance : function(settings)
+        newInstance : function(settings, newInstanceCallback)
         {
-            return new pictureWidget(settings);
+	        newInstanceCallback( new pictureWidget(settings));
         }
     });
 
@@ -666,9 +666,9 @@
 				type        : "calculated"
 			}
 		],
-		newInstance : function(settings)
+		newInstance : function(settings, newInstanceCallback)
 		{
-			return new indicatorWidget(settings);
+			newInstanceCallback(new indicatorWidget(settings));
 		}
 	});
 

@@ -22,10 +22,10 @@
                 "js/freeboard/freeboard.js",
                 "js/freeboard/plugins/freeboard.datasources.js",
                 "js/freeboard/plugins/freeboard.widgets.js",
-                function (){
+                function(){
                     $(function()
                     { //DOM Ready
-                        freeboard.newDashboard();
+                        freeboard.initialize(true);
                     });
                 });
     </script>
@@ -76,7 +76,12 @@
 </header>
 <div class="gridster">
     <img id="dash-logo" data-bind="attr:{src: header_image}">
-    <ul data-bind="grid: true, template: {name: 'pane-template', foreach: panes}">
+    <ul data-bind="grid: true">
+    </ul>
+</div>
+
+<div style="display:hidden">
+    <ul data-bind="template: { name: 'pane-template', foreach: panes}">
     </ul>
 </div>
 
@@ -84,6 +89,7 @@
     <li data-bind="pane: true">
         <header>
             <h1 data-bind="text: title"></h1>
+
             <div class="widget-tools">
                 <i class="icon-plus icon-white action-icon" data-bind="pluginEditor: {operation: 'add', type: 'widget'}"></i><i class="icon-wrench icon-white action-icon" data-bind="pluginEditor: {operation: 'edit', type: 'pane'}"></i><i class="icon-trash icon-white action-icon" data-bind="pluginEditor: {operation: 'delete', type: 'pane'}"></i></a>
             </div>

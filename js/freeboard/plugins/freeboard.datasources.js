@@ -14,7 +14,7 @@
 	var swarmAvailable = false;
 
 	// Load the bugswarm API javascript if it's not already loaded
-	head.js({bugswarm: "http://cdn.buglabs.net/swarm/swarm-v0.6.1.js"}, function()
+	head.js({bugswarm: "http://cdn.buglabs.net/swarm/swarm-v0.4.1.js"}, function()
 	{
 		swarmAvailable = true;
 	});
@@ -167,9 +167,9 @@
 				type        : "text"
 			}
 		],
-		newInstance : function(settings, updateCallback)
+		newInstance : function(settings, newInstanceCallback, updateCallback)
 		{
-			return new rl78Datasource(settings, updateCallback);
+			newInstanceCallback( new rl78Datasource(settings, updateCallback));
 		}
 	});
 
@@ -279,9 +279,9 @@
 				]
 			}
 		],
-		newInstance: function(settings, updateCallback)
+		newInstance: function(settings, newInstanceCallback, updateCallback)
 		{
-			return new jsonDatasource(settings, updateCallback);
+			newInstanceCallback( new jsonDatasource(settings, updateCallback));
 		}
 	});
 
@@ -392,9 +392,9 @@
 				default_value: 5
 			}
 		],
-		newInstance: function(settings, updateCallback)
+		newInstance: function(settings, newInstanceCallback, updateCallback)
 		{
-			return new openWeatherMapDatasource(settings, updateCallback);
+			newInstanceCallback( new openWeatherMapDatasource(settings, updateCallback));
 		}
 	});
 
