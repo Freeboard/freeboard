@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Building a Freeboard Plugin</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco-fb.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <h1 id="building-a-freeboard-plugin">Building a Freeboard Plugin</h1>
+<p>A freeboard plugin is simply a javascript file that is loaded into a web page after the main freeboard.js file is loaded.</p>
+<p>Let&#39;s get started with an example of a datasource plugin and a widget plugin.</p>
+<hr>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Best to encapsulate your plugin in a closure, although not required.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>(<span class="function"><span class="keyword">function</span><span class="params">()</span>
+{</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <h2 id="a-datasource-plugin">A Datasource Plugin</h2>
+<hr>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <h3 id="datasource-definition">Datasource Definition</h3>
+<hr>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p><strong>freeboard.loadDatasourcePlugin(definition)</strong> tells freeboard that we are giving it a datasource plugin. It expects an object with the following:</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	freeboard.loadDatasourcePlugin({</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p><strong>type_name</strong> (required) : A unique name for this plugin. This name should be as unique as possible to avoid collisions with other plugins, and should follow naming conventions for javascript variable and function declarations.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="string">"type_name"</span>   : <span class="string">"my_datasource_plugin"</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p><strong>display_name</strong> : The pretty name that will be used for display purposes for this plugin. If the name is not defined, type_name will be used instead.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="string">"display_name"</span>: <span class="string">"My Datasource Plugin"</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p><strong>settings</strong> : An array of settings that will be displayed for this plugin when the user adds it.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="string">"settings"</span>    : [
+			{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p><strong>name</strong> (required) : The name of the setting. This value will be used in your code to retrieve the value specified by the user. This should follow naming conventions for javascript variable and function declarations.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				<span class="string">"name"</span>         : <span class="string">"first_name"</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p><strong>display_name</strong> : The pretty name that will be shown to the user when they adjust this setting.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				<span class="string">"display_name"</span> : <span class="string">"First Name"</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p><strong>type</strong> (required) : The type of input expected for this setting. &quot;text&quot; will display a single text box input. Examples of other types will follow in this documentation.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				<span class="string">"type"</span>         : <span class="string">"text"</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p><strong>default_value</strong> : A default value for this setting.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				<span class="string">"default_value"</span>: <span class="string">"John"</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p><strong>description</strong> : Text that will be displayed below the setting to give the user any extra information.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				<span class="string">"description"</span>  : <span class="string">"This is pretty self explanitory..."</span>
+			},
+			{
+				<span class="string">"name"</span>        : <span class="string">"last_name"</span>,
+				<span class="string">"display_name"</span>: <span class="string">"Last Name"</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p><strong>type &quot;calculated&quot;</strong> : This is a special text input box that can may contain javascript formulas and references to datasources in the freeboard.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				<span class="string">"type"</span>        : <span class="string">"calculated"</span>
+			},
+			{
+				<span class="string">"name"</span>        : <span class="string">"is_human"</span>,
+				<span class="string">"display_name"</span>: <span class="string">"I am human"</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p><strong>type &quot;boolean&quot;</strong> : Will display a checkbox indicating a true/false setting.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				<span class="string">"type"</span>        : <span class="string">"boolean"</span>
+			},
+			{
+				<span class="string">"name"</span>        : <span class="string">"age"</span>,
+				<span class="string">"display_name"</span>: <span class="string">"Your age"</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p><strong>type &quot;option&quot;</strong> : Will display a dropdown box with a list of choices.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				<span class="string">"type"</span>        : <span class="string">"option"</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p><strong>options</strong> (required) : An array of options to be populated in the dropdown.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				<span class="string">"options"</span>     : [
+					{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p><strong>name</strong> (required) : The text to be displayed in the dropdown.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>						<span class="string">"name"</span> : <span class="string">"0-50"</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p><strong>value</strong> : The value of the option. If not specified, the name parameter will be used.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>						<span class="string">"value"</span>: <span class="string">"young"</span>
+					},
+					{
+						<span class="string">"name"</span> : <span class="string">"51-100"</span>,
+						<span class="string">"value"</span>: <span class="string">"old"</span>
+					}
+				]
+			},
+			{
+				<span class="string">"name"</span>        : <span class="string">"other"</span>,
+				<span class="string">"display_name"</span>: <span class="string">"Other attributes"</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p><strong>type &quot;array&quot;</strong> : Will allow a user to enter in rows of data.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				<span class="string">"type"</span>        : <span class="string">"array"</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p><strong>settings</strong> (required) : An array of columns of the text to be entered by the user.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				<span class="string">"settings"</span>    : [
+					{
+						<span class="string">"name"</span>        : <span class="string">"name"</span>,
+						<span class="string">"display_name"</span>: <span class="string">"Name"</span>,
+						<span class="string">"type"</span>        : <span class="string">"text"</span>
+					},
+					{
+						<span class="string">"name"</span>        : <span class="string">"value"</span>,
+						<span class="string">"display_name"</span>: <span class="string">"Value"</span>,
+						<span class="string">"type"</span>        : <span class="string">"text"</span>
+					}
+				]
+			},
+			{
+				<span class="string">"name"</span>         : <span class="string">"refresh_time"</span>,
+				<span class="string">"display_name"</span> : <span class="string">"Refresh Time"</span>,
+				<span class="string">"type"</span>         : <span class="string">"text"</span>,
+				<span class="string">"description"</span>  : <span class="string">"In milliseconds"</span>,
+				<span class="string">"default_value"</span>: <span class="number">5000</span>
+			}
+		],</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p><strong>newInstance(settings, newInstanceCallback, updateCallback)</strong> (required) : A function that will be called when a new instance of this plugin is requested.</p>
+<ul>
+<li><strong>settings</strong> : A javascript object with the initial settings set by the user. The names of the properties in the object will correspond to the setting names defined above.</li>
+<li><strong>newInstanceCallback</strong> : A callback function that you&#39;ll call when the new instance of the plugin is ready. This function expects a single argument, which is the new instance of your plugin object.</li>
+<li><strong>updateCallback</strong> : A callback function that you&#39;ll call if and when your datasource has an update for freeboard to recalculate. This function expects a single parameter which is a javascript object with the new, updated data. You should hold on to this reference and call it when needed.</li>
+</ul>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		newInstance   : <span class="function"><span class="keyword">function</span><span class="params">(settings, newInstanceCallback, updateCallback)</span>
+		{</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <p>myDatasourcePlugin is defined below.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>			newInstanceCallback(<span class="keyword">new</span> myDatasourcePlugin(settings, updateCallback));
+		}
+	});</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <h3 id="datasource-implementation">Datasource Implementation</h3>
+<hr>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>Here we implement the actual datasource plugin. We pass in the settings and updateCallback.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="keyword">var</span> myDatasourcePlugin = <span class="function"><span class="keyword">function</span><span class="params">(settings, updateCallback)</span>
+	{</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>Always a good idea...</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="keyword">var</span> self = <span class="keyword">this</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>Good idea to create a variable to hold on to our settings, because they might change in the future. See below.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="keyword">var</span> currentSettings = settings;
+
+		<span class="comment">/* This is some function where I'll get my data from somewhere */</span>
+		<span class="function"><span class="keyword">function</span> <span class="title">getData</span><span class="params">()</span>
+		{</span>
+			<span class="keyword">var</span> newData;
+
+			<span class="comment">/* Get my data from somewhere and populate newData with it... Probably a JSON API or something. */</span>
+			<span class="comment">/* ... */</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p>I&#39;m calling updateCallback to tell it I&#39;ve got new data for it to munch on.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>			updateCallback(newData);
+		}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <p>You&#39;ll probably want to implement some sort of timer to refresh your data every so often.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="keyword">var</span> refreshTimer;
+
+		<span class="function"><span class="keyword">function</span> <span class="title">createRefreshTimer</span><span class="params">(interval)</span>
+		{</span>
+			<span class="keyword">if</span>(refreshTimer)
+			{
+				clearInterval(refreshTimer);
+			}
+
+			refreshTimer = setInterval(<span class="function"><span class="keyword">function</span><span class="params">()</span>
+			{</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p>Here we call our getData function to update freeboard with new data.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				self.getData();
+			}, interval);
+		}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <p><strong>onSettingsChanged(newSettings)</strong> (required) : A public function we must implement that will be called when a user makes a change to the settings.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		self.onSettingsChanged = <span class="function"><span class="keyword">function</span><span class="params">(newSettings)</span>
+		{</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-32">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-32">&#182;</a>
+              </div>
+              <p>Here we update our current settings with the variable that is passed in.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>			currentSettings = newSettings;
+		}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-33">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-33">&#182;</a>
+              </div>
+              <p><strong>updateNow()</strong> (required) : A public function we must implement that will be called when the user wants to manually refresh the datasource</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		self.updateNow = <span class="function"><span class="keyword">function</span><span class="params">()</span>
+		{</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-34">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-34">&#182;</a>
+              </div>
+              <p>Most likely I&#39;ll just call getData() here.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>			getData();
+		}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-35">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-35">&#182;</a>
+              </div>
+              <p><strong>onDispose()</strong> (required) : A public function we must implement that will be called when this instance of this plugin is no longer needed. Do anything you need to cleanup after yourself here.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		self.onDispose = <span class="function"><span class="keyword">function</span><span class="params">()</span>
+		{</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-36">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-36">&#182;</a>
+              </div>
+              <p>Probably a good idea to get rid of our timer.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>			clearInterval(refreshTimer);
+			refreshTimer = <span class="literal">undefined</span>;
+		}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-37">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-37">&#182;</a>
+              </div>
+              <p>Here we call createRefreshTimer with our current settings, to kick things off, initially. Notice how we make use of one of the user defined settings that we setup earlier.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		createRefreshTimer(currentSettings.refresh_time);
+	}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-38">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-38">&#182;</a>
+              </div>
+              <h2 id="a-widget-plugin">A Widget Plugin</h2>
+<hr>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-39">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-39">&#182;</a>
+              </div>
+              <h3 id="widget-definition">Widget Definition</h3>
+<hr>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-40">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-40">&#182;</a>
+              </div>
+              <p><strong>freeboard.loadWidgetPlugin(definition)</strong> tells freeboard that we are giving it a widget plugin. It expects an object with the following:</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	freeboard.loadWidgetPlugin({</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-41">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-41">&#182;</a>
+              </div>
+              <p>Same stuff here as with datasource plugin.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="string">"type_name"</span>   : <span class="string">"my_widget_plugin"</span>,
+		<span class="string">"display_name"</span>: <span class="string">"My Widget Plugin"</span>,
+		<span class="string">"settings"</span>    : [
+			{
+				<span class="string">"name"</span>        : <span class="string">"the_text"</span>,
+				<span class="string">"display_name"</span>: <span class="string">"Some Text"</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-42">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-42">&#182;</a>
+              </div>
+              <p>We&#39;ll use a calculated setting because we want what&#39;s displayed in this widget to be dynamic based on something changing (like a datasource).</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				<span class="string">"type"</span>        : <span class="string">"calculated"</span>
+			},
+			{
+				<span class="string">"name"</span>        : <span class="string">"size"</span>,
+				<span class="string">"display_name"</span>: <span class="string">"Size"</span>,
+				<span class="string">"type"</span>        : <span class="string">"option"</span>,
+				<span class="string">"options"</span>     : [
+					{
+						<span class="string">"name"</span> : <span class="string">"Regular"</span>,
+						<span class="string">"value"</span>: <span class="string">"regular"</span>
+					},
+					{
+						<span class="string">"name"</span> : <span class="string">"Big"</span>,
+						<span class="string">"value"</span>: <span class="string">"big"</span>
+					}
+				]
+			}
+		],</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-43">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-43">&#182;</a>
+              </div>
+              <p>Same as with datasource plugin, but there is no updateCallback parameter in this case.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		newInstance   : <span class="function"><span class="keyword">function</span><span class="params">(settings, newInstanceCallback)</span>
+		{</span>
+			newInstanceCallback(<span class="keyword">new</span> myWidgetPlugin(settings));
+		}
+	});</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-44">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-44">&#182;</a>
+              </div>
+              <h3 id="widget-implementation">Widget Implementation</h3>
+<hr>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-45">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-45">&#182;</a>
+              </div>
+              <p>Here we implement the actual widget plugin. We pass in the settings;</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="keyword">var</span> myWidgetPlugin = <span class="function"><span class="keyword">function</span><span class="params">(settings)</span>
+	{</span>
+		<span class="keyword">var</span> self = <span class="keyword">this</span>;
+		<span class="keyword">var</span> currentSettings = settings;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-46">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-46">&#182;</a>
+              </div>
+              <p>Here we create an element to hold the text we&#39;re going to display. We&#39;re going to set the value displayed in it below.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="keyword">var</span> myTextElement = $(<span class="string">"&lt;span&gt;&lt;/span&gt;"</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-47">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-47">&#182;</a>
+              </div>
+              <p><strong>render(containerElement)</strong> (required) : A public function we must implement that will be called when freeboard wants us to render the contents of our widget. The container element is the DIV that will surround the widget.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		self.render = <span class="function"><span class="keyword">function</span><span class="params">(containerElement)</span>
+		{</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-48">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-48">&#182;</a>
+              </div>
+              <p>Here we append our text element to the widget container element.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>			$(containerElement).append(myTextElement);
+		}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-49">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-49">&#182;</a>
+              </div>
+              <p><strong>getHeight()</strong> (required) : A public function we must implement that will be called when freeboard wants to know how big we expect to be when we render, and returns a height. This function will be called any time a user updates their settings (including the first time they create the widget).</p>
+<p>Note here that the height is not in pixels, but in blocks. A block in freeboard is currently defined as a rectangle that is fixed at 300 pixels wide and around 45 pixels multiplied by the value you return here.</p>
+<p>Blocks of different sizes may be supported in the future.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		self.getHeight = <span class="function"><span class="keyword">function</span><span class="params">()</span>
+		{</span>
+			<span class="keyword">if</span>(currentSettings.size == <span class="string">"big"</span>)
+			{
+				<span class="keyword">return</span> <span class="number">2</span>;
+			}
+			<span class="keyword">else</span>
+			{
+				<span class="keyword">return</span> <span class="number">1</span>;
+			}
+		}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-50">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-50">&#182;</a>
+              </div>
+              <p><strong>onSettingsChanged(newSettings)</strong> (required) : A public function we must implement that will be called when a user makes a change to the settings.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		self.onSettingsChanged = <span class="function"><span class="keyword">function</span><span class="params">(newSettings)</span>
+		{</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-51">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-51">&#182;</a>
+              </div>
+              <p>Normally we&#39;d update our text element with the value we defined in the user settings above (the_text), but there is a special case for settings that are of type <strong>&quot;calculated&quot;</strong> -- see below.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>			currentSettings = newSettings;
+		}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-52">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-52">&#182;</a>
+              </div>
+              <p><strong>onCalculatedValueChanged(settingName, newValue)</strong> (required) : A public function we must implement that will be called when a calculated value changes. Since calculated values can change at any time (like when a datasource is updated) we handle them in a special callback function here.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		self.onCalculatedValueChanged = <span class="function"><span class="keyword">function</span><span class="params">(settingName, newValue)</span>
+		{</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-53">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-53">&#182;</a>
+              </div>
+              <p>Remember we defined &quot;the_text&quot; up above in our settings.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>			<span class="keyword">if</span>(settingName == <span class="string">"the_text"</span>)
+			{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-54">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-54">&#182;</a>
+              </div>
+              <p>Here we do the actual update of the value that&#39;s displayed in on the screen.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				$(myTextElement).html(newValue);
+			}
+		}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-55">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-55">&#182;</a>
+              </div>
+              <p><strong>onDispose()</strong> (required) : Same as with datasource plugins.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		self.onDispose = <span class="function"><span class="keyword">function</span><span class="params">()</span>
+		{</span>
+		}
+	}
+}());</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
