@@ -38,7 +38,7 @@
 			{
 				"name"        : "last_name",
 				"display_name": "Last Name",
-				// **type "calculated"** : This is a special text input box that can may contain javascript formulas and references to datasources in the freeboard.
+				// **type "calculated"** : This is a special text input box that may contain javascript formulas and references to datasources in the freeboard.
 				"type"        : "calculated"
 			},
 			{

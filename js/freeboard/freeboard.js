@@ -943,13 +943,14 @@ var freeboard = (function()
 						}
 
 						types = {
-							settings: [
+							settings: {
+								settings: [
 								{
 									name        : "title",
 									display_name: "Title",
 									type        : "text"
-								}
-							]
+								}]
+							}
 						}
 					}
 
@@ -985,6 +986,7 @@ var freeboard = (function()
 							}
 							else
 							{
+								viewModel.name(newSettings.name);
 								viewModel.type(newSettings.type);
 								viewModel.settings(newSettings.settings);
 							}
