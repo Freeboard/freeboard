@@ -436,6 +436,11 @@ table
 freeboard
 ============*/
 
+html
+{
+	background-color : #101214;
+}
+
 body
 {
     background-color: #101214;
@@ -444,7 +449,6 @@ body
 	font-family : "Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-size   : 14px;
 	line-height : 20px;
-
 }
 
 .modal
@@ -469,7 +473,7 @@ body
 	background-color : #272727;
 	height           : 40px;
 	margin           : 0;
-	padding          : 0 10px 0 10px;
+	padding          : 0 10px 0 24px;
 	color            : #8b8b8b;
 	text-transform   : uppercase;
 }
@@ -500,7 +504,6 @@ body
 .modal section
 {
 	padding: 25px;
-	padding-bottom : 54px;
 }
 
 .control-group:last-child
@@ -909,25 +912,17 @@ header h1
 
 .widget-tools
 {
-	top : 8px;
-	right: 0px;
-    padding-right: 10px;
+	top : 6px;
+	right: 6px;
 	position: absolute;
-	display: none;
-	opacity: 0.0;
 }
 
 .sub-section-tools
 {
-    top : 15px;
+    top : 12px;
     right: 0px;
     position: absolute;
     display: none;
-}
-
-.sub-section-tools .edit-widget
-{
-    padding-right: 10px;
 }
 
 .datasource-edit-btn
@@ -1095,71 +1090,6 @@ ul, ol {
     border: none!important;
     border-radius: 0!important;
     background: rgba(255,255,255,.2)!important;
-}
-
-.onoffswitch {
-    position: relative; width: 100px;
-    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
-}
-
-.onoffswitch-checkbox {
-    display: none;
-}
-
-.onoffswitch-label {
-    display: block; overflow: hidden; cursor: pointer;
-    border: 0px solid #999999; border-radius: 0px;
-}
-
-.onoffswitch-inner {
-    width: 200%; margin-left: -100%;
-    -moz-transition: margin 0.3s ease-in 0s; -webkit-transition: margin 0.3s ease-in 0s;
-    -o-transition: margin 0.3s ease-in 0s; transition: margin 0.3s ease-in 0s;
-}
-
-.onoffswitch-inner > div {
-    float: left; position: relative; width: 50%; height: 40px; padding: 0; line-height: 40px;
-    font-size: 15px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
-    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
-}
-
-.onoffswitch-inner .onoffswitch-active {
-    padding-left: 15px;
-    background-color: #1F1F1F; color: #FFFFFF;
-}
-
-.onoffswitch-inner .onoffswitch-inactive {
-    padding-right: 15px;
-    background-color: #1F1F1F; color: #FFFFFF;
-    text-align: right;
-}
-
-.onoffswitch-switch {
-    width: 50px; margin: 0px; text-align: center;
-    border: 0px solid #999999;border-radius: 0px;
-    position: absolute; top: 0; bottom: 0;
-}
-.onoffswitch-active .onoffswitch-switch {
-    background: #78AB49; left: 0;
-}
-.onoffswitch-inactive .onoffswitch-switch {
-    background: #9D3926; right: 0;
-}
-
-.onoffswitch-active .onoffswitch-switch:before {
-    content: " "; position: absolute; top: 0; left: 50px;
-    border-style: solid; border-color: #78AB49 transparent transparent #78AB49; border-width: 20px 10px;
-}
-
-
-.onoffswitch-inactive .onoffswitch-switch:before {
-    content: " "; position: absolute; top: 0; right: 50px;
-    border-style: solid; border-color: transparent #9D3926 #9D3926 transparent; border-width: 20px 10px;
-}
-
-
-.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
-    margin-left: 0;
 }
 
 [class^="icon-"],
@@ -1930,7 +1860,6 @@ ul, ol {
 
 td.table-row-operation
 {
-	padding-top: 9px;
 }
 
 input.table-row-value
@@ -1947,6 +1876,7 @@ input.table-row-value
 .sub-table td
 {
 	border: none;
+	vertical-align : middle;
 }
 
 .form-table-value-subtable
@@ -2000,13 +1930,6 @@ td.form-table-value > input[type="checkbox"]
 	cursor: pointer;
 }
 
-.action-icon
-{
-    cursor: pointer;
-    margin: 3px 0px 3px 10px;
-
-}
-
 #main-logo
 {
     display: block;
@@ -2024,6 +1947,50 @@ td.form-table-value > input[type="checkbox"]
 {
 	color : #0088cc;
 	cursor: pointer;
+}
+
+ul.board-toolbar
+{
+	padding        : 0px;
+	margin         : 0px;
+	text-transform : uppercase;
+	font-size      : 11px;
+}
+
+.board-toolbar li
+{
+	float : left;
+	cursor           : pointer;
+	margin           : 0px 0px 0px 5px;
+	background-color : rgba(75, 75, 75, 0.0);
+	padding : 7px;
+}
+
+.board-toolbar li:hover
+{
+	background-color   : rgba(75, 75, 75, 1.0);
+
+	-webkit-transition : 250ms linear;
+	-moz-transition    : 250ms linear;
+	-o-transition      : 250ms linear;
+	-ms-transition     : 250ms linear;
+	transition         : 250ms linear;
+}
+
+.board-toolbar li i
+{
+	float: left;
+	margin: 0;
+	padding : 0;
+}
+
+.board-toolbar li label
+{
+	cursor : pointer;
+	margin-left: 5px;
+	float: left;
+	margin-top : -3px;
+	margin-bottom : -10px;
 }
 
 .text-button
@@ -2333,6 +2300,7 @@ h2.title
 	margin-top  : -100px;
 	left        : 50%;
 	margin-left : -100px;
+	z-index:2000;
 }
 
 .wrapperloading .loading.up
@@ -2491,4 +2459,14 @@ h2.title
 		-o-transform      : rotate(360deg);
 		transform         : rotate(360deg);
 	}
+}
+
+input::-webkit-input-placeholder, textarea::-webkit-input-placeholder
+{
+	color : #636363;
+}
+
+input:-moz-placeholder, textarea:-moz-placeholder
+{
+	color : #636363;
 }

@@ -63,7 +63,12 @@
                             <tr>
                                 <td><span class="text-button" data-bind="text: name, pluginEditor: {operation: 'edit', type: 'datasource'}"></span></td>
                                 <td data-bind="text: last_updated"></td>
-                                <td><i class="icon-refresh icon-white action-icon" data-bind="click: updateNow"></i><i class="icon-trash icon-white action-icon" data-bind="pluginEditor: {operation: 'delete', type: 'datasource'}"></i></td>
+                                <td>
+                                    <ul class="board-toolbar">
+                                        <li data-bind="click: updateNow"><i class="icon-refresh icon-white"></i></li>
+                                        <li data-bind="pluginEditor: {operation: 'delete', type: 'datasource'}"><i class="icon-trash icon-white"></i></li>
+                                    </ul>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -89,16 +94,26 @@
     <li data-bind="pane: true">
         <header>
             <h1 data-bind="text: title"></h1>
-
-            <div class="widget-tools">
-                <i class="icon-plus icon-white action-icon" data-bind="pluginEditor: {operation: 'add', type: 'widget'}"></i><i class="icon-wrench icon-white action-icon" data-bind="pluginEditor: {operation: 'edit', type: 'pane'}"></i><i class="icon-trash icon-white action-icon" data-bind="pluginEditor: {operation: 'delete', type: 'pane'}"></i></a>
-            </div>
+            <ul class="board-toolbar widget-tools">
+                <li data-bind="pluginEditor: {operation: 'add', type: 'widget'}">
+                    <i class="icon-plus icon-white"></i>
+                </li>
+                <li data-bind="pluginEditor: {operation: 'edit', type: 'pane'}">
+                    <i class="icon-wrench icon-white"></i>
+                </li>
+                <li data-bind="pluginEditor: {operation: 'delete', type: 'pane'}">
+                    <i class="icon-trash icon-white"></i>
+                </li>
+            </ul>
         </header>
         <section data-bind="foreach: widgets">
             <div class="sub-section" data-bind="css: 'sub-section-height-' + height()">
                 <div class="widget" data-bind="widget: true"></div>
                 <div class="sub-section-tools">
-                    <i class="icon-wrench icon-white action-icon" data-bind="pluginEditor: {operation: 'edit', type: 'widget'}"></i><i class="icon-trash icon-white action-icon" data-bind="pluginEditor: {operation: 'delete', type: 'widget'}"></i>
+                    <ul class="board-toolbar">
+                        <li data-bind="pluginEditor: {operation: 'edit', type: 'widget'}"><i class="icon-wrench icon-white"></i></li>
+                        <li data-bind="pluginEditor: {operation: 'delete', type: 'widget'}"><i class="icon-trash icon-white"></i></li>
+                    </ul>
                 </div>
             </div>
         </section>

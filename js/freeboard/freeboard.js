@@ -202,7 +202,7 @@ var freeboard = (function()
 	{
 		if(show)
 		{
-			loadingIndicator.hide().appendTo("body").fadeIn(500);
+			loadingIndicator.fadeOut(0).appendTo("body").fadeIn(500);
 		}
 		else
 		{
@@ -478,7 +478,7 @@ var freeboard = (function()
 			'display' : 'block',
 			'position': 'fixed',
 			'opacity' : 0,
-			'z-index' : 11000
+			'z-index' : 1000
 
 		});
 
@@ -643,7 +643,12 @@ var freeboard = (function()
 								});
 							});
 
-							subsettingRow.append($('<td class="table-row-operation"></td>').append($('<i class="icon-trash icon-white action-icon"></i>').click(function()
+							subsettingRow
+								.append($('<td class="table-row-operation"></td>')
+								.append($('<ul class="board-toolbar"></ul>')
+									.append($('<li></li>')
+										.append($('<i class="icon-trash icon-white"></i>')
+											.click(function()
 							{
 								var subSettingIndex = newSettings.settings[settingDef.name].indexOf(newSetting);
 
@@ -653,7 +658,7 @@ var freeboard = (function()
 									subsettingRow.remove();
 									processHeaderVisibility();
 								}
-							})));
+							})))));
 
 							subTableDiv.scrollTop(subTableDiv[0].scrollHeight);
 
@@ -1856,14 +1861,14 @@ var freeboard = (function()
 
 		if(show)
 		{
-			$(".widget-tools").css("display", "block").animate({opacity: 1.0}, animateLength);
+			$(".widget-tools").fadeIn(animateLength);//.css("display", "block").animate({opacity: 1.0}, animateLength);
 		}
 		else
 		{
-			$(".widget-tools").animate({opacity: 0.0}, animateLength, function()
-			{
-				$().css("display", "none");
-			});
+			$(".widget-tools").fadeOut(animateLength);//.animate({opacity: 0.0}, animateLength).css("display", "none");//, function()
+			/*{
+				$(this).css("display", "none");
+			});*/
 		}
 	}
 
@@ -2008,6 +2013,14 @@ var freeboard = (function()
 					stylesheet.insertRule(selector + '{' + rules + '}', stylesheet.cssRules.length);
 				}
 			}
+		},
+		showLoadingIndicator : function(show)
+		{
+			showLoadingIndicator(show);
+		},
+		showDialog : function(contentElement, title, okTitle, cancelTitle, okCallback)
+		{
+			createDialogBox(contentElement, title, okTitle, cancelTitle, okCallback);
 		},
 		getStyleString      : function(name)
 		{
