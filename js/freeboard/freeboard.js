@@ -991,7 +991,11 @@ var freeboard = (function()
 							}
 							else
 							{
-								viewModel.name(newSettings.name);
+								if(viewModel.name)
+								{
+									viewModel.name(newSettings.name);
+								}
+								
 								viewModel.type(newSettings.type);
 								viewModel.settings(newSettings.settings);
 							}
