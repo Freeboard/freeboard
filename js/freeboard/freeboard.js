@@ -1435,6 +1435,12 @@ var freeboard = (function()
 
 		this.setEditing = function(editing, animate)
 		{
+			// Don't allow editing if it's not allowed
+			if(!self.allow_edit() && editing)
+			{
+				return;
+			}
+
 			self.isEditing(editing);
 
 			if(_.isUndefined(animate))
@@ -1997,6 +2003,10 @@ var freeboard = (function()
 		serialize           : function()
 		{
 			return theFreeboardModel.serialize();
+		},
+		setEditing          : function(editing, animate)
+		{
+			theFreeboardModel.setEditing(editing, animate);
 		},
 		isEditing           : function()
 		{
