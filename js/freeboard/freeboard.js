@@ -187,7 +187,7 @@ var freeboard = (function()
 		}
 	};
 
-	var veDatasourceRegex = new RegExp(".*datasources[.]([^.]*)([.][^\\s]*)?$");
+	var veDatasourceRegex = new RegExp(".*datasources\\[\"([^\"]*)(\"\\].)?$");
 
 	function resizeValueEditor(element)
 	{
@@ -225,10 +225,12 @@ var freeboard = (function()
 			}
 
 			var inputString = $(element).val().substring(0, $(element).getCaretPosition());
+			inputString = inputString.replace(String.fromCharCode(160), " "); // Weird issue where the textarea box was putting in ASCII (non breaking space) for spaces.
+
 			var match = veDatasourceRegex.exec(inputString);
 
 			var options = [];
-			var replacementString = undefined;
+			var replacementString;
 
 			if(match)
 			{
@@ -236,7 +238,7 @@ var freeboard = (function()
 				{
 					_.each(theFreeboardModel.datasources(), function(datasource)
 					{
-						options.push({value: datasource.name(), follow_char: "."});
+						options.push({value: datasource.name(), follow_char: "\"]."});
 					});
 				}
 				else if(match[1] != "" && _.isUndefined(match[2])) // List partial datasources
@@ -245,12 +247,11 @@ var freeboard = (function()
 
 					_.each(theFreeboardModel.datasources(), function(datasource)
 					{
+						var dsName = datasource.name();
 
-						var name = datasource.name();
-
-						if(name != match[1] && name.indexOf(match[1]) == 0)
+						if(dsName != replacementString && dsName.indexOf(replacementString) == 0)
 						{
-							options.push({value: name, follow_char: "."});
+							options.push({value: dsName, follow_char: "\"]."});
 						}
 					});
 				}
@@ -778,7 +779,7 @@ var freeboard = (function()
 							{
 								e.preventDefault();
 								$(input).focus();
-								$(input).insertAtCaret("datasources.");
+								$(input).insertAtCaret("datasources[\"");
 								$(input).trigger("freeboard-eval");
 							}));
 						}
