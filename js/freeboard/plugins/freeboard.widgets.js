@@ -683,6 +683,16 @@
 		var marker;
 		var currentPosition = {};
 
+		function updatePosition()
+		{
+			if(map && marker && currentPosition.lat && currentPosition.lon)
+			{
+				var newLatLon = new google.maps.LatLng(currentPosition.lat, currentPosition.lon);
+				marker.setPosition(newLatLon);
+				map.panTo(newLatLon);
+			}
+		}
+
 		this.render = function(element)
 		{
 			function initializeMap()
@@ -772,6 +782,8 @@
 				});
 
 				marker = new google.maps.Marker({map: map});
+
+				updatePosition();
 			}
 
 			if(window.google && window.google.maps)
@@ -801,12 +813,7 @@
 				currentPosition.lon = newValue;
 			}
 
-			if(marker && currentPosition.lat && currentPosition.lon)
-			{
-				var newLatLon = new google.maps.LatLng(currentPosition.lat, currentPosition.lon);
-				marker.setPosition(newLatLon);
-				map.panTo(newLatLon);
-			}
+			updatePosition();
 		}
 
 		this.onDispose = function()

@@ -287,7 +287,8 @@
 		"settings"    : [
 			{
 				name        : "thing_id",
-				display_name: "Thing",
+				display_name: "Thing Name",
+				"description": "Example: salty-dog-1",
 				type        : "text"
 			}
 		],
