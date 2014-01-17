@@ -1877,11 +1877,11 @@ var freeboard = (function()
 
 		if(show)
 		{
-			$(".widget-tools").fadeIn(animateLength);//.css("display", "block").animate({opacity: 1.0}, animateLength);
+			$(".pane-tools").fadeIn(animateLength);//.css("display", "block").animate({opacity: 1.0}, animateLength);
 		}
 		else
 		{
-			$(".widget-tools").fadeOut(animateLength);//.animate({opacity: 0.0}, animateLength).css("display", "none");//, function()
+			$(".pane-tools").fadeOut(animateLength);//.animate({opacity: 0.0}, animateLength).css("display", "none");//, function()
 			/*{
 				$(this).css("display", "none");
 			});*/

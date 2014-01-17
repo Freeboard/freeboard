@@ -910,11 +910,12 @@ header h1
 	height: 100%;
 }
 
-.widget-tools
+.pane-tools
 {
 	top : 6px;
 	right: 6px;
 	position: absolute;
+	display : none;
 }
 
 .sub-section-tools
