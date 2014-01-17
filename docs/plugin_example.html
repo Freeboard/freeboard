@@ -723,11 +723,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>		<span class="string">"type_name"</span>   : <span class="string">"my_widget_plugin"</span>,
-		<span class="string">"display_name"</span>: <span class="string">"My Widget Plugin"</span>,
-		<span class="string">"settings"</span>    : [
-			{
-				<span class="string">"name"</span>        : <span class="string">"the_text"</span>,
-				<span class="string">"display_name"</span>: <span class="string">"Some Text"</span>,</pre></div></div>
+		<span class="string">"display_name"</span>: <span class="string">"My Widget Plugin"</span>,</pre></div></div>
             
         </li>
         
@@ -737,6 +733,42 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-43">&#182;</a>
+              </div>
+              <p><strong>external_scripts</strong> : Any external scripts that should be loaded before the plugin instance is created.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="string">"external_scripts"</span>: [
+			<span class="string">"http://mydomain.com/myscript1.js"</span>, <span class="string">"http://mydomain.com/myscript2.js"</span>
+		],</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-44">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-44">&#182;</a>
+              </div>
+              <p><strong>fill_size</strong> : If this is set to true, the widget will fill be allowed to fill the entire space given it, otherwise it will contain an automatic padding of around 10 pixels around it.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="string">"fill_size"</span> : <span class="literal">false</span>,
+		<span class="string">"settings"</span>    : [
+			{
+				<span class="string">"name"</span>        : <span class="string">"the_text"</span>,
+				<span class="string">"display_name"</span>: <span class="string">"Some Text"</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-45">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-45">&#182;</a>
               </div>
               <p>We&#39;ll use a calculated setting because we want what&#39;s displayed in this widget to be dynamic based on something changing (like a datasource).</p>
 
@@ -764,11 +796,11 @@
         </li>
         
         
-        <li id="section-44">
+        <li id="section-46">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-44">&#182;</a>
+                <a class="pilcrow" href="#section-46">&#182;</a>
               </div>
               <p>Same as with datasource plugin, but there is no updateCallback parameter in this case.</p>
 
@@ -783,11 +815,11 @@
         </li>
         
         
-        <li id="section-45">
+        <li id="section-47">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-45">&#182;</a>
+                <a class="pilcrow" href="#section-47">&#182;</a>
               </div>
               <h3 id="widget-implementation">Widget Implementation</h3>
 <hr>
@@ -797,11 +829,11 @@
         </li>
         
         
-        <li id="section-46">
+        <li id="section-48">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-46">&#182;</a>
+                <a class="pilcrow" href="#section-48">&#182;</a>
               </div>
               <p>Here we implement the actual widget plugin. We pass in the settings;</p>
 
@@ -815,11 +847,11 @@
         </li>
         
         
-        <li id="section-47">
+        <li id="section-49">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-47">&#182;</a>
+                <a class="pilcrow" href="#section-49">&#182;</a>
               </div>
               <p>Here we create an element to hold the text we&#39;re going to display. We&#39;re going to set the value displayed in it below.</p>
 
@@ -830,11 +862,11 @@
         </li>
         
         
-        <li id="section-48">
+        <li id="section-50">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-48">&#182;</a>
+                <a class="pilcrow" href="#section-50">&#182;</a>
               </div>
               <p><strong>render(containerElement)</strong> (required) : A public function we must implement that will be called when freeboard wants us to render the contents of our widget. The container element is the DIV that will surround the widget.</p>
 
@@ -846,11 +878,11 @@
         </li>
         
         
-        <li id="section-49">
+        <li id="section-51">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-49">&#182;</a>
+                <a class="pilcrow" href="#section-51">&#182;</a>
               </div>
               <p>Here we append our text element to the widget container element.</p>
 
@@ -862,11 +894,11 @@
         </li>
         
         
-        <li id="section-50">
+        <li id="section-52">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-50">&#182;</a>
+                <a class="pilcrow" href="#section-52">&#182;</a>
               </div>
               <p><strong>getHeight()</strong> (required) : A public function we must implement that will be called when freeboard wants to know how big we expect to be when we render, and returns a height. This function will be called any time a user updates their settings (including the first time they create the widget).</p>
 <p>Note here that the height is not in pixels, but in blocks. A block in freeboard is currently defined as a rectangle that is fixed at 300 pixels wide and around 45 pixels multiplied by the value you return here.</p>
@@ -889,11 +921,11 @@
         </li>
         
         
-        <li id="section-51">
+        <li id="section-53">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-51">&#182;</a>
+                <a class="pilcrow" href="#section-53">&#182;</a>
               </div>
               <p><strong>onSettingsChanged(newSettings)</strong> (required) : A public function we must implement that will be called when a user makes a change to the settings.</p>
 
@@ -905,11 +937,11 @@
         </li>
         
         
-        <li id="section-52">
+        <li id="section-54">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-52">&#182;</a>
+                <a class="pilcrow" href="#section-54">&#182;</a>
               </div>
               <p>Normally we&#39;d update our text element with the value we defined in the user settings above (the_text), but there is a special case for settings that are of type <strong>&quot;calculated&quot;</strong> -- see below.</p>
 
@@ -921,11 +953,11 @@
         </li>
         
         
-        <li id="section-53">
+        <li id="section-55">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-53">&#182;</a>
+                <a class="pilcrow" href="#section-55">&#182;</a>
               </div>
               <p><strong>onCalculatedValueChanged(settingName, newValue)</strong> (required) : A public function we must implement that will be called when a calculated value changes. Since calculated values can change at any time (like when a datasource is updated) we handle them in a special callback function here.</p>
 
@@ -937,11 +969,11 @@
         </li>
         
         
-        <li id="section-54">
+        <li id="section-56">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-54">&#182;</a>
+                <a class="pilcrow" href="#section-56">&#182;</a>
               </div>
               <p>Remember we defined &quot;the_text&quot; up above in our settings.</p>
 
@@ -953,11 +985,11 @@
         </li>
         
         
-        <li id="section-55">
+        <li id="section-57">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-55">&#182;</a>
+                <a class="pilcrow" href="#section-57">&#182;</a>
               </div>
               <p>Here we do the actual update of the value that&#39;s displayed in on the screen.</p>
 
@@ -970,11 +1002,11 @@
         </li>
         
         
-        <li id="section-56">
+        <li id="section-58">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-56">&#182;</a>
+                <a class="pilcrow" href="#section-58">&#182;</a>
               </div>
               <p><strong>onDispose()</strong> (required) : Same as with datasource plugins.</p>
 

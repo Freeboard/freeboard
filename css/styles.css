@@ -834,7 +834,7 @@ a:focus
 .gridster header
 {
     background-color: #272727;
-    height: 40px;
+    height: 30px;
     margin: 0;
     padding: 0 10px 0 10px;
     color: #8b8b8b;
@@ -849,11 +849,11 @@ header h1
     text-overflow: ellipsis;
     padding: 0;
     margin: 0;
+	line-height: 30px;
 }
 
 .gridster section
 {
-    padding: 5px 10px 5px 10px;
     line-height: normal;
     bottom: 0;
     left: 0;
@@ -866,7 +866,7 @@ header h1
 
 #main-header
 {
-	height: 300px;
+	height: 225px;
 	position : fixed;
 	width: 100%;
 	z-index : 50;
@@ -906,21 +906,27 @@ header h1
 
 .widget
 {
+	padding : 5px 10px 5px 10px;
+	height : 100%;
 	width: 100%;
-	height: 100%;
+}
+
+.widget.fillsize
+{
+	padding : 0;
 }
 
 .pane-tools
 {
-	top : 6px;
-	right: 6px;
+	top : 0px;
+	right: 0px;
 	position: absolute;
 	display : none;
 }
 
 .sub-section-tools
 {
-    top : 12px;
+    top : 0px;
     right: 0px;
     position: absolute;
     display: none;
@@ -1003,30 +1009,30 @@ header h1
 
 .sub-section
 {
+	padding: 0;
     border-bottom: solid 1px #363636;
-    margin-bottom: 6px;
-	padding-bottom: 8px;
     position: relative;
+	overflow: hidden;
 }
 
 .sub-section-height-1
 {
-	height : 45px;
+	height : 60px;
 }
 
 .sub-section-height-2
 {
-	height : 100px;
+	height : 120px;
 }
 
 .sub-section-height-3
 {
-    height : 155px;
+    height : 180px;
 }
 
 .sub-section-height-4
 {
-    height : 225px;
+    height : 240px;
 }
 
 .sub-section:last-of-type
@@ -1075,16 +1081,9 @@ ul, ol {
 
 .gridster .gs_w {
     background: #2a2a2a;
-    -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.3);
-    box-shadow: 0 0 5px rgba(0,0,0,0.3);
     padding: 0px;
     margin: 0px;
     overflow: hidden;
-}
-
-.gridster .player {
-    -webkit-box-shadow: 3px 3px 5px rgba(0,0,0,0.3);
-    box-shadow: 3px 3px 5px rgba(0,0,0,0.3);
 }
 
 .gridster .preview-holder {
@@ -1890,7 +1889,7 @@ input.table-row-value
 
 .datasource-list-container
 {
-	max-height : 180px;
+	max-height : 125px;
 	overflow   : scroll;
 	border-bottom : solid 1px #3d3d3d;
 }
@@ -1964,7 +1963,7 @@ ul.board-toolbar
 	cursor           : pointer;
 	margin           : 0px 0px 0px 5px;
 	background-color : rgba(75, 75, 75, 0.0);
-	padding : 7px;
+	padding : 8px;
 }
 
 .board-toolbar li:hover

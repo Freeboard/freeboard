@@ -1020,7 +1020,7 @@ var freeboard = (function()
 			// Initialize our grid
 			grid = $(element).gridster({
 				widget_margins        : [10, 10],
-				widget_base_dimensions: [300, 40]
+				widget_base_dimensions: [300, 10]
 			}).data("gridster");
 
 			grid.disable();
@@ -1440,23 +1440,19 @@ var freeboard = (function()
 			if(!editing)
 			{
 				$(".gridster .gs_w").css({cursor: "default"});
-				$("#main-header").animate({top: "-280px"}, animateLength);
+				$("#main-header").animate({top: "-205"}, animateLength);
 				$(".gridster").animate({"margin-top": "20px"}, animateLength);
 				$("#main-header").data().shown = false;
-
 				$(".sub-section").unbind();
-
 				grid.disable();
 			}
 			else
 			{
 				$(".gridster .gs_w").css({cursor: "pointer"});
 				$("#main-header").animate({top: "0px"}, animateLength);
-				$(".gridster").animate({"margin-top": "300px"}, animateLength);
+				$(".gridster").animate({"margin-top": "223px"}, animateLength);
 				$("#main-header").data().shown = true;
-
 				attachWidgetEditIcons($(".sub-section"));
-
 				grid.enable();
 			}
 
@@ -1492,7 +1488,14 @@ var freeboard = (function()
 				return memo + widget.height();
 			}, 0);
 
-			return Math.max(2, sumHeights + 1);
+			sumHeights *= 6;
+			sumHeights += 3;
+
+			sumHeights *= 10;
+
+			var rows = Math.ceil((sumHeights + 20) / 30);
+
+			return Math.max(4, rows);
 		}
 
 		this.serialize = function()
@@ -1558,6 +1561,7 @@ var freeboard = (function()
 		this.calculatedSettingScripts = {};
 
 		this.title = ko.observable();
+		this.fillSize = ko.observable(false);
 
 		this.type = ko.observable();
 		this.type.subscribe(function(newValue)
@@ -1566,13 +1570,29 @@ var freeboard = (function()
 
 			if((newValue in widgetPlugins) && _.isFunction(widgetPlugins[newValue].newInstance))
 			{
-				widgetPlugins[newValue].newInstance(self.settings(), function(widgetInstance){
+				var widgetType = widgetPlugins[newValue];
 
-					self.widgetInstance = widgetInstance;
-					self.shouldRender(true);
-					self._heightUpdate.valueHasMutated();
+				function finishLoad()
+				{
+					widgetType.newInstance(self.settings(), function(widgetInstance){
 
-				});
+						self.fillSize((widgetType.fill_size === true));
+						self.widgetInstance = widgetInstance;
+						self.shouldRender(true);
+						self._heightUpdate.valueHasMutated();
+
+					});
+				}
+
+				// Do we need to load any external scripts?
+				if(widgetType.external_scripts)
+				{
+					head.js(widgetType.external_scripts.slice(0), finishLoad); // Need to clone the array because head.js adds some weird functions to it
+				}
+				else
+				{
+					finishLoad();
+				}
 			}
 		});
 
@@ -1822,7 +1842,6 @@ var freeboard = (function()
 				{
 					finishLoad();
 				}
-
 			}
 		});
 

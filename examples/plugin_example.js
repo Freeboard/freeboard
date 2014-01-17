@@ -189,6 +189,12 @@
 		// Same stuff here as with datasource plugin.
 		"type_name"   : "my_widget_plugin",
 		"display_name": "My Widget Plugin",
+		// **external_scripts** : Any external scripts that should be loaded before the plugin instance is created.
+		"external_scripts": [
+			"http://mydomain.com/myscript1.js", "http://mydomain.com/myscript2.js"
+		],
+		// **fill_size** : If this is set to true, the widget will fill be allowed to fill the entire space given it, otherwise it will contain an automatic padding of around 10 pixels around it.
+		"fill_size" : false,
 		"settings"    : [
 			{
 				"name"        : "the_text",
