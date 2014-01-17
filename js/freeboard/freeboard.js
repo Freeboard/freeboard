@@ -995,7 +995,7 @@ var freeboard = (function()
 								{
 									viewModel.name(newSettings.name);
 								}
-								
+
 								viewModel.type(newSettings.type);
 								viewModel.settings(newSettings.settings);
 							}
@@ -1336,11 +1336,6 @@ var freeboard = (function()
 					}
 
 				});
-				//$(".gridster").animate({opacity: 1.0}, 1000, function()
-				//{
-
-				//});
-			//});*/
 		}
 
 		this.loadDashboardFromLocalFile = function()
@@ -1805,12 +1800,29 @@ var freeboard = (function()
 
 			if((newValue in datasourcePlugins) && _.isFunction(datasourcePlugins[newValue].newInstance))
 			{
-				datasourcePlugins[newValue].newInstance(self.settings(), function(datasourceInstance){
+				var datasourceType = datasourcePlugins[newValue];
 
-					self.datasourceInstance = datasourceInstance;
-					datasourceInstance.updateNow();
+				function finishLoad()
+				{
+					datasourceType.newInstance(self.settings(), function(datasourceInstance)
+					{
 
-				}, self.updateCallback);
+						self.datasourceInstance = datasourceInstance;
+						datasourceInstance.updateNow();
+
+					}, self.updateCallback);
+				}
+
+				// Do we need to load any external scripts?
+				if(datasourceType.external_scripts)
+				{
+					head.js(datasourceType.external_scripts.slice(0), finishLoad); // Need to clone the array because head.js adds some weird functions to it
+				}
+				else
+				{
+					finishLoad();
+				}
+
 			}
 		});
 

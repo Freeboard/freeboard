@@ -21,6 +21,11 @@
 		"type_name"   : "my_datasource_plugin",
 		// **display_name** : The pretty name that will be used for display purposes for this plugin. If the name is not defined, type_name will be used instead.
 		"display_name": "My Datasource Plugin",
+		// **external_scripts** : Any external scripts that should be loaded before the plugin instance is created.
+		"external_scripts" : [
+			"http://mydomain.com/myscript1.js",
+		    "http://mydomain.com/myscript2.js"
+		],
 		// **settings** : An array of settings that will be displayed for this plugin when the user adds it.
 		"settings"    : [
 			{
