@@ -501,20 +501,27 @@ var freeboard = (function()
 
 		// Create our footer
 		var footer = $('<footer></footer>').appendTo(modalDialog);
-		$('<span id="dialog-ok" class="text-button">' + okTitle + '</span>').appendTo(footer).click(function()
+
+		if(okTitle)
 		{
-			if(_.isFunction(okCallback))
+			$('<span id="dialog-ok" class="text-button">' + okTitle + '</span>').appendTo(footer).click(function()
 			{
-				okCallback();
-			}
+				if(_.isFunction(okCallback))
+				{
+					okCallback();
+				}
 
-			closeModal();
-		});
+				closeModal();
+			});
+		}
 
-		$('<span id="dialog-cancel" class="text-button">' + cancelTitle + '</span>').appendTo(footer).click(function()
+		if(cancelTitle)
 		{
-			closeModal();
-		});
+			$('<span id="dialog-cancel" class="text-button">' + cancelTitle + '</span>').appendTo(footer).click(function()
+			{
+				closeModal();
+			});
+		}
 
 		$("body").append([overlay, modalDialog]);
 
