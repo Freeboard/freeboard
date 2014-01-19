@@ -1687,7 +1687,7 @@ var freeboard = (function()
 
 			// Check for any calculated settings
 			var settingsDefs = widgetPlugins[self.type()].settings;
-			var datasourceRegex = new RegExp("datasources.(\\w+)", "g");
+			var datasourceRegex = new RegExp("datasources(?:\\[\"|[.])([\\w\\s]+)", "g");
 			var currentSettings = self.settings();
 
 			_.each(settingsDefs, function(settingDef)
