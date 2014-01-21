@@ -249,7 +249,7 @@
 			dweetio.get_latest_dweet_for(currentSettings.thing_id, function(err, dweet){
 				if(err)
 				{
-					onNewDweet({});
+					//onNewDweet({});
 				}
 				else
 				{
