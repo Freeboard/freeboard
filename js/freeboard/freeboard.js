@@ -538,12 +538,12 @@ var freeboard = (function()
 			settings: {}
 		};
 
-		function createSettingRow(displayName)
+		function createSettingRow(name, displayName)
 		{
-			var tr = $('<div class="form-row"></div>').appendTo(form);
+			var tr = $('<div id="setting-row-' + name + '" class="form-row"></div>').appendTo(form);
 
 			tr.append('<div class="form-label"><label class="control-label">' + displayName + '</label></div>');
-			return $('<div class="form-value"></td>').appendTo(tr);
+			return $('<div id="setting-value-container-' + name + '" class="form-value"></div>').appendTo(tr);
 		}
 
 
@@ -552,7 +552,7 @@ var freeboard = (function()
 		// Create our body
 		if(!_.isUndefined(currentInstanceName))
 		{
-			createSettingRow("Name").append($('<input type="text">').val(currentInstanceName).change(function()
+			createSettingRow("instance-name", "Name").append($('<input type="text">').val(currentInstanceName).change(function()
 			{
 				newSettings.name = $(this).val();
 			}));
@@ -575,7 +575,7 @@ var freeboard = (function()
 					displayName = settingDef.display_name;
 				}
 
-				var valueCell = createSettingRow(displayName);
+				var valueCell = createSettingRow(settingDef.name, displayName);
 
 				switch (settingDef.type)
 				{
@@ -651,22 +651,17 @@ var freeboard = (function()
 								});
 							});
 
-							subsettingRow
-								.append($('<td class="table-row-operation"></td>')
-								.append($('<ul class="board-toolbar"></ul>')
-									.append($('<li></li>')
-										.append($('<i class="icon-trash icon-white"></i>')
-											.click(function()
-							{
-								var subSettingIndex = newSettings.settings[settingDef.name].indexOf(newSetting);
+							subsettingRow.append($('<td class="table-row-operation"></td>').append($('<ul class="board-toolbar"></ul>').append($('<li></li>').append($('<i class="icon-trash icon-white"></i>').click(function()
+												{
+													var subSettingIndex = newSettings.settings[settingDef.name].indexOf(newSetting);
 
-								if(subSettingIndex != -1)
-								{
-									newSettings.settings[settingDef.name].splice(subSettingIndex, 1);
-									subsettingRow.remove();
-									processHeaderVisibility();
-								}
-							})))));
+													if(subSettingIndex != -1)
+													{
+														newSettings.settings[settingDef.name].splice(subSettingIndex, 1);
+														subsettingRow.remove();
+														processHeaderVisibility();
+													}
+												})))));
 
 							subTableDiv.scrollTop(subTableDiv[0].scrollHeight);
 
@@ -819,7 +814,7 @@ var freeboard = (function()
 
 		if(pluginTypeNames.length > 1)
 		{
-			var typeRow = createSettingRow("Type");
+			var typeRow = createSettingRow("plugin-types", "Type");
 			var typeSelect = $('<select></select>').appendTo($('<div class="styled-select"></div>').appendTo(typeRow));
 
 			typeSelect.append($("<option>Select a type...</option>").attr("value", "undefined"));
@@ -958,11 +953,12 @@ var freeboard = (function()
 						types = {
 							settings: {
 								settings: [
-								{
-									name        : "title",
-									display_name: "Title",
-									type        : "text"
-								}]
+									{
+										name        : "title",
+										display_name: "Title",
+										type        : "text"
+									}
+								]
 							}
 						}
 					}
@@ -1329,21 +1325,17 @@ var freeboard = (function()
 
 		this.loadDashboard = function(dashboardData, callback)
 		{
-			/*var fadeOutTime = (self.panes().length > 0) ? 1000 : 0;
-
-			$(".gridster").animate({opacity: 0.0}, fadeOutTime, function()
-			{*/
 			showLoadingIndicator(true);
-				self.deserialize(dashboardData, function(){
+			self.deserialize(dashboardData, function()
+			{
+				showLoadingIndicator(false);
 
-					showLoadingIndicator(false);
+				if(_.isFunction(callback))
+				{
+					callback();
+				}
 
-					if(_.isFunction(callback))
-					{
-						callback();
-					}
-
-				});
+			});
 		}
 
 		this.loadDashboardFromLocalFile = function()
@@ -1450,21 +1442,24 @@ var freeboard = (function()
 			}
 
 			var animateLength = (animate) ? 250 : 0;
+			var barHeight = $("#admin-bar").outerHeight();
 
 			if(!editing)
 			{
+				$("#toggle-header-icon").addClass("icon-wrench").removeClass("icon-chevron-up");
 				$(".gridster .gs_w").css({cursor: "default"});
-				$("#main-header").animate({top: "-205"}, animateLength);
-				$(".gridster").animate({"margin-top": "20px"}, animateLength);
+				$("#main-header").animate({"top": "-" + barHeight + "px"}, animateLength);
+				$(".gridster").animate({"top": "20"}, animateLength);
 				$("#main-header").data().shown = false;
 				$(".sub-section").unbind();
 				grid.disable();
 			}
 			else
 			{
+				$("#toggle-header-icon").addClass("icon-chevron-up").removeClass("icon-wrench");
 				$(".gridster .gs_w").css({cursor: "pointer"});
-				$("#main-header").animate({top: "0px"}, animateLength);
-				$(".gridster").animate({"margin-top": "223px"}, animateLength);
+				$("#main-header").animate({"top": "0px"}, animateLength);
+				$(".gridster").animate({"top": (barHeight + 20) + "px"}, animateLength);
 				$("#main-header").data().shown = true;
 				attachWidgetEditIcons($(".sub-section"));
 				grid.enable();
@@ -1588,7 +1583,8 @@ var freeboard = (function()
 
 				function finishLoad()
 				{
-					widgetType.newInstance(self.settings(), function(widgetInstance){
+					widgetType.newInstance(self.settings(), function(widgetInstance)
+					{
 
 						self.fillSize((widgetType.fill_size === true));
 						self.widgetInstance = widgetInstance;
@@ -1916,8 +1912,8 @@ var freeboard = (function()
 		{
 			$(".pane-tools").fadeOut(animateLength);//.animate({opacity: 0.0}, animateLength).css("display", "none");//, function()
 			/*{
-				$(this).css("display", "none");
-			});*/
+			 $(this).css("display", "none");
+			 });*/
 		}
 	}
 
@@ -1959,7 +1955,7 @@ var freeboard = (function()
 
 	// PUBLIC FUNCTIONS
 	return {
-		initialize : function(allowEdit, finishedCallback)
+		initialize          : function(allowEdit, finishedCallback)
 		{
 			ko.applyBindings(theFreeboardModel);
 
@@ -2067,11 +2063,11 @@ var freeboard = (function()
 				}
 			}
 		},
-		showLoadingIndicator : function(show)
+		showLoadingIndicator: function(show)
 		{
 			showLoadingIndicator(show);
 		},
-		showDialog : function(contentElement, title, okTitle, cancelTitle, okCallback)
+		showDialog          : function(contentElement, title, okTitle, cancelTitle, okCallback)
 		{
 			createDialogBox(contentElement, title, okTitle, cancelTitle, okCallback);
 		},

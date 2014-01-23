@@ -31,25 +31,29 @@
     </script>
 </head>
 <body>
+<div id="board-content">
+    <div class="gridster">
+        <img id="dash-logo" data-bind="attr:{src: header_image}">
+        <ul data-bind="grid: true">
+        </ul>
+    </div>
+</div>
 <header id="main-header" data-bind="if:allow_edit">
     <div id="admin-bar">
         <div id="admin-menu">
             <div id="board-tools">
                 <h1 id="board-logo" class="title bordered">FREEBOARD</h1>
                 <div id="board-actions">
-                    <div class="text-button" data-bind="click: loadDashboardFromLocalFile">
-                        <i class="icon-folder-open icon-white"></i>Load Freeboard
-                    </div>
-                    <div class="text-button" data-bind="click: saveDashboard">
-                        <i class="icon-download-alt icon-white"></i>Save Freeboard
-                    </div>
-                    <div id="add-pane" class="text-button" data-bind="click: createPane">
-                        <i class="icon-plus icon-white"></i>Add Pane
-                    </div>
+                    <ul class="board-toolbar vertical">
+                        <li data-bind="click: loadDashboardFromLocalFile"><i id="full-screen-icon" class="icon-folder-open icon-white"></i><label id="full-screen">Load Freeboard</label></li>
+                        <li data-bind="click: saveDashboard"><i class="icon-download-alt icon-white"></i><label>Save Freeboard</label></li>
+                        <li id="add-pane" data-bind="click: createPane"><i class="icon-plus icon-white"></i><label>Add Pane</label></li>
+                    </ul>
                 </div>
             </div>
             <div id="datasources">
                 <h2 class="title">DATASOURCES</h2>
+
                 <div class="datasource-list-container">
                     <table class="table table-condensed sub-table" id="datasources-list" data-bind="if: datasources().length">
                         <thead>
@@ -60,16 +64,19 @@
                         </tr>
                         </thead>
                         <tbody data-bind="foreach: datasources">
-                            <tr>
-                                <td><span class="text-button" data-bind="text: name, pluginEditor: {operation: 'edit', type: 'datasource'}"></span></td>
-                                <td data-bind="text: last_updated"></td>
-                                <td>
-                                    <ul class="board-toolbar">
-                                        <li data-bind="click: updateNow"><i class="icon-refresh icon-white"></i></li>
-                                        <li data-bind="pluginEditor: {operation: 'delete', type: 'datasource'}"><i class="icon-trash icon-white"></i></li>
-                                    </ul>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td>
+                                <span class="text-button datasource-name" data-bind="text: name, pluginEditor: {operation: 'edit', type: 'datasource'}"></span>
+                            </td>
+                            <td data-bind="text: last_updated"></td>
+                            <td>
+                                <ul class="board-toolbar">
+                                    <li data-bind="click: updateNow"><i class="icon-refresh icon-white"></i></li>
+                                    <li data-bind="pluginEditor: {operation: 'delete', type: 'datasource'}">
+                                        <i class="icon-trash icon-white"></i></li>
+                                </ul>
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
@@ -77,13 +84,9 @@
             </div>
         </div>
     </div>
-    <div id="toggle-header" data-bind="click: toggleEditing" ><i class="icon-wrench icon-white"></i></div>
+    <div id="toggle-header" data-bind="click: toggleEditing">
+        <i id="toggle-header-icon" class="icon-wrench icon-white"></i></div>
 </header>
-<div class="gridster">
-    <img id="dash-logo" data-bind="attr:{src: header_image}">
-    <ul data-bind="grid: true">
-    </ul>
-</div>
 
 <div style="display:hidden">
     <ul data-bind="template: { name: 'pane-template', foreach: panes}">
