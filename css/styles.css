@@ -875,7 +875,7 @@ header h1
 #main-header
 {
 	width: 100%;
-	position: absolute;
+	position: fixed;
 	z-index: 50;
 }
 
@@ -992,6 +992,9 @@ header h1
 	padding-left: 20px;
 	padding-right: 20px;
 	position: absolute;
+	-moz-box-sizing    : border-box;
+	-webkit-box-sizing : border-box;
+	box-sizing         : border-box;
 }
 
 #admin-menu button
@@ -1085,6 +1088,7 @@ ul, ol {
 	left: 0;
 	right: 0;
 	top: 0;
+	padding-bottom: 100px;
 }
 
 .gridster .gs_w {
@@ -2214,7 +2218,6 @@ h2.title
 	#board-tools
 	{
 		width: 100%;
-		float: none;
 	}
 
 	#datasources
@@ -2248,7 +2251,7 @@ h2.title
 
 	.datasource-list-container
 	{
-		max-height : 135px;
+		max-height : 77px;
 	}
 
 	.form-label
