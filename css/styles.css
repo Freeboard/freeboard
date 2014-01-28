@@ -440,6 +440,7 @@ html
 {
 	background-color : #101214;
 	height: 100%;
+	overflow : hidden;
 }
 
 body
@@ -450,6 +451,7 @@ body
 	font-size   : 14px;
 	line-height : 20px;
 	height: 100%;
+	overflow : scroll;
 }
 
 .modal
@@ -868,7 +870,6 @@ header h1
 #board-content
 {
 	overflow: scroll;
-	height: 100%;
 	position : relative;
 }
 
@@ -1084,11 +1085,9 @@ ul, ol {
     max-width: 960px;
 	width: 100%;
     margin: 0 auto;
-	position: absolute;
 	left: 0;
 	right: 0;
 	top: 0;
-	padding-bottom: 100px;
 }
 
 .gridster .gs_w {

@@ -1449,7 +1449,7 @@ var freeboard = (function()
 				$("#toggle-header-icon").addClass("icon-wrench").removeClass("icon-chevron-up");
 				$(".gridster .gs_w").css({cursor: "default"});
 				$("#main-header").animate({"top": "-" + barHeight + "px"}, animateLength);
-				$(".gridster").animate({"top": "20"}, animateLength);
+				$("#board-content").animate({"top": "20"}, animateLength);
 				$("#main-header").data().shown = false;
 				$(".sub-section").unbind();
 				grid.disable();
@@ -1459,7 +1459,7 @@ var freeboard = (function()
 				$("#toggle-header-icon").addClass("icon-chevron-up").removeClass("icon-wrench");
 				$(".gridster .gs_w").css({cursor: "pointer"});
 				$("#main-header").animate({"top": "0px"}, animateLength);
-				$(".gridster").animate({"top": (barHeight + 20) + "px"}, animateLength);
+				$("#board-content").animate({"top": (barHeight + 20) + "px"}, animateLength);
 				$("#main-header").data().shown = true;
 				attachWidgetEditIcons($(".sub-section"));
 				grid.enable();
