@@ -859,8 +859,6 @@ var freeboard = (function()
 		{
 			createSettingsFromDefinition(pluginTypes[pluginTypeNames[0]].settings);
 		}
-
-
 	}
 
 	ko.bindingHandlers.pluginEditor = {
@@ -1024,7 +1022,24 @@ var freeboard = (function()
 			// Initialize our grid
 			grid = $(element).gridster({
 				widget_margins        : [10, 10],
-				widget_base_dimensions: [300, 10]
+				widget_base_dimensions: [300, 10]/*,
+				draggable : {
+					start: function(event, ui)
+					{
+						this.startingCol = this.$player.attr('data-col');
+						this.startingRow = this.$player.attr('data-row');
+					},
+					stop : function(event, ui)
+					{
+						var newCol = this.$player.attr('data-col');
+						var newRow = this.$player.attr('data-row');
+
+						var paneModel = ko.dataFor(this.$player[0]);
+
+						paneModel.col(Number(this.$player.attr('data-col')));
+						paneModel.row(Number(this.$player.attr('data-row')));
+					}
+				}*/
 			}).data("gridster");
 
 			grid.disable();
@@ -1039,21 +1054,10 @@ var freeboard = (function()
 				$(element).css({cursor: "pointer"});
 			}
 
-			var col = viewModel.col();
-			var row = viewModel.row();
-			var width = viewModel.width();
-			var height = viewModel.getCalculatedHeight();
-
-			if(col > grid.cols)
-			{
-				col = grid.cols;
-				row = 1;
-			}
-
-			while(grid.is_occupied(col, row))
-			{
-				row++;
-			}
+			var col = Number(viewModel.col());
+			var row = Number(viewModel.row());
+			var width = Number(viewModel.width());
+			var height = Number(viewModel.getCalculatedHeight());
 
 			grid.add_widget(element, width, height, col, row);
 			viewModel.col(col);
@@ -1064,19 +1068,17 @@ var freeboard = (function()
 				showPaneEditIcons(true);
 			}
 
-			$(element).data("freeboardPaneModel", viewModel);
-
 			$(element).attrchange({
 				trackValues: true,
 				callback   : function(event)
 				{
 					if(event.attributeName == "data-row")
 					{
-						viewModel.row(event.newValue);
+						viewModel.row(Number(event.newValue));
 					}
 					else if(event.attributeName == "data-col")
 					{
-						viewModel.col(event.newValue);
+						viewModel.col(Number(event.newValue));
 					}
 				}
 			});
@@ -1092,7 +1094,11 @@ var freeboard = (function()
 			// If widget has been added or removed
 			if(viewModel.getCalculatedHeight() != Number($(element).attr("data-sizey")))
 			{
-				grid.resize_widget($(element), undefined, viewModel.getCalculatedHeight());
+				grid.resize_widget($(element), undefined, viewModel.getCalculatedHeight(), function(){
+
+					grid.set_dom_grid_height();
+
+				});
 			}
 		}
 	}

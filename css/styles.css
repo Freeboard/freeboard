@@ -1,3 +1,23 @@
+@font-face
+{
+	font-family : 'montserrat';
+	src         : url('montserrat.eot');
+	src         : url('montserrat.eot?#iefix') format('eot'),
+	url('montserrat.svg') format('svg'),
+	url('montserrat.woff') format('woff'),
+	url('montserrat.ttf') format('truetype')
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0)
+{
+	@font-face
+	{
+		font-family : 'montserrat';
+		src         : url('montserrat.svg') format('svg');
+	}
+}
+
+
 /*! normalize.css v2.1.2 | MIT License | git.io/normalize */
 
 /* ==========================================================================
@@ -451,7 +471,8 @@ body
 	font-size   : 14px;
 	line-height : 20px;
 	height: 100%;
-	overflow : scroll;
+	overflow-x : hidden;
+	overflow-y : auto;
 }
 
 .modal
@@ -869,7 +890,7 @@ header h1
 
 #board-content
 {
-	overflow: scroll;
+	overflow: hidden;
 	position : relative;
 }
 
@@ -999,15 +1020,6 @@ header h1
 	box-sizing         : border-box;
 }
 
-#admin-menu button
-{
-	color : #d3d4d4;
-	text-shadow : 1px 1px #0e0e0e;
-	text-transform: uppercase;
-	font-weight : 100;
-	font-family : "HelveticaNeue-UltraLight", "Helvetica Neue Ultra Light", "Helvetica Neue", sans-serif;
-}
-
 .sub-section h2
 {
 	font-size: 14px;
@@ -1072,7 +1084,7 @@ header h1
     color: #d3d4d4;
     font-size: 20px;
     font-weight: 100;
-    font-family: "HelveticaNeue-UltraLight", "Helvetica Neue Ultra Light", "Helvetica Neue", sans-serif;
+	font-family : "Helvetica Neue", Helvetica, Arial, sans-serif;
     overflow: hidden;
     text-overflow: ellipsis;
 	letter-spacing: 1px;
@@ -1895,7 +1907,8 @@ input.table-row-value
 .form-table-value-subtable
 {
 	max-height: 110px;
-	overflow: scroll;
+	overflow-x : hidden;
+	overflow-y : auto;
 	border-bottom : solid 1px #3d3d3d;
 	width: 414px;
 }
@@ -1903,7 +1916,8 @@ input.table-row-value
 .datasource-list-container
 {
 	max-height : 110px;
-	overflow   : scroll;
+	overflow-x: hidden;
+	overflow-y   : auto;
 	border-bottom : solid 1px #3d3d3d;
 }
 
@@ -1915,7 +1929,8 @@ ul.value-dropdown
 	margin     : 0px;
 	background-color : #272727;
 	border           : 1px solid rgba(255, 153, 0, 0.8);
-	overflow: scroll;
+	overflow-x : hidden;
+	overflow-y : auto;
 	z-index: 200;
 }
 
@@ -2135,7 +2150,7 @@ textarea.calculated-value-input
 {
 	border : solid 3px #d3d4d4;
 	display : inline-block;
-	padding : 5px 20px;
+	padding : 5px 20px 2px 20px;
 	line-height : 39px;
 }
 
@@ -2493,4 +2508,23 @@ input::-webkit-input-placeholder, textarea::-webkit-input-placeholder
 input:-moz-placeholder, textarea:-moz-placeholder
 {
 	color : #636363;
+}
+
+::-webkit-scrollbar
+{
+	height     : 0px;
+	width      : 4px;
+	background : transparent;
+	padding-right: 10px
+}
+
+::-webkit-scrollbar-thumb
+{
+	background            : rgba(255,255,255, 0.05);
+	-webkit-border-radius : 1ex;
+}
+
+::-webkit-scrollbar-corner
+{
+	background : transparent;
 }

@@ -3287,7 +3287,7 @@
 	 */
 	fn.set_dom_grid_height = function()
 	{
-		var r = this.get_highest_occupied_cell().row;
+		var r = this.get_highest_occupied_cell().row + 1;
 		this.$el.css('height', r * this.min_widget_height);
 		return this;
 	};
