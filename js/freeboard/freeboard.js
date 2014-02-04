@@ -1059,9 +1059,12 @@ var freeboard = (function()
 			var width = Number(viewModel.width());
 			var height = Number(viewModel.getCalculatedHeight());
 
+			//viewModel.col(col);
+			//viewModel.row(row);
+
+			//console.log(col + ":" + row + ", " + width + ":" + height);
+
 			grid.add_widget(element, width, height, col, row);
-			viewModel.col(col);
-			viewModel.row(row);
 
 			if(bindingContext.$root.isEditing())
 			{
@@ -1094,6 +1097,8 @@ var freeboard = (function()
 			// If widget has been added or removed
 			if(viewModel.getCalculatedHeight() != Number($(element).attr("data-sizey")))
 			{
+				console.log(viewModel.col() + ":" + viewModel.row());
+
 				grid.resize_widget($(element), undefined, viewModel.getCalculatedHeight(), function(){
 
 					grid.set_dom_grid_height();
@@ -1272,7 +1277,11 @@ var freeboard = (function()
 					self.addDatasource(datasource);
 				});
 
-				_.each(object.panes, function(paneConfig)
+				var sortedPanes = _.sortBy(object.panes, function(pane){
+					return pane.row;
+				});
+
+				_.each(sortedPanes, function(paneConfig)
 				{
 					var pane = new PaneModel();
 					pane.deserialize(paneConfig);
@@ -1297,7 +1306,7 @@ var freeboard = (function()
 			});
 
 			// Load any plugins referenced in this definition
-			if(_.isArray(object.plugins))
+			if(_.isArray(object.plugins) && object.plugins.length > 0)
 			{
 				head.js(object.plugins, function()
 				{
