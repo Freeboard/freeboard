@@ -1,23 +1,3 @@
-@font-face
-{
-	font-family : 'montserrat';
-	src         : url('montserrat.eot');
-	src         : url('montserrat.eot?#iefix') format('eot'),
-	url('montserrat.svg') format('svg'),
-	url('montserrat.woff') format('woff'),
-	url('montserrat.ttf') format('truetype')
-}
-
-@media screen and (-webkit-min-device-pixel-ratio:0)
-{
-	@font-face
-	{
-		font-family : 'montserrat';
-		src         : url('montserrat.svg') format('svg');
-	}
-}
-
-
 /*! normalize.css v2.1.2 | MIT License | git.io/normalize */
 
 /* ==========================================================================
@@ -497,7 +477,7 @@ body
 	background-color : #272727;
 	height           : 40px;
 	margin           : 0;
-	padding          : 0 10px 0 24px;
+	padding          : 0 10px 0 10px;
 	color            : #8b8b8b;
 	text-transform   : uppercase;
 }
@@ -2138,8 +2118,7 @@ textarea.calculated-value-input
 
 .title
 {
-	font-family : montserrat, sans-serif;
-	text-transform : uppercase;
+	font-family : 'Helvetica-Neue', 'Helvetica', 'Arial', sans-serif;
 	vertical-align : baseline;
 	-webkit-font-smoothing : antialiased;
 	font-style  : normal;
@@ -2150,7 +2129,7 @@ textarea.calculated-value-input
 {
 	border : solid 3px #d3d4d4;
 	display : inline-block;
-	padding : 5px 20px 2px 20px;
+	padding : 2px 17px 2px 17px;
 	line-height : 39px;
 }
 
@@ -2158,7 +2137,7 @@ h1.title
 {
 	margin-bottom: 10px;
 	font-size : 23px;
-	letter-spacing : 2px;
+	letter-spacing : -1px;
 }
 
 h2.title
