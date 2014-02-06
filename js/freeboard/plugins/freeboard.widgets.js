@@ -768,7 +768,7 @@
 					if(!map.hover)
 					{
 						map.hover = true;
-						map.setOptions({zoomControl: true, panControl: true});
+						map.setOptions({zoomControl: true});
 					}
 				});
 
@@ -776,7 +776,7 @@
 				{
 					if(map.hover)
 					{
-						map.setOptions({zoomControl: false, panControl: false});
+						map.setOptions({zoomControl: false});
 						map.hover = false;
 					}
 				});
