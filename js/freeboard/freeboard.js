@@ -1117,8 +1117,6 @@ var freeboard = (function()
 			// If widget has been added or removed
 			if(viewModel.getCalculatedHeight() != Number($(element).attr("data-sizey")))
 			{
-				console.log(viewModel.col() + ":" + viewModel.row());
-
 				grid.resize_widget($(element), undefined, viewModel.getCalculatedHeight(), function(){
 
 					grid.set_dom_grid_height();
