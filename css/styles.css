@@ -2507,3 +2507,11 @@ input:-moz-placeholder, textarea:-moz-placeholder
 {
 	background : transparent;
 }
+
+.validation-error
+{
+	margin-top    : 7px;
+	margin-bottom : 7px;
+	color         : #AA7575;
+	font-size     : 13px;
+}

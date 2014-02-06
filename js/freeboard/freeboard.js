@@ -507,12 +507,17 @@ var freeboard = (function()
 		{
 			$('<span id="dialog-ok" class="text-button">' + okTitle + '</span>').appendTo(footer).click(function()
 			{
+				var hold = false;
+
 				if(_.isFunction(okCallback))
 				{
-					okCallback();
+					hold = okCallback();
 				}
 
-				closeModal();
+				if(!hold)
+				{
+					closeModal();
+				}
 			});
 		}
 
@@ -802,8 +807,23 @@ var freeboard = (function()
 			});
 		}
 
+		function displayValidationError(settingName, errorMessage)
+		{
+			var errorElement = $('<div class="validation-error"></div>').html(errorMessage);
+			$("#setting-value-container-" + settingName).append(errorElement);
+		}
+
 		createDialogBox(form, title, "Save", "Cancel", function()
 		{
+			$(".validation-error").remove();
+
+			// Validate our new settings
+			if(!_.isUndefined(currentInstanceName) && newSettings.name == "")
+			{
+				displayValidationError("instance-name", "A name is required.");
+				return true;
+			}
+
 			if(_.isFunction(settingsSavedCallback))
 			{
 				settingsSavedCallback(newSettings);
