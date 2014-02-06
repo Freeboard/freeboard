@@ -2142,7 +2142,7 @@ h1.title
 
 h2.title
 {
-	font-size : 15px;
+	font-size : 13px;
 	line-height: 20px;
 	margin : 0px;
 	padding-top: 10px;
@@ -2188,13 +2188,14 @@ h2.title
 	{
 		margin-bottom  : 0px;
 		font-size      : 13px;
-		letter-spacing : 2px;
+		letter-spacing : 0px;
 	}
 
 	.title.bordered
 	{
 		padding     : 1px 8px;
 		line-height : 25px;
+		border-width : 2px;
 	}
 
 	#admin-menu
