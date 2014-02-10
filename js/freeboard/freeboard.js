@@ -173,7 +173,7 @@
 
 var freeboard = (function()
 {
-	var loadingIndicator = $('<div class="wrapperloading"><div class="loading up" > </div><div class="loading down"></div></div>');
+	var loadingIndicator = $('<div class="wrapperloading"><div class="loading up" ></div><div class="loading down"></div></div>');
 
 	var datasourcePlugins = {};
 	var widgetPlugins = {};
@@ -1887,7 +1887,6 @@ var freeboard = (function()
 				}
 			}
 		});
-
 
 		this.last_updated = ko.observable("never");
 		this.last_error = ko.observable();
