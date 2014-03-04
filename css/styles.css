@@ -457,7 +457,7 @@ body
 
 .modal
 {
-	display: none;
+    position: absolute;
 	background-color: #2a2a2a;
 	top: 120px;
 	width: 900px;
@@ -806,14 +806,14 @@ a:focus
 
 #modal_overlay
 {
-	position   : fixed;
+	position   : absolute;
 	z-index    : 100;
 	top        : 0px;
 	left       : 0px;
 	height     : 100%;
 	width      : 100%;
-	background : #000;
-	display    : none;
+	background : rgba(0,0,0,0.8);
+    overflow-y: auto;
 }
 
 a:hover,

@@ -472,24 +472,13 @@ var freeboard = (function()
 		var modal_width = 900;
 
 		// Initialize our modal overlay
-		var overlay = $('<div id="modal_overlay"></div>').css({ 'display': 'block', opacity: 0 });
+		var overlay = $('<div id="modal_overlay" style="display:none;"></div>');
 
-		var modalDialog = $('<div class="modal"></div>').css({
-
-			'display' : 'block',
-			'position': 'fixed',
-			'opacity' : 0,
-			'z-index' : 1000
-
-		});
+		var modalDialog = $('<div class="modal"></div>');
 
 		function closeModal()
 		{
-			overlay.fadeTo(200, 0.0, function()
-			{
-				$(this).remove();
-			});
-			modalDialog.fadeTo(200, 0.0, function()
+			overlay.fadeOut(200, function()
 			{
 				$(this).remove();
 			});
@@ -529,10 +518,11 @@ var freeboard = (function()
 			});
 		}
 
-		$("body").append([overlay, modalDialog]);
+        overlay.append(modalDialog);
+		$("body").append(overlay);
 
-		overlay.fadeTo(200, 0.8);
-		modalDialog.fadeTo(200, 1);
+		overlay.fadeIn(200);
+		//modalDialog.fadeIn(200);
 	}
 
 	function showDeveloperConsole()
