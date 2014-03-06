@@ -1598,6 +1598,24 @@ var freeboard = (function()
 			this.widgets.push(widget);
 		}
 
+        this.moveWidgetUp = function(widget)
+        {
+            var i = self.widgets.indexOf(widget);
+            if (i >= 1) {
+                var array = self.widgets();
+                self.widgets.splice(i - 1, 2, array[i], array[i - 1]);
+            }
+        }
+
+        this.moveWidgetDown = function(widget)
+        {
+            var i = self.widgets.indexOf(widget);
+            var array = self.widgets();
+            if (i < array.length - 1) {
+                self.widgets.splice(i, 2, array[i + 1], array[i]);
+            }
+        }
+
 		this.getCalculatedHeight = function()
 		{
 			var sumHeights = _.reduce(self.widgets(), function(memo, widget)
