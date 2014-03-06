@@ -113,8 +113,12 @@
                 <div class="widget" data-bind="widget: true, css:{fillsize:fillSize}"></div>
                 <div class="sub-section-tools">
                     <ul class="board-toolbar">
+                        <!-- ko if:$parent.widgetCanMoveUp($data) -->
                         <li data-bind="click:$parent.moveWidgetUp"><i class="icon-chevron-up icon-white"></i></li>
+                        <!-- /ko -->
+                        <!-- ko if:$parent.widgetCanMoveDown($data) -->
                         <li data-bind="click:$parent.moveWidgetDown"><i class="icon-chevron-down icon-white"></i></li>
+                        <!-- /ko -->
                         <li data-bind="pluginEditor: {operation: 'edit', type: 'widget'}"><i class="icon-wrench icon-white"></i></li>
                         <li data-bind="pluginEditor: {operation: 'delete', type: 'widget'}"><i class="icon-trash icon-white"></i></li>
                     </ul>

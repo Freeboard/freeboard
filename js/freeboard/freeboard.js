@@ -1598,10 +1598,23 @@ var freeboard = (function()
 			this.widgets.push(widget);
 		}
 
-        this.moveWidgetUp = function(widget)
+        this.widgetCanMoveUp = function(widget)
+        {
+            return (self.widgets.indexOf(widget) >= 1);
+        }
+
+        this.widgetCanMoveDown = function(widget)
         {
             var i = self.widgets.indexOf(widget);
-            if (i >= 1) {
+
+            return (i < self.widgets().length - 1);
+        }
+
+        this.moveWidgetUp = function(widget)
+        {
+            if(self.widgetCanMoveUp(widget))
+            {
+                var i = self.widgets.indexOf(widget);
                 var array = self.widgets();
                 self.widgets.splice(i - 1, 2, array[i], array[i - 1]);
             }
@@ -1609,9 +1622,10 @@ var freeboard = (function()
 
         this.moveWidgetDown = function(widget)
         {
-            var i = self.widgets.indexOf(widget);
-            var array = self.widgets();
-            if (i < array.length - 1) {
+            if(self.widgetCanMoveDown(widget))
+            {
+                var i = self.widgets.indexOf(widget);
+                var array = self.widgets();
                 self.widgets.splice(i, 2, array[i + 1], array[i]);
             }
         }
