@@ -629,14 +629,8 @@ var freeboard = (function()
 
 		var form = $('<div></div>');
 
-		// Create our body
-		if(!_.isUndefined(currentInstanceName))
-		{
-			createSettingRow("instance-name", "Name").append($('<input type="text">').val(currentInstanceName).change(function()
-			{
-				newSettings.name = $(this).val();
-			}));
-		}
+        var pluginDescriptionElement = $('<div id="plugin-description"></div>').hide();
+        form.append(pluginDescriptionElement);
 
 		function createSettingsFromDefinition(settingsDefs)
 		{
@@ -893,6 +887,18 @@ var freeboard = (function()
 			$("#setting-value-container-" + settingName).append(errorElement);
 		}
 
+        function removeSettingsRows()
+        {
+            if($("#setting-row-instance-name").length)
+            {
+                $("#setting-row-instance-name").nextAll().remove();
+            }
+            else
+            {
+                $("#setting-row-plugin-types").nextAll().remove();
+            }
+        }
+
 		createDialogBox(form, title, "Save", "Cancel", function()
 		{
 			$(".validation-error").remove();
@@ -910,12 +916,14 @@ var freeboard = (function()
 			}
 		});
 
+        // Create our body
 		var pluginTypeNames = _.keys(pluginTypes);
+        var typeSelect;
 
 		if(pluginTypeNames.length > 1)
 		{
 			var typeRow = createSettingRow("plugin-types", "Type");
-			var typeSelect = $('<select></select>').appendTo($('<div class="styled-select"></div>').appendTo(typeRow));
+			typeSelect = $('<select></select>').appendTo($('<div class="styled-select"></div>').appendTo(typeRow));
 
 			typeSelect.append($("<option>Select a type...</option>").attr("value", "undefined"));
 
@@ -930,35 +938,59 @@ var freeboard = (function()
 				newSettings.settings = {};
 
 				// Remove all the previous settings
-				typeRow.parent().nextAll().remove();
+                removeSettingsRows();
 
 				var currentType = pluginTypes[typeSelect.val()];
 
 				if(_.isUndefined(currentType))
 				{
+                    $("#setting-row-instance-name").hide();
 					$("#dialog-ok").hide();
 				}
 				else
 				{
+                    $("#setting-row-instance-name").show();
+
+                    if(currentType.description && currentType.description.length > 0)
+                    {
+                        pluginDescriptionElement.html(currentType.description).show();
+                    }
+                    else
+                    {
+                        pluginDescriptionElement.hide();
+                    }
+
 					$("#dialog-ok").show();
 					createSettingsFromDefinition(currentType.settings);
 				}
 			});
-
-			if(_.isUndefined(currentTypeName))
-			{
-				$("#dialog-ok").hide();
-			}
-			else
-			{
-				$("#dialog-ok").show();
-				typeSelect.val(currentTypeName).trigger("change");
-			}
 		}
 		else if(pluginTypeNames.length == 1)
 		{
 			createSettingsFromDefinition(pluginTypes[pluginTypeNames[0]].settings);
 		}
+
+        if(!_.isUndefined(currentInstanceName))
+        {
+            createSettingRow("instance-name", "Name").append($('<input type="text">').val(currentInstanceName).change(function()
+            {
+                newSettings.name = $(this).val();
+            }));
+        }
+
+        if(typeSelect)
+        {
+            if(_.isUndefined(currentTypeName))
+            {
+                $("#setting-row-instance-name").hide();
+                $("#dialog-ok").hide();
+            }
+            else
+            {
+                $("#dialog-ok").show();
+                typeSelect.val(currentTypeName).trigger("change");
+            }
+        }
 	}
 
 	ko.bindingHandlers.pluginEditor = {

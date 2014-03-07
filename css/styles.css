@@ -464,6 +464,7 @@ body
 	margin : auto;
 	right  : 0px;
 	left   : 0px;
+    margin-bottom: 25px;
 }
 
 .modal.small
@@ -508,6 +509,7 @@ body
 .modal section
 {
 	padding: 25px;
+    padding-bottom: 55px;
 }
 
 .control-group:last-child
@@ -557,6 +559,11 @@ body
 	text-transform : uppercase;
 	font-size      : 11px;
 	min-width: 16px;
+}
+
+#plugin-description
+{
+    margin-bottom: 25px;
 }
 
 .align-right
