@@ -875,6 +875,11 @@ var freeboard = (function()
 					}
 				}
 
+                if(!_.isUndefined(settingDef.suffix))
+                {
+                    valueCell.append($('<div class="input-suffix">' + settingDef.suffix + '</div>'));
+                }
+
 				if(!_.isUndefined(settingDef.description))
 				{
 					valueCell.append($('<div class="setting-description">' + settingDef.description + '</div>'));
