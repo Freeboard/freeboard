@@ -40,7 +40,7 @@
 				// **default_value** : A default value for this setting.
 				"default_value": "John",
 				// **description** : Text that will be displayed below the setting to give the user any extra information.
-				"description"  : "This is pretty self explanitory..."
+				"description"  : "This is pretty self explanatory..."
 			},
 			{
 				"name"        : "last_name",
