@@ -20,7 +20,7 @@
 		// **type_name** (required) : A unique name for this plugin. This name should be as unique as possible to avoid collisions with other plugins, and should follow naming conventions for javascript variable and function declarations.
 		"type_name"   : "my_datasource_plugin",
 		// **display_name** : The pretty name that will be used for display purposes for this plugin. If the name is not defined, type_name will be used instead.
-		"display_name": "My Datasource Plugin",
+		"display_name": "Datasource Plugin Example",
         // **description** : A description of the plugin. This description will be displayed when the plugin is selected or within search results (in the future). The description may contain HTML if needed.
         "description" : "Some sort of description <strong>with optional html!</strong>",
 		// **external_scripts** : Any external scripts that should be loaded before the plugin instance is created.
@@ -190,7 +190,7 @@
 	freeboard.loadWidgetPlugin({
 		// Same stuff here as with datasource plugin.
 		"type_name"   : "my_widget_plugin",
-		"display_name": "My Widget Plugin",
+		"display_name": "Widget Plugin Example",
         "description" : "Some sort of description <strong>with optional html!</strong>",
 		// **external_scripts** : Any external scripts that should be loaded before the plugin instance is created.
 		"external_scripts": [
