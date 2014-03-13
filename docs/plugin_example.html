@@ -115,7 +115,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>		<span class="string">"display_name"</span>: <span class="string">"My Datasource Plugin"</span>,</pre></div></div>
+            <div class="content"><div class='highlight'><pre>		<span class="string">"display_name"</span>: <span class="string">"Datasource Plugin Example"</span>,</pre></div></div>
             
         </li>
         
@@ -505,7 +505,7 @@
 		<span class="comment">/* This is some function where I'll get my data from somewhere */</span>
 		<span class="function"><span class="keyword">function</span> <span class="title">getData</span><span class="params">()</span>
 		{</span>
-			<span class="keyword">var</span> newData;
+			<span class="keyword">var</span> newData = { hello : <span class="string">"world! it's "</span> + <span class="keyword">new</span> Date().toLocaleTimeString() }; <span class="comment">// Just putting some sample data in for fun.</span>
 
 			<span class="comment">/* Get my data from somewhere and populate newData with it... Probably a JSON API or something. */</span>
 			<span class="comment">/* ... */</span></pre></div></div>
@@ -564,7 +564,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>				self.getData();
+            <div class="content"><div class='highlight'><pre>				getData();
 			}, interval);
 		}</pre></div></div>
             
@@ -738,7 +738,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>		<span class="string">"type_name"</span>   : <span class="string">"my_widget_plugin"</span>,
-		<span class="string">"display_name"</span>: <span class="string">"My Widget Plugin"</span>,
+		<span class="string">"display_name"</span>: <span class="string">"Widget Plugin Example"</span>,
         <span class="string">"description"</span> : <span class="string">"Some sort of description &lt;strong&gt;with optional html!&lt;/strong&gt;"</span>,</pre></div></div>
             
         </li>

@@ -127,7 +127,7 @@
 		/* This is some function where I'll get my data from somewhere */
 		function getData()
 		{
-			var newData;
+			var newData = { hello : "world! it's " + new Date().toLocaleTimeString() }; // Just putting some sample data in for fun.
 
 			/* Get my data from somewhere and populate newData with it... Probably a JSON API or something. */
 			/* ... */
@@ -149,7 +149,7 @@
 			refreshTimer = setInterval(function()
 			{
 				// Here we call our getData function to update freeboard with new data.
-				self.getData();
+				getData();
 			}, interval);
 		}
 
