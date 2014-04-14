@@ -876,7 +876,7 @@ header h1
 
 #board-content
 {
-	overflow: hidden;
+	overflow: visible;
 	position : relative;
 }
 
@@ -1082,7 +1082,6 @@ ul, ol {
 
 .gridster {
     max-width: 960px;
-	width: 100%;
     margin: 0 auto;
 	left: 0;
 	right: 0;
@@ -2501,7 +2500,7 @@ input:-moz-placeholder, textarea:-moz-placeholder
 	height     : 0px;
 	width      : 4px;
 	background : transparent;
-	padding-right: 10px
+	padding-right: 10;
 }
 
 ::-webkit-scrollbar-thumb

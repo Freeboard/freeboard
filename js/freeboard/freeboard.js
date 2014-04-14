@@ -1156,29 +1156,72 @@ var freeboard = (function()
 			// Initialize our grid
 			grid = $(element).gridster({
 				widget_margins        : [10, 10],
-				widget_base_dimensions: [300, 10]/*,
-				draggable : {
-					start: function(event, ui)
-					{
-						this.startingCol = this.$player.attr('data-col');
-						this.startingRow = this.$player.attr('data-row');
-					},
-					stop : function(event, ui)
-					{
-						var newCol = this.$player.attr('data-col');
-						var newRow = this.$player.attr('data-row');
-
-						var paneModel = ko.dataFor(this.$player[0]);
-
-						paneModel.col(Number(this.$player.attr('data-col')));
-						paneModel.row(Number(this.$player.attr('data-row')));
-					}
-				}*/
+				widget_base_dimensions: [300, 10]
 			}).data("gridster");
+
+            $(".gridster").css("width", grid.cols * 300 + (grid.cols * 20));
 
 			grid.disable();
 		}
 	}
+
+    var MIN_WIDTH_FOR_LG_SCREEN = 960;
+    var MIN_WIDTH_FOR_MD_SCREEN = 640;
+
+    function updateRowColForScreenSize(paneModel, row, col)
+    {
+        var displayWidth = $(".gridster").width();
+
+        var paneRow = paneModel.row();
+        var paneCol = paneModel.col();
+
+        if(displayWidth < MIN_WIDTH_FOR_MD_SCREEN)
+        {
+            if(!_.isUndefined(row)) paneRow.sm = row;
+            if(!_.isUndefined(col)) paneCol.sm = col;
+        }
+        else if(displayWidth < MIN_WIDTH_FOR_LG_SCREEN)
+        {
+            if(!_.isUndefined(row)) paneRow.md = row;
+            if(!_.isUndefined(col)) paneCol.md = col;
+        }
+
+        if(displayWidth >= MIN_WIDTH_FOR_LG_SCREEN || !paneRow.lg || !paneCol.lg)
+        {
+            if(!_.isUndefined(row)) paneRow.lg = row;
+            if(!_.isUndefined(col)) paneCol.lg = col;
+        }
+
+        paneModel.row(paneRow);
+        paneModel.col(paneCol);
+    }
+
+    function getRowColForScreenSize(paneModel)
+    {
+        var displayWidth = $(".gridster").width();
+
+        var paneRow = _.isFunction(paneModel.row) ? paneModel.row() : paneModel.row;
+        var paneCol = _.isFunction(paneModel.col) ? paneModel.col() : paneModel.col;
+
+        // Our large setting is default
+        var rowCol = {
+            row: paneRow.lg,
+            col: paneCol.lg
+        };
+
+        if(displayWidth < MIN_WIDTH_FOR_MD_SCREEN && paneRow.sm && paneCol.sm)
+        {
+            rowCol.row = paneRow.sm;
+            rowCol.col = paneCol.sm;
+        }
+        else if(displayWidth < MIN_WIDTH_FOR_LG_SCREEN && paneRow.md && paneCol.md)
+        {
+            rowCol.row = paneRow.md;
+            rowCol.col = paneCol.md;
+        }
+
+        return rowCol;
+    }
 
 	ko.bindingHandlers.pane = {
 		init  : function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
@@ -1188,15 +1231,12 @@ var freeboard = (function()
 				$(element).css({cursor: "pointer"});
 			}
 
-			var col = Number(viewModel.col());
-			var row = Number(viewModel.row());
+            var rowCol = getRowColForScreenSize(viewModel);
+
+			var col = rowCol.col;
+			var row = rowCol.row;
 			var width = Number(viewModel.width());
 			var height = Number(viewModel.getCalculatedHeight());
-
-			//viewModel.col(col);
-			//viewModel.row(row);
-
-			//console.log(col + ":" + row + ", " + width + ":" + height);
 
 			grid.add_widget(element, width, height, col, row);
 
@@ -1211,11 +1251,11 @@ var freeboard = (function()
 				{
 					if(event.attributeName == "data-row")
 					{
-						viewModel.row(Number(event.newValue));
+                        updateRowColForScreenSize(viewModel, Number(event.newValue), undefined);
 					}
 					else if(event.attributeName == "data-col")
 					{
-						viewModel.col(Number(event.newValue));
+                        updateRowColForScreenSize(viewModel, undefined, Number(event.newValue));
 					}
 				}
 			});
@@ -1410,7 +1450,9 @@ var freeboard = (function()
 				});
 
 				var sortedPanes = _.sortBy(object.panes, function(pane){
-					return pane.row;
+
+                    return getRowColForScreenSize(pane).row;
+
 				});
 
 				_.each(sortedPanes, function(paneConfig)
@@ -1628,8 +1670,8 @@ var freeboard = (function()
 
 		this.title = ko.observable();
 		this.width = ko.observable(1);
-		this.row = ko.observable(1);
-		this.col = ko.observable(1);
+		this.row = ko.observable({lg:1});
+		this.col = ko.observable({lg:1});
 		this.widgets = ko.observableArray();
 
 		this.addWidget = function(widget)
@@ -1708,6 +1750,18 @@ var freeboard = (function()
 		{
 			self.title(object.title);
 			self.width(object.width);
+
+            // Support for old versions that didn't include different sizes
+            if(_.isNumber(object.row))
+            {
+                object.row = {lg:object.row}
+            }
+
+            if(_.isNumber(object.col))
+            {
+                object.col = {lg:object.col}
+            }
+
 			self.row(object.row);
 			self.col(object.col);
 
