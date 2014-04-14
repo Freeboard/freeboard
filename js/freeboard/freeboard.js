@@ -1177,14 +1177,16 @@ var freeboard = (function()
     {
         var displayCols = grid.cols;
 
-        if(_.isNumber(paneModel.row))
+        if(_.isNumber(paneModel.row) && _.isNumber(paneModel.col)) // Support for legacy format
         {
-            paneModel.row[displayCols] = paneModel.row;
-        }
+            var obj = {};
+            obj[displayCols] = paneModel.row;
+            paneModel.row[displayCols] = obj;
 
-        if(_.isNumber(paneModel.col))
-        {
-            paneModel.col[displayCols] = paneModel.col;
+
+            obj = {};
+            obj[displayCols] = paneModel.col;
+            paneModel.col[displayCols] = obj;
         }
 
         var rowCol = {};
