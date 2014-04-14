@@ -1181,12 +1181,12 @@ var freeboard = (function()
         {
             var obj = {};
             obj[displayCols] = paneModel.row;
-            paneModel.row[displayCols] = obj;
+            paneModel.row = obj;
 
 
             obj = {};
             obj[displayCols] = paneModel.col;
-            paneModel.col[displayCols] = obj;
+            paneModel.col = obj;
         }
 
         var rowCol = {};
