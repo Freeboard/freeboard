@@ -9,6 +9,7 @@ freeboard
 
 ### Demo
 http://freeboard.github.io/freeboard
+https://freeboard.io
 
 ### Screenshots
 ![Weather](https://raw.github.com/Freeboard/branding/master/screenshots/freeboard-screenshot-1.jpg)
