@@ -15,7 +15,7 @@ http://freeboard.github.io/freeboard
 
 ### How to Use
 
-Freeboard can be run entirely from a local hard drive. Simply download/clone the repository and open index.html. You may run into issues with CORS when accessing JSON based APIs if you load from your local hard-drive in this case you can switch to using JSONP or load index.html and run from a local or remote web server.
+Freeboard can be run entirely from a local hard drive. Simply download/clone the repository and open index.html. When using Chrome, you may run into issues with CORS when accessing JSON based APIs if you load from your local hard-drive— in this case you can switch to using JSONP or load index.html and run from a local or remote web server.
 
 ### Building Plugins
 
