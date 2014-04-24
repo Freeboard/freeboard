@@ -312,7 +312,7 @@
             },
             {
                 name: "max_value",
-                display_name: "Minimum",
+                display_name: "Maximum",
                 type: "text",
                 default_value: 100
             }
