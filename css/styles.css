@@ -2112,6 +2112,11 @@ textarea.calculated-value-input
 	margin-left: 413px;
 }
 
+.datasource-input-suffix i
+{
+    margin-top: -1px;
+}
+
 .styled-select select
 {
 	width              : 414px;

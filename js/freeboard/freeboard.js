@@ -846,7 +846,7 @@ var freeboard = (function()
 
 							createValueEditor(input);
 
-							$(valueCell).append($('<div class="datasource-input-suffix text-button">+ Datasource</div>').mousedown(function(e)
+							$(valueCell).append($('<div class="datasource-input-suffix text-button"><i class="icon-plus icon-white"></i>Datasource</div>').mousedown(function(e)
 							{
 								e.preventDefault();
 								$(input).focus();
