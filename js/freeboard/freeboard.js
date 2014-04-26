@@ -1566,8 +1566,10 @@ var freeboard = (function()
 			var contentType = 'application/octet-stream';
 			var a = document.createElement('a');
 			var blob = new Blob([JSON.stringify(self.serialize())], {'type': contentType});
+			document.body.appendChild(a);
 			a.href = window.URL.createObjectURL(blob);
 			a.download = "dashboard.json";
+			a.target="_self";
 			a.click();
 		}
 
