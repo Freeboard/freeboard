@@ -3,6 +3,13 @@ var pubnubDatasource = function (settings, updateCallback) {
     var currentSettings = {};
     var pubnub;
 
+    this.onPubNubHistory = function (envelope) {
+        var messages = envelope[0];
+        for (var idx in messages) {
+            self.onPubNubMessage(messages[idx]);
+        }
+    }
+
     this.onPubNubMessage = function (message) {
 
         if (_.isString(message)) {
@@ -49,7 +56,10 @@ var pubnubDatasource = function (settings, updateCallback) {
     }
 
     this.updateNow = function () {
-        // Not implemented
+        pubnub.history({
+            channel: currentSettings["channel"],
+            callback: self.onPubNubHistory
+        })
     }
 
     this.onDispose = function () {
