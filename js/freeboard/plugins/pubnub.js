@@ -59,7 +59,8 @@ var pubnubDatasource = function (settings, updateCallback) {
     this.onSettingsChanged = function (newSettings) {
         if (newSettings["subscribe_key"] !== currentSettings["subscribe_key"]) {
             pubnub = PUBNUB.init({
-                subscribe_key: newSettings["subscribe_key"]
+                subscribe_key: newSettings["subscribe_key"],
+                ssl: true
             });
         }
 
