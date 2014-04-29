@@ -1900,7 +1900,7 @@ var freeboard = (function()
 
 			// Check for any calculated settings
 			var settingsDefs = widgetPlugins[self.type()].settings;
-			var datasourceRegex = new RegExp("datasources(?:\\[\"|[.])([\\w\\s]+)", "g");
+			var datasourceRegex = new RegExp("datasources.([\\w_-]+)|datasources\\[['\"]([^'\"]+)", "g");
 			var currentSettings = self.settings();
 
 			_.each(settingsDefs, function(settingDef)
@@ -1939,12 +1939,13 @@ var freeboard = (function()
 
 						while(matches = datasourceRegex.exec(script))
 						{
-							var refreshSettingNames = self.datasourceRefreshNotifications[matches[1]];
+                            var dsName = (matches[1] || matches[2]);
+							var refreshSettingNames = self.datasourceRefreshNotifications[dsName];
 
 							if(_.isUndefined(refreshSettingNames))
 							{
 								refreshSettingNames = [];
-								self.datasourceRefreshNotifications[matches[1]] = refreshSettingNames;
+								self.datasourceRefreshNotifications[dsName] = refreshSettingNames;
 							}
 
 							refreshSettingNames.push(settingDef.name);
