@@ -2097,6 +2097,7 @@ textarea.calculated-value-input
 	resize : none;
 	white-space : nowrap;
 	overflow    : auto;
+	Z-index     :3000;
 }
 
 .datasource-input-suffix
