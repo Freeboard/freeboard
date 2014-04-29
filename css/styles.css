@@ -878,6 +878,7 @@ header h1
 {
 	overflow: visible;
 	position : relative;
+    padding-top: 10px;
 }
 
 #main-header
