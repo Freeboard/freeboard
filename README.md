@@ -29,11 +29,25 @@ Freeboard can be run entirely from a local hard drive. Simply download/clone the
 
 While freeboard runs as a stand-alone app out of the box, you can augment and control it from javascript with a simple API.
 
+-------
+
 **freeboard.initialize(allowEdit, [callback])**
 
 Must be called first to initialize freeboard.
 
 *allowEdit* (boolean) - Sets the initial state of freeboard to allow or disallow editing.
+
+*callback* (function) - Function that will be called back when freeboard has finished initializing.
+
+-------
+
+**freeboard.initialize(allowEdit, [callback])**
+
+Must be called first to initialize freeboard.
+
+*allowEdit* (boolean) - Sets the initial state of freeboard to allow or disallow editing.
+
+*callback* (function) - Function that will be called back when freeboard has finished initializing.
 
 
 ### Building Plugins
