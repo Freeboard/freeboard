@@ -27,7 +27,7 @@ Freeboard can be run entirely from a local hard drive. Simply download/clone the
 
 ### API
 
-While freeboard runs as a stand-alone app out of the box, you can augment and control it from javascript with a simple API.
+While freeboard runs as a stand-alone app out of the box, you can augment and control it from javascript with a simple API. All API calls are made on the `freeboard` singleton object.
 
 -------
 
@@ -41,13 +41,28 @@ Must be called first to initialize freeboard.
 
 -------
 
-**freeboard.initialize(allowEdit, [callback])**
+**freeboard.newDashboard()**
 
-Must be called first to initialize freeboard.
+Clear the contents of the freeboard and initialize a new dashboard.
 
-*allowEdit* (boolean) - Sets the initial state of freeboard to allow or disallow editing.
+-------
 
-*callback* (function) - Function that will be called back when freeboard has finished initializing.
+**freeboard.serialize()**
+
+Serializes the current dashboard and returns a javascript object.
+
+-------
+
+**freeboard.loadDashboard(configuration, [callback])**
+
+Load the dashboard from a serialized dashboard object.
+
+*configuration* (object) - A javascript object containing the configuration of a dashboard. Normally this will be an object that has been created and saved via the `freeboard.serialize()` function.
+
+*callback* (function) - Function that will be called back when the dashboard has finished loading.
+
+-------
+
 
 
 ### Building Plugins
