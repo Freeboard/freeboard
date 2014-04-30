@@ -57,13 +57,67 @@ Serializes the current dashboard and returns a javascript object.
 
 Load the dashboard from a serialized dashboard object.
 
-*configuration* (object) - A javascript object containing the configuration of a dashboard. Normally this will be an object that has been created and saved via the `freeboard.serialize()` function.
+> *configuration* (object) - A javascript object containing the configuration of a dashboard. Normally this will be an object that has been created and saved via the `freeboard.serialize()` function.
 
-*callback* (function) - Function that will be called back when the dashboard has finished loading.
+> *callback* (function) - Function that will be called back when the dashboard has finished loading.
 
 -------
 
+**freeboard.setEditing(editing, animate)**
 
+Programatically control the editing state of the of dashboard.
+
+> *editing* (bool) - Set to true or false to modify the view-only or editing state of the board.
+
+> *animate* (function) - Set to true or false to animate the modification of the editing state. This animates the top-tab dropdown (the part where you can edit datasources and such).
+
+-------
+
+**freeboard.isEditing()**
+
+Returns boolean depending on whether the dashboard is in in the view-only or edit state.
+
+-------
+
+**freeboard.loadDatasourcePlugin(plugin)**
+
+Register a datasource plugin. See http://freeboard.github.io/freeboard/docs/plugin_example.html for information on creating plugins.
+
+> *plugin* (object) - A plugin definition object as defined at http://freeboard.github.io/freeboard/docs/plugin_example.html
+
+-------
+
+**freeboard.loadWidgetPlugin(plugin)**
+
+Register a widget plugin. See http://freeboard.github.io/freeboard/docs/plugin_example.html for information on creating plugins.
+
+> *plugin* (object) - A plugin definition object as defined at http://freeboard.github.io/freeboard/docs/plugin_example.html
+
+-------
+
+**freeboard.showLoadingIndicator(show)**
+
+Show/hide the loading indicator. The loading indicator will display an indicator over the entire board that can be useful when you have some code that takes a while and you want to give a visual indication and to prevent the user from modifying the board.
+
+> *show* (boolean) - Set to true or false to show or hide the loading indicator.
+
+-------
+
+**freeboard.showDialog(contentElement, title, okButtonTitle, cancelButtonTitle, okCallback)**
+
+Show a styled dialog box with custom content.
+
+> *contentElement* (DOM or jquery element) - The DOM or jquery element to display within the content of the dialog box.
+
+> *title* (string) - The title of the dialog box displayed on the top left.
+
+> *okButtonTitle* (string) - The string to display in the button that will be used as the OK button. A null or undefined value will result in no button being displayed.
+
+> *cancelButtonTitle* (string) - The string to display in the button that will be used as the Cancel button. A null or undefined value will result in no button being displayed.
+
+> *okCallback* (function) - A function that will be called if the user presses the OK button.
+
+-------
 
 ### Building Plugins
 
