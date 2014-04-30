@@ -25,6 +25,17 @@ The code here is the client-side portion of what you see when you visit a freebo
 
 Freeboard can be run entirely from a local hard drive. Simply download/clone the repository and open index.html. When using Chrome, you may run into issues with CORS when accessing JSON based APIs if you load from your local hard-drive— in this case you can switch to using JSONP or load index.html and run from a local or remote web server.
 
+### API
+
+While freeboard runs as a stand-alone app out of the box, you can augment and control it from javascript with a simple API.
+
+**initialize**
+
+Must be called first to initialize freeboard.
+
+freeboard.initialize(allowEdit, [callback])
+
+
 ### Building Plugins
 
 See http://freeboard.github.io/freeboard/docs/plugin_example.html for info on how to build plugins for freeboard.
