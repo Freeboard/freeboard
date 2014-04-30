@@ -35,9 +35,9 @@ While freeboard runs as a stand-alone app out of the box, you can augment and co
 
 Must be called first to initialize freeboard.
 
-*allowEdit* (boolean) - Sets the initial state of freeboard to allow or disallow editing.
+> *allowEdit* (boolean) - Sets the initial state of freeboard to allow or disallow editing.
 
-*callback* (function) - Function that will be called back when freeboard has finished initializing.
+> *callback* (function) - Function that will be called back when freeboard has finished initializing.
 
 -------
 
