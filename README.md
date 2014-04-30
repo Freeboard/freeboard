@@ -119,6 +119,20 @@ Show a styled dialog box with custom content.
 
 -------
 
+**freeboard.on(eventName, callback)**
+
+Attach to a global freeboard event.
+
+> **eventName** (string) - The name of a global event. The following events are supported:
+
+> **"dashboard_loaded"** - Occurs after a dashboard has been loaded.
+
+> **"initialized"** - Occurs after freeboard has first been initialized.
+
+> **callback** (function) - The callback function to be called when the event occurs.
+
+-------
+
 ### Building Plugins
 
 See http://freeboard.github.io/freeboard/docs/plugin_example.html for info on how to build plugins for freeboard.
