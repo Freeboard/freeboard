@@ -171,6 +171,32 @@
 	}
 })(jQuery);
 
+(function(jQuery) {
+
+    jQuery.eventEmitter = {
+        _JQInit: function() {
+            this._JQ = jQuery(this);
+        },
+        emit: function(evt, data) {
+            !this._JQ && this._JQInit();
+            this._JQ.trigger(evt, data);
+        },
+        once: function(evt, handler) {
+            !this._JQ && this._JQInit();
+            this._JQ.one(evt, handler);
+        },
+        on: function(evt, handler) {
+            !this._JQ && this._JQInit();
+            this._JQ.bind(evt, handler);
+        },
+        off: function(evt, handler) {
+            !this._JQ && this._JQInit();
+            this._JQ.unbind(evt, handler);
+        }
+    };
+
+}(jQuery));
+
 var freeboard = (function()
 {
 	var loadingIndicator = $('<div class="wrapperloading"><div class="loading up" ></div><div class="loading down"></div></div>');
@@ -1519,6 +1545,7 @@ var freeboard = (function()
 					callback();
 				}
 
+                freeboard.emit("dashboard_loaded");
 			});
 		}
 
@@ -2204,6 +2231,8 @@ var freeboard = (function()
 				{
 					finishedCallback();
 				}
+
+                freeboard.emit("initialized");
 			}
 		},
 		newDashboard        : function()
@@ -2309,3 +2338,5 @@ var freeboard = (function()
 		}
 	};
 }());
+
+$.extend(freeboard, jQuery.eventEmitter);
