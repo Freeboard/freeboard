@@ -955,7 +955,14 @@ var freeboard = (function()
 						{
 							var input = $('<input type="text">').appendTo(valueCell).change(function()
 							{
-								newSettings.settings[settingDef.name] = $(this).val();
+                                if(settingDef.type == "number")
+                                {
+                                    newSettings.settings[settingDef.name] = Number($(this).val());
+                                }
+                                else
+                                {
+								    newSettings.settings[settingDef.name] = $(this).val();
+                                }
 							});
 
 							if(settingDef.name in currentSettingsValues)
@@ -1361,9 +1368,11 @@ var freeboard = (function()
 			}
 
 			// If widget has been added or removed
-			if(viewModel.getCalculatedHeight() != Number($(element).attr("data-sizey")))
+            var calculatedHeight = viewModel.getCalculatedHeight();
+
+			if(calculatedHeight != Number($(element).attr("data-sizey")))
 			{
-				grid.resize_widget($(element), undefined, viewModel.getCalculatedHeight(), function(){
+				grid.resize_widget($(element), undefined, calculatedHeight, function(){
 
 					grid.set_dom_grid_height();
 

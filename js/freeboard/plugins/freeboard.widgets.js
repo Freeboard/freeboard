@@ -826,7 +826,7 @@
         }
 
         this.getHeight = function () {
-            return currentSettings.height;
+            return Number(currentSettings.height);
         }
 
         this.onSettingsChanged(settings);
@@ -846,7 +846,7 @@
             {
                 "name": "height",
                 "display_name": "Height Blocks",
-                "type": "text",
+                "type": "number",
                 "default_value": 4,
                 "description": "A height block is around 60 pixels"
             }
