@@ -204,6 +204,7 @@ var freeboard = (function()
 	var datasourcePlugins = {};
 	var widgetPlugins = {};
 	var grid;
+    var assetRoot = "";
 	var theFreeboardModel = new freeboardModel();
 	var currentStyle = {
 		values: {
@@ -637,10 +638,11 @@ var freeboard = (function()
 
     function displayJSEditor(value, callback)
     {
+        // We load these when we need them— no sense in loading more javascript and css if we're never using the editor.
         head.js(
-            "css/codemirror.css",
-            "css/codemirror-ambiance.css",
-            "js/codemirror.js",
+            assetRoot + "css/codemirror.css",
+            assetRoot + "css/codemirror-ambiance.css",
+            assetRoot + "js/codemirror.js",
             function(){
 
                 var exampleText = "// Example: Returns a number truncated to 2 decimal places.\n// return (datasources[\"MyDatasource\"].sensor.value).toFixed(2);";
@@ -2349,6 +2351,10 @@ var freeboard = (function()
 			widgetPlugins[plugin.type_name] = plugin;
 			theFreeboardModel._widgetTypes.valueHasMutated();
 		},
+        setAssetRoot : function(_assetRoot) // To be used if freeboard is going to load dynamic assets from a different root URL
+        {
+            assetRoot = _assetRoot;
+        },
 		addStyle            : function(selector, rules)
 		{
 			var context = document, stylesheet;
