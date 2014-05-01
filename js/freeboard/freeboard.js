@@ -662,7 +662,7 @@ var freeboard = (function()
 
                 $("body").append(codeWindow);
 
-                var myCodeMirror = CodeMirror(codeMirrorWrapper.get(0),
+                var codeMirrorEditor = CodeMirror(codeMirrorWrapper.get(0),
                     {
                         value: value,
                         mode:  "javascript",
@@ -670,15 +670,14 @@ var freeboard = (function()
                         indentUnit: 4,
                         lineNumbers: true,
                         matchBrackets: true,
-                        autoCloseBrackets: true,
-                        continueComments: true
+                        autoCloseBrackets: true
                     }
                 );
 
                 var closeButton = $('<span id="dialog-cancel" class="text-button">Close</span>').click(function(){
                     if(callback)
                     {
-                        var newValue = myCodeMirror.getValue();
+                        var newValue = codeMirrorEditor.getValue();
 
                         if(newValue === exampleText)
                         {
