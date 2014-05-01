@@ -2025,7 +2025,7 @@ var freeboard = (function()
 						}
 						catch(e)
 						{
-							var literalText = currentSettings[settingDef.name].replace(/"/g, '\\"');
+							var literalText = currentSettings[settingDef.name].replace(/"/g, '\\"').replace(/[\r\n]/g, ' \\\n');
 
 							// If the value function cannot be created, then go ahead and treat it as literal text
 							valueFunction = new Function("datasources", "return \"" + literalText + "\";");
