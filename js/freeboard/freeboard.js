@@ -645,7 +645,7 @@ var freeboard = (function()
             assetRoot + "js/codemirror.js",
             function(){
 
-                var exampleText = "// Example: Returns a number truncated to 2 decimal places.\n// return (datasources[\"MyDatasource\"].sensor.value).toFixed(2);";
+                var exampleText = "// Example: Convert temp from C to F and truncate to 2 decimal places.\n// return (datasources[\"MyDatasource\"].sensor.tempInF * 1.8 + 32).toFixed(2);";
 
                 // If value is empty, go ahead and suggest something
                 if(!value)
@@ -2394,6 +2394,42 @@ var freeboard = (function()
 		{
 			createDialogBox(contentElement, title, okTitle, cancelTitle, okCallback);
 		},
+        getDatasourceSettings : function(datasourceName)
+        {
+            var datasources = theFreeboardModel.datasources();
+
+            // Find the datasource with the name specified
+            var datasource = _.find(datasources, function(datasourceModel){
+                return (datasourceModel.name() === datasourceName);
+            });
+
+            if(datasource)
+            {
+                return datasource.settings();
+            }
+            else
+            {
+                return null;
+            }
+        },
+        setDatasourceSettings : function(datasourceName, settings)
+        {
+            var datasources = theFreeboardModel.datasources();
+
+            // Find the datasource with the name specified
+            var datasource = _.find(datasources, function(datasourceModel){
+                return (datasourceModel.name() === datasourceName);
+            });
+
+            if(!datasource)
+            {
+                console.log("Datasource not found");
+                return;
+            }
+
+            var combinedSettings = _.defaults(settings, datasource.settings());
+            datasource.settings(combinedSettings);
+        },
 		getStyleString      : function(name)
 		{
 			var returnString = "";

@@ -119,6 +119,24 @@ Show a styled dialog box with custom content.
 
 -------
 
+**freeboard.getDatasourceSettings(datasourceName)**
+
+Returns an object with the current settings for a datasource or null if no datasource with the given name is found.
+
+> **datasourceName** (string) - The name of a datasource in the dashboard.
+
+-------
+
+**freeboard.setDatasourceSettings(datasourceName, settings)**
+
+Updates settings on a datasource.
+
+> **datasourceName** (string) - The name of a datasource in the dashboard.
+
+> **settings** (object) - An object of key-value pairs for the settings of the datasource. The values specified here will be combined with the current settings, so you do not need specify every setting if you only want to update one. To get a list of possible settings for a datasource, consult the datasource documentation or code, or call the freeboard.getDatasourceSettings function.
+
+-------
+
 **freeboard.on(eventName, callback)**
 
 Attach to a global freeboard event.
