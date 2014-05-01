@@ -2100,23 +2100,9 @@ textarea.calculated-value-input
 	Z-index     :3000;
 }
 
-.datasource-input-suffix
+ul.datasource-input-suffix
 {
-	display          : inline-block;
-	height           : 22px;
-	padding          : 4px 10px;
-	line-height      : 23px;
-	vertical-align   : middle;
-	background-color : #3d3d3d;
-	text-transform   : uppercase;
-	font-size        : 11px;
-	min-width        : 16px;
-	margin-left: 413px;
-}
-
-.datasource-input-suffix i
-{
-    margin-top: -1px;
+	margin-left: 409px;
 }
 
 .styled-select select
@@ -2288,12 +2274,16 @@ h2.title
 		padding-top: 10px;
 	}
 
-	.datasource-input-suffix
+	ul.datasource-input-suffix
 	{
-		font-size: 11px;
-		margin: 0px;
-		padding: 0px;
+		margin-left: 0px;
+        margin-bottom: 30px;
 	}
+
+    ul.datasource-input-suffix li
+    {
+        margin-left: 0;
+    }
 
 	textarea, input[type="text"]
 	{
@@ -2618,3 +2608,59 @@ input:-moz-placeholder, textarea:-moz-placeholder
     right            : 0px;
     background-color : #FF9900;
 }
+
+.code-window
+{
+    z-index: 5000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #2a2a2a;
+}
+
+.code-window-footer
+{
+    height: 64px;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    line-height: 64px;
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
+.code-window-header
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 20px;
+    line-height: 1.1em;
+    font-weight: 200;
+}
+
+@media screen and (max-width : 800px)
+{
+    .code-window-header
+    {
+        font-size: 11px;
+    }
+}
+
+.code-mirror-wrapper
+{
+    width: 100%;
+    position: absolute;
+    bottom: 64px;
+    top: 100px;
+    left: 0;
+}
+
+.CodeMirror
+{
+    width: 100%;
+    height: 100% !important;
+}
+

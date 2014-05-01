@@ -548,7 +548,6 @@ var freeboard = (function()
 		$("body").append(overlay);
 
 		overlay.fadeIn(200);
-		//modalDialog.fadeIn(200);
 	}
 
 	function showDeveloperConsole()
@@ -635,6 +634,63 @@ var freeboard = (function()
 
 		});
 	}
+
+    function displayJSEditor(value, callback)
+    {
+        head.js(
+            "css/codemirror.css",
+            "css/codemirror-ambiance.css",
+            "js/codemirror.js",
+            function(){
+
+                var exampleText = "// Example: Returns a number truncated to 2 decimal places.\n// return (datasources[\"MyDatasource\"].sensor.value).toFixed(2);";
+
+                // If value is empty, go ahead and suggest something
+                if(!value)
+                {
+                    value = exampleText;
+                }
+
+                var codeWindow = $('<div class="code-window"></div>');
+                var codeMirrorWrapper = $('<div class="code-mirror-wrapper"></div>');
+                var codeWindowFooter = $('<div class="code-window-footer"></div>');
+                var codeWindowHeader = $('<div class="code-window-header cm-s-ambiance">This javascript will be re-evaluated any time a datasource referenced here is updated, and the value you <code><span class="cm-keyword">return</span></code> will be displayed in the widget. You can assume this javascript is wrapped in a function of the form <code><span class="cm-keyword">function</span>(<span class="cm-def">datasources</span>)</code> where datasources is a collection of javascript objects (keyed by their name) corresponding to the most current data in a datasource.</div>');
+
+                codeWindow.append([codeWindowHeader, codeMirrorWrapper, codeWindowFooter]);
+
+                $("body").append(codeWindow);
+
+                var myCodeMirror = CodeMirror(codeMirrorWrapper.get(0),
+                    {
+                        value: value,
+                        mode:  "javascript",
+                        theme: "ambiance",
+                        indentUnit: 4,
+                        lineNumbers: true,
+                        matchBrackets: true,
+                        autoCloseBrackets: true,
+                        continueComments: true
+                    }
+                );
+
+                var closeButton = $('<span id="dialog-cancel" class="text-button">Close</span>').click(function(){
+                    if(callback)
+                    {
+                        var newValue = myCodeMirror.getValue();
+
+                        if(newValue === exampleText)
+                        {
+                            newValue = "";
+                        }
+
+                        callback(newValue);
+                        codeWindow.remove();
+                    }
+                });
+
+                codeWindowFooter.append(closeButton);
+        });
+    }
 
 	function createPluginEditor(title, pluginTypes, currentInstanceName, currentTypeName, currentSettingsValues, settingsSavedCallback)
 	{
@@ -872,13 +928,27 @@ var freeboard = (function()
 
 							createValueEditor(input);
 
-							$(valueCell).append($('<div class="datasource-input-suffix text-button"><i class="icon-plus icon-white"></i>Datasource</div>').mousedown(function(e)
-							{
-								e.preventDefault();
-								$(input).focus();
-								$(input).insertAtCaret("datasources[\"");
-								$(input).trigger("freeboard-eval");
-							}));
+                            var datasourceToolbox = $('<ul class="board-toolbar datasource-input-suffix"></ul>');
+
+                            var datasourceTool = $('<li><i class="icon-plus icon-white"></i><label>DATASOURCE</label></li>').mousedown(function(e)
+                            {
+                                e.preventDefault();
+                                $(input).focus();
+                                $(input).insertAtCaret("datasources[\"");
+                                $(input).trigger("freeboard-eval");
+                            });
+
+                            var jsEditorTool = $('<li><i class="icon-fullscreen icon-white"></i><label>.JS EDITOR</label></li>').mousedown(function(e)
+                            {
+                                e.preventDefault();
+
+                                displayJSEditor(input.val(), function(result){
+                                    input.val(result);
+                                    input.change();
+                                });
+                            });
+
+                            $(valueCell).append(datasourceToolbox.append([datasourceTool, jsEditorTool]));
 						}
 						else
 						{
