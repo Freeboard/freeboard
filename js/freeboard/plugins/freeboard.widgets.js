@@ -803,9 +803,11 @@
         }
     });
 
+    freeboard.addStyle('.html-widget', "white-space:normal;width:100%;height:100%");
+
     var htmlWidget = function (settings) {
         var self = this;
-        var htmlElement = $("<div></div>");
+        var htmlElement = $('<div class="html-widget"></div>');
         var currentSettings = settings;
 
         this.render = function (element) {
