@@ -1917,7 +1917,7 @@ ul.value-dropdown
 	border           : 1px solid rgba(255, 153, 0, 0.8);
 	overflow-x : hidden;
 	overflow-y : auto;
-	z-index: 200;
+	z-index: 3001;
 }
 
 ul.value-dropdown li
