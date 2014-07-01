@@ -151,13 +151,13 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 
 			var sortedPanes = _.sortBy(object.panes, function(pane){
 
-            return getPositionForScreenSize(pane).row;
+            return freeboard._getPositionForScreenSize(pane).row;
 
 			});
 
 			_.each(sortedPanes, function(paneConfig)
 			{
-				var pane = new PaneModel();
+				var pane = new PaneModel(self, widgetPlugins);
 				pane.deserialize(paneConfig);
 				self.panes.push(pane);
 			});
@@ -195,7 +195,7 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 
 	this.clearDashboard = function()
 	{
-		grid._removeAllWidgets();
+		freeboard._removeAllWidgets();
 
 		_.each(self.datasources(), function(datasource)
 		{

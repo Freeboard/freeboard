@@ -714,17 +714,23 @@ var freeboard = (function()
 		{
 			developerConsole.showDeveloperConsole();
 		},
+
+		// Temporary measures for FreeboardModel; move these to FreeboardUI.
 	        _removeAllWidgets : function()
 	        {
-		    grid.remove_all_widgets();
+			grid.remove_all_widgets();
 		},
 	        _disableGrid : function()
 	        {
-		    grid.disable();
+			grid.disable();
 		},
 	        _enableGrid : function()
 	        {
-		    grid.enable();
+			grid.enable();
+		},
+		_getPositionForScreenSize : function(paneModel)
+		{
+			return getPositionForScreenSize(paneModel);
 		}
 	};
 }());
