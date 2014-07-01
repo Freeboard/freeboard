@@ -199,6 +199,10 @@
 
 var freeboard = (function()
 {
+    var SERIALIZATION_VERSION = 1;
+    var PANE_MARGIN = 10;
+    var PANE_WIDTH = 300;
+
 	var loadingIndicator = $('<div class="wrapperloading"><div class="loading up" ></div><div class="loading down"></div></div>');
 
 	var datasourcePlugins = {};
@@ -693,10 +697,9 @@ var freeboard = (function()
         });
     }
 
-	function createPluginEditor(title, pluginTypes, currentInstanceName, currentTypeName, currentSettingsValues, settingsSavedCallback)
+	function createPluginEditor(title, pluginTypes, currentTypeName, currentSettingsValues, settingsSavedCallback)
 	{
 		var newSettings = {
-			name    : currentInstanceName,
 			type    : currentTypeName,
 			settings: {}
 		};
@@ -710,6 +713,7 @@ var freeboard = (function()
 		}
 
 
+        var selectedType;
 		var form = $('<div></div>');
 
         var pluginDescriptionElement = $('<div id="plugin-description"></div>').hide();
@@ -1009,12 +1013,22 @@ var freeboard = (function()
 		{
 			$(".validation-error").remove();
 
-			// Validate our new settings
-			if(!_.isUndefined(currentInstanceName) && newSettings.name == "")
-			{
-				displayValidationError("instance-name", "A name is required.");
-				return true;
-			}
+            // Loop through each setting and validate it
+            for(var index = 0; index < selectedType.settings.length; index++)
+            {
+                var settingDef = selectedType.settings[index];
+
+                if(settingDef.required && (_.isUndefined(newSettings.settings[settingDef.name]) || newSettings.settings[settingDef.name] == ""))
+                {
+                    displayValidationError(settingDef.name, "This is required.");
+                    return true;
+                }
+                else if(settingDef.type == "number" && !isNumerical(newSettings.settings[settingDef.name]))
+                {
+                    displayValidationError(settingDef.name, "Must be a number.");
+                    return true;
+                }
+            }
 
 			if(_.isFunction(settingsSavedCallback))
 			{
@@ -1046,9 +1060,9 @@ var freeboard = (function()
 				// Remove all the previous settings
                 removeSettingsRows();
 
-				var currentType = pluginTypes[typeSelect.val()];
+                selectedType = pluginTypes[typeSelect.val()];
 
-				if(_.isUndefined(currentType))
+				if(_.isUndefined(selectedType))
 				{
                     $("#setting-row-instance-name").hide();
 					$("#dialog-ok").hide();
@@ -1057,9 +1071,9 @@ var freeboard = (function()
 				{
                     $("#setting-row-instance-name").show();
 
-                    if(currentType.description && currentType.description.length > 0)
+                    if(selectedType.description && selectedType.description.length > 0)
                     {
-                        pluginDescriptionElement.html(currentType.description).show();
+                        pluginDescriptionElement.html(selectedType.description).show();
                     }
                     else
                     {
@@ -1067,22 +1081,15 @@ var freeboard = (function()
                     }
 
 					$("#dialog-ok").show();
-					createSettingsFromDefinition(currentType.settings);
+					createSettingsFromDefinition(selectedType.settings);
 				}
 			});
 		}
 		else if(pluginTypeNames.length == 1)
 		{
-			createSettingsFromDefinition(pluginTypes[pluginTypeNames[0]].settings);
+            selectedType = pluginTypes[pluginTypeNames[0]];
+			createSettingsFromDefinition(selectedType.settings);
 		}
-
-        if(!_.isUndefined(currentInstanceName))
-        {
-            createSettingRow("instance-name", "Name").append($('<input type="text">').val(currentInstanceName).change(function()
-            {
-                newSettings.name = $(this).val();
-            }));
-        }
 
         if(typeSelect)
         {
@@ -1148,7 +1155,6 @@ var freeboard = (function()
 				}
 				else
 				{
-					var instanceName = undefined;
 					var instanceType = undefined;
 
 					if(options.type == 'datasource')
@@ -1156,13 +1162,12 @@ var freeboard = (function()
 						if(options.operation == 'add')
 						{
 							settings = {};
-							instanceName = "";
 						}
 						else
 						{
-							instanceName = viewModel.name();
 							instanceType = viewModel.type();
 							settings = viewModel.settings();
+                            settings.name = viewModel.name();
 						}
 					}
 					else if(options.type == 'widget')
@@ -1184,6 +1189,7 @@ var freeboard = (function()
 						if(options.operation == 'edit')
 						{
 							settings.title = viewModel.title();
+                            settings.col_width = viewModel.col_width();
 						}
 
 						types = {
@@ -1193,13 +1199,20 @@ var freeboard = (function()
 										name        : "title",
 										display_name: "Title",
 										type        : "text"
-									}
+									},
+                                    {
+                                        name        : "col_width",
+                                        display_name : "Columns",
+                                        type : "number",
+                                        default_value: 1,
+                                        required : true
+                                    }
 								]
 							}
 						}
 					}
 
-					createPluginEditor(title, types, instanceName, instanceType, settings, function(newSettings)
+					createPluginEditor(title, types, instanceType, settings, function(newSettings)
 					{
 						if(options.operation == 'add')
 						{
@@ -1208,8 +1221,9 @@ var freeboard = (function()
 								var newViewModel = new DatasourceModel();
 								theFreeboardModel.addDatasource(newViewModel);
 
+                                newViewModel.name(newSettings.settings.name);
+                                delete newSettings.settings.name;
 								newViewModel.settings(newSettings.settings);
-								newViewModel.name(newSettings.name);
 								newViewModel.type(newSettings.type);
 							}
 							else if(options.type == 'widget')
@@ -1228,12 +1242,14 @@ var freeboard = (function()
 							if(options.type == 'pane')
 							{
 								viewModel.title(newSettings.settings.title);
+                                viewModel.col_width(newSettings.settings.col_width);
 							}
 							else
 							{
-								if(viewModel.name)
+                                if(options.type == 'datasource')
 								{
-									viewModel.name(newSettings.name);
+									viewModel.name(newSettings.settings.name);
+                                    delete newSettings.settings.name;
 								}
 
 								viewModel.type(newSettings.type);
@@ -1254,16 +1270,50 @@ var freeboard = (function()
 		}
 	}
 
+    function isNumerical(n)
+    {
+        return !isNaN(parseFloat(n)) && isFinite(n);
+    }
+
+    function processResize(layoutWidgets)
+    {
+        var rootElement = grid.$el;
+
+        // Get the maximum size
+
+        rootElement.find("> li").unbind().removeData();
+        $(".gridster").css("width", "");
+        grid.generate_grid_and_stylesheet();
+
+        if(layoutWidgets)
+        {
+            rootElement.find("> li").each(function(index){
+                var paneElement = this;
+                var viewModel = ko.dataFor(paneElement);
+                var newPosition = getPositionForScreenSize(viewModel);
+
+                $(paneElement).attr("data-row", newPosition.row).attr("data-col", newPosition.col);
+            });
+        }
+
+        grid.init();
+
+        $(".gridster").css("width", grid.cols * 300 + (grid.cols * 20));
+    }
+
 	ko.bindingHandlers.grid = {
 		init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
 		{
-			// Initialize our grid
-			grid = $(element).gridster({
-				widget_margins        : [10, 10],
-				widget_base_dimensions: [300, 10]
-			}).data("gridster");
+            grid = $(element).gridster({
+                widget_margins        : [PANE_MARGIN, PANE_MARGIN],
+                widget_base_dimensions: [PANE_WIDTH, 10],
+                resize: {
+                    enabled : true,
+                    axes : "x"
+                }
+            }).data("gridster");
 
-            $(".gridster").css("width", grid.cols * 300 + (grid.cols * 20));
+            processResize(false);
 
 			grid.disable();
 		}
@@ -1277,9 +1327,9 @@ var freeboard = (function()
         if(!_.isUndefined(col)) paneModel.col[displayCols] = col;
     }
 
-    function getPositionForScreenSize(paneModel)
+    function getPositionForScreenSize(paneModel, cols)
     {
-        var displayCols = grid.cols;
+        var displayCols = _.isUndefined(cols) ? grid.cols : cols;
 
         if(_.isNumber(paneModel.row) && _.isNumber(paneModel.col)) // Support for legacy format
         {
@@ -1293,31 +1343,37 @@ var freeboard = (function()
             paneModel.col = obj;
         }
 
-        var rowCol = {};
+        var newColumnIndex = 1;
+        var columnDiff = 1000;
 
-        // Loop through our settings until we find one that is equal to or less than our display cols
-        for(var colIndex = displayCols; colIndex >= 1; colIndex--)
+        for(var columnIndex in paneModel.col)
         {
-            if(!_.isUndefined(paneModel.row[colIndex]))
+            if(columnIndex == displayCols) // If we already have a position defined for this number of columns, return that position
             {
-                rowCol.row = paneModel.row[colIndex];
-                break;
+                return {row: paneModel.row[columnIndex], col: paneModel.col[columnIndex]};
+            }
+            else if(paneModel.col[columnIndex] > displayCols) // If it's greater than our display columns, put it in the last column
+            {
+                newColumnIndex = displayCols;
+            }
+            else // If it's less than, pick whichever one is closest
+            {
+                var delta = displayCols - columnIndex;
+
+                if(delta < columnDiff)
+                {
+                    newColumnIndex = columnIndex;
+                    columnDiff = delta;
+                }
             }
         }
 
-        for(var colIndex = displayCols; colIndex >= 1; colIndex--)
+        if(newColumnIndex in paneModel.col && newColumnIndex in paneModel.row)
         {
-            if(!_.isUndefined(paneModel.col[colIndex]))
-            {
-                rowCol.col = paneModel.col[colIndex];
-                break;
-            }
+            return {row: paneModel.row[newColumnIndex], col: paneModel.col[newColumnIndex]};
         }
 
-        if(_.isUndefined(rowCol.row)) rowCol.row = 1;
-        if(_.isUndefined(rowCol.col)) rowCol.col = 1;
-
-        return rowCol;
+        return {row:1,col:newColumnIndex};
     }
 
 	ko.bindingHandlers.pane = {
@@ -1370,9 +1426,9 @@ var freeboard = (function()
 			// If widget has been added or removed
             var calculatedHeight = viewModel.getCalculatedHeight();
 
-			if(calculatedHeight != Number($(element).attr("data-sizey")))
+			if(calculatedHeight != Number($(element).attr("data-sizey")) || viewModel.col_width() != Number($(element).attr("data-sizex")) )
 			{
-				grid.resize_widget($(element), undefined, calculatedHeight, function(){
+				grid.resize_widget($(element), viewModel.col_width(), calculatedHeight, function(){
 
 					grid.set_dom_grid_height();
 
@@ -1403,6 +1459,7 @@ var freeboard = (function()
 	{
 		var self = this;
 
+        this.version = 0;
 		this.isEditing = ko.observable(false);
 		this.allow_edit = ko.observable(false);
 		this.allow_edit.subscribe(function(newValue)
@@ -1518,6 +1575,7 @@ var freeboard = (function()
 			});
 
 			return {
+                version : SERIALIZATION_VERSION,
 				header_image: self.header_image(),
 				allow_edit  : self.allow_edit(),
 				plugins     : self.plugins(),
@@ -1541,6 +1599,7 @@ var freeboard = (function()
 					self.allow_edit(true);
 				}
 
+                self.version = object.version || 0;
 				self.header_image(object.header_image);
 
 				_.each(object.datasources, function(datasourceConfig)
@@ -1776,6 +1835,7 @@ var freeboard = (function()
 		this.width = ko.observable(1);
 		this.row = {};
 		this.col = {};
+        this.col_width = ko.observable(1);
 		this.widgets = ko.observableArray();
 
 		this.addWidget = function(widget)
@@ -1846,6 +1906,7 @@ var freeboard = (function()
 				width  : self.width(),
 				row    : self.row,
 				col    : self.col,
+                col_width : self.col_width(),
 				widgets: widgets
 			};
 		}
@@ -1857,6 +1918,7 @@ var freeboard = (function()
 
 			self.row = object.row;
 			self.col = object.col;
+            self.col_width(object.col_width || 1);
 
 			_.each(object.widgets, function(widgetConfig)
 			{
@@ -2277,6 +2339,18 @@ var freeboard = (function()
 	{ //DOM Ready
 		// Show the loading indicator when we first load
 		showLoadingIndicator(true);
+
+        var resizeTimer;
+
+        function resizeEnd()
+        {
+            processResize(true);
+        }
+
+        $(window).resize(function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(resizeEnd, 500);
+        });
 	});
 
 	// PUBLIC FUNCTIONS
@@ -2344,10 +2418,23 @@ var freeboard = (function()
 				plugin.display_name = plugin.type_name;
 			}
 
+            // Add a required setting called name to the beginning
+            plugin.settings.unshift({
+                name : "name",
+                display_name : "Name",
+                type : "text",
+                required : true
+            });
+
+
 			theFreeboardModel.addPluginSource(plugin.source);
 			datasourcePlugins[plugin.type_name] = plugin;
 			theFreeboardModel._datasourceTypes.valueHasMutated();
 		},
+        resize : function()
+        {
+            processResize(true);
+        },
 		loadWidgetPlugin    : function(plugin)
 		{
 			if(_.isUndefined(plugin.display_name))
