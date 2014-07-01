@@ -199,13 +199,18 @@
 
 var freeboard = (function()
 {
-	var loadingIndicator = $('<div class="wrapperloading"><div class="loading up" ></div><div class="loading down"></div></div>');
 
 	var datasourcePlugins = {};
 	var widgetPlugins = {};
 	var grid;
-    var assetRoot = "";
-	var theFreeboardModel = new FreeboardModel(datasourcePlugins, widgetPlugins);
+
+        var freeboardUI = new FreeboardUI();
+	var theFreeboardModel = new FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI);
+
+	var jsEditor = new JSEditor();
+	var valueEditor = new ValueEditor(theFreeboardModel);
+	var pluginEditor = new PluginEditor(jsEditor, valueEditor);
+
 	var currentStyle = {
 		values: {
 			"font-family": '"HelveticaNeue-UltraLight", "Helvetica Neue Ultra Light", "Helvetica Neue", sans-serif',
@@ -213,343 +218,6 @@ var freeboard = (function()
 			"font-weight": 100
 		}
 	};
-
-	var veDatasourceRegex = new RegExp(".*datasources\\[\"([^\"]*)(\"\\].)?$");
-
-	function resizeValueEditor(element)
-	{
-		var lineBreakCount = ($(element).val().match(/\n/g) || []).length;
-
-		var newHeight = Math.min(200, 20 * (lineBreakCount + 1));
-
-		$(element).css({height: newHeight + "px"});
-	}
-
-	function showLoadingIndicator(show)
-	{
-		if(show)
-		{
-			loadingIndicator.fadeOut(0).appendTo("body").fadeIn(500);
-		}
-		else
-		{
-			loadingIndicator.fadeOut(500).remove();
-		}
-	}
-
-	function createValueEditor(element)
-	{
-		var dropdown = null;
-		var selectedOptionIndex = 0;
-
-		$(element).addClass("calculated-value-input").bind("keyup mouseup freeboard-eval",function(event)
-		{
-			// Ignore arrow keys and enter keys
-			if(dropdown && event.type == "keyup" && (event.keyCode == 38 || event.keyCode == 40 || event.keyCode == 13))
-			{
-				event.preventDefault();
-				return;
-			}
-
-			var inputString = $(element).val().substring(0, $(element).getCaretPosition());
-			inputString = inputString.replace(String.fromCharCode(160), " "); // Weird issue where the textarea box was putting in ASCII (non breaking space) for spaces.
-
-			var match = veDatasourceRegex.exec(inputString);
-
-			var options = [];
-			var replacementString;
-
-			if(match)
-			{
-				if(match[1] == "") // List all datasources
-				{
-					_.each(theFreeboardModel.datasources(), function(datasource)
-					{
-						options.push({value: datasource.name(), follow_char: "\"]."});
-					});
-				}
-				else if(match[1] != "" && _.isUndefined(match[2])) // List partial datasources
-				{
-					replacementString = match[1];
-
-					_.each(theFreeboardModel.datasources(), function(datasource)
-					{
-						var dsName = datasource.name();
-
-						if(dsName != replacementString && dsName.indexOf(replacementString) == 0)
-						{
-							options.push({value: dsName, follow_char: "\"]."});
-						}
-					});
-				}
-				else
-				{
-					var datasource = _.find(theFreeboardModel.datasources(), function(datasource)
-					{
-						return (datasource.name() === match[1]);
-					});
-
-					if(!_.isUndefined(datasource))
-					{
-						var dataPath = "";
-
-						if(!_.isUndefined(match[2]))
-						{
-							dataPath = match[2];
-						}
-
-						var dataPathItems = dataPath.split(".");
-						dataPath = "data";
-
-						for(var index = 1; index < dataPathItems.length - 1; index++)
-						{
-							if(dataPathItems[index] != "")
-							{
-								dataPath = dataPath + "." + dataPathItems[index];
-							}
-						}
-
-						var lastPathObject = _.last(dataPathItems);
-
-						// If the last character is a [, then ignore it
-						if(lastPathObject.charAt(lastPathObject.length - 1) == "[")
-						{
-							lastPathObject = lastPathObject.replace(/\[+$/, "");
-							dataPath = dataPath + "." + lastPathObject;
-						}
-
-						var dataValue = datasource.getDataRepresentation(dataPath);
-
-						if(_.isArray(dataValue))
-						{
-							for(var index = 0; index < dataValue.length; index++)
-							{
-								var followChar = "]";
-
-								if(_.isObject(dataValue[index]))
-								{
-									followChar = followChar + ".";
-								}
-								else if(_.isArray(dataValue[index]))
-								{
-									followChar = followChar + "[";
-								}
-
-								options.push({value: index, follow_char: followChar});
-							}
-						}
-						else if(_.isObject(dataValue))
-						{
-							replacementString = lastPathObject;
-
-							if(_.keys(dataValue).indexOf(replacementString) == -1)
-							{
-								_.each(dataValue, function(value, name)
-								{
-									if(name != lastPathObject && name.indexOf(lastPathObject) == 0)
-									{
-										var followChar = undefined;
-
-										if(_.isArray(value))
-										{
-											followChar = "[";
-										}
-										else if(_.isObject(value))
-										{
-											followChar = ".";
-										}
-
-										options.push({value: name, follow_char: followChar});
-									}
-								});
-							}
-						}
-					}
-				}
-			}
-
-			if(options.length > 0)
-			{
-				if(!dropdown)
-				{
-					dropdown = $('<ul id="value-selector" class="value-dropdown"></ul>').insertAfter(element).width($(element).outerWidth() - 2).css("left", $(element).position().left).css("top", $(element).position().top + $(element).outerHeight() - 1);
-				}
-
-				dropdown.empty();
-				dropdown.scrollTop(0);
-
-				var selected = true;
-				selectedOptionIndex = 0;
-
-				var currentIndex = 0;
-
-				_.each(options, function(option)
-				{
-					var li = $('<li>' + option.value + '</li>').appendTo(dropdown).mouseenter(function()
-					{
-						$(this).trigger("freeboard-select");
-					}).mousedown(function(event)
-						{
-							$(this).trigger("freeboard-insertValue");
-							event.preventDefault();
-						}).data("freeboard-optionIndex", currentIndex).data("freeboard-optionValue", option.value).bind("freeboard-insertValue",function()
-						{
-							var optionValue = option.value;
-
-							if(!_.isUndefined(option.follow_char))
-							{
-								optionValue = optionValue + option.follow_char;
-							}
-
-							if(!_.isUndefined(replacementString))
-							{
-								var replacementIndex = inputString.lastIndexOf(replacementString);
-
-								if(replacementIndex != -1)
-								{
-									$(element).replaceTextAt(replacementIndex, replacementIndex + replacementString.length, optionValue);
-								}
-							}
-							else
-							{
-								$(element).insertAtCaret(optionValue);
-							}
-
-							$(element).triggerHandler("mouseup");
-						}).bind("freeboard-select", function()
-						{
-							$(this).parent().find("li.selected").removeClass("selected");
-							$(this).addClass("selected");
-							selectedOptionIndex = $(this).data("freeboard-optionIndex");
-						});
-
-					if(selected)
-					{
-						$(li).addClass("selected");
-						selected = false;
-					}
-
-					currentIndex++;
-				});
-			}
-			else
-			{
-				$(element).next("ul#value-selector").remove();
-				dropdown = null;
-				selectedOptionIndex = -1;
-			}
-		}).focus(function()
-			{
-				resizeValueEditor(element);
-			}).focusout(function()
-			{
-				$(element).css({height: ""});
-				$(element).next("ul#value-selector").remove();
-				dropdown = null;
-				selectedOptionIndex = -1;
-			}).bind("keydown", function(event)
-			{
-
-				if(dropdown)
-				{
-					if(event.keyCode == 38 || event.keyCode == 40) // Handle Arrow keys
-					{
-						event.preventDefault();
-
-						var optionItems = $(dropdown).find("li");
-
-						if(event.keyCode == 38) // Up Arrow
-						{
-							selectedOptionIndex--;
-						}
-						else if(event.keyCode == 40) // Down Arrow
-						{
-							selectedOptionIndex++;
-						}
-
-						if(selectedOptionIndex < 0)
-						{
-							selectedOptionIndex = optionItems.size() - 1;
-						}
-						else if(selectedOptionIndex >= optionItems.size())
-						{
-							selectedOptionIndex = 0;
-						}
-
-						var optionElement = $(optionItems).eq(selectedOptionIndex);
-
-						optionElement.trigger("freeboard-select");
-						$(dropdown).scrollTop($(optionElement).position().top);
-					}
-					else if(event.keyCode == 13) // Handle enter key
-					{
-						event.preventDefault();
-
-						if(selectedOptionIndex != -1)
-						{
-							$(dropdown).find("li").eq(selectedOptionIndex).trigger("freeboard-insertValue");
-						}
-					}
-				}
-			});
-	}
-
-	function createDialogBox(contentElement, title, okTitle, cancelTitle, okCallback)
-	{
-		var modal_width = 900;
-
-		// Initialize our modal overlay
-		var overlay = $('<div id="modal_overlay" style="display:none;"></div>');
-
-		var modalDialog = $('<div class="modal"></div>');
-
-		function closeModal()
-		{
-			overlay.fadeOut(200, function()
-			{
-				$(this).remove();
-			});
-		}
-
-		// Create our header
-		modalDialog.append('<header><h2 class="title">' + title + "</h2></header>");
-
-		$('<section></section>').appendTo(modalDialog).append(contentElement);
-
-		// Create our footer
-		var footer = $('<footer></footer>').appendTo(modalDialog);
-
-		if(okTitle)
-		{
-			$('<span id="dialog-ok" class="text-button">' + okTitle + '</span>').appendTo(footer).click(function()
-			{
-				var hold = false;
-
-				if(_.isFunction(okCallback))
-				{
-					hold = okCallback();
-				}
-
-				if(!hold)
-				{
-					closeModal();
-				}
-			});
-		}
-
-		if(cancelTitle)
-		{
-			$('<span id="dialog-cancel" class="text-button">' + cancelTitle + '</span>').appendTo(footer).click(function()
-			{
-				closeModal();
-			});
-		}
-
-        overlay.append(modalDialog);
-		$("body").append(overlay);
-
-		overlay.fadeIn(200);
-	}
 
 	function showDeveloperConsole()
 	{
@@ -609,7 +277,7 @@ var freeboard = (function()
 			addNewScriptRow();
 		});
 
-		createDialogBox(container, "Developer Console", "OK", null, function(){
+		new DialogBox(container, "Developer Console", "OK", null, function(){
 
 			// Unload our previous scripts
 			_.each(theFreeboardModel.plugins(), function(pluginSource){
@@ -636,468 +304,6 @@ var freeboard = (function()
 		});
 	}
 
-    function displayJSEditor(value, callback)
-    {
-        // We load these when we need them— no sense in loading more javascript and css if we're never using the editor.
-        head.js(
-            assetRoot + "css/codemirror.css",
-            assetRoot + "css/codemirror-ambiance.css",
-            assetRoot + "js/codemirror.js",
-            function(){
-
-                var exampleText = "// Example: Convert temp from C to F and truncate to 2 decimal places.\n// return (datasources[\"MyDatasource\"].sensor.tempInF * 1.8 + 32).toFixed(2);";
-
-                // If value is empty, go ahead and suggest something
-                if(!value)
-                {
-                    value = exampleText;
-                }
-
-                var codeWindow = $('<div class="code-window"></div>');
-                var codeMirrorWrapper = $('<div class="code-mirror-wrapper"></div>');
-                var codeWindowFooter = $('<div class="code-window-footer"></div>');
-                var codeWindowHeader = $('<div class="code-window-header cm-s-ambiance">This javascript will be re-evaluated any time a datasource referenced here is updated, and the value you <code><span class="cm-keyword">return</span></code> will be displayed in the widget. You can assume this javascript is wrapped in a function of the form <code><span class="cm-keyword">function</span>(<span class="cm-def">datasources</span>)</code> where datasources is a collection of javascript objects (keyed by their name) corresponding to the most current data in a datasource.</div>');
-
-                codeWindow.append([codeWindowHeader, codeMirrorWrapper, codeWindowFooter]);
-
-                $("body").append(codeWindow);
-
-                var codeMirrorEditor = CodeMirror(codeMirrorWrapper.get(0),
-                    {
-                        value: value,
-                        mode:  "javascript",
-                        theme: "ambiance",
-                        indentUnit: 4,
-                        lineNumbers: true,
-                        matchBrackets: true,
-                        autoCloseBrackets: true
-                    }
-                );
-
-                var closeButton = $('<span id="dialog-cancel" class="text-button">Close</span>').click(function(){
-                    if(callback)
-                    {
-                        var newValue = codeMirrorEditor.getValue();
-
-                        if(newValue === exampleText)
-                        {
-                            newValue = "";
-                        }
-
-                        callback(newValue);
-                        codeWindow.remove();
-                    }
-                });
-
-                codeWindowFooter.append(closeButton);
-        });
-    }
-
-	function createPluginEditor(title, pluginTypes, currentInstanceName, currentTypeName, currentSettingsValues, settingsSavedCallback)
-	{
-		var newSettings = {
-			name    : currentInstanceName,
-			type    : currentTypeName,
-			settings: {}
-		};
-
-		function createSettingRow(name, displayName)
-		{
-			var tr = $('<div id="setting-row-' + name + '" class="form-row"></div>').appendTo(form);
-
-			tr.append('<div class="form-label"><label class="control-label">' + displayName + '</label></div>');
-			return $('<div id="setting-value-container-' + name + '" class="form-value"></div>').appendTo(tr);
-		}
-
-
-		var form = $('<div></div>');
-
-        var pluginDescriptionElement = $('<div id="plugin-description"></div>').hide();
-        form.append(pluginDescriptionElement);
-
-		function createSettingsFromDefinition(settingsDefs)
-		{
-			_.each(settingsDefs, function(settingDef)
-			{
-				// Set a default value if one doesn't exist
-				if(!_.isUndefined(settingDef.default_value) && _.isUndefined(currentSettingsValues[settingDef.name]))
-				{
-					currentSettingsValues[settingDef.name] = settingDef.default_value;
-				}
-
-				var displayName = settingDef.name;
-
-				if(!_.isUndefined(settingDef.display_name))
-				{
-					displayName = settingDef.display_name;
-				}
-
-				var valueCell = createSettingRow(settingDef.name, displayName);
-
-				switch (settingDef.type)
-				{
-					case "array":
-					{
-						var subTableDiv = $('<div class="form-table-value-subtable"></div>').appendTo(valueCell);
-
-						var subTable = $('<table class="table table-condensed sub-table"></table>').appendTo(subTableDiv);
-						var subTableHead = $("<thead></thead>").hide().appendTo(subTable);
-						var subTableHeadRow = $("<tr></tr>").appendTo(subTableHead);
-						var subTableBody = $('<tbody></tbody>').appendTo(subTable);
-
-						var currentSubSettingValues = [];
-
-						// Create our headers
-						_.each(settingDef.settings, function(subSettingDef)
-						{
-							var subsettingDisplayName = subSettingDef.name;
-
-							if(!_.isUndefined(subSettingDef.display_name))
-							{
-								subsettingDisplayName = subSettingDef.display_name;
-							}
-
-							$('<th>' + subsettingDisplayName + '</th>').appendTo(subTableHeadRow);
-						});
-
-						if(settingDef.name in currentSettingsValues)
-						{
-							currentSubSettingValues = currentSettingsValues[settingDef.name];
-						}
-
-						function processHeaderVisibility()
-						{
-							if(newSettings.settings[settingDef.name].length > 0)
-							{
-								subTableHead.show();
-							}
-							else
-							{
-								subTableHead.hide();
-							}
-						}
-
-						function createSubsettingRow(subsettingValue)
-						{
-							var subsettingRow = $('<tr></tr>').appendTo(subTableBody);
-
-							var newSetting = {};
-
-							if(!_.isArray(newSettings.settings[settingDef.name]))
-							{
-								newSettings.settings[settingDef.name] = [];
-							}
-
-							newSettings.settings[settingDef.name].push(newSetting);
-
-							_.each(settingDef.settings, function(subSettingDef)
-							{
-								var subsettingCol = $('<td></td>').appendTo(subsettingRow);
-								var subsettingValueString = "";
-
-								if(!_.isUndefined(subsettingValue[subSettingDef.name]))
-								{
-									subsettingValueString = subsettingValue[subSettingDef.name];
-								}
-
-								newSetting[subSettingDef.name] = subsettingValueString;
-
-								$('<input class="table-row-value" type="text">').appendTo(subsettingCol).val(subsettingValueString).change(function()
-								{
-									newSetting[subSettingDef.name] = $(this).val();
-								});
-							});
-
-							subsettingRow.append($('<td class="table-row-operation"></td>').append($('<ul class="board-toolbar"></ul>').append($('<li></li>').append($('<i class="icon-trash icon-white"></i>').click(function()
-												{
-													var subSettingIndex = newSettings.settings[settingDef.name].indexOf(newSetting);
-
-													if(subSettingIndex != -1)
-													{
-														newSettings.settings[settingDef.name].splice(subSettingIndex, 1);
-														subsettingRow.remove();
-														processHeaderVisibility();
-													}
-												})))));
-
-							subTableDiv.scrollTop(subTableDiv[0].scrollHeight);
-
-							processHeaderVisibility();
-						}
-
-						$('<div class="table-operation text-button">ADD</div>').appendTo(valueCell).click(function()
-						{
-							var newSubsettingValue = {};
-
-							_.each(settingDef.settings, function(subSettingDef)
-							{
-								newSubsettingValue[subSettingDef.name] = "";
-							});
-
-							createSubsettingRow(newSubsettingValue);
-						});
-
-						// Create our rows
-						_.each(currentSubSettingValues, function(currentSubSettingValue, subSettingIndex)
-						{
-							createSubsettingRow(currentSubSettingValue);
-						});
-
-						break;
-					}
-					case "boolean":
-					{
-						newSettings.settings[settingDef.name] = currentSettingsValues[settingDef.name];
-
-                        var onOffSwitch = $('<div class="onoffswitch"><label class="onoffswitch-label" for="' + settingDef.name + '-onoff"><div class="onoffswitch-inner"><span class="on">YES</span><span class="off">NO</span></div><div class="onoffswitch-switch"></div></label></div>').appendTo(valueCell);
-
-						var input = $('<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="' + settingDef.name + '-onoff">').prependTo(onOffSwitch).change(function()
-						{
-							newSettings.settings[settingDef.name] = this.checked;
-						});
-
-						if(settingDef.name in currentSettingsValues)
-						{
-							input.prop("checked", currentSettingsValues[settingDef.name]);
-						}
-
-						break;
-					}
-					case "option":
-					{
-						var defaultValue = currentSettingsValues[settingDef.name];
-
-						var input = $('<select></select>').appendTo($('<div class="styled-select"></div>').appendTo(valueCell)).change(function()
-						{
-							newSettings.settings[settingDef.name] = $(this).val();
-						});
-
-						_.each(settingDef.options, function(option)
-						{
-
-							var optionName;
-							var optionValue;
-
-							if(_.isObject(option))
-							{
-								optionName = option.name;
-								optionValue = option.value;
-							}
-							else
-							{
-								optionName = option;
-							}
-
-							if(_.isUndefined(optionValue))
-							{
-								optionValue = optionName;
-							}
-
-							if(_.isUndefined(defaultValue))
-							{
-								defaultValue = optionValue;
-							}
-
-							$("<option></option>").text(optionName).attr("value", optionValue).appendTo(input);
-						});
-
-						newSettings.settings[settingDef.name] = defaultValue;
-
-						if(settingDef.name in currentSettingsValues)
-						{
-							input.val(currentSettingsValues[settingDef.name]);
-						}
-
-						break;
-					}
-					default:
-					{
-						newSettings.settings[settingDef.name] = currentSettingsValues[settingDef.name];
-
-
-						if(settingDef.type == "calculated")
-						{
-							var input = $('<textarea></textarea>').appendTo(valueCell).change(function()
-							{
-								newSettings.settings[settingDef.name] = $(this).val();
-							});
-
-							if(settingDef.name in currentSettingsValues)
-							{
-								input.val(currentSettingsValues[settingDef.name]);
-							}
-
-							createValueEditor(input);
-
-                            var datasourceToolbox = $('<ul class="board-toolbar datasource-input-suffix"></ul>');
-
-                            var datasourceTool = $('<li><i class="icon-plus icon-white"></i><label>DATASOURCE</label></li>').mousedown(function(e)
-                            {
-                                e.preventDefault();
-                                $(input).focus();
-                                $(input).insertAtCaret("datasources[\"");
-                                $(input).trigger("freeboard-eval");
-                            });
-
-                            var jsEditorTool = $('<li><i class="icon-fullscreen icon-white"></i><label>.JS EDITOR</label></li>').mousedown(function(e)
-                            {
-                                e.preventDefault();
-
-                                displayJSEditor(input.val(), function(result){
-                                    input.val(result);
-                                    input.change();
-                                });
-                            });
-
-                            $(valueCell).append(datasourceToolbox.append([datasourceTool, jsEditorTool]));
-						}
-						else
-						{
-							var input = $('<input type="text">').appendTo(valueCell).change(function()
-							{
-                                if(settingDef.type == "number")
-                                {
-                                    newSettings.settings[settingDef.name] = Number($(this).val());
-                                }
-                                else
-                                {
-								    newSettings.settings[settingDef.name] = $(this).val();
-                                }
-							});
-
-							if(settingDef.name in currentSettingsValues)
-							{
-								input.val(currentSettingsValues[settingDef.name]);
-							}
-						}
-
-						break;
-					}
-				}
-
-                if(!_.isUndefined(settingDef.suffix))
-                {
-                    valueCell.append($('<div class="input-suffix">' + settingDef.suffix + '</div>'));
-                }
-
-				if(!_.isUndefined(settingDef.description))
-				{
-					valueCell.append($('<div class="setting-description">' + settingDef.description + '</div>'));
-				}
-			});
-		}
-
-		function displayValidationError(settingName, errorMessage)
-		{
-			var errorElement = $('<div class="validation-error"></div>').html(errorMessage);
-			$("#setting-value-container-" + settingName).append(errorElement);
-		}
-
-        function removeSettingsRows()
-        {
-            if($("#setting-row-instance-name").length)
-            {
-                $("#setting-row-instance-name").nextAll().remove();
-            }
-            else
-            {
-                $("#setting-row-plugin-types").nextAll().remove();
-            }
-        }
-
-		createDialogBox(form, title, "Save", "Cancel", function()
-		{
-			$(".validation-error").remove();
-
-			// Validate our new settings
-			if(!_.isUndefined(currentInstanceName) && newSettings.name == "")
-			{
-				displayValidationError("instance-name", "A name is required.");
-				return true;
-			}
-
-			if(_.isFunction(settingsSavedCallback))
-			{
-				settingsSavedCallback(newSettings);
-			}
-		});
-
-        // Create our body
-		var pluginTypeNames = _.keys(pluginTypes);
-        var typeSelect;
-
-		if(pluginTypeNames.length > 1)
-		{
-			var typeRow = createSettingRow("plugin-types", "Type");
-			typeSelect = $('<select></select>').appendTo($('<div class="styled-select"></div>').appendTo(typeRow));
-
-			typeSelect.append($("<option>Select a type...</option>").attr("value", "undefined"));
-
-			_.each(pluginTypes, function(pluginType)
-			{
-				typeSelect.append($("<option></option>").text(pluginType.display_name).attr("value", pluginType.type_name));
-			});
-
-			typeSelect.change(function()
-			{
-				newSettings.type = $(this).val();
-				newSettings.settings = {};
-
-				// Remove all the previous settings
-                removeSettingsRows();
-
-				var currentType = pluginTypes[typeSelect.val()];
-
-				if(_.isUndefined(currentType))
-				{
-                    $("#setting-row-instance-name").hide();
-					$("#dialog-ok").hide();
-				}
-				else
-				{
-                    $("#setting-row-instance-name").show();
-
-                    if(currentType.description && currentType.description.length > 0)
-                    {
-                        pluginDescriptionElement.html(currentType.description).show();
-                    }
-                    else
-                    {
-                        pluginDescriptionElement.hide();
-                    }
-
-					$("#dialog-ok").show();
-					createSettingsFromDefinition(currentType.settings);
-				}
-			});
-		}
-		else if(pluginTypeNames.length == 1)
-		{
-			createSettingsFromDefinition(pluginTypes[pluginTypeNames[0]].settings);
-		}
-
-        if(!_.isUndefined(currentInstanceName))
-        {
-            createSettingRow("instance-name", "Name").append($('<input type="text">').val(currentInstanceName).change(function()
-            {
-                newSettings.name = $(this).val();
-            }));
-        }
-
-        if(typeSelect)
-        {
-            if(_.isUndefined(currentTypeName))
-            {
-                $("#setting-row-instance-name").hide();
-                $("#dialog-ok").hide();
-            }
-            else
-            {
-                $("#dialog-ok").show();
-                typeSelect.val(currentTypeName).trigger("change");
-            }
-        }
-	}
 
 	ko.bindingHandlers.pluginEditor = {
 		init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
@@ -1128,7 +334,7 @@ var freeboard = (function()
 				if(options.operation == 'delete')
 				{
 					var phraseElement = $('<p>Are you sure you want to delete this ' + title + '?</p>');
-					createDialogBox(phraseElement, "Confirm Delete", "Yes", "No", function()
+					new DialogBox(phraseElement, "Confirm Delete", "Yes", "No", function()
 					{
 
 						if(options.type == 'datasource')
@@ -1199,7 +405,7 @@ var freeboard = (function()
 						}
 					}
 
-					createPluginEditor(title, types, instanceName, instanceType, settings, function(newSettings)
+					pluginEditor.createPluginEditor(title, types, instanceName, instanceType, settings, function(newSettings)
 					{
 						if(options.operation == 'add')
 						{
@@ -1220,7 +426,7 @@ var freeboard = (function()
 
 								viewModel.widgets.push(newViewModel);
 
-								attachWidgetEditIcons(element);
+								freeboardUI.attachWidgetEditIcons(element);
 							}
 						}
 						else if(options.operation == 'edit')
@@ -1339,7 +545,7 @@ var freeboard = (function()
 
 			if(bindingContext.$root.isEditing())
 			{
-				showPaneEditIcons(true);
+				freeboardUI.showPaneEditIcons(true);
 			}
 
             updatePositionForScreenSize(viewModel, row, col);
@@ -1386,7 +592,7 @@ var freeboard = (function()
 		{
 			if(theFreeboardModel.isEditing())
 			{
-				attachWidgetEditIcons($(element).parent());
+				freeboardUI.attachWidgetEditIcons($(element).parent());
 			}
 		},
 		update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext)
@@ -1396,51 +602,6 @@ var freeboard = (function()
 				$(element).empty();
 				viewModel.render(element);
 			}
-		}
-	}
-
-	function showPaneEditIcons(show, animate)
-	{
-		if(_.isUndefined(animate))
-		{
-			animate = true;
-		}
-
-		var animateLength = (animate) ? 250 : 0;
-
-		if(show)
-		{
-			$(".pane-tools").fadeIn(animateLength);//.css("display", "block").animate({opacity: 1.0}, animateLength);
-		}
-		else
-		{
-			$(".pane-tools").fadeOut(animateLength);//.animate({opacity: 0.0}, animateLength).css("display", "none");//, function()
-			/*{
-			 $(this).css("display", "none");
-			 });*/
-		}
-	}
-
-	function attachWidgetEditIcons(element)
-	{
-		$(element).hover(function()
-		{
-			showWidgetEditIcons(this, true);
-		}, function()
-		{
-			showWidgetEditIcons(this, false);
-		});
-	}
-
-	function showWidgetEditIcons(element, show)
-	{
-		if(show)
-		{
-			$(element).find(".sub-section-tools").fadeIn(250);
-		}
-		else
-		{
-			$(element).find(".sub-section-tools").fadeOut(250);
 		}
 	}
 
@@ -1454,7 +615,7 @@ var freeboard = (function()
 	$(function()
 	{ //DOM Ready
 		// Show the loading indicator when we first load
-		showLoadingIndicator(true);
+		freeboardUI.showLoadingIndicator(true);
 	});
 
 	// PUBLIC FUNCTIONS
@@ -1486,7 +647,7 @@ var freeboard = (function()
 				theFreeboardModel.allow_edit(allowEdit);
 				theFreeboardModel.setEditing(allowEdit);
 
-				showLoadingIndicator(false);
+				freeboardUI.showLoadingIndicator(false);
 				if(_.isFunction(finishedCallback))
 				{
 					finishedCallback();
@@ -1537,10 +698,11 @@ var freeboard = (function()
 			widgetPlugins[plugin.type_name] = plugin;
 			theFreeboardModel._widgetTypes.valueHasMutated();
 		},
-        setAssetRoot : function(_assetRoot) // To be used if freeboard is going to load dynamic assets from a different root URL
-        {
-            assetRoot = _assetRoot;
-        },
+		// To be used if freeboard is going to load dynamic assets from a different root URL
+		setAssetRoot        : function(assetRoot)
+		{
+			jsEditor.setAssetRoot(assetRoot);
+		},
 		addStyle            : function(selector, rules)
 		{
 			var context = document, stylesheet;
@@ -1575,11 +737,11 @@ var freeboard = (function()
 		},
 		showLoadingIndicator: function(show)
 		{
-			showLoadingIndicator(show);
+			freeboardUI.showLoadingIndicator(show);
 		},
 		showDialog          : function(contentElement, title, okTitle, cancelTitle, okCallback)
 		{
-			createDialogBox(contentElement, title, okTitle, cancelTitle, okCallback);
+			new DialogBox(contentElement, title, okTitle, cancelTitle, okCallback);
 		},
         getDatasourceSettings : function(datasourceName)
         {
@@ -1635,14 +797,6 @@ var freeboard = (function()
 		showDeveloperConsole : function()
 		{
 			showDeveloperConsole();
-		},
-	        _attachWidgetEditIcons : function(element)
-	        {
-		    attachWidgetEditIcons(element);
-		},
-	        _showPaneEditIcons : function(show, animate)
-	        {
-		    showPaneEditIcons(show, animate);
 		},
 	        _removeAllWidgets : function()
 	        {

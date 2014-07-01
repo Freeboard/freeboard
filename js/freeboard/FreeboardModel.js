@@ -1,4 +1,4 @@
-function FreeboardModel(datasourcePlugins, widgetPlugins)
+function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 {
 	var self = this;
 
@@ -214,10 +214,10 @@ function FreeboardModel(datasourcePlugins, widgetPlugins)
 
 	this.loadDashboard = function(dashboardData, callback)
 	{
-		freeboard.showLoadingIndicator(true);
+		freeboardUI.showLoadingIndicator(true);
 		self.deserialize(dashboardData, function()
 		{
-			freeboard.showLoadingIndicator(false);
+			freeboardUI.showLoadingIndicator(false);
 
 			if(_.isFunction(callback))
 			{
@@ -353,11 +353,11 @@ function FreeboardModel(datasourcePlugins, widgetPlugins)
 			$("#main-header").animate({"top": "0px"}, animateLength);
 			$("#board-content").animate({"top": (barHeight + 20) + "px"}, animateLength);
 			$("#main-header").data().shown = true;
-			freeboard._attachWidgetEditIcons($(".sub-section"));
+			freeboardUI.attachWidgetEditIcons($(".sub-section"));
 			freeboard._enableGrid();
 		}
 
-		freeboard._showPaneEditIcons(editing, animate);
+		freeboardUI.showPaneEditIcons(editing, animate);
 	}
 
 	this.toggleEditing = function()

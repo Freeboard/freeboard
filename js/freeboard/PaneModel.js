@@ -1,6 +1,5 @@
-
 function PaneModel(theFreeboardModel, widgetPlugins)
-	{
+{
 	var self = this;
 
 	this.title = ko.observable();
