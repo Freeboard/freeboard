@@ -18,6 +18,10 @@ PluginEditor = function(jsEditor, valueEditor)
 		}
 	}
 
+	function _isNumerical(n)
+	{
+		return !isNaN(parseFloat(n)) && isFinite(n);
+	}
 
 	function createPluginEditor(title, pluginTypes, currentTypeName, currentSettingsValues, settingsSavedCallback)
 	{
@@ -327,7 +331,7 @@ PluginEditor = function(jsEditor, valueEditor)
 					displayValidationError(settingDef.name, "This is required.");
 					return true;
 				}
-				else if(settingDef.type == "number" && !isNumerical(newSettings.settings[settingDef.name]))
+				else if(settingDef.type == "number" && !_isNumerical(newSettings.settings[settingDef.name]))
 				{
 					displayValidationError(settingDef.name, "Must be a number.");
 					return true;

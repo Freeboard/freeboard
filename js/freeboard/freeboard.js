@@ -388,11 +388,6 @@ var freeboard = (function()
 		}
 	}
 
-    function isNumerical(n)
-    {
-        return !isNaN(parseFloat(n)) && isFinite(n);
-    }
-
     function processResize(layoutWidgets)
     {
         var rootElement = grid.$el;
