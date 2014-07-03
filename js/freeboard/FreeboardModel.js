@@ -2,6 +2,9 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 {
 	var self = this;
 
+	var SERIALIZATION_VERSION = 1;
+
+	this.version = 0;
 	this.isEditing = ko.observable(false);
 	this.allow_edit = ko.observable(false);
 	this.allow_edit.subscribe(function(newValue)
@@ -117,6 +120,7 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 		});
 
 		return {
+			version     : SERIALIZATION_VERSION,
 			header_image: self.header_image(),
 			allow_edit  : self.allow_edit(),
 			plugins     : self.plugins(),
@@ -139,7 +143,7 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 			{
 				self.allow_edit(true);
 			}
-
+			self.version = object.version || 0;
 			self.header_image(object.header_image);
 
 			_.each(object.datasources, function(datasourceConfig)

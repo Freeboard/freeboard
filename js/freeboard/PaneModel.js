@@ -6,6 +6,7 @@ function PaneModel(theFreeboardModel, widgetPlugins)
 	this.width = ko.observable(1);
 	this.row = {};
 	this.col = {};
+	this.col_width = ko.observable(1);
 	this.widgets = ko.observableArray();
 
 	this.addWidget = function(widget)
@@ -76,6 +77,7 @@ function PaneModel(theFreeboardModel, widgetPlugins)
 			width  : self.width(),
 			row    : self.row,
 			col    : self.col,
+			col_width : self.col_width(),
 			widgets: widgets
 		};
 	}
@@ -87,6 +89,7 @@ function PaneModel(theFreeboardModel, widgetPlugins)
 
 		self.row = object.row;
 		self.col = object.col;
+		self.col_width(object.col_width || 1);
 
 		_.each(object.widgets, function(widgetConfig)
 		{

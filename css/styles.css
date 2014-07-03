@@ -67,6 +67,12 @@ audio:not([controls])
 
 html
 {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 	font-family              : sans-serif; /* 1 */
 	-ms-text-size-adjust     : 100%; /* 2 */
 	-webkit-text-size-adjust : 100%; /* 2 */
@@ -1082,7 +1088,6 @@ ul, ol {
 }
 
 .gridster {
-    max-width: 960px;
     margin: 0 auto;
 	left: 0;
 	right: 0;
@@ -1095,6 +1100,12 @@ ul, ol {
     margin: 0px;
     overflow: hidden;
 	z-index:auto;
+    -webkit-touch-callout: text;
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
 }
 
 .gridster .preview-holder {
@@ -1112,7 +1123,7 @@ ul, ol {
 	margin-top          : 1px;
 	*margin-right       : .3em;
 	line-height         : 14px;
-	vertical-align      : text-top;
+    vertical-align      : text-top;
 	background-image    : url("../img/glyphicons-halflings.png");
 	background-position : 14px 14px;
 	background-repeat   : no-repeat;

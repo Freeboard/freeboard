@@ -19,10 +19,9 @@ PluginEditor = function(jsEditor, valueEditor)
 	}
 
 
-	function createPluginEditor(title, pluginTypes, currentInstanceName, currentTypeName, currentSettingsValues, settingsSavedCallback)
+	function createPluginEditor(title, pluginTypes, currentTypeName, currentSettingsValues, settingsSavedCallback)
 	{
 		var newSettings = {
-			name    : currentInstanceName,
 			type    : currentTypeName,
 			settings: {}
 		};
@@ -35,7 +34,7 @@ PluginEditor = function(jsEditor, valueEditor)
 			return $('<div id="setting-value-container-' + name + '" class="form-value"></div>').appendTo(tr);
 		}
 
-
+		var selectedType;
 		var form = $('<div></div>');
 
 		var pluginDescriptionElement = $('<div id="plugin-description"></div>').hide();
@@ -317,12 +316,22 @@ PluginEditor = function(jsEditor, valueEditor)
 		new DialogBox(form, title, "Save", "Cancel", function()
 		{
 			$(".validation-error").remove();
-
-			// Validate our new settings
-			if(!_.isUndefined(currentInstanceName) && newSettings.name == "")
+	
+			// Loop through each setting and validate it
+			for(var index = 0; index < selectedType.settings.length; index++)
 			{
-				_displayValidationError("instance-name", "A name is required.");
-				return true;
+				var settingDef = selectedType.settings[index];
+
+				if(settingDef.required && (_.isUndefined(newSettings.settings[settingDef.name]) || newSettings.settings[settingDef.name] == ""))
+				{
+					displayValidationError(settingDef.name, "This is required.");
+					return true;
+				}
+				else if(settingDef.type == "number" && !isNumerical(newSettings.settings[settingDef.name]))
+				{
+					displayValidationError(settingDef.name, "Must be a number.");
+					return true;
+				}
 			}
 
 			if(_.isFunction(settingsSavedCallback))
@@ -331,7 +340,7 @@ PluginEditor = function(jsEditor, valueEditor)
 			}
 		});
 
-        // Create our body
+		// Create our body
 		var pluginTypeNames = _.keys(pluginTypes);
 		var typeSelect;
 
@@ -355,9 +364,9 @@ PluginEditor = function(jsEditor, valueEditor)
 				// Remove all the previous settings
 				_removeSettingsRows();
 
-				var currentType = pluginTypes[typeSelect.val()];
+				selectedType = pluginTypes[typeSelect.val()];
 
-				if(_.isUndefined(currentType))
+				if(_.isUndefined(selectedType))
 				{
 					$("#setting-row-instance-name").hide();
 					$("#dialog-ok").hide();
@@ -366,9 +375,9 @@ PluginEditor = function(jsEditor, valueEditor)
 				{
                     $("#setting-row-instance-name").show();
 
-                    if(currentType.description && currentType.description.length > 0)
+                    if(selectedType.description && selectedType.description.length > 0)
                     {
-                        pluginDescriptionElement.html(currentType.description).show();
+                        pluginDescriptionElement.html(selectedType.description).show();
                     }
                     else
                     {
@@ -376,22 +385,15 @@ PluginEditor = function(jsEditor, valueEditor)
                     }
 
 					$("#dialog-ok").show();
-					createSettingsFromDefinition(currentType.settings);
+					createSettingsFromDefinition(selectedType.settings);
 				}
 			});
 		}
 		else if(pluginTypeNames.length == 1)
 		{
-			createSettingsFromDefinition(pluginTypes[pluginTypeNames[0]].settings);
+			selectedType = pluginTypes[pluginTypeNames[0]];
+			createSettingsFromDefinition(selectedType.settings);
 		}
-
-        if(!_.isUndefined(currentInstanceName))
-        {
-            createSettingRow("instance-name", "Name").append($('<input type="text">').val(currentInstanceName).change(function()
-            {
-                newSettings.name = $(this).val();
-            }));
-        }
 
         if(typeSelect)
         {
