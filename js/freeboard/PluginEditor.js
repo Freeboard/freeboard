@@ -328,12 +328,12 @@ PluginEditor = function(jsEditor, valueEditor)
 
 				if(settingDef.required && (_.isUndefined(newSettings.settings[settingDef.name]) || newSettings.settings[settingDef.name] == ""))
 				{
-					displayValidationError(settingDef.name, "This is required.");
+                    _displayValidationError(settingDef.name, "This is required.");
 					return true;
 				}
 				else if(settingDef.type == "number" && !_isNumerical(newSettings.settings[settingDef.name]))
 				{
-					displayValidationError(settingDef.name, "Must be a number.");
+                    _displayValidationError(settingDef.name, "Must be a number.");
 					return true;
 				}
 			}
