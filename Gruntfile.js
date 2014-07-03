@@ -4,17 +4,30 @@ module.exports = function(grunt) {
         concat: {
             css: {
                 src: [
-                    'css/*'
+                    'lib/css/**/*.css'
                 ],
-                dest: 'combined.css'
+                dest: 'css/freeboard.css'
             },
             js : {
                 src : [
-                    'js/*'
+                    'lib/js/**/*.js'
                 ],
-                dest : 'combined.js'
+                dest : 'js/freeboard.js'
             }
         },
+        cssmin : {
+            css:{
+                src: 'css/freeboard.css',
+                dest: 'css/freeboard.min.css'
+            }
+        },
+        uglify : {
+            js: {
+                files: {
+                    'js/freeboard.min.js' : [ 'js/freeboard.js' ]
+                }
+            }
+        }
     });
 
     grunt.loadNpmTasks('grunt-contrib-concat');
