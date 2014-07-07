@@ -1332,7 +1332,10 @@ PluginEditor = function(jsEditor, valueEditor)
 
 ValueEditor = function(theFreeboardModel)
 {
-	var _veDatasourceRegex = new RegExp(".*datasources\\[\"([^\"]*)(\"\\].)?$");
+	var _veDatasourceRegex = new RegExp(".*datasources\\[\"([^\"]*)(\"\\]\\[\")?(.*)$");
+
+	var _autocompleteOptions = [];
+	var _autocompleteReplacementString;
 
 	function _resizeValueEditor(element)
 	{
@@ -1341,6 +1344,126 @@ ValueEditor = function(theFreeboardModel)
 		var newHeight = Math.min(200, 20 * (lineBreakCount + 1));
 
 		$(element).css({height: newHeight + "px"});
+	}
+
+	function _autocompleteFromDatasource(inputString, datasources)
+	{
+		var match = _veDatasourceRegex.exec(inputString);
+
+		var options = [];
+		var replacementString;
+
+		if(match)
+		{
+			if(match[1] == "") // List all datasources
+			{
+				_.each(datasources, function(datasource)
+				{
+					options.push({value: datasource.name(), follow_char: "\"][\""});
+				});
+			}
+			else if(match[1] != "" && _.isUndefined(match[2])) // List partial datasources
+			{
+				replacementString = match[1];
+
+				_.each(datasources, function(datasource)
+				{
+					var dsName = datasource.name();
+
+					if(dsName != replacementString && dsName.indexOf(replacementString) == 0)
+					{
+						options.push({value: dsName, follow_char: "\"][\""});
+					}
+				});
+			}
+			else
+			{
+				var datasource = _.find(datasources, function(datasource)
+				{
+					return (datasource.name() === match[1]);
+				});
+
+				if(!_.isUndefined(datasource))
+				{
+					var dataPath = "";
+
+					if(!_.isUndefined(match[2]))
+					{
+						dataPath = match[2] + match[3];
+					}
+
+					var dataPathItems = dataPath.split("\"][\"");
+					dataPath = "data";
+
+					for(var index = 1; index < dataPathItems.length - 1; index++)
+					{
+						if(dataPathItems[index] != "")
+						{
+							dataPathItem = "[\"" + dataPathItems[index] + "\"]";
+							dataPath = dataPath + dataPathItem;
+						}
+					}
+
+					var lastPathObject = _.last(dataPathItems);
+
+					// If the last character is a ", then ignore it
+					if(lastPathObject.charAt(lastPathObject.length - 1) == "\"")
+					{
+						lastPathObject = lastPathObject.replace(/\[\"?$/, "");
+						dataPath = dataPath + "[\"" + lastPathObject + "\"]";
+					}
+
+					var dataValue = datasource.getDataRepresentation(dataPath);
+
+					if(_.isArray(dataValue))
+					{
+						for(var index = 0; index < dataValue.length; index++)
+						{
+							var followChar = "\"]";
+
+							if(_.isObject(dataValue[index]))
+							{
+								followChar = followChar + "\"][\"";
+							}
+							else if(_.isArray(dataValue[index]))
+							{
+								followChar = followChar + "\"][";
+							}
+
+							options.push({value: index, follow_char: followChar});
+						}
+					}
+					else if(_.isObject(dataValue))
+					{
+						replacementString = lastPathObject;
+
+						if(_.keys(dataValue).indexOf(replacementString) == -1)
+						{
+							_.each(dataValue, function(value, name)
+							{
+								if(name != lastPathObject && name.indexOf(lastPathObject) == 0)
+								{
+									var followChar = "\"]";
+
+									if(_.isArray(value))
+									{
+										followChar = "\"][";
+									}
+									else if(_.isObject(value))
+									{
+										followChar = "\"][\"";
+									}
+
+									options.push({value: name, follow_char: followChar});
+								}
+							});
+						}
+					}
+				}
+			}
+		}
+		_autocompleteOptions = options;
+		_autocompleteReplacementString = replacementString;
 	}
 
 	function createValueEditor(element)
@@ -1360,121 +1483,9 @@ ValueEditor = function(theFreeboardModel)
 			var inputString = $(element).val().substring(0, $(element).getCaretPosition());
 			inputString = inputString.replace(String.fromCharCode(160), " "); // Weird issue where the textarea box was putting in ASCII (non breaking space) for spaces.
 
-			var match = _veDatasourceRegex.exec(inputString);
+			_autocompleteFromDatasource(inputString, theFreeboardModel.datasources());
 
-			var options = [];
-			var replacementString;
-
-			if(match)
-			{
-				if(match[1] == "") // List all datasources
-				{
-					_.each(theFreeboardModel.datasources(), function(datasource)
-					{
-						options.push({value: datasource.name(), follow_char: "\"]."});
-					});
-				}
-				else if(match[1] != "" && _.isUndefined(match[2])) // List partial datasources
-				{
-					replacementString = match[1];
-
-					_.each(theFreeboardModel.datasources(), function(datasource)
-					{
-						var dsName = datasource.name();
-
-						if(dsName != replacementString && dsName.indexOf(replacementString) == 0)
-						{
-							options.push({value: dsName, follow_char: "\"]."});
-						}
-					});
-				}
-				else
-				{
-					var datasource = _.find(theFreeboardModel.datasources(), function(datasource)
-					{
-						return (datasource.name() === match[1]);
-					});
-
-					if(!_.isUndefined(datasource))
-					{
-						var dataPath = "";
-
-						if(!_.isUndefined(match[2]))
-						{
-							dataPath = match[2];
-						}
-
-						var dataPathItems = dataPath.split(".");
-						dataPath = "data";
-
-						for(var index = 1; index < dataPathItems.length - 1; index++)
-						{
-							if(dataPathItems[index] != "")
-							{
-								dataPath = dataPath + "." + dataPathItems[index];
-							}
-						}
-
-						var lastPathObject = _.last(dataPathItems);
-
-						// If the last character is a [, then ignore it
-						if(lastPathObject.charAt(lastPathObject.length - 1) == "[")
-						{
-							lastPathObject = lastPathObject.replace(/\[+$/, "");
-							dataPath = dataPath + "." + lastPathObject;
-						}
-
-						var dataValue = datasource.getDataRepresentation(dataPath);
-
-						if(_.isArray(dataValue))
-						{
-							for(var index = 0; index < dataValue.length; index++)
-							{
-								var followChar = "]";
-
-								if(_.isObject(dataValue[index]))
-								{
-									followChar = followChar + ".";
-								}
-								else if(_.isArray(dataValue[index]))
-								{
-									followChar = followChar + "[";
-								}
-
-								options.push({value: index, follow_char: followChar});
-							}
-						}
-						else if(_.isObject(dataValue))
-						{
-							replacementString = lastPathObject;
-
-							if(_.keys(dataValue).indexOf(replacementString) == -1)
-							{
-								_.each(dataValue, function(value, name)
-								{
-									if(name != lastPathObject && name.indexOf(lastPathObject) == 0)
-									{
-										var followChar = undefined;
-
-										if(_.isArray(value))
-										{
-											followChar = "[";
-										}
-										else if(_.isObject(value))
-										{
-											followChar = ".";
-										}
-
-										options.push({value: name, follow_char: followChar});
-									}
-								});
-							}
-						}
-					}
-				}
-			}
-
-			if(options.length > 0)
+			if(_autocompleteOptions.length > 0)
 			{
 				if(!dropdown)
 				{
@@ -1489,7 +1500,7 @@ ValueEditor = function(theFreeboardModel)
 
 				var currentIndex = 0;
 
-				_.each(options, function(option)
+				_.each(_autocompleteOptions, function(option)
 				{
 					var li = $('<li>' + option.value + '</li>').appendTo(dropdown).mouseenter(function()
 					{
@@ -1507,13 +1518,13 @@ ValueEditor = function(theFreeboardModel)
 								optionValue = optionValue + option.follow_char;
 							}
 
-							if(!_.isUndefined(replacementString))
+							if(!_.isUndefined(_autocompleteReplacementString))
 							{
-								var replacementIndex = inputString.lastIndexOf(replacementString);
+								var replacementIndex = inputString.lastIndexOf(_autocompleteReplacementString);
 
 								if(replacementIndex != -1)
 								{
-									$(element).replaceTextAt(replacementIndex, replacementIndex + replacementString.length, optionValue);
+									$(element).replaceTextAt(replacementIndex, replacementIndex + _autocompleteReplacementString.length, optionValue);
 								}
 							}
 							else
