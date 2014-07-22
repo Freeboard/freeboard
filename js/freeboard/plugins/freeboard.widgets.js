@@ -19,6 +19,7 @@
     // Add some styles to our sheet
     freeboard.addStyle('.text-widget-unit', 'padding-left: 5px;display:inline;');
     freeboard.addStyle('.text-widget-regular-value', valueStyle + "font-size:30px;");
+    freeboard.addStyle('.text-widget-small-value', valueStyle + "font-size:18px;");
     freeboard.addStyle('.text-widget-big-value', valueStyle + "font-size:75px;");
 
     freeboard.addStyle('.gauge-widget-wrapper', "width: 100%;text-align: center;");
@@ -121,7 +122,8 @@
 
             valueElement
                 .toggleClass("text-widget-regular-value", (newSettings.size == "regular"))
-                .toggleClass("text-widget-big-value", (newSettings.size == "big"));
+                .toggleClass("text-widget-big-value", (newSettings.size == "big"))
+                .toggleClass("text-widget-small-value", (newSettings.size == "small"));
 
             unitsElement.html((_.isUndefined(newSettings.units) ? "" : newSettings.units));
 
@@ -189,6 +191,10 @@
                     {
                         name: "Big",
                         value: "big"
+                    },
+                    {
+                        name: "Small",
+                        value: "small"
                     }
                 ]
             },
