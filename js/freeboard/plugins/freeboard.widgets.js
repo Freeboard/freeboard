@@ -631,12 +631,12 @@
             {
                 name: "on_text",
                 display_name: "On Text",
-                type: "calculated"
+                type: "text"
             },
             {
                 name: "off_text",
                 display_name: "Off Text",
-                type: "calculated"
+                type: "text"
             }
         ],
         newInstance: function (settings, newInstanceCallback) {
