@@ -847,6 +847,11 @@ a:focus
 	text-decoration : underline;
 }
 
+.gridster header.transparent
+{
+	background-color: transparent;
+}
+
 .gridster header
 {
     background-color: #272727;
@@ -1092,6 +1097,10 @@ ul, ol {
 	left: 0;
 	right: 0;
 	top: 0;
+}
+
+.gridster .gs_w.transparent {
+    background: transparent;
 }
 
 .gridster .gs_w {

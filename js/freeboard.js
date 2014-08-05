@@ -978,6 +978,7 @@ function PaneModel(theFreeboardModel, widgetPlugins)
 
 	this.title = ko.observable();
 	this.width = ko.observable(1);
+	this.transparent = ko.observable(false);
 	this.row = {};
 	this.col = {};
 	this.col_width = ko.observable(1);
@@ -1047,12 +1048,13 @@ function PaneModel(theFreeboardModel, widgetPlugins)
 		});
 
 		return {
-			title  : self.title(),
-			width  : self.width(),
-			row    : self.row,
-			col    : self.col,
-			col_width : self.col_width(),
-			widgets: widgets
+			title      : self.title(),
+			width      : self.width(),
+			transparent: self.transparent(),
+			row        : self.row,
+			col        : self.col,
+			col_width  : self.col_width(),
+			widgets    : widgets
 		};
 	}
 
@@ -1060,6 +1062,7 @@ function PaneModel(theFreeboardModel, widgetPlugins)
 	{
 		self.title(object.title);
 		self.width(object.width);
+		self.transparent(object.transparent || false);
 
 		self.row = object.row;
 		self.col = object.col;
@@ -2345,6 +2348,7 @@ var freeboard = (function()
 						{
 							settings.title = viewModel.title();
 							settings.col_width = viewModel.col_width();
+							settings.transparent = viewModel.transparent();
 						}
 
 						types = {
@@ -2361,6 +2365,11 @@ var freeboard = (function()
 										type : "number",
 										default_value : 1,
 										required : true
+									},
+									{
+										name        : "transparent",
+										display_name: "Transparent background",
+										type        : "boolean"
 									}
 								]
 							}
@@ -2399,6 +2408,7 @@ var freeboard = (function()
 							{
 								viewModel.title(newSettings.settings.title);
 								viewModel.col_width(newSettings.settings.col_width);
+								viewModel.transparent(newSettings.settings.transparent);
 							}
 							else
 							{
