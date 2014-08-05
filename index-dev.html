@@ -63,7 +63,7 @@
                         <li id="add-pane" data-bind="click: createPane"><i class="icon-plus icon-white"></i><label>Add Pane</label></li>
                     </ul>
                     <ul data-bind="visible: storageKey()" class="board-toolbar vertical">
-                        <li data-bind="visible: storageKey(), click: loadDashboardFromLocalStorage"><i id="full-screen-icon" class="icon-folder-open icon-white"></i><label data-bind="text: 'Restore Freeboard (' + storageKey() + ')'" id="full-screen"></label></li>
+                        <li data-bind="click: loadDashboardFromLocalStorage"><i id="full-screen-icon" class="icon-folder-open icon-white"></i><label data-bind="text: 'Restore Freeboard (' + storageKey() + ')'" id="full-screen"></label></li>
                         <li data-bind="click: saveDashboardToLocalStorage"><i class="icon-download-alt icon-white"></i><label data-bind="text: 'Store Freeboard (' + storageKey() + ')'"></label></li>
                         <li data-bind="click: removeDashboardFromLocalStorage"><i class="icon-remove icon-white"></i><label data-bind="text: 'Remove Freeboard (' + storageKey() + ')'"></label></li>
                     </ul>
