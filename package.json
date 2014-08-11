@@ -1,0 +1,28 @@
+{
+  "name": "freeboard",
+  "version": "0.0.0",
+  "description": "A free open-source alternative to Geckoboard.",
+  "main": "js/freeboard/freeboard.js",
+  "directories": {
+    "doc": "docs",
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/allouis/freeboard.git"
+  },
+  "keywords": [
+    "dashboard",
+    "freeboard",
+    "geckoboard"
+  ],
+  "author": "Fabien O'Carroll <fabien@allou.is> (http://allou.is/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/allouis/freeboard/issues"
+  },
+  "homepage": "https://github.com/allouis/freeboard"
+}
