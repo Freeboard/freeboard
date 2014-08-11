@@ -24,5 +24,10 @@
   "bugs": {
     "url": "https://github.com/allouis/freeboard/issues"
   },
-  "homepage": "https://github.com/allouis/freeboard"
+  "homepage": "https://github.com/allouis/freeboard",
+  "dependencies": {
+    "knockout": "~3.1.0",
+    "underscore": "~1.6.0",
+    "jquery": "~2.1.1"
+  }
 }
