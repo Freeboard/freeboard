@@ -111,8 +111,12 @@
 
 		this.onSettingsChanged = function(newSettings)
 		{
+			lockErrorStage = false;
+			errorStage = 0;
+
 			currentSettings = newSettings;
 			updateRefresh(currentSettings.refresh * 1000);
+			self.updateNow();
 		}
 	};
 
@@ -130,6 +134,13 @@
 				description : 'A direct JSON connection will be tried first, if that fails, a JSONP connection will be tried. If that fails, you can use thingproxy, which can solve many connection problems to APIs. <a href="https://github.com/Freeboard/thingproxy" target="_blank">More information</a>.',
 				type         : "boolean",
 				default_value: true
+			},
+			{
+				name         : "refresh",
+				display_name : "Refresh Every",
+				type         : "number",
+				suffix       : "seconds",
+				default_value: 5
 			},
 			{
 				name: "method",
@@ -159,13 +170,6 @@
 				display_name: "Body",
 				type        : "text",
 				description : "The body of the request. Normally only used if method is POST"
-			},
-			{
-				name         : "refresh",
-				display_name : "Refresh Every",
-				type         : "number",
-				suffix       : "seconds",
-				default_value: 5
 			},
 			{
 				name        : "headers",
