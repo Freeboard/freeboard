@@ -14,6 +14,10 @@
 		var self = this;
 		var updateTimer = null;
 		var currentSettings = settings;
+		var errorStage = 0; 	// 0 = try standard request
+								// 1 = try JSONP
+								// 2 = try thingproxy.freeboard.io
+		var lockErrorStage = false;
 
 		function updateRefresh(refreshTime)
 		{
@@ -32,9 +36,21 @@
 
 		this.updateNow = function()
 		{
+			if((errorStage > 1 && !currentSettings.use_thingproxy) || errorStage > 2) // We've tried everything, let's quit
+			{
+				return; // TODO: Report an error
+			}
+
+			var requestURL = currentSettings.url;
+
+			if(errorStage == 2 && currentSettings.use_thingproxy)
+			{
+				requestURL = (location.protocol == "https:" ? "https:" : "http:") + "//thingproxy.freeboard.io/fetch/" + encodeURI(currentSettings.url);
+			}
+
 			$.ajax({
-				url       : currentSettings.url,
-				dataType  : (currentSettings.is_jsonp) ? "JSONP" : "JSON",
+				url       : requestURL,
+				dataType  : (errorStage == 1) ? "JSONP" : "JSON",
 				beforeSend: function(xhr)
 				{
 					try
@@ -56,10 +72,17 @@
 				},
 				success   : function(data)
 				{
+					lockErrorStage = true;
 					updateCallback(data);
 				},
 				error     : function(xhr, status, error)
 				{
+					if(!lockErrorStage)
+					{
+						// TODO: Figure out a way to intercept CORS errors only. The error message for CORS errors seems to be a standard 404.
+						errorStage++;
+						self.updateNow();
+					}
 				}
 			});
 		}
@@ -86,16 +109,18 @@
 				type        : "text"
 			},
 			{
+				name         : "use_thingproxy",
+				display_name : "Use thingproxy",
+				description : 'Using thingproxy can solve many connection problems. <a href="http://freeboard.github.io/thingproxy" target="_blank">More information</a>.',
+				type         : "boolean",
+				default_value: true
+			},
+			{
 				name         : "refresh",
 				display_name : "Refresh Every",
 				type         : "number",
 				suffix       : "seconds",
 				default_value: 5
-			},
-			{
-				name        : "is_jsonp",
-				display_name: "Is JSONP",
-				type        : "boolean"
 			},
 			{
 				name        : "headers",
