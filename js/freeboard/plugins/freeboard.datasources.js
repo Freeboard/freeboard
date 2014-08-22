@@ -126,8 +126,8 @@
 			},
 			{
 				name         : "use_thingproxy",
-				display_name : "Use thingproxy",
-				description : 'thingproxy can solve many connection problems to APIs. <a href="https://github.com/Freeboard/thingproxy" target="_blank">More information</a>.',
+				display_name : "Try thingproxy",
+				description : 'A direct JSON connection will be tried first, if that fails, a JSONP connection will be tried. If that fails, you can use thingproxy, which can solve many connection problems to APIs. <a href="https://github.com/Freeboard/thingproxy" target="_blank">More information</a>.',
 				type         : "boolean",
 				default_value: true
 			},

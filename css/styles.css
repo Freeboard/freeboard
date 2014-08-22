@@ -2086,7 +2086,10 @@ a:hover.text-button, a:focus.text-button
 	font-size   : 10px;
 	text-shadow : none;
 	color: #6F6F6F;
-	margin-bottom: 5px;
+	margin-top: 5px;
+	margin-bottom: 15px;
+	max-width: 414px;
+	line-height: 1.5em;
 }
 
 textarea.calculated-value-input
