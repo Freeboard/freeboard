@@ -48,9 +48,25 @@
 				requestURL = (location.protocol == "https:" ? "https:" : "http:") + "//thingproxy.freeboard.io/fetch/" + encodeURI(currentSettings.url);
 			}
 
+			var body = currentSettings.body;
+
+			// Can the body be converted to JSON?
+			if(body)
+			{
+				try
+				{
+					body = JSON.parse(body);
+				}
+				catch(e)
+				{
+				}
+			}
+
 			$.ajax({
 				url       : requestURL,
 				dataType  : (errorStage == 1) ? "JSONP" : "JSON",
+				type : currentSettings.method || "GET",
+				data : body,
 				beforeSend: function(xhr)
 				{
 					try
@@ -114,6 +130,35 @@
 				description : 'thingproxy can solve many connection problems to APIs. <a href="https://github.com/Freeboard/thingproxy" target="_blank">More information</a>.',
 				type         : "boolean",
 				default_value: true
+			},
+			{
+				name: "method",
+				display_name: "Method",
+				type: "option",
+				options: [
+					{
+						name: "GET",
+						value: "GET"
+					},
+					{
+						name: "POST",
+						value: "POST"
+					},
+					{
+						name: "PUT",
+						value: "PUT"
+					},
+					{
+						name: "DELETE",
+						value: "DELETE"
+					}
+				]
+			},
+			{
+				name        : "body",
+				display_name: "Body",
+				type        : "text",
+				description : "The body of the request. Normally only used if method is POST"
 			},
 			{
 				name         : "refresh",
