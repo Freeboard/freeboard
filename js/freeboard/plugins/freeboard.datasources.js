@@ -111,7 +111,7 @@
 			{
 				name         : "use_thingproxy",
 				display_name : "Use thingproxy",
-				description : 'Using thingproxy can solve many connection problems. <a href="http://freeboard.github.io/thingproxy" target="_blank">More information</a>.',
+				description : 'Using thingproxy can solve many connection problems. <a href="http://freeboard.io/thingproxy" target="_blank">More information</a>.',
 				type         : "boolean",
 				default_value: true
 			},
