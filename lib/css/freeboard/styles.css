@@ -1087,7 +1087,33 @@ ul, ol {
     list-style: none;
 }
 
+.add_grid_col,
+.sub_grid_col {
+	position: absolute;
+	border: 1px gray solid;
+	padding: 15px 20px;
+	margin: 5px 10px;
+	width: 10px;
+	cursor: pointer;
+}
+
+.add_grid_col {
+	top: 60px;
+}
+
+.add_grid_col.left,
+.sub_grid_col.left {
+	left: 0;
+}
+
+.add_grid_col.right,
+.sub_grid_col.right {
+	right: 0;
+}
+
+
 .gridster {
+	max-width: 960px;
     margin: 0 auto;
 	left: 0;
 	right: 0;
