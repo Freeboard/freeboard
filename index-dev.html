@@ -46,10 +46,12 @@
 <body>
 <div id="board-content">
     <img id="dash-logo" data-bind="attr:{src: header_image}, visible:header_image()">
-	<div class="add_grid_col left" data-bind="click: addGridColumnLeft">+</div>
-	<div class="sub_grid_col left" data-bind="click: subGridColumnLeft">-</div>
-	<div class="add_grid_col right" data-bind="click: addGridColumnRight">+</div>
-	<div class="sub_grid_col right" data-bind="click: subGridColumnRight">-</div>
+	<div class="grid-column-controls">
+		<div class="add left" data-bind="click: addGridColumnLeft">+</div>
+		<div class="sub left" data-bind="click: subGridColumnLeft">-</div>
+		<div class="add right" data-bind="click: addGridColumnRight">+</div>
+		<div class="sub right" data-bind="click: subGridColumnRight">-</div>
+	</div>
     <div class="gridster">
         <ul data-bind="grid: true">
         </ul>
