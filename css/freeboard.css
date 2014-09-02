@@ -968,7 +968,7 @@ input[type="color"]:focus,
 .uneditable-input:focus {
 	border-color: rgba(255, 153, 0, 0.8);
 	outline: 0;
-	outline: thin dotted   \9;
+	outline: thin dotted    \9;
 	/* IE6-9 */
 
 	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgb(255, 153, 0);
@@ -1338,31 +1338,26 @@ ul, ol {
 	right: 0;
 }
 
-.column-tool
-{
+.column-tool {
 	cursor: pointer;
 }
 
-.column-tool.min.sub, .column-tool.max.add
-{
+.column-tool.min.sub, .column-tool.max.add {
 	display: none;
 }
 
-.column-icon
-{
+.column-icon {
 	display: inline-block;
 	background-color: white;
 	width: 5px;
 	height: 100%;
 }
 
-.column-icon.right
-{
+.column-icon.right {
 	float: right;
 }
 
-.column-icon.left
-{
+.column-icon.left {
 	float: left;
 }
 
@@ -2201,7 +2196,10 @@ a:hover.text-button, a:focus.text-button {
 	font-size: 10px;
 	text-shadow: none;
 	color: #6F6F6F;
-	margin-bottom: 5px;
+	margin-top: 5px;
+	margin-bottom: 15px;
+	max-width: 414px;
+	line-height: 1.5em;
 }
 
 textarea.calculated-value-input {
