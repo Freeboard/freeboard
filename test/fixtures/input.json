@@ -1,0 +1,40 @@
+{
+	"x" : 42,
+	"y" : 19,
+	"z" : 313,
+	"meta" : {
+		"owner" :
+		{
+			"first_name" : "Alfonso",
+			"last_name" : "Jones",
+			"maiden_name" : "Smith"
+		},
+		"country" : "USA",
+		"make" : "BMW",
+		"model" : "XL",
+		"year" : "2018"
+	},
+	"entries" : ["2000", "2003", "2004", "2006", "2011", "2014"],
+	"previous_owners" : [
+		{
+			"owner" : "Zelnit",
+			"country" : "Russia"
+		},
+		{
+			"owner" : "Yolga",
+			"country" : "Venezuela"
+		},
+		{
+			"owner" : "Xavier",
+			"country" : "Poland"
+		},
+		{
+			"owner" : "Voltron",
+			"country" : "Greenland"
+		},
+		{
+			"owner" : "Uther",
+			"country" : "Cambodia"
+		}
+	]
+}

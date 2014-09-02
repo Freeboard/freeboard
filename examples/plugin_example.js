@@ -40,7 +40,9 @@
 				// **default_value** : A default value for this setting.
 				"default_value": "John",
 				// **description** : Text that will be displayed below the setting to give the user any extra information.
-				"description"  : "This is pretty self explanatory..."
+				"description"  : "This is pretty self explanatory...",
+                // **required** : If set to true, the field will be required to be filled in by the user. Defaults to false if not specified.
+                "required" : true
 			},
 			{
 				"name"        : "last_name",
@@ -48,6 +50,12 @@
 				// **type "calculated"** : This is a special text input box that may contain javascript formulas and references to datasources in the freeboard.
 				"type"        : "calculated"
 			},
+            {
+                "name"        : "age",
+                "display_name": "Age",
+                // **type "number"** : A data of a numerical type. Requires the user to enter a numerical value
+                "type"        : "number"
+            },
 			{
 				"name"        : "is_human",
 				"display_name": "I am human",
