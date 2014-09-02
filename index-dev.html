@@ -46,13 +46,7 @@
 <body>
 <div id="board-content">
     <img id="dash-logo" data-bind="attr:{src: header_image}, visible:header_image()">
-	<div class="grid-column-controls">
-		<div class="add left" data-bind="click: addGridColumnLeft">+</div>
-		<div class="sub left" data-bind="click: subGridColumnLeft">-</div>
-		<div class="add right" data-bind="click: addGridColumnRight">+</div>
-		<div class="sub right" data-bind="click: subGridColumnRight">-</div>
-	</div>
-    <div class="gridster">
+    <div class="gridster responsive-column-width">
         <ul data-bind="grid: true">
         </ul>
     </div>
@@ -103,8 +97,19 @@
             </div>
         </div>
     </div>
+	<div id="column-tools" class="responsive-column-width">
+		<ul class="board-toolbar left-columns">
+			<li class="column-tool add" data-bind="click: addGridColumnLeft"><span class="column-icon right"></span><i class="icon-arrow-left icon-white"></i></li>
+			<li class="column-tool sub" data-bind="click: subGridColumnLeft"><span class="column-icon left"></span><i class="icon-arrow-right icon-white"></i></li>
+		</ul>
+		<ul class="board-toolbar right-columns">
+			<li class="column-tool sub" data-bind="click: subGridColumnRight"><span class="column-icon right"></span><i class="icon-arrow-left icon-white"></i></li>
+			<li class="column-tool add" data-bind="click: addGridColumnRight"><span class="column-icon left"></span><i class="icon-arrow-right icon-white"></i></li>
+		</ul>
+	</div>
     <div id="toggle-header" data-bind="click: toggleEditing">
-        <i id="toggle-header-icon" class="icon-wrench icon-white"></i></div>
+        <i id="toggle-header-icon" class="icon-wrench icon-white"></i>
+	</div>
 </header>
 
 <div style="display:hidden">
