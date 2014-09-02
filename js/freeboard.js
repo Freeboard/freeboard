@@ -1099,7 +1099,7 @@ JSEditor = function()
         },
         setAssetRoot : function(assetRoot)
         {
-            setAssetRoot(_assetRoot)
+            setAssetRoot(assetRoot)
         }
     }
 }
