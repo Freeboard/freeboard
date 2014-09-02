@@ -15617,6 +15617,11 @@ new a.w;var b=new a.Ba;0<b.Rb&&a.La(b);a.b("jqueryTmplTemplateEngine",a.Ba)})()}
 		$(window).bind('resize.gridster-draggable', throttle($.proxy(this.calculate_positions, this), 200));
 	};
 
+	fn.setOptions = function(options)
+	{
+		this.options = $.extend(this.options, options);
+	};
+
 	fn.events = function()
 	{
 		this.$container.on('selectstart.gridster-draggable', $.proxy(this.on_select_start, this));
@@ -15932,6 +15937,10 @@ new a.w;var b=new a.Ba;0<b.Rb&&a.La(b);a.b("jqueryTmplTemplateEngine",a.Ba)})()}
 			if(!$.data(this, 'drag'))
 			{
 				$.data(this, 'drag', new Draggable(this, options));
+			}
+			else
+			{
+				$.data(this, 'drag').setOptions(options);
 			}
 		});
 	};
@@ -18985,6 +18994,7 @@ new a.w;var b=new a.Ba;0<b.Rb&&a.La(b);a.b("jqueryTmplTemplateEngine",a.Ba)})()}
 	};
 
 }(jQuery, window, document));
+
 (function($)
 {
 	$.fn.insertAtCaret = function(text, opts)
