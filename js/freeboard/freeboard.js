@@ -2300,6 +2300,9 @@ var freeboard = (function()
 						{
 							finishedCallback();
 						}
+
+                        theFreeboardModel.allow_edit(allowEdit);
+                        theFreeboardModel.setEditing(allowEdit);
 					}
 				});
 			}
