@@ -385,12 +385,15 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 			allow_edit  : self.allow_edit(),
 			plugins     : self.plugins(),
 			panes       : panes,
-			datasources : datasources
+			datasources : datasources,
+			columns     : freeboardUI.getGridColumns()
 		};
 	}
 
 	this.deserialize = function(object, finishedCallback)
 	{
+		freeboardUI.setGridColumns(object["columns"]);
+
 		self.clearDashboard();
 
 		function finishLoad()
@@ -433,6 +436,8 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 			{
 				finishedCallback();
 			}
+
+			freeboardUI.processResize(true);
 		}
 
 		// This could have been self.plugins(object.plugins), but for some weird reason head.js was causing a function to be added to the list of plugins.
@@ -757,6 +762,10 @@ function FreeboardUI()
 	}
 
 	function updateGridWidth(newCols) {
+		if(newCols === undefined)
+		{
+			newCols = MIN_COLUMNS;
+		}
 		var new_width = COLUMN_WIDTH*newCols;
 		var available_width = $("#board-content").width();
 
@@ -1007,20 +1016,34 @@ function FreeboardUI()
 		{
 			grid.remove_widget(element);
 		},
-		removeAllPanes : function() {
+		removeAllPanes : function()
+		{
 			grid.remove_all_widgets();
 		},
-		addGridColumnLeft : function() {
+		addGridColumnLeft : function()
+		{
 			addGridColumn(true);
 		},
-		addGridColumnRight : function() {
+		addGridColumnRight : function()
+		{
 			addGridColumn(false);
 		},
-		subGridColumnLeft : function() {
+		subGridColumnLeft : function()
+		{
 			subtractGridColumn(true);
 		},
-		subGridColumnRight : function() {
+		subGridColumnRight : function()
+		{
 			subtractGridColumn(false);
+		},
+		getGridColumns : function()
+		{
+			return grid.cols;
+		},
+		setGridColumns : function(numCols)
+		{
+			updateGridWidth(numCols);
+			processResize(true);
 		}
 	}
 }
