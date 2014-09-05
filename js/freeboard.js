@@ -669,7 +669,8 @@ function FreeboardUI()
 		var repositionFunction = function(){};
 		if(layoutWidgets)
 		{
-			repositionFunction = function(index){
+			repositionFunction = function(index)
+			{
 				var paneElement = this;
 				var viewModel = ko.dataFor(paneElement);
 
@@ -685,7 +686,8 @@ function FreeboardUI()
 	function addGridColumn(shift)
 	{
 		var num_cols = grid.cols + 1;
-		if(updateGridWidth(num_cols)) {
+		if(updateGridWidth(num_cols))
+		{
 			repositionGrid(function() {
 				var paneElement = this;
 				var paneModel = ko.dataFor(paneElement);
@@ -715,7 +717,8 @@ function FreeboardUI()
 	function subtractGridColumn(shift)
 	{
 		var num_cols = grid.cols - 1;
-		if(updateGridWidth(num_cols)) {
+		if(updateGridWidth(num_cols))
+		{
 			repositionGrid(function() {
 				var paneElement = this;
 				var paneModel = ko.dataFor(paneElement);
@@ -743,42 +746,60 @@ function FreeboardUI()
 		updateGridColumnControls();
 	}
 
-	function updateGridColumnControls() {
+	function updateGridColumnControls()
+	{
 		var col_controls = $(".column-tool");
 		var available_width = $("#board-content").width();
 		var max_columns = Math.floor(available_width / COLUMN_WIDTH);
 
-		if(grid.cols <= MIN_COLUMNS) {
+		if(grid.cols <= MIN_COLUMNS)
+		{
 			col_controls.addClass("min");
-		} else {
+		}
+		else
+		{
 			col_controls.removeClass("min");
 		}
 
-		if(grid.cols >= max_columns) {
+		if(grid.cols >= max_columns)
+		{
 			col_controls.addClass("max");
-		} else {
+		}
+		else
+		{
 			col_controls.removeClass("max");
 		}
 	}
 
-	function updateGridWidth(newCols) {
-		if(newCols === undefined)
+	function updateGridWidth(newCols)
+	{
+		if(newCols === undefined || newCols < MIN_COLUMNS)
 		{
 			newCols = MIN_COLUMNS;
 		}
-		var new_width = COLUMN_WIDTH*newCols;
-		var available_width = $("#board-content").width();
 
-		if(newCols < MIN_COLUMNS || new_width > available_width)
+		var available_width = $("#board-content").width();
+		var max_columns = Math.floor(available_width / COLUMN_WIDTH);
+		if(newCols > max_columns)
 		{
-			return false;
-		} else {
-			$(".responsive-column-width").css("max-width", new_width);
+			newCols = max_columns;
+		}
+
+		var new_width = COLUMN_WIDTH*newCols;
+		$(".responsive-column-width").css("max-width", new_width);
+
+		if(newCols === grid.cols)
+		{
+			return false; 
+		}
+		else
+		{
 			return true;
 		}
 	}
 
-	function repositionGrid(repositionFunction) {
+	function repositionGrid(repositionFunction)
+	{
 		var rootElement = grid.$el;
 
 		rootElement.find("> li").unbind().removeData();
@@ -789,7 +810,37 @@ function FreeboardUI()
 
 		grid.init();
 		$(".responsive-column-width").css("width", grid.cols * PANE_WIDTH + (grid.cols * PANE_MARGIN * 2));
+	}
 
+	function getGridColumns()
+	{
+		var maxCols = MIN_COLUMNS;
+
+		var rootElement = grid.$el;
+		rootElement.find("> li").each(function(index)
+		{
+			var paneModel = ko.dataFor(this);
+
+			// legacy format
+			if(_.isNumber(paneModel.row) && _.isNumber(paneModel.col))
+			{
+				if(paneModel.col > maxCols)
+				{
+					maxCols = paneModel.col;
+					return;
+				}
+			}
+
+			for(var columnIndex in paneModel.col)
+			{
+				if(columnIndex > maxCols)
+				{
+					maxCols = paneModel.col;
+				}
+			}
+		});
+
+		return maxCols;
 	}
 
 	ko.bindingHandlers.grid = {
@@ -1038,7 +1089,7 @@ function FreeboardUI()
 		},
 		getGridColumns : function()
 		{
-			return grid.cols;
+			return getGridColumns();
 		},
 		setGridColumns : function(numCols)
 		{
