@@ -835,7 +835,7 @@ function FreeboardUI()
 			{
 				if(columnIndex > maxCols)
 				{
-					maxCols = paneModel.col;
+					maxCols = columnIndex;
 				}
 			}
 		});
