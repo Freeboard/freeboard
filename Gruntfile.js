@@ -9,12 +9,6 @@ module.exports = function(grunt) {
                 ],
                 dest: 'css/freeboard.css'
             },
-            fb : {
-                src : [
-                    'lib/js/freeboard/*.js'
-                ],
-                dest : 'js/freeboard.js'
-            },
             thirdparty : {
                 src : [
                     [
@@ -30,6 +24,22 @@ module.exports = function(grunt) {
                 ],
                 dest : 'js/freeboard.thirdparty.js'
             },
+			fb : {
+				src : [
+					'lib/js/freeboard/datasourceModel.js',
+					'lib/js/freeboard/developerConsole.js',
+					'lib/js/freeboard/dialogBox.js',
+					'lib/js/freeboard/freeboardModel.js',
+					'lib/js/freeboard/freeboardUI.js',
+					'lib/js/freeboard/jsEditor.js',
+					'lib/js/freeboard/paneModel.js',
+					'lib/js/freeboard/pluginEditor.js',
+					'lib/js/freeboard/valueEditor.js',
+					'lib/js/freeboard/widgetModel.js',
+					'lib/js/freeboard/freeboard.js',
+				],
+				dest : 'js/freeboard.js'
+			},
             plugins : {
                 src : [
                     'plugins/freeboard/*.js'
