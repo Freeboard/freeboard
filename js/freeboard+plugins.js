@@ -678,7 +678,8 @@ function FreeboardUI()
 				var viewModel = ko.dataFor(paneElement);
 
 				var newPosition = getPositionForScreenSize(viewModel);
-				$(paneElement).attr("data-sizex", Math.min(viewModel.col_width(), maxDisplayableColumns))
+				$(paneElement).attr("data-sizex", Math.min(viewModel.col_width(),
+					maxDisplayableColumns, grid.cols))
 					.attr("data-row", newPosition.row)
 					.attr("data-col", newPosition.col);
 			}
@@ -714,8 +715,9 @@ function FreeboardUI()
 					rightPreviewCol = true;
 					newPosition = {row: prevRow, col: prevCol};
 				}
-				$(paneElement).attr("data-row", newPosition.row)
-							  .attr("data-col", newPosition.col);
+				$(paneElement).attr("data-sizex", Math.min(paneModel.col_width(), grid.cols))
+					.attr("data-row", newPosition.row)
+					.attr("data-col", newPosition.col);
 			});
 		}
 		updateGridColumnControls();
@@ -737,18 +739,17 @@ function FreeboardUI()
 				var newPosition;
 				if(shift)
 				{
-					// This will cause problems if there are panes in column 1
 					var newCol = prevCol > 1 ? prevCol - 1 : 1;
 					newPosition = {row: prevRow, col: newCol};
 				}
 				else
 				{
-					// This will cause problems if there are panes in the last column
 					var newCol = prevCol <= grid.cols ? prevCol : grid.cols;
 					newPosition = {row: prevRow, col: newCol};
 				}
-				$(paneElement).attr("data-row", newPosition.row)
-							  .attr("data-col", newPosition.col);
+				$(paneElement).attr("data-sizex", Math.min(paneModel.col_width(), grid.cols))
+					.attr("data-row", newPosition.row)
+					.attr("data-col", newPosition.col);
 			});
 		}
 		updateGridColumnControls();
@@ -2597,6 +2598,7 @@ var freeboard = (function()
 							{
 								viewModel.title(newSettings.settings.title);
 								viewModel.col_width(newSettings.settings.col_width);
+								freeboardUI.processResize(false);
 							}
 							else
 							{
