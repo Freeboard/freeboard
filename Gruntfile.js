@@ -107,6 +107,5 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-string-replace');
-    grunt.loadNpmTasks('grunt-githooks');
     grunt.registerTask('default', [ 'concat:css', 'cssmin:css', 'concat:fb', 'concat:thirdparty', 'concat:plugins', 'concat:fb+plugins', 'uglify:fb', 'uglify:plugins', 'uglify:fb+plugins', 'uglify:thirdparty', 'string-replace:css' ]);
 };
