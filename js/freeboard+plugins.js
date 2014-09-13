@@ -675,13 +675,15 @@ function FreeboardUI()
 			repositionFunction = function(index)
 			{
 				var paneElement = this;
-				var viewModel = ko.dataFor(paneElement);
+				var paneModel = ko.dataFor(paneElement);
 
-				var newPosition = getPositionForScreenSize(viewModel);
-				$(paneElement).attr("data-sizex", Math.min(viewModel.col_width(),
+				var newPosition = getPositionForScreenSize(paneModel);
+				$(paneElement).attr("data-sizex", Math.min(paneModel.col_width(),
 					maxDisplayableColumns, grid.cols))
 					.attr("data-row", newPosition.row)
 					.attr("data-col", newPosition.col);
+
+				paneModel.processSizeChange();
 			}
 		}
 
@@ -1171,58 +1173,65 @@ JSEditor = function()
     }
 }
 
-function PaneModel(theFreeboardModel, widgetPlugins)
-{
+function PaneModel(theFreeboardModel, widgetPlugins) {
 	var self = this;
 
 	this.title = ko.observable();
 	this.width = ko.observable(1);
 	this.row = {};
 	this.col = {};
+
 	this.col_width = ko.observable(1);
+	this.col_width.subscribe(function(newValue)
+	{
+		self.processSizeChange();
+	});
+
 	this.widgets = ko.observableArray();
 
-	this.addWidget = function(widget)
-	{
+	this.addWidget = function (widget) {
 		this.widgets.push(widget);
 	}
 
-        this.widgetCanMoveUp = function(widget)
-        {
-            return (self.widgets.indexOf(widget) >= 1);
-        }
+	this.widgetCanMoveUp = function (widget) {
+		return (self.widgets.indexOf(widget) >= 1);
+	}
 
-        this.widgetCanMoveDown = function(widget)
-        {
-            var i = self.widgets.indexOf(widget);
+	this.widgetCanMoveDown = function (widget) {
+		var i = self.widgets.indexOf(widget);
 
-            return (i < self.widgets().length - 1);
-        }
+		return (i < self.widgets().length - 1);
+	}
 
-        this.moveWidgetUp = function(widget)
-        {
-            if(self.widgetCanMoveUp(widget))
-            {
-                var i = self.widgets.indexOf(widget);
-                var array = self.widgets();
-                self.widgets.splice(i - 1, 2, array[i], array[i - 1]);
-            }
-        }
+	this.moveWidgetUp = function (widget) {
+		if (self.widgetCanMoveUp(widget)) {
+			var i = self.widgets.indexOf(widget);
+			var array = self.widgets();
+			self.widgets.splice(i - 1, 2, array[i], array[i - 1]);
+		}
+	}
 
-        this.moveWidgetDown = function(widget)
-        {
-            if(self.widgetCanMoveDown(widget))
-            {
-                var i = self.widgets.indexOf(widget);
-                var array = self.widgets();
-                self.widgets.splice(i, 2, array[i + 1], array[i]);
-            }
-        }
+	this.moveWidgetDown = function (widget) {
+		if (self.widgetCanMoveDown(widget)) {
+			var i = self.widgets.indexOf(widget);
+			var array = self.widgets();
+			self.widgets.splice(i, 2, array[i + 1], array[i]);
+		}
+	}
 
-	this.getCalculatedHeight = function()
+	this.processSizeChange = function()
 	{
-		var sumHeights = _.reduce(self.widgets(), function(memo, widget)
-		{
+		// Give the animation a moment to complete. Really hacky.
+		// TODO: Make less hacky. Also, doesn't work when screen resizes.
+		setTimeout(function(){
+			_.each(self.widgets(), function (widget) {
+				widget.processSizeChange();
+			});
+		}, 1000);
+	}
+
+	this.getCalculatedHeight = function () {
+		var sumHeights = _.reduce(self.widgets(), function (memo, widget) {
 			return memo + widget.height();
 		}, 0);
 
@@ -1236,27 +1245,24 @@ function PaneModel(theFreeboardModel, widgetPlugins)
 		return Math.max(4, rows);
 	}
 
-	this.serialize = function()
-	{
+	this.serialize = function () {
 		var widgets = [];
 
-		_.each(self.widgets(), function(widget)
-		{
+		_.each(self.widgets(), function (widget) {
 			widgets.push(widget.serialize());
 		});
 
 		return {
-			title  : self.title(),
-			width  : self.width(),
-			row    : self.row,
-			col    : self.col,
-			col_width : self.col_width(),
+			title: self.title(),
+			width: self.width(),
+			row: self.row,
+			col: self.col,
+			col_width: self.col_width(),
 			widgets: widgets
 		};
 	}
 
-	this.deserialize = function(object)
-	{
+	this.deserialize = function (object) {
 		self.title(object.title);
 		self.width(object.width);
 
@@ -1264,18 +1270,15 @@ function PaneModel(theFreeboardModel, widgetPlugins)
 		self.col = object.col;
 		self.col_width(object.col_width || 1);
 
-		_.each(object.widgets, function(widgetConfig)
-		{
+		_.each(object.widgets, function (widgetConfig) {
 			var widget = new WidgetModel(theFreeboardModel, widgetPlugins);
 			widget.deserialize(widgetConfig);
 			self.widgets.push(widget);
 		});
 	}
 
-	this.dispose = function()
-	{
-		_.each(self.widgets(), function(widget)
-		{
+	this.dispose = function () {
+		_.each(self.widgets(), function (widget) {
 			widget.dispose();
 		});
 	}
@@ -2087,6 +2090,14 @@ function WidgetModel(theFreeboardModel, widgetPlugins)
 	this.callValueFunction = function(theFunction)
 	{
 		return theFunction.call(undefined, theFreeboardModel.datasourceData);
+	}
+
+	this.processSizeChange = function()
+	{
+		if(!_.isUndefined(self.widgetInstance) && _.isFunction(self.widgetInstance.onSizeChanged))
+		{
+			self.widgetInstance.onSizeChanged();
+		}
 	}
 
 	this.processCalculatedSetting = function(settingName)
@@ -3397,31 +3408,11 @@ $.extend(freeboard, jQuery.eventEmitter);
 
 (function () {
     var SPARKLINE_HISTORY_LENGTH = 100;
-    var valueStyle = freeboard.getStyleString("values");
 
-    valueStyle +=
-        "overflow: hidden;" +
-            "text-overflow: ellipsis;" +
-            "display: inline;";
+    function easeTransitionText(newValue, textElement, duration) {
 
-    // Add some styles to our sheet
-    freeboard.addStyle('.text-widget-unit', 'padding-left: 5px;display:inline;');
-    freeboard.addStyle('.text-widget-regular-value', valueStyle + "font-size:30px;");
-    freeboard.addStyle('.text-widget-big-value', valueStyle + "font-size:75px;");
+		var currentValue = $(textElement).text();
 
-    freeboard.addStyle('.gauge-widget-wrapper', "width: 100%;text-align: center;");
-    freeboard.addStyle('.gauge-widget', "width:200px;height:160px;display:inline-block;");
-
-    freeboard.addStyle('.sparkline', "width:100%;height: 75px;");
-    freeboard.addStyle('.sparkline-inline', "width:50%;float:right;height:30px;");
-
-    freeboard.addStyle('.indicator-light', "border-radius:50%;width:22px;height:22px;border:2px solid #3d3d3d;margin-top:5px;float:left;background-color:#222;margin-right:10px;");
-    freeboard.addStyle('.indicator-light.on', "background-color:#FFC773;box-shadow: 0px 0px 15px #FF9900;border-color:#FDF1DF;");
-    freeboard.addStyle('.indicator-text', "margin-top:10px;");
-
-    freeboard.addStyle('div.pointer-value', "position:absolute;height:95px;margin: auto;top: 0px;bottom: 0px;width: 100%;text-align:center;");
-
-    function easeTransitionText(currentValue, newValue, textElement, duration) {
         if (currentValue == newValue)
             return;
 
@@ -3466,8 +3457,6 @@ $.extend(freeboard, jQuery.eventEmitter);
             values.shift();
         }
 
-        //if(_.isNumber(value))
-        //{
         values.push(Number(value));
 
         $(element).data().values = values;
@@ -3486,47 +3475,148 @@ $.extend(freeboard, jQuery.eventEmitter);
             highlightSpotColor: "#9D3926",
             highlightLineColor: "#9D3926"
         });
-        //}
     }
 
+	var valueStyle = freeboard.getStyleString("values");
+
+	freeboard.addStyle('.widget-big-text', valueStyle + "font-size:75px;");
+
+	freeboard.addStyle('.tw-display', 'width: 100%; height:100%; display:table; table-layout:fixed;');
+
+	freeboard.addStyle('.tw-tr',
+		'display:table-row;');
+
+	freeboard.addStyle('.tw-tg',
+		'display:table-row-group;');
+
+	freeboard.addStyle('.tw-tc',
+		'display:table-caption;');
+
+	freeboard.addStyle('.tw-td',
+		'display:table-cell;');
+
+	freeboard.addStyle('.tw-value',
+		valueStyle +
+		'overflow: hidden;' +
+		'display: inline-block;' +
+		'text-overflow: ellipsis;');
+
+	freeboard.addStyle('.tw-unit',
+		'display: inline-block;' +
+		'padding-left: 10px;' +
+		'padding-bottom: 1.1em;' +
+		'vertical-align: bottom;');
+
+	freeboard.addStyle('.tw-value-wrapper',
+		'position: relative;' +
+		'vertical-align: middle;' +
+		'height:100%;');
+
+	freeboard.addStyle('.tw-sparkline',
+		'height:20px;');
+
     var textWidget = function (settings) {
+
         var self = this;
 
         var currentSettings = settings;
-        var titleElement = $('<h2 class="section-title"></h2>');
-        var valueElement = $('<div></div>');
-        var unitsElement = $('<div class="text-widget-unit"></div>');
-        var sparklineElement = $('<span class="sparkline-inline"></span>');
-        var currentValue;
+		var displayElement = $('<div class="tw-display"></div>');
+		var titleElement = $('<h2 class="section-title tw-title tw-tr"></h2>');
+        var valueElement = $('<div class="tw-value"></div>');
+        var unitsElement = $('<div class="tw-unit"></div>');
+        var sparklineElement = $('<div class="tw-sparkline tw-tr"></div>');
+
+		function updateValueSizing()
+		{
+			if(!_.isUndefined(currentSettings.units) && currentSettings.units != "") // If we're displaying our units
+			{
+				valueElement.css("max-width", (displayElement.innerWidth() - unitsElement.outerWidth(true)) + "px");
+			}
+			else
+			{
+				valueElement.css("max-width", "100%");
+			}
+		}
 
         this.render = function (element) {
-            $(element).append(titleElement).append(valueElement).append(unitsElement).append(sparklineElement);
+			$(element).empty();
+
+			$(displayElement)
+				.append(titleElement)
+				.append($('<div class="tw-tr"></div>').append($('<div class="tw-value-wrapper tw-td"></div>').append(valueElement).append(unitsElement)))
+				.append(sparklineElement);
+
+			$(element).append(displayElement);
+
+			updateValueSizing();
         }
 
         this.onSettingsChanged = function (newSettings) {
             currentSettings = newSettings;
-            titleElement.html((_.isUndefined(newSettings.title) ? "" : newSettings.title));
 
-            valueElement
-                .toggleClass("text-widget-regular-value", (newSettings.size == "regular"))
-                .toggleClass("text-widget-big-value", (newSettings.size == "big"));
+			var shouldDisplayTitle = (!_.isUndefined(newSettings.title) && newSettings.title != "");
+			var shouldDisplayUnits = (!_.isUndefined(newSettings.units) && newSettings.units != "");
 
-            unitsElement.html((_.isUndefined(newSettings.units) ? "" : newSettings.units));
+			if(newSettings.sparkline)
+			{
+				sparklineElement.attr("style", null);
+			}
+			else
+			{
+				delete sparklineElement.data().values;
+				sparklineElement.empty();
+				sparklineElement.hide();
+			}
 
-            if (newSettings.sparkline) {
-                sparklineElement.show();
-            }
-            else {
-                delete sparklineElement.data().values;
-                sparklineElement.empty();
-                sparklineElement.hide();
-            }
+			if(shouldDisplayTitle)
+			{
+				titleElement.html((_.isUndefined(newSettings.title) ? "" : newSettings.title));
+				titleElement.attr("style", null);
+			}
+			else
+			{
+				titleElement.empty();
+				titleElement.hide();
+			}
+
+			if(shouldDisplayUnits)
+			{
+				unitsElement.html((_.isUndefined(newSettings.units) ? "" : newSettings.units));
+				unitsElement.attr("style", null);
+			}
+			else
+			{
+				unitsElement.empty();
+				unitsElement.hide();
+			}
+
+			var valueFontSize = 30;
+
+			if(newSettings.size == "big")
+			{
+				valueFontSize = 75;
+
+				if(newSettings.sparkline)
+				{
+					valueFontSize = 60;
+				}
+			}
+
+			valueElement.css({"font-size" : valueFontSize + "px"});
+
+			updateValueSizing();
         }
+
+		this.onSizeChanged = function()
+		{
+			updateValueSizing();
+		}
 
         this.onCalculatedValueChanged = function (settingName, newValue) {
             if (settingName == "value") {
+
                 if (currentSettings.animate) {
-                    easeTransitionText(currentValue, newValue, valueElement, 500);
+                    easeTransitionText(newValue, valueElement, 500);
                 }
                 else {
                     valueElement.text(newValue);
@@ -3535,8 +3625,6 @@ $.extend(freeboard, jQuery.eventEmitter);
                 if (currentSettings.sparkline) {
                     addValueToSparkline(sparklineElement, newValue);
                 }
-
-                currentValue = newValue;
             }
         }
 
@@ -3545,7 +3633,7 @@ $.extend(freeboard, jQuery.eventEmitter);
         }
 
         this.getHeight = function () {
-            if (currentSettings.size == "big") {
+            if (currentSettings.size == "big" || currentSettings.sparkline) {
                 return 2;
             }
             else {
@@ -3611,6 +3699,8 @@ $.extend(freeboard, jQuery.eventEmitter);
     });
 
     var gaugeID = 0;
+	freeboard.addStyle('.gauge-widget-wrapper', "width: 100%;text-align: center;");
+	freeboard.addStyle('.gauge-widget', "width:200px;height:160px;display:inline-block;");
 
     var gaugeWidget = function (settings) {
         var self = this;
@@ -3717,6 +3807,8 @@ $.extend(freeboard, jQuery.eventEmitter);
         }
     });
 
+
+	freeboard.addStyle('.sparkline', "width:100%;height: 75px;");
     var sparklineWidget = function (settings) {
         var self = this;
 
@@ -3768,6 +3860,7 @@ $.extend(freeboard, jQuery.eventEmitter);
         }
     });
 
+	freeboard.addStyle('div.pointer-value', "position:absolute;height:95px;margin: auto;top: 0px;bottom: 0px;width: 100%;text-align:center;");
     var pointerWidget = function (settings) {
         var self = this;
         var paper;
@@ -3775,7 +3868,7 @@ $.extend(freeboard, jQuery.eventEmitter);
         var triangle;
         var width, height;
         var currentValue = 0;
-        var valueDiv = $('<div class="text-widget-big-value"></div>');
+        var valueDiv = $('<div class="widget-big-text"></div>');
         var unitsDiv = $('<div></div>');
 
         function polygonPath(points) {
@@ -3968,6 +4061,9 @@ $.extend(freeboard, jQuery.eventEmitter);
         }
     });
 
+	freeboard.addStyle('.indicator-light', "border-radius:50%;width:22px;height:22px;border:2px solid #3d3d3d;margin-top:5px;float:left;background-color:#222;margin-right:10px;");
+	freeboard.addStyle('.indicator-light.on', "background-color:#FFC773;box-shadow: 0px 0px 15px #FF9900;border-color:#FDF1DF;");
+	freeboard.addStyle('.indicator-text', "margin-top:10px;");
     var indicatorWidget = function (settings) {
         var self = this;
         var titleElement = $('<h2 class="section-title"></h2>');

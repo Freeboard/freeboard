@@ -208,6 +208,11 @@
 			updateValueSizing();
         }
 
+		this.onSizeChanged = function()
+		{
+			updateValueSizing();
+		}
+
         this.onCalculatedValueChanged = function (settingName, newValue) {
             if (settingName == "value") {
 
