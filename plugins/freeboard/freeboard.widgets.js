@@ -58,8 +58,6 @@
             values.shift();
         }
 
-        //if(_.isNumber(value))
-        //{
         values.push(Number(value));
 
         $(element).data().values = values;
@@ -78,17 +76,12 @@
             highlightSpotColor: "#9D3926",
             highlightLineColor: "#9D3926"
         });
-        //}
     }
 
 	var valueStyle = freeboard.getStyleString("values");
 
-	//valueStyle += "overflow: hidden; text-overflow: ellipsis; display: block;";
+	freeboard.addStyle('.widget-big-text', valueStyle + "font-size:75px;");
 
-	// Add some styles to our sheet
-	//freeboard.addStyle('.text-widget-unit', 'padding-left: 5px;display:inline;');
-	//freeboard.addStyle('.text-widget-regular-value', valueStyle + "font-size:30px;");
-	//freeboard.addStyle('.text-widget-big-value', valueStyle + "font-size:75px;");
 	freeboard.addStyle('.tw-display', 'width: 100%; height:100%; display:table; table-layout:fixed;');
 
 	freeboard.addStyle('.tw-tr',
@@ -206,7 +199,7 @@
 
 				if(newSettings.sparkline)
 				{
-					valueFontSize = 65;
+					valueFontSize = 60;
 				}
 			}
 
@@ -471,7 +464,7 @@
         var triangle;
         var width, height;
         var currentValue = 0;
-        var valueDiv = $('<div class="text-widget-big-value"></div>');
+        var valueDiv = $('<div class="widget-big-text"></div>');
         var unitsDiv = $('<div></div>');
 
         function polygonPath(points) {
