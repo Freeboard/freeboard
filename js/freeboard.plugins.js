@@ -619,10 +619,10 @@
 
         var currentSettings = settings;
 		var displayElement = $('<div class="tw-display"></div>');
-		var titleElement = $('<h2 class="section-title tw-title tw-tr"></h2>');
+		var titleElement = $('<h2 class="section-title tw-title tw-td"></h2>');
         var valueElement = $('<div class="tw-value"></div>');
         var unitsElement = $('<div class="tw-unit"></div>');
-        var sparklineElement = $('<div class="tw-sparkline tw-tr"></div>');
+        var sparklineElement = $('<div class="tw-sparkline tw-td"></div>');
 
 		function updateValueSizing()
 		{
@@ -640,9 +640,9 @@
 			$(element).empty();
 
 			$(displayElement)
-				.append(titleElement)
+				.append($('<div class="tw-tr"></div>').append(titleElement))
 				.append($('<div class="tw-tr"></div>').append($('<div class="tw-value-wrapper tw-td"></div>').append(valueElement).append(unitsElement)))
-				.append(sparklineElement);
+				.append($('<div class="tw-tr"></div>').append(sparklineElement));
 
 			$(element).append(displayElement);
 
