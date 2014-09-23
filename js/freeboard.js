@@ -2792,24 +2792,21 @@ var freeboard = (function()
 		{
 			var styleString = selector + "{" + rules + "}";
 
-			var d = document;
-			var tag = d.getElementById("fb-styles");
+			var styleElement = $("style#fb-styles");
 
-			if(!tag)
+			if(styleElement.length == 0)
 			{
-				tag = d.createElement('style');
-				tag.setAttribute("id", "fb-styles");
-				tag.setAttribute('type', 'text/css');
-				d.getElementsByTagName('head')[0].appendChild(tag);
+				styleElement = $('<style id="fb-styles" type="text/css"></style>');
+				$("head").append(styleElement);
 			}
 
-			if(tag.styleSheet)
+			if(styleElement[0].styleSheet)
 			{
-				tag.styleSheet.cssText += styleString;
+				styleElement[0].styleSheet.cssText += styleString;
 			}
 			else
 			{
-				tag.appendChild(document.createTextNode(styleString));
+				styleElement.text(styleElement.text() + styleString);
 			}
 		},
 		showLoadingIndicator: function(show)
