@@ -1668,6 +1668,8 @@ PluginEditor = function(jsEditor, valueEditor)
 		else if(pluginTypeNames.length == 1)
 		{
 			selectedType = pluginTypes[pluginTypeNames[0]];
+			newSettings.type = selectedType.type_name;
+			newSettings.settings = {};
 			createSettingsFromDefinition(selectedType.settings);
 		}
 
