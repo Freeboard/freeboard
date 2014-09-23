@@ -19,6 +19,7 @@ module.exports = function(grunt) {
                         'lib/js/thirdparty/underscore.js',
                         'lib/js/thirdparty/jquery.gridster.js',
                         'lib/js/thirdparty/jquery.caret.js',
+						'lib/js/thirdparty/jquery.xdomainrequest.js',
                         'lib/js/thirdparty/codemirror.js',
                     ]
                 ],
