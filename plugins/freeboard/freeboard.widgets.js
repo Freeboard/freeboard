@@ -9,31 +9,11 @@
 
 (function () {
     var SPARKLINE_HISTORY_LENGTH = 100;
-    var valueStyle = freeboard.getStyleString("values");
 
-    valueStyle +=
-        "overflow: hidden;" +
-            "text-overflow: ellipsis;" +
-            "display: inline;";
+    function easeTransitionText(newValue, textElement, duration) {
 
-    // Add some styles to our sheet
-    freeboard.addStyle('.text-widget-unit', 'padding-left: 5px;display:inline;');
-    freeboard.addStyle('.text-widget-regular-value', valueStyle + "font-size:30px;");
-    freeboard.addStyle('.text-widget-big-value', valueStyle + "font-size:75px;");
+		var currentValue = $(textElement).text();
 
-    freeboard.addStyle('.gauge-widget-wrapper', "width: 100%;text-align: center;");
-    freeboard.addStyle('.gauge-widget', "width:200px;height:160px;display:inline-block;");
-
-    freeboard.addStyle('.sparkline', "width:100%;height: 75px;");
-    freeboard.addStyle('.sparkline-inline', "width:50%;float:right;height:30px;");
-
-    freeboard.addStyle('.indicator-light', "border-radius:50%;width:22px;height:22px;border:2px solid #3d3d3d;margin-top:5px;float:left;background-color:#222;margin-right:10px;");
-    freeboard.addStyle('.indicator-light.on', "background-color:#FFC773;box-shadow: 0px 0px 15px #FF9900;border-color:#FDF1DF;");
-    freeboard.addStyle('.indicator-text', "margin-top:10px;");
-
-    freeboard.addStyle('div.pointer-value', "position:absolute;height:95px;margin: auto;top: 0px;bottom: 0px;width: 100%;text-align:center;");
-
-    function easeTransitionText(currentValue, newValue, textElement, duration) {
         if (currentValue == newValue)
             return;
 
@@ -78,8 +58,6 @@
             values.shift();
         }
 
-        //if(_.isNumber(value))
-        //{
         values.push(Number(value));
 
         $(element).data().values = values;
@@ -98,47 +76,148 @@
             highlightSpotColor: "#9D3926",
             highlightLineColor: "#9D3926"
         });
-        //}
     }
 
+	var valueStyle = freeboard.getStyleString("values");
+
+	freeboard.addStyle('.widget-big-text', valueStyle + "font-size:75px;");
+
+	freeboard.addStyle('.tw-display', 'width: 100%; height:100%; display:table; table-layout:fixed;');
+
+	freeboard.addStyle('.tw-tr',
+		'display:table-row;');
+
+	freeboard.addStyle('.tw-tg',
+		'display:table-row-group;');
+
+	freeboard.addStyle('.tw-tc',
+		'display:table-caption;');
+
+	freeboard.addStyle('.tw-td',
+		'display:table-cell;');
+
+	freeboard.addStyle('.tw-value',
+		valueStyle +
+		'overflow: hidden;' +
+		'display: inline-block;' +
+		'text-overflow: ellipsis;');
+
+	freeboard.addStyle('.tw-unit',
+		'display: inline-block;' +
+		'padding-left: 10px;' +
+		'padding-bottom: 1.1em;' +
+		'vertical-align: bottom;');
+
+	freeboard.addStyle('.tw-value-wrapper',
+		'position: relative;' +
+		'vertical-align: middle;' +
+		'height:100%;');
+
+	freeboard.addStyle('.tw-sparkline',
+		'height:20px;');
+
     var textWidget = function (settings) {
+
         var self = this;
 
         var currentSettings = settings;
-        var titleElement = $('<h2 class="section-title"></h2>');
-        var valueElement = $('<div></div>');
-        var unitsElement = $('<div class="text-widget-unit"></div>');
-        var sparklineElement = $('<span class="sparkline-inline"></span>');
-        var currentValue;
+		var displayElement = $('<div class="tw-display"></div>');
+		var titleElement = $('<h2 class="section-title tw-title tw-td"></h2>');
+        var valueElement = $('<div class="tw-value"></div>');
+        var unitsElement = $('<div class="tw-unit"></div>');
+        var sparklineElement = $('<div class="tw-sparkline tw-td"></div>');
+
+		function updateValueSizing()
+		{
+			if(!_.isUndefined(currentSettings.units) && currentSettings.units != "") // If we're displaying our units
+			{
+				valueElement.css("max-width", (displayElement.innerWidth() - unitsElement.outerWidth(true)) + "px");
+			}
+			else
+			{
+				valueElement.css("max-width", "100%");
+			}
+		}
 
         this.render = function (element) {
-            $(element).append(titleElement).append(valueElement).append(unitsElement).append(sparklineElement);
+			$(element).empty();
+
+			$(displayElement)
+				.append($('<div class="tw-tr"></div>').append(titleElement))
+				.append($('<div class="tw-tr"></div>').append($('<div class="tw-value-wrapper tw-td"></div>').append(valueElement).append(unitsElement)))
+				.append($('<div class="tw-tr"></div>').append(sparklineElement));
+
+			$(element).append(displayElement);
+
+			updateValueSizing();
         }
 
         this.onSettingsChanged = function (newSettings) {
             currentSettings = newSettings;
-            titleElement.html((_.isUndefined(newSettings.title) ? "" : newSettings.title));
 
-            valueElement
-                .toggleClass("text-widget-regular-value", (newSettings.size == "regular"))
-                .toggleClass("text-widget-big-value", (newSettings.size == "big"));
+			var shouldDisplayTitle = (!_.isUndefined(newSettings.title) && newSettings.title != "");
+			var shouldDisplayUnits = (!_.isUndefined(newSettings.units) && newSettings.units != "");
 
-            unitsElement.html((_.isUndefined(newSettings.units) ? "" : newSettings.units));
+			if(newSettings.sparkline)
+			{
+				sparklineElement.attr("style", null);
+			}
+			else
+			{
+				delete sparklineElement.data().values;
+				sparklineElement.empty();
+				sparklineElement.hide();
+			}
 
-            if (newSettings.sparkline) {
-                sparklineElement.show();
-            }
-            else {
-                delete sparklineElement.data().values;
-                sparklineElement.empty();
-                sparklineElement.hide();
-            }
+			if(shouldDisplayTitle)
+			{
+				titleElement.html((_.isUndefined(newSettings.title) ? "" : newSettings.title));
+				titleElement.attr("style", null);
+			}
+			else
+			{
+				titleElement.empty();
+				titleElement.hide();
+			}
+
+			if(shouldDisplayUnits)
+			{
+				unitsElement.html((_.isUndefined(newSettings.units) ? "" : newSettings.units));
+				unitsElement.attr("style", null);
+			}
+			else
+			{
+				unitsElement.empty();
+				unitsElement.hide();
+			}
+
+			var valueFontSize = 30;
+
+			if(newSettings.size == "big")
+			{
+				valueFontSize = 75;
+
+				if(newSettings.sparkline)
+				{
+					valueFontSize = 60;
+				}
+			}
+
+			valueElement.css({"font-size" : valueFontSize + "px"});
+
+			updateValueSizing();
         }
+
+		this.onSizeChanged = function()
+		{
+			updateValueSizing();
+		}
 
         this.onCalculatedValueChanged = function (settingName, newValue) {
             if (settingName == "value") {
+
                 if (currentSettings.animate) {
-                    easeTransitionText(currentValue, newValue, valueElement, 500);
+                    easeTransitionText(newValue, valueElement, 500);
                 }
                 else {
                     valueElement.text(newValue);
@@ -147,8 +226,6 @@
                 if (currentSettings.sparkline) {
                     addValueToSparkline(sparklineElement, newValue);
                 }
-
-                currentValue = newValue;
             }
         }
 
@@ -157,7 +234,7 @@
         }
 
         this.getHeight = function () {
-            if (currentSettings.size == "big") {
+            if (currentSettings.size == "big" || currentSettings.sparkline) {
                 return 2;
             }
             else {
@@ -223,6 +300,8 @@
     });
 
     var gaugeID = 0;
+	freeboard.addStyle('.gauge-widget-wrapper', "width: 100%;text-align: center;");
+	freeboard.addStyle('.gauge-widget', "width:200px;height:160px;display:inline-block;");
 
     var gaugeWidget = function (settings) {
         var self = this;
@@ -329,6 +408,8 @@
         }
     });
 
+
+	freeboard.addStyle('.sparkline', "width:100%;height: 75px;");
     var sparklineWidget = function (settings) {
         var self = this;
 
@@ -380,6 +461,7 @@
         }
     });
 
+	freeboard.addStyle('div.pointer-value', "position:absolute;height:95px;margin: auto;top: 0px;bottom: 0px;width: 100%;text-align:center;");
     var pointerWidget = function (settings) {
         var self = this;
         var paper;
@@ -387,7 +469,7 @@
         var triangle;
         var width, height;
         var currentValue = 0;
-        var valueDiv = $('<div class="text-widget-big-value"></div>');
+        var valueDiv = $('<div class="widget-big-text"></div>');
         var unitsDiv = $('<div></div>');
 
         function polygonPath(points) {
@@ -580,6 +662,9 @@
         }
     });
 
+	freeboard.addStyle('.indicator-light', "border-radius:50%;width:22px;height:22px;border:2px solid #3d3d3d;margin-top:5px;float:left;background-color:#222;margin-right:10px;");
+	freeboard.addStyle('.indicator-light.on', "background-color:#FFC773;box-shadow: 0px 0px 15px #FF9900;border-color:#FDF1DF;");
+	freeboard.addStyle('.indicator-text', "margin-top:10px;");
     var indicatorWidget = function (settings) {
         var self = this;
         var titleElement = $('<h2 class="section-title"></h2>');

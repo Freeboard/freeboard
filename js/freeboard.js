@@ -675,13 +675,15 @@ function FreeboardUI()
 			repositionFunction = function(index)
 			{
 				var paneElement = this;
-				var viewModel = ko.dataFor(paneElement);
+				var paneModel = ko.dataFor(paneElement);
 
-				var newPosition = getPositionForScreenSize(viewModel);
-				$(paneElement).attr("data-sizex", Math.min(viewModel.col_width(),
+				var newPosition = getPositionForScreenSize(paneModel);
+				$(paneElement).attr("data-sizex", Math.min(paneModel.col_width(),
 					maxDisplayableColumns, grid.cols))
 					.attr("data-row", newPosition.row)
 					.attr("data-col", newPosition.col);
+
+				paneModel.processSizeChange();
 			}
 		}
 
@@ -800,7 +802,8 @@ function FreeboardUI()
 			newCols = max_columns;
 		}
 
-		var new_width = COLUMN_WIDTH * newCols;
+		// +newCols to account for scaling on zoomed browsers
+		var new_width = (COLUMN_WIDTH * newCols) + newCols;
 		$(".responsive-column-width").css("max-width", new_width);
 
 		if(newCols === grid.cols)
@@ -1092,137 +1095,129 @@ function FreeboardUI()
 	}
 }
 
-JSEditor = function()
-{
-    var assetRoot = ""
+JSEditor = function () {
+	var assetRoot = ""
 
-    function setAssetRoot(_assetRoot)
-    {
-        assetRoot = _assetRoot;
-    }	
+	function setAssetRoot(_assetRoot) {
+		assetRoot = _assetRoot;
+	}
 
-    function displayJSEditor(value, callback)
-    {
-        // We load these when we need them— no sense in loading more javascript and css if we're never using the editor.
-        head.js(
-            assetRoot + "css/codemirror.css",
-            assetRoot + "css/codemirror-ambiance.css",
-            assetRoot + "js/codemirror.js",
-            function(){
+	function displayJSEditor(value, callback) {
 
-                var exampleText = "// Example: Convert temp from C to F and truncate to 2 decimal places.\n// return (datasources[\"MyDatasource\"].sensor.tempInF * 1.8 + 32).toFixed(2);";
+		var exampleText = "// Example: Convert temp from C to F and truncate to 2 decimal places.\n// return (datasources[\"MyDatasource\"].sensor.tempInF * 1.8 + 32).toFixed(2);";
 
-                // If value is empty, go ahead and suggest something
-                if(!value)
-                {
-                    value = exampleText;
-                }
+		// If value is empty, go ahead and suggest something
+		if (!value) {
+			value = exampleText;
+		}
 
-                var codeWindow = $('<div class="code-window"></div>');
-                var codeMirrorWrapper = $('<div class="code-mirror-wrapper"></div>');
-                var codeWindowFooter = $('<div class="code-window-footer"></div>');
-                var codeWindowHeader = $('<div class="code-window-header cm-s-ambiance">This javascript will be re-evaluated any time a datasource referenced here is updated, and the value you <code><span class="cm-keyword">return</span></code> will be displayed in the widget. You can assume this javascript is wrapped in a function of the form <code><span class="cm-keyword">function</span>(<span class="cm-def">datasources</span>)</code> where datasources is a collection of javascript objects (keyed by their name) corresponding to the most current data in a datasource.</div>');
+		var codeWindow = $('<div class="code-window"></div>');
+		var codeMirrorWrapper = $('<div class="code-mirror-wrapper"></div>');
+		var codeWindowFooter = $('<div class="code-window-footer"></div>');
+		var codeWindowHeader = $('<div class="code-window-header cm-s-ambiance">This javascript will be re-evaluated any time a datasource referenced here is updated, and the value you <code><span class="cm-keyword">return</span></code> will be displayed in the widget. You can assume this javascript is wrapped in a function of the form <code><span class="cm-keyword">function</span>(<span class="cm-def">datasources</span>)</code> where datasources is a collection of javascript objects (keyed by their name) corresponding to the most current data in a datasource.</div>');
 
-                codeWindow.append([codeWindowHeader, codeMirrorWrapper, codeWindowFooter]);
+		codeWindow.append([codeWindowHeader, codeMirrorWrapper, codeWindowFooter]);
 
-                $("body").append(codeWindow);
+		$("body").append(codeWindow);
 
-                var codeMirrorEditor = CodeMirror(codeMirrorWrapper.get(0),
-                    {
-                        value: value,
-                        mode:  "javascript",
-                        theme: "ambiance",
-                        indentUnit: 4,
-                        lineNumbers: true,
-                        matchBrackets: true,
-                        autoCloseBrackets: true
-                    }
-                );
+		var codeMirrorEditor = CodeMirror(codeMirrorWrapper.get(0),
+			{
+				value: value,
+				mode: "javascript",
+				theme: "ambiance",
+				indentUnit: 4,
+				lineNumbers: true,
+				matchBrackets: true,
+				autoCloseBrackets: true
+			}
+		);
 
-                var closeButton = $('<span id="dialog-cancel" class="text-button">Close</span>').click(function(){
-                    if(callback)
-                    {
-                        var newValue = codeMirrorEditor.getValue();
+		var closeButton = $('<span id="dialog-cancel" class="text-button">Close</span>').click(function () {
+			if (callback) {
+				var newValue = codeMirrorEditor.getValue();
 
-                        if(newValue === exampleText)
-                        {
-                            newValue = "";
-                        }
+				if (newValue === exampleText) {
+					newValue = "";
+				}
 
-                        callback(newValue);
-                        codeWindow.remove();
-                    }
-                });
+				callback(newValue);
+				codeWindow.remove();
+			}
+		});
 
-                codeWindowFooter.append(closeButton);
-        });
-    }
+		codeWindowFooter.append(closeButton);
+	}
 
-    // Public API
-    return {
-        displayJSEditor : function(value, callback)
-        {
-            displayJSEditor(value, callback);
-        },
-        setAssetRoot : function(assetRoot)
-        {
-            setAssetRoot(assetRoot)
-        }
-    }
+	// Public API
+	return {
+		displayJSEditor: function (value, callback) {
+			displayJSEditor(value, callback);
+		},
+		setAssetRoot: function (assetRoot) {
+			setAssetRoot(assetRoot)
+		}
+	}
 }
 
-function PaneModel(theFreeboardModel, widgetPlugins)
-{
+function PaneModel(theFreeboardModel, widgetPlugins) {
 	var self = this;
 
 	this.title = ko.observable();
 	this.width = ko.observable(1);
 	this.row = {};
 	this.col = {};
+
 	this.col_width = ko.observable(1);
+	this.col_width.subscribe(function(newValue)
+	{
+		self.processSizeChange();
+	});
+
 	this.widgets = ko.observableArray();
 
-	this.addWidget = function(widget)
-	{
+	this.addWidget = function (widget) {
 		this.widgets.push(widget);
 	}
 
-        this.widgetCanMoveUp = function(widget)
-        {
-            return (self.widgets.indexOf(widget) >= 1);
-        }
+	this.widgetCanMoveUp = function (widget) {
+		return (self.widgets.indexOf(widget) >= 1);
+	}
 
-        this.widgetCanMoveDown = function(widget)
-        {
-            var i = self.widgets.indexOf(widget);
+	this.widgetCanMoveDown = function (widget) {
+		var i = self.widgets.indexOf(widget);
 
-            return (i < self.widgets().length - 1);
-        }
+		return (i < self.widgets().length - 1);
+	}
 
-        this.moveWidgetUp = function(widget)
-        {
-            if(self.widgetCanMoveUp(widget))
-            {
-                var i = self.widgets.indexOf(widget);
-                var array = self.widgets();
-                self.widgets.splice(i - 1, 2, array[i], array[i - 1]);
-            }
-        }
+	this.moveWidgetUp = function (widget) {
+		if (self.widgetCanMoveUp(widget)) {
+			var i = self.widgets.indexOf(widget);
+			var array = self.widgets();
+			self.widgets.splice(i - 1, 2, array[i], array[i - 1]);
+		}
+	}
 
-        this.moveWidgetDown = function(widget)
-        {
-            if(self.widgetCanMoveDown(widget))
-            {
-                var i = self.widgets.indexOf(widget);
-                var array = self.widgets();
-                self.widgets.splice(i, 2, array[i + 1], array[i]);
-            }
-        }
+	this.moveWidgetDown = function (widget) {
+		if (self.widgetCanMoveDown(widget)) {
+			var i = self.widgets.indexOf(widget);
+			var array = self.widgets();
+			self.widgets.splice(i, 2, array[i + 1], array[i]);
+		}
+	}
 
-	this.getCalculatedHeight = function()
+	this.processSizeChange = function()
 	{
-		var sumHeights = _.reduce(self.widgets(), function(memo, widget)
-		{
+		// Give the animation a moment to complete. Really hacky.
+		// TODO: Make less hacky. Also, doesn't work when screen resizes.
+		setTimeout(function(){
+			_.each(self.widgets(), function (widget) {
+				widget.processSizeChange();
+			});
+		}, 1000);
+	}
+
+	this.getCalculatedHeight = function () {
+		var sumHeights = _.reduce(self.widgets(), function (memo, widget) {
 			return memo + widget.height();
 		}, 0);
 
@@ -1236,27 +1231,24 @@ function PaneModel(theFreeboardModel, widgetPlugins)
 		return Math.max(4, rows);
 	}
 
-	this.serialize = function()
-	{
+	this.serialize = function () {
 		var widgets = [];
 
-		_.each(self.widgets(), function(widget)
-		{
+		_.each(self.widgets(), function (widget) {
 			widgets.push(widget.serialize());
 		});
 
 		return {
-			title  : self.title(),
-			width  : self.width(),
-			row    : self.row,
-			col    : self.col,
-			col_width : self.col_width(),
+			title: self.title(),
+			width: self.width(),
+			row: self.row,
+			col: self.col,
+			col_width: self.col_width(),
 			widgets: widgets
 		};
 	}
 
-	this.deserialize = function(object)
-	{
+	this.deserialize = function (object) {
 		self.title(object.title);
 		self.width(object.width);
 
@@ -1264,18 +1256,15 @@ function PaneModel(theFreeboardModel, widgetPlugins)
 		self.col = object.col;
 		self.col_width(object.col_width || 1);
 
-		_.each(object.widgets, function(widgetConfig)
-		{
+		_.each(object.widgets, function (widgetConfig) {
 			var widget = new WidgetModel(theFreeboardModel, widgetPlugins);
 			widget.deserialize(widgetConfig);
 			self.widgets.push(widget);
 		});
 	}
 
-	this.dispose = function()
-	{
-		_.each(self.widgets(), function(widget)
-		{
+	this.dispose = function () {
+		_.each(self.widgets(), function (widget) {
 			widget.dispose();
 		});
 	}
@@ -1679,6 +1668,8 @@ PluginEditor = function(jsEditor, valueEditor)
 		else if(pluginTypeNames.length == 1)
 		{
 			selectedType = pluginTypes[pluginTypeNames[0]];
+			newSettings.type = selectedType.type_name;
+			newSettings.settings = {};
 			createSettingsFromDefinition(selectedType.settings);
 		}
 
@@ -2087,6 +2078,14 @@ function WidgetModel(theFreeboardModel, widgetPlugins)
 	this.callValueFunction = function(theFunction)
 	{
 		return theFunction.call(undefined, theFreeboardModel.datasourceData);
+	}
+
+	this.processSizeChange = function()
+	{
+		if(!_.isUndefined(self.widgetInstance) && _.isFunction(self.widgetInstance.onSizeChanged))
+		{
+			self.widgetInstance.onSizeChanged();
+		}
 	}
 
 	this.processCalculatedSetting = function(settingName)
