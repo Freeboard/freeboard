@@ -2866,7 +2866,7 @@ var freeboard = (function()
 		},
 		getStyleObject      : function(name)
 		{
-			return currentStyle[name];
+			return currentStyle.values[name];
 		},
 		showDeveloperConsole : function()
 		{

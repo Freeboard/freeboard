@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>My First Chart</title>
+	<link href="lib/css/thirdparty/jquery.gridster.min.css" rel="stylesheet">
+	<link href="lib/css/thirdparty/codemirror.css" rel="stylesheet">
+	<link href="lib/css/thirdparty/codemirror-ambiance.css" rel="stylesheet">
+	<link href="lib/css/freeboard/styles.css" rel="stylesheet">
+	<script src="lib/js/thirdparty/head.js"></script>
+
+	<script type="text/javascript" src="lib/js/thirdparty/knockout.js"></script>
+	<script type="text/javascript" src="lib/js/thirdparty/jquery.js"></script>
+	<script type="text/javascript" src="lib/js/thirdparty/jquery-ui.js"></script>
+	<script type="text/javascript" src="lib/js/thirdparty/underscore.js"></script>
+	<script type="text/javascript" src="lib/js/thirdparty/jquery.gridster.js"></script>
+	<script type="text/javascript" src="lib/js/thirdparty/jquery.caret.js"></script>
+	<script type="text/javascript" src="lib/js/thirdparty/codemirror.js"></script>
+	<script type="text/javascript" src="lib/js/thirdparty/jquery.xdomainrequest.js"></script>
+
+	<style id="fb-styles" type="text/css">.widget-big-text{font-family:"HelveticaNeue-UltraLight", "Helvetica Neue Ultra Light", "Helvetica Neue", sans-serif;color:#d3d4d4;font-weight:100;font-size:75px;}.tw-display{width: 100%; height:100%; display:table; table-layout:fixed;}.tw-tr{display:table-row;}.tw-tg{display:table-row-group;}.tw-tc{display:table-caption;}.tw-td{display:table-cell;}.tw-value{font-family:"HelveticaNeue-UltraLight", "Helvetica Neue Ultra Light", "Helvetica Neue", sans-serif;color:#d3d4d4;font-weight:100;overflow: hidden;display: inline-block;text-overflow: ellipsis;}.tw-unit{display: inline-block;padding-left: 10px;padding-bottom: 1.1em;vertical-align: bottom;}.tw-value-wrapper{position: relative;vertical-align: middle;height:100%;}.tw-sparkline{height:20px;}.gauge-widget-wrapper{width: 100%;text-align: center;}.gauge-widget{width:200px;height:160px;display:inline-block;}.sparkline{width:100%;height: 75px;}div.pointer-value{position:absolute;height:95px;margin: auto;top: 0px;bottom: 0px;width: 100%;text-align:center;}.indicator-light{border-radius:50%;width:22px;height:22px;border:2px solid #3d3d3d;margin-top:5px;float:left;background-color:#222;margin-right:10px;}.indicator-light.on{background-color:#FFC773;box-shadow: 0px 0px 15px #FF9900;border-color:#FDF1DF;}.indicator-text{margin-top:10px;}.gm-style-cc a{text-shadow:none;}.html-widget{white-space:normal;width:100%;height:100%}</style>
+
+	<link href="plugins/thirdparty/nv.d3.min.css" rel="stylesheet" type="text/css">
+	<script src="plugins/thirdparty/d3.v3.js"></script>
+	<script src="plugins/thirdparty/nv.d3.min.js"></script>
+
+	<style type="text/css"> [data-col="4"] { left:970px;}  [data-col="3"] { left:650px;}  [data-col="2"] { left:330px;}  [data-col="1"] { left:10px;}  [data-row="16"] { top:460px;}  [data-row="15"] { top:430px;}  [data-row="14"] { top:400px;}  [data-row="13"] { top:370px;}  [data-row="12"] { top:340px;}  [data-row="11"] { top:310px;}  [data-row="10"] { top:280px;}  [data-row="9"] { top:250px;}  [data-row="8"] { top:220px;}  [data-row="7"] { top:190px;}  [data-row="6"] { top:160px;}  [data-row="5"] { top:130px;}  [data-row="4"] { top:100px;}  [data-row="3"] { top:70px;}  [data-row="2"] { top:40px;}  [data-row="1"] { top:10px;}  [data-sizey="1"] { height:10px;} [data-sizey="2"] { height:40px;} [data-sizey="3"] { height:70px;} [data-sizey="4"] { height:100px;} [data-sizey="5"] { height:130px;} [data-sizey="6"] { height:160px;} [data-sizey="7"] { height:190px;} [data-sizey="8"] { height:220px;} [data-sizey="9"] { height:250px;} [data-sizey="10"] { height:280px;} [data-sizey="11"] { height:310px;} [data-sizey="12"] { height:340px;} [data-sizey="13"] { height:370px;} [data-sizey="14"] { height:400px;} [data-sizey="15"] { height:430px;} [data-sizex="1"] { width:300px;} [data-sizex="2"] { width:620px;} [data-sizex="3"] { width:940px;} [data-sizex="4"] { width:1260px;} [data-sizex="5"] { width:1580px;} [data-sizex="6"] { width:1900px;}</style>
+	<style type="text/css"> [data-col="4"] { left:970px;}  [data-col="3"] { left:650px;}  [data-col="2"] { left:330px;}  [data-col="1"] { left:10px;}  [data-row="17"] { top:490px;}  [data-row="16"] { top:460px;}  [data-row="15"] { top:430px;}  [data-row="14"] { top:400px;}  [data-row="13"] { top:370px;}  [data-row="12"] { top:340px;}  [data-row="11"] { top:310px;}  [data-row="10"] { top:280px;}  [data-row="9"] { top:250px;}  [data-row="8"] { top:220px;}  [data-row="7"] { top:190px;}  [data-row="6"] { top:160px;}  [data-row="5"] { top:130px;}  [data-row="4"] { top:100px;}  [data-row="3"] { top:70px;}  [data-row="2"] { top:40px;}  [data-row="1"] { top:10px;}  [data-sizey="1"] { height:10px;} [data-sizey="2"] { height:40px;} [data-sizey="3"] { height:70px;} [data-sizey="4"] { height:100px;} [data-sizey="5"] { height:130px;} [data-sizey="6"] { height:160px;} [data-sizey="7"] { height:190px;} [data-sizey="8"] { height:220px;} [data-sizey="9"] { height:250px;} [data-sizey="10"] { height:280px;} [data-sizey="11"] { height:310px;} [data-sizey="12"] { height:340px;} [data-sizey="13"] { height:370px;} [data-sizey="14"] { height:400px;} [data-sizey="15"] { height:430px;} [data-sizey="16"] { height:460px;} [data-sizex="1"] { width:300px;} [data-sizex="2"] { width:620px;} [data-sizex="3"] { width:940px;} [data-sizex="4"] { width:1260px;} [data-sizex="5"] { width:1580px;} [data-sizex="6"] { width:1900px;}</style>
+	<style type="text/css"> [data-col="6"] { left:1610px;}  [data-col="5"] { left:1290px;}  [data-col="4"] { left:970px;}  [data-col="3"] { left:650px;}  [data-col="2"] { left:330px;}  [data-col="1"] { left:10px;}  [data-row="17"] { top:490px;}  [data-row="16"] { top:460px;}  [data-row="15"] { top:430px;}  [data-row="14"] { top:400px;}  [data-row="13"] { top:370px;}  [data-row="12"] { top:340px;}  [data-row="11"] { top:310px;}  [data-row="10"] { top:280px;}  [data-row="9"] { top:250px;}  [data-row="8"] { top:220px;}  [data-row="7"] { top:190px;}  [data-row="6"] { top:160px;}  [data-row="5"] { top:130px;}  [data-row="4"] { top:100px;}  [data-row="3"] { top:70px;}  [data-row="2"] { top:40px;}  [data-row="1"] { top:10px;}  [data-sizey="1"] { height:10px;} [data-sizey="2"] { height:40px;} [data-sizey="3"] { height:70px;} [data-sizey="4"] { height:100px;} [data-sizey="5"] { height:130px;} [data-sizey="6"] { height:160px;} [data-sizey="7"] { height:190px;} [data-sizey="8"] { height:220px;} [data-sizey="9"] { height:250px;} [data-sizey="10"] { height:280px;} [data-sizey="11"] { height:310px;} [data-sizey="12"] { height:340px;} [data-sizey="13"] { height:370px;} [data-sizey="14"] { height:400px;} [data-sizey="15"] { height:430px;} [data-sizey="16"] { height:460px;} [data-sizex="1"] { width:300px;} [data-sizex="2"] { width:620px;} [data-sizex="3"] { width:940px;} [data-sizex="4"] { width:1260px;} [data-sizex="5"] { width:1580px;} [data-sizex="6"] { width:1900px;}</style>
+	<style type="text/css"> [data-col="4"] { left:970px;}  [data-col="3"] { left:650px;}  [data-col="2"] { left:330px;}  [data-col="1"] { left:10px;}  [data-row="22"] { top:640px;}  [data-row="21"] { top:610px;}  [data-row="20"] { top:580px;}  [data-row="19"] { top:550px;}  [data-row="18"] { top:520px;}  [data-row="17"] { top:490px;}  [data-row="16"] { top:460px;}  [data-row="15"] { top:430px;}  [data-row="14"] { top:400px;}  [data-row="13"] { top:370px;}  [data-row="12"] { top:340px;}  [data-row="11"] { top:310px;}  [data-row="10"] { top:280px;}  [data-row="9"] { top:250px;}  [data-row="8"] { top:220px;}  [data-row="7"] { top:190px;}  [data-row="6"] { top:160px;}  [data-row="5"] { top:130px;}  [data-row="4"] { top:100px;}  [data-row="3"] { top:70px;}  [data-row="2"] { top:40px;}  [data-row="1"] { top:10px;}  [data-sizey="1"] { height:10px;} [data-sizey="2"] { height:40px;} [data-sizey="3"] { height:70px;} [data-sizey="4"] { height:100px;} [data-sizey="5"] { height:130px;} [data-sizey="6"] { height:160px;} [data-sizey="7"] { height:190px;} [data-sizey="8"] { height:220px;} [data-sizey="9"] { height:250px;} [data-sizey="10"] { height:280px;} [data-sizey="11"] { height:310px;} [data-sizey="12"] { height:340px;} [data-sizey="13"] { height:370px;} [data-sizey="14"] { height:400px;} [data-sizey="15"] { height:430px;} [data-sizey="16"] { height:460px;} [data-sizey="17"] { height:490px;} [data-sizey="18"] { height:520px;} [data-sizey="19"] { height:550px;} [data-sizey="20"] { height:580px;} [data-sizey="21"] { height:610px;} [data-sizex="1"] { width:300px;} [data-sizex="2"] { width:620px;} [data-sizex="3"] { width:940px;} [data-sizex="4"] { width:1260px;} [data-sizex="5"] { width:1580px;} [data-sizex="6"] { width:1900px;}</style>
+</head>
+<body>
+<div id="board-content" style="top: 20px;">
+	<img id="dash-logo" data-bind="attr:{src: header_image}, visible:header_image()" style="display: none;">
+
+	<div class="gridster responsive-column-width ready" style="max-width: 963px; width: 960px;">
+		<ul data-bind="grid: true" style="position: relative; height: 330px;">
+			<li data-bind="pane: true" data-col="1" data-row="1" data-sizex="3" data-sizey="10" class="gs_w" style="cursor: default; display: list-item;">
+				<section data-bind="foreach: widgets">
+					<div class="sub-section sub-section-height-4">
+						<div class="widget">
+							<svg id="mychart" style='overflow: hidden; width:920px; height: 230px;'></svg>
+						</div>
+					</div>
+				</section>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<script>
+	function myData() {
+		var series1 = [];
+		for (var i = 1; i < 100; i++) {
+			series1.push({
+				x: i, y: 100 / i
+			});
+		}
+
+		return [
+			{
+				key: "Series #1",
+				values: series1,
+				color: "#0000ff"
+			}
+		];
+	}
+
+	nv.addGraph(function () {
+		var chart = nv.models.lineChart();
+
+		chart.xAxis
+			.axisLabel("X-axis Label");
+
+		chart.yAxis
+			.axisLabel("Y-axis Label")
+			.tickFormat(d3.format("d"))
+		;
+
+		d3.select(document.getElementById("mychart"))
+			.datum(myData())
+			.transition().duration(500).call(chart);
+
+		/*nv.utils.windowResize(
+		 function() {
+		 chart.update();
+		 }
+		 );*/
+
+		return chart;
+	});
+</script>
+</body>
+</html>

@@ -1,3 +1,7 @@
+freeboard.addStyle(".nvd3 text", "fill: #686868; font-family: " + freeboard.getStyleObject("font-family"));
+freeboard.addStyle(".nvd3 .nv-axis line", "stroke: #686868 !important; stroke-width: 1;shape-rendering: crispEdges;stroke-dasharray: 5,5;");
+freeboard.addStyle(".nv-legend-text", "font-weight: 700;");
+
 var chartWidget = function (settings) {
 
 	var self = this;
@@ -5,84 +9,94 @@ var chartWidget = function (settings) {
 	var chart;
 	var chartData;
 	var rootElement;
+	var chartElement;
 
-	function sampleChartData() {
-		var sin = [],
-			cos = [];
+	function createChart()
+	{
+		nv.addGraph(function() {
 
-		for (var i = 0; i < 100; i++) {
-			sin.push({x: i, y: Math.sin(i/10)});
-			cos.push({x: i, y: .5 * Math.cos(i/10)});
-		}
-
-		return [
+			switch(currentSettings.render_type)
 			{
-				values: sin,
-				key: 'Sine Wave',
-				color: '#ff7f0e'
-			},
-			{
-				values: cos,
-				key: 'Cosine Wave',
-				color: '#2ca02c'
+				case "line":
+					chart = nv.models.lineChart()
+						.useInteractiveGuideline(true);
+					break;
+				case "bar":
+					chart = nv.models.multiBarChart()
+						.reduceXTicks(true)
+						.showControls(true);
+					break;
 			}
-		];
+
+			chart.transitionDuration(350)
+				.showLegend(true)
+				.showYAxis(true)
+				.showXAxis(true);
+
+			if(!_.isUndefined(currentSettings.y_label) && currentSettings.y_label != "")
+			{
+				chart.margin({left: 75});
+			}
+
+			chart.xAxis
+				.axisLabel(currentSettings.x_label);
+
+			chart.yAxis
+				.axisLabel(currentSettings.y_label);
+
+			refreshChartData();
+
+			return chart;
+		});
 	}
 
-	function updateGraph(recreate)
+	function refreshChartData()
 	{
-		if(rootElement)
+		if(chart && chartData)
 		{
-			var chartContainer = $("<svg></svg>").css({
-				width : $(rootElement).width(),
-				height: $(rootElement).height()
+			//var id = "#" + chartElement.attr("id"); // For some reason we can only select by ID here. Not exactly sure why.
+			d3.select(chartElement.get(0)).datum(chartData).transition().duration(500).call(chart);
+		}
+	}
+
+	function resetChartElement(element)
+	{
+		rootElement = $(element);
+		chartElement = $('<svg id=""></svg>').uniqueId();
+		$(element).empty().append(chartElement);
+		chart = null;
+	}
+
+	function updateSize()
+	{
+		if(chartElement)
+		{
+			chartElement.css({
+				width : rootElement.width(),
+				height: rootElement.height()
 			});
+		}
 
-			$(rootElement).empty().append(chartContainer);
-
-			nv.addGraph(function() {
-				chart = nv.models.lineChart()
-						.useInteractiveGuideline(true)
-					;
-
-				chart.xAxis
-					.axisLabel('Time (ms)')
-					.tickFormat(d3.format(',r'))
-				;
-
-				chart.yAxis
-					.axisLabel('Voltage (v)')
-					.tickFormat(d3.format('.02f'))
-				;
-
-				d3.select(chartContainer[0])
-					.datum(sampleChartData())
-					.transition().duration(500)
-					.call(chart)
-				;
-
-				return chart;
-			});
-
+		if(chart && chart.update)
+		{
+			chart.update();
 		}
 	}
 
 	this.render = function (element){
-
-		rootElement = $(element)[0];
+		resetChartElement(element);
 	}
 
 	this.onSettingsChanged = function (newSettings) {
 		currentSettings = newSettings;
+
+		updateSize();
+		resetChartElement(rootElement);
+		createChart();
 	}
 
 	this.onSizeChanged = function () {
-
-		if(chart)
-		{
-			chart.update();
-		}
-
+		updateSize();
 	}
 
 	function createSeriesData(data, xSelector, ySelector, name, color)
@@ -117,7 +131,7 @@ var chartWidget = function (settings) {
 					chartData.push(createSeriesData(newValue, currentSettings.series_1_x, currentSettings.series_1_y, currentSettings.series_1_name, 'steelblue'));
 				}
 
-				updateGraph(true);
+				refreshChartData();
 			}
 		}
 	}
@@ -137,8 +151,8 @@ freeboard.loadWidgetPlugin({
 	type_name: "chart_widget",
 	display_name: "Chart",
 	"external_scripts": [
-		"plugins/thirdparty/d3.v3.js",
 		"plugins/thirdparty/nv.d3.min.css",
+		"plugins/thirdparty/d3.v3.js",
 		"plugins/thirdparty/nv.d3.min.js"
 	],
 	settings: [
@@ -179,6 +193,16 @@ freeboard.loadWidgetPlugin({
 			display_name: "Data Path",
 			type: "calculated",
 			description : "A path to a series of data (an array)"
+		},
+		{
+			name: "x_label",
+			display_name: "X Axis Label",
+			type: "text"
+		},
+		{
+			name: "y_label",
+			display_name: "Y Axis Label",
+			type: "text"
 		},
 		{
 			name: "series_1_name",
