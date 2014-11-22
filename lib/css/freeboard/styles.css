@@ -1714,6 +1714,18 @@ ul.value-dropdown li.selected {
 	text-shadow: none;
 }
 
+ul.value-dropdown li .preview {
+	font-style: italic;
+	font-size: 10px;
+	width: 300px;
+	display: inline-block;
+	vertical-align: bottom;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	padding-left: 20px;
+}
+
 td.form-table-value > input[type="checkbox"] {
 	height: 15px;
 	margin-top: 7px;
