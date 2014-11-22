@@ -1,5 +1,10 @@
 var util = require('../util/test_util.js');
 
+casper.options.viewportSize = {width: 1024, height: 768}
+casper.options.onError = function() {
+	casper.capture("error_screenshot.png");
+};
+
 casper.test.begin('Freeboard smoke test', function testFunction(test)
 {
 	casper.start(util.FREEBOARD_URL, function()

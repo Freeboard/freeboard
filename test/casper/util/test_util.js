@@ -25,7 +25,7 @@ var SELECTORS = {
 	autofillDatasource : '#modal_overlay #setting-value-container-value li i.icon-plus',
 	autofillMenu : '#modal_overlay #value-selector',
 	autofillMenuItem : '#modal_overlay #value-selector li:nth-child(%s)',
-	singlePaneTextWidget : '#board-content li section div.text-widget-regular-value',
+	singlePaneTextWidget : '#board-content li section div.tw-value',
 	trashWidget : '#board-content li section i.icon-trash',
 	trashPane : '#board-content li header i.icon-trash',
 	trashDatasource : '#datasources table#datasources-list i.icon-trash'
