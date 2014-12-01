@@ -99,6 +99,11 @@ var chartWidget = function (settings) {
 		updateSize();
 	}
 
+	function getDataValue(data, selector) {
+		var valueFunction = new Function("data", "return data" + selector + ";");
+		return Number(valueFunction.call(undefined, data));
+	}
+
 	function createSeriesData(data, xSelector, ySelector, name, color)
 	{
 		var newData = [];
@@ -106,8 +111,8 @@ var chartWidget = function (settings) {
 		_.each(data, function(point)
 		{
 			newData.push({
-				x : Number(point[xSelector]),
-				y : Number(point[ySelector])
+				x : getDataValue(point, xSelector),
+				y : getDataValue(point, ySelector)
 			});
 		});
 
@@ -192,17 +197,8 @@ freeboard.loadWidgetPlugin({
 			name: "data_points",
 			display_name: "Data Path",
 			type: "calculated",
-			description : "A path to a series of data (an array)"
-		},
-		{
-			name: "x_label",
-			display_name: "X Axis Label",
-			type: "text"
-		},
-		{
-			name: "y_label",
-			display_name: "Y Axis Label",
-			type: "text"
+			description : "A path to a series of data (an array)",
+			expected: "array"
 		},
 		{
 			name: "series_1_name",
@@ -213,14 +209,30 @@ freeboard.loadWidgetPlugin({
 		{
 			name: "series_1_x",
 			display_name: "Series 1 X",
-			type: "text",
-			description : ""
+			type: "calculated",
+			description : "",
+			expected: "value",
+			depends: "data_points",
+			dependent_selector: "[0]"
 		},
 		{
 			name: "series_1_y",
 			display_name: "Series 1 Y",
-			type: "text",
-			description : ""
+			type: "calculated",
+			description : "",
+			expected: "value",
+			depends: "data_points",
+			dependent_selector: "[0]"
+		},
+		{
+			name: "x_label",
+			display_name: "X Axis Label",
+			type: "text"
+		},
+		{
+			name: "y_label",
+			display_name: "Y Axis Label",
+			type: "text"
 		},
 		{
 			"name": "height",
