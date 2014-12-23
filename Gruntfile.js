@@ -65,18 +65,12 @@ module.exports = function(grunt) {
             fb: {
                 files: {
                     'js/freeboard.min.js' : [ 'js/freeboard.js' ]
-                },
-				options:{
-					sourceMap : true
-				}
+                }
             },
             plugins: {
                 files: {
                     'js/freeboard.plugins.min.js' : [ 'js/freeboard.plugins.js' ]
-                },
-				options:{
-					sourceMap : true
-				}
+                }
             },
             thirdparty :{
                 options: {
@@ -91,10 +85,7 @@ module.exports = function(grunt) {
             'fb+plugins': {
                 files: {
                     'js/freeboard+plugins.min.js' : [ 'js/freeboard+plugins.js' ]
-                },
-				options:{
-					sourceMap : true
-				}
+                }
             }
         },
         'string-replace': {
