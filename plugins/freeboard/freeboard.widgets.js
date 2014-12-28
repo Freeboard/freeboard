@@ -8,7 +8,8 @@
 // └────────────────────────────────────────────────────────────────────┘ \\
 
 (function () {
-    var SPARKLINE_HISTORY_LENGTH = 100;
+	var SPARKLINE_HISTORY_LENGTH = 100;
+	var SPARKLINE_COLORS = ["#FF9900", "#FFFFFF", "#B3B4B4", "#6B6B6B", "#28DE28", "#13F7F9", "#E6EE18", "#C41204", "#CA3CB8", "#0B1CFB"];
 
     function easeTransitionText(newValue, textElement, duration) {
 
@@ -47,36 +48,64 @@
         }
     }
 
-    function addValueToSparkline(element, value) {
-        var values = $(element).data().values;
+	function addValueToSparkline(element, value) {
+		var values = $(element).data().values;
+		var valueMin = $(element).data().valueMin;
+		var valueMax = $(element).data().valueMax;
+		if (!values) {
+			values = [];
+			valueMin = undefined;
+			valueMax = undefined;
+		}
 
-        if (!values) {
-            values = [];
-        }
+		var collateValues = function(val, plotIndex) {
+			if(!values[plotIndex]) {
+				values[plotIndex] = [];
+			}
+			if (values[plotIndex].length >= SPARKLINE_HISTORY_LENGTH) {
+				values[plotIndex].shift();
+			}
+			values[plotIndex].push(Number(val));
 
-        if (values.length >= SPARKLINE_HISTORY_LENGTH) {
-            values.shift();
-        }
+			if(valueMin === undefined || val < valueMin) {
+				valueMin = val;
+			}
+			if(valueMax === undefined || val > valueMax) {
+				valueMax = val;
+			}
+		}
 
-        values.push(Number(value));
+		if(_.isArray(value)) {
+			_.each(value, collateValues);
+		} else {
+			collateValues(value, 0);
+		}
+		$(element).data().values = values;
+		$(element).data().valueMin = valueMin;
+		$(element).data().valueMax = valueMax;
 
-        $(element).data().values = values;
-
-        $(element).sparkline(values, {
-            type: "line",
-            height: "100%",
-            width: "100%",
-            fillColor: false,
-            lineColor: "#FF9900",
-            lineWidth: 2,
-            spotRadius: 3,
-            spotColor: false,
-            minSpotColor: "#78AB49",
-            maxSpotColor: "#78AB49",
-            highlightSpotColor: "#9D3926",
-            highlightLineColor: "#9D3926"
-        });
-    }
+		var composite = false;
+		_.each(values, function(valueArray, valueIndex) {
+			$(element).sparkline(valueArray, {
+				type: "line",
+				composite: composite,
+				height: "100%",
+				width: "100%",
+				fillColor: false,
+				lineColor: SPARKLINE_COLORS[valueIndex % SPARKLINE_COLORS.length],
+				lineWidth: 2,
+				spotRadius: 3,
+				spotColor: false,
+				minSpotColor: "#78AB49",
+				maxSpotColor: "#78AB49",
+				highlightSpotColor: "#9D3926",
+				highlightLineColor: "#9D3926",
+				chartRangeMin: valueMin,
+				chartRangeMax: valueMax
+			});
+			composite = true;
+		});
+	}
 
 	var valueStyle = freeboard.getStyleString("values");
 
