@@ -1864,6 +1864,12 @@ a:hover.text-button, a:focus.text-button {
 	line-height: 1.5em;
 }
 
+.calculated-setting-row {
+	clear: both;
+	height: 30px;
+	margin-bottom: 5px;
+}
+
 textarea.calculated-value-input {
 	position: absolute;
 	width: 400px;
@@ -1876,6 +1882,10 @@ textarea.calculated-value-input {
 
 ul.datasource-input-suffix {
 	margin-left: 409px;
+}
+
+.form-label .board-toolbar li {
+	float: right;
 }
 
 .styled-select select {

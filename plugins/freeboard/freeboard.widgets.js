@@ -482,7 +482,8 @@
             {
                 name: "value",
                 display_name: "Value",
-                type: "calculated"
+                type: "calculated",
+				multi_input: "true"
             }
         ],
         newInstance: function (settings, newInstanceCallback) {
