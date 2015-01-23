@@ -35,7 +35,7 @@ JustGage = function(config)
 
 		// valueFontColor : string
 		// color of label showing current value
-		valueFontColor      : (config.valueFontColor) ? config.valueFontColor : "#010101",
+		valueFontColor      : (config.valueFontColor) ? config.valueFontColor : "#005CE3",
 
 		// min : int
 		// min value
@@ -87,7 +87,7 @@ JustGage = function(config)
 
 		// labelFontColor : string
 		// color of label showing label under value
-		labelFontColor      : (config.labelFontColor) ? config.labelFontColor : "#b3b3b3",
+		labelFontColor      : (config.labelFontColor) ? config.labelFontColor : "#6bbbfd",
 
 		// startAnimationTime : int
 		// length of initial animation
@@ -314,7 +314,7 @@ JustGage.prototype.refresh = function(val)
 };
 
 var percentColors = [
-	"#a9d70b", "#f9c802", "#ff0000"
+	"#bcbec0", "#a9d70b", "#a6ce00"
 ]
 
 JustGage.prototype.generateShadow = function(svg, defs)
