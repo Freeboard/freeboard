@@ -6,12 +6,12 @@
 .cm-s-ambiance .cm-atom { color: #CF7EA9; }
 .cm-s-ambiance .cm-number { color: #78CF8A; }
 .cm-s-ambiance .cm-def { color: #aac6e3; }
-.cm-s-ambiance .cm-variable { color: #ffb795; }
+.cm-s-ambiance .cm-variable { color: #58595b; }
 .cm-s-ambiance .cm-variable-2 { color: #eed1b3; }
 .cm-s-ambiance .cm-variable-3 { color: #faded3; }
 .cm-s-ambiance .cm-property { color: #eed1b3; }
 .cm-s-ambiance .cm-operator {color: #fa8d6a;}
-.cm-s-ambiance .cm-comment { color: #555; font-style:italic; }
+.cm-s-ambiance .cm-comment { color: #005ce3; font-style:italic; }
 .cm-s-ambiance .cm-string { color: #8f9d6a; }
 .cm-s-ambiance .cm-string-2 { color: #9d937c; }
 .cm-s-ambiance .cm-meta { color: #D2A8A1; }
@@ -42,14 +42,14 @@
 .cm-s-ambiance.CodeMirror {
   line-height: 1.40em;
   color: #E6E1DC;
-  background-color: #202020;
+  background-color: #e6e7e8;
   -webkit-box-shadow: inset 0 0 10px black;
   -moz-box-shadow: inset 0 0 10px black;
   box-shadow: inset 0 0 10px black;
 }
 
 .cm-s-ambiance .CodeMirror-gutters {
-  background: #3D3D3D;
+  background: #ffffff;
   border-right: 1px solid #4D4D4D;
   box-shadow: 0 10px 20px black;
 }
@@ -974,7 +974,7 @@ input[type="color"]:focus,
 
 	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgb(255, 153, 0);
 	-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgb(255, 153, 0);
-	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgb(255, 153, 0);
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #a9d70b;
 }
 
 select {
@@ -2050,7 +2050,7 @@ ul.value-dropdown {
 	padding: 0px;
 	margin: 0px;
 	background-color: #272727;
-	border: 1px solid rgba(255, 153, 0, 0.8);
+	border: none;
 	overflow-x: hidden;
 	overflow-y: auto;
 	z-index: 3001;
