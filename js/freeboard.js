@@ -1532,7 +1532,7 @@ PluginEditor = function(jsEditor, valueEditor)
 
                             var datasourceToolbox = $('<ul class="board-toolbar datasource-input-suffix"></ul>');
 
-                            var datasourceTool = $('<li><i class="icon-plus icon-white"></i><label>DATASOURCE</label></li>').mousedown(function(e)
+                            var datasourceTool = $('<li><i class="icon-plus"></i><label>DATASOURCE</label></li>').mousedown(function(e)
                             {
                                 e.preventDefault();
                                 $(input).focus();
@@ -1540,7 +1540,7 @@ PluginEditor = function(jsEditor, valueEditor)
                                 $(input).trigger("freeboard-eval");
                             });
 
-                            var jsEditorTool = $('<li><i class="icon-fullscreen icon-white"></i><label>.JS EDITOR</label></li>').mousedown(function(e)
+                            var jsEditorTool = $('<li><i class="icon-fullscreen"></i><label>.JS EDITOR</label></li>').mousedown(function(e)
                             {
                                 e.preventDefault();
 
