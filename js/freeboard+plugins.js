@@ -3502,7 +3502,7 @@ $.extend(freeboard, jQuery.eventEmitter);
 			var color = SPARKLINE_COLORS[i % SPARKLINE_COLORS.length];
 			var label = legend[i];
 			legendElt.append("<div class='sparkline-legend-value'><span style='color:" +
-							 color + "'>&bull;</span>" + label + "</div>");
+							 color + "'>&#9679;</span>" + label + "</div>");
 		}
 		element.empty().append(legendElt);
 
@@ -3513,7 +3513,7 @@ $.extend(freeboard, jQuery.eventEmitter);
 			'font-weight:bold; padding-right:5px;');
 	}
 
-	function addValueToSparkline(element, value) {
+	function addValueToSparkline(element, value, legend) {
 		var values = $(element).data().values;
 		var valueMin = $(element).data().valueMin;
 		var valueMax = $(element).data().valueMax;
@@ -3549,6 +3549,8 @@ $.extend(freeboard, jQuery.eventEmitter);
 		$(element).data().valueMin = valueMin;
 		$(element).data().valueMax = valueMax;
 
+		var tooltipHTML = '<span style="color: {{color}}">&#9679;</span> {{y}}';
+
 		var composite = false;
 		_.each(values, function(valueArray, valueIndex) {
 			$(element).sparkline(valueArray, {
@@ -3566,7 +3568,8 @@ $.extend(freeboard, jQuery.eventEmitter);
 				highlightSpotColor: "#9D3926",
 				highlightLineColor: "#9D3926",
 				chartRangeMin: valueMin,
-				chartRangeMax: valueMax
+				chartRangeMax: valueMax,
+				tooltipFormat: (legend && legend[valueIndex])?tooltipHTML + ' (' + legend[valueIndex] + ')':tooltipHTML
 			});
 			composite = true;
 		});
@@ -3926,7 +3929,11 @@ $.extend(freeboard, jQuery.eventEmitter);
         }
 
         this.onCalculatedValueChanged = function (settingName, newValue) {
-            addValueToSparkline(sparklineElement, newValue);
+			if (currentSettings.legend) {
+				addValueToSparkline(sparklineElement, newValue, currentSettings.legend.split(","));
+			} else {
+				addValueToSparkline(sparklineElement, newValue);
+			}
         }
 
         this.onDispose = function () {
@@ -3934,10 +3941,12 @@ $.extend(freeboard, jQuery.eventEmitter);
 
         this.getHeight = function () {
 			var legendHeight = 0;
-			if (currentSettings.include_legend) {
+			if (currentSettings.include_legend && currentSettings.legend) {
 				var legendLength = currentSettings.legend.split(",").length;
 				if (legendLength > 4) {
 					legendHeight = Math.floor((legendLength-1) / 4) * 0.5;
+				} else if (legendLength) {
+					legendHeight = 0.5;
 				}
 			}
 			return 2 + legendHeight;
