@@ -3496,7 +3496,24 @@ $.extend(freeboard, jQuery.eventEmitter);
         }
     }
 
-	function addValueToSparkline(element, value) {
+	function addSparklineLegend(element, legend) {
+		var legendElt = $("<div class='sparkline-legend'></div>");
+		for(var i=0; i<legend.length; i++) {
+			var color = SPARKLINE_COLORS[i % SPARKLINE_COLORS.length];
+			var label = legend[i];
+			legendElt.append("<div class='sparkline-legend-value'><span style='color:" +
+							 color + "'>&#9679;</span>" + label + "</div>");
+		}
+		element.empty().append(legendElt);
+
+		freeboard.addStyle('.sparkline-legend', "margin:5px;");
+		freeboard.addStyle('.sparkline-legend-value',
+			'color:white; font:10px arial,san serif; float:left; overflow:hidden; width:50%;');
+		freeboard.addStyle('.sparkline-legend-value span',
+			'font-weight:bold; padding-right:5px;');
+	}
+
+	function addValueToSparkline(element, value, legend) {
 		var values = $(element).data().values;
 		var valueMin = $(element).data().valueMin;
 		var valueMax = $(element).data().valueMax;
@@ -3532,6 +3549,8 @@ $.extend(freeboard, jQuery.eventEmitter);
 		$(element).data().valueMin = valueMin;
 		$(element).data().valueMax = valueMax;
 
+		var tooltipHTML = '<span style="color: {{color}}">&#9679;</span> {{y}}';
+
 		var composite = false;
 		_.each(values, function(valueArray, valueIndex) {
 			$(element).sparkline(valueArray, {
@@ -3549,7 +3568,8 @@ $.extend(freeboard, jQuery.eventEmitter);
 				highlightSpotColor: "#9D3926",
 				highlightLineColor: "#9D3926",
 				chartRangeMin: valueMin,
-				chartRangeMax: valueMax
+				chartRangeMax: valueMax,
+				tooltipFormat: (legend && legend[valueIndex])?tooltipHTML + ' (' + legend[valueIndex] + ')':tooltipHTML
 			});
 			composite = true;
 		});
@@ -3892,24 +3912,44 @@ $.extend(freeboard, jQuery.eventEmitter);
 
         var titleElement = $('<h2 class="section-title"></h2>');
         var sparklineElement = $('<div class="sparkline"></div>');
+		var sparklineLegend = $('<div></div>');
+		var currentSettings = settings;
 
         this.render = function (element) {
-            $(element).append(titleElement).append(sparklineElement);
+            $(element).append(titleElement).append(sparklineElement).append(sparklineLegend);
         }
 
         this.onSettingsChanged = function (newSettings) {
+			currentSettings = newSettings;
             titleElement.html((_.isUndefined(newSettings.title) ? "" : newSettings.title));
+
+			if(newSettings.include_legend) {
+				addSparklineLegend(sparklineLegend,  newSettings.legend.split(","));
+			}
         }
 
         this.onCalculatedValueChanged = function (settingName, newValue) {
-            addValueToSparkline(sparklineElement, newValue);
+			if (currentSettings.legend) {
+				addValueToSparkline(sparklineElement, newValue, currentSettings.legend.split(","));
+			} else {
+				addValueToSparkline(sparklineElement, newValue);
+			}
         }
 
         this.onDispose = function () {
         }
 
         this.getHeight = function () {
-            return 2;
+			var legendHeight = 0;
+			if (currentSettings.include_legend && currentSettings.legend) {
+				var legendLength = currentSettings.legend.split(",").length;
+				if (legendLength > 4) {
+					legendHeight = Math.floor((legendLength-1) / 4) * 0.5;
+				} else if (legendLength) {
+					legendHeight = 0.5;
+				}
+			}
+			return 2 + legendHeight;
         }
 
         this.onSettingsChanged(settings);
@@ -3932,7 +3972,18 @@ $.extend(freeboard, jQuery.eventEmitter);
                 display_name: "Value",
                 type: "calculated",
 				multi_input: "true"
-            }
+            },
+			{
+				name: "include_legend",
+				display_name: "Include Legend",
+				type: "boolean"
+			},
+			{
+				name: "legend",
+				display_name: "Legend",
+				type: "text",
+				description: "Comma-separated for multiple sparklines"
+			}
         ],
         newInstance: function (settings, newInstanceCallback) {
             newInstanceCallback(new sparklineWidget(settings));
