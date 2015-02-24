@@ -2290,6 +2290,8 @@ var freeboard = (function()
 
 			if(freeboardLocation != "")
 			{
+			theFreeboardModel.allow_edit(allowEdit); // respect the allowEdit flag
+            		theFreeboardModel.setEditing(false); // but always start with editor shut.
 				$.ajax({
 					url    : freeboardLocation,
 					success: function(data)
