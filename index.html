@@ -19,7 +19,7 @@
 
                         var hashpattern = window.location.hash.match(/(&|#)source=([^&]+)/);
                         if (hashpattern !== null) {
-                            $.get(hashpattern[2], function(data) {
+                            $.getJSON(hashpattern[2], function(data) {
                                 freeboard.loadDashboard(data, function() {
                                     freeboard.setEditing(false);
                                 });
