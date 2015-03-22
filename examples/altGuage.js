@@ -1,3 +1,4 @@
+window.dyngaugeID = 0;
 (function() {    
         var dynamicGaugeWidget = function (settings) {
         var self = this;
@@ -67,8 +68,8 @@
         type_name: "dyngauge",
         display_name: "DynamicGauge",
         "external_scripts" : [
-            "../freeboard-ui/plugins/thirdparty/raphael.2.1.0.min.js",
-            "../freeboard-ui/plugins/thirdparty/justgage.1.0.1.js"
+            "plugins/thirdparty/raphael.2.1.0.min.js",
+            "plugins/thirdparty/justgage.1.0.1.js"
         ],
         settings: [
             {
