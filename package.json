@@ -1,7 +1,7 @@
 {
   "name": "freeboard",
   "title": "freeboard",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "devDependencies": {
     "grunt": "0.4.1",
     "grunt-contrib-concat": "0.1.3",
