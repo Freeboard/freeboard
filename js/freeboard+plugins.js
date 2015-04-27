@@ -1283,9 +1283,9 @@ PluginEditor = function(jsEditor, valueEditor)
 		if($("#setting-row-instance-name").length)
 		{
 			$("#setting-row-instance-name").nextAll().remove();
-	  	 }
-	    	else
-	    	{
+		}
+		else
+		{
 			$("#setting-row-plugin-types").nextAll().remove();
 		}
 	}
@@ -1322,18 +1322,18 @@ PluginEditor = function(jsEditor, valueEditor)
 
 		valueEditor.createValueEditor(input);
 
-        var datasourceToolbox = $('<ul class="board-toolbar datasource-input-suffix"></ul>');
+		var datasourceToolbox = $('<ul class="board-toolbar datasource-input-suffix"></ul>');
 		var wrapperDiv = $('<div class="calculated-setting-row"></div>');
 		wrapperDiv.append(input).append(datasourceToolbox);
 
-        var datasourceTool = $('<li><i class="icon-plus icon-white"></i><label>DATASOURCE</label></li>')
+		var datasourceTool = $('<li><i class="icon-plus icon-white"></i><label>DATASOURCE</label></li>')
 			.mousedown(function(e) {
 				e.preventDefault();
 				$(input).val("").focus().insertAtCaret("datasources[\"").trigger("freeboard-eval");
 			});
 		datasourceToolbox.append(datasourceTool);
 
-        var jsEditorTool = $('<li><i class="icon-fullscreen icon-white"></i><label>.JS EDITOR</label></li>')
+		var jsEditorTool = $('<li><i class="icon-fullscreen icon-white"></i><label>.JS EDITOR</label></li>')
 			.mousedown(function(e) {
 				e.preventDefault();
 				jsEditor.displayJSEditor(input.val(), function(result) {
@@ -1349,7 +1349,7 @@ PluginEditor = function(jsEditor, valueEditor)
 					e.preventDefault();
 					wrapperDiv.remove();
 					$(valueCell).find('textarea:first').change();
-			});
+				});
 			datasourceToolbox.prepend(removeButton);
 		}
 
@@ -1377,7 +1377,7 @@ PluginEditor = function(jsEditor, valueEditor)
 		var pluginDescriptionElement = $('<div id="plugin-description"></div>').hide();
 		form.append(pluginDescriptionElement);
 
-		function createSettingsFromDefinition(settingsDefs)
+		function createSettingsFromDefinition(settingsDefs, typeaheadSource, typeaheadDataSegment)
 		{
 			_.each(settingsDefs, function(settingDef)
 			{
@@ -1471,16 +1471,16 @@ PluginEditor = function(jsEditor, valueEditor)
 							});
 
 							subsettingRow.append($('<td class="table-row-operation"></td>').append($('<ul class="board-toolbar"></ul>').append($('<li></li>').append($('<i class="icon-trash icon-white"></i>').click(function()
-												{
-													var subSettingIndex = newSettings.settings[settingDef.name].indexOf(newSetting);
+							{
+								var subSettingIndex = newSettings.settings[settingDef.name].indexOf(newSetting);
 
-													if(subSettingIndex != -1)
-													{
-														newSettings.settings[settingDef.name].splice(subSettingIndex, 1);
-														subsettingRow.remove();
-														processHeaderVisibility();
-													}
-												})))));
+								if(subSettingIndex != -1)
+								{
+									newSettings.settings[settingDef.name].splice(subSettingIndex, 1);
+									subsettingRow.remove();
+									processHeaderVisibility();
+								}
+							})))));
 
 							subTableDiv.scrollTop(subTableDiv[0].scrollHeight);
 
@@ -1511,7 +1511,7 @@ PluginEditor = function(jsEditor, valueEditor)
 					{
 						newSettings.settings[settingDef.name] = currentSettingsValues[settingDef.name];
 
-                        var onOffSwitch = $('<div class="onoffswitch"><label class="onoffswitch-label" for="' + settingDef.name + '-onoff"><div class="onoffswitch-inner"><span class="on">YES</span><span class="off">NO</span></div><div class="onoffswitch-switch"></div></label></div>').appendTo(valueCell);
+						var onOffSwitch = $('<div class="onoffswitch"><label class="onoffswitch-label" for="' + settingDef.name + '-onoff"><div class="onoffswitch-inner"><span class="on">YES</span><span class="off">NO</span></div><div class="onoffswitch-switch"></div></label></div>').appendTo(valueCell);
 
 						var input = $('<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="' + settingDef.name + '-onoff">').prependTo(onOffSwitch).change(function()
 						{
@@ -1606,19 +1606,75 @@ PluginEditor = function(jsEditor, valueEditor)
 						{
 							var input = $('<input type="text">').appendTo(valueCell).change(function()
 							{
-                                if(settingDef.type == "number")
-                                {
-                                    newSettings.settings[settingDef.name] = Number($(this).val());
-                                }
-                                else
-                                {
-								    newSettings.settings[settingDef.name] = $(this).val();
-                                }
+								if(settingDef.type == "number")
+								{
+									newSettings.settings[settingDef.name] = Number($(this).val());
+								}
+								else
+								{
+									newSettings.settings[settingDef.name] = $(this).val();
+								}
 							});
 
 							if(settingDef.name in currentSettingsValues)
 							{
 								input.val(currentSettingsValues[settingDef.name]);
+							}
+
+							if(typeaheadSource && settingDef.typeahead_data_field){
+								input.addClass('typeahead_data_field-' + settingDef.typeahead_data_field);
+							}
+
+							if(typeaheadSource && settingDef.typeahead_field){
+								var typeaheadValues = [];
+
+								input.keyup(function(event){
+									if(event.which >= 65 && event.which <= 91) {
+										input.trigger('change');
+									}
+								});
+
+								$(input).autocomplete({
+									source: typeaheadValues,
+									select: function(event, ui){
+										input.val(ui.item.value);
+										input.trigger('change');
+									}
+								});
+
+								input.change(function(event){
+									var value = input.val();
+									var source = _.template(typeaheadSource)({input: value});
+									$.get(source, function(data){
+										if(typeaheadDataSegment){
+											data = data[typeaheadDataSegment];
+										}
+										data  = _.select(data, function(elm){
+											return elm[settingDef.typeahead_field][0] == value[0];
+										});
+
+										typeaheadValues = _.map(data, function(elm){
+											return elm[settingDef.typeahead_field];
+										});
+										$(input).autocomplete("option", "source", typeaheadValues);
+
+										if(data.length == 1){
+											data = data[0];
+											//we found the one. let's use it to populate the other info
+											for(var field in data){
+												if(data.hasOwnProperty(field)){
+													var otherInput = $(_.template('input.typeahead_data_field-<%= field %>')({field: field}));
+													if(otherInput){
+														otherInput.val(data[field]);
+														if(otherInput.val() != input.val()) {
+															otherInput.trigger('change');
+														}
+													}
+												}
+											}
+										}
+									});
+								});
 							}
 						}
 
@@ -1626,10 +1682,10 @@ PluginEditor = function(jsEditor, valueEditor)
 					}
 				}
 
-                if(!_.isUndefined(settingDef.suffix))
-                {
-                    valueCell.append($('<div class="input-suffix">' + settingDef.suffix + '</div>'));
-                }
+				if(!_.isUndefined(settingDef.suffix))
+				{
+					valueCell.append($('<div class="input-suffix">' + settingDef.suffix + '</div>'));
+				}
 
 				if(!_.isUndefined(settingDef.description))
 				{
@@ -1642,7 +1698,7 @@ PluginEditor = function(jsEditor, valueEditor)
 		new DialogBox(form, title, "Save", "Cancel", function()
 		{
 			$(".validation-error").remove();
-	
+
 			// Loop through each setting and validate it
 			for(var index = 0; index < selectedType.settings.length; index++)
 			{
@@ -1650,12 +1706,12 @@ PluginEditor = function(jsEditor, valueEditor)
 
 				if(settingDef.required && (_.isUndefined(newSettings.settings[settingDef.name]) || newSettings.settings[settingDef.name] == ""))
 				{
-                    _displayValidationError(settingDef.name, "This is required.");
+					_displayValidationError(settingDef.name, "This is required.");
 					return true;
 				}
 				else if(settingDef.type == "number" && !_isNumerical(newSettings.settings[settingDef.name]))
 				{
-                    _displayValidationError(settingDef.name, "Must be a number.");
+					_displayValidationError(settingDef.name, "Must be a number.");
 					return true;
 				}
 			}
@@ -1699,19 +1755,19 @@ PluginEditor = function(jsEditor, valueEditor)
 				}
 				else
 				{
-                    $("#setting-row-instance-name").show();
+					$("#setting-row-instance-name").show();
 
-                    if(selectedType.description && selectedType.description.length > 0)
-                    {
-                        pluginDescriptionElement.html(selectedType.description).show();
-                    }
-                    else
-                    {
-                        pluginDescriptionElement.hide();
-                    }
+					if(selectedType.description && selectedType.description.length > 0)
+					{
+						pluginDescriptionElement.html(selectedType.description).show();
+					}
+					else
+					{
+						pluginDescriptionElement.hide();
+					}
 
 					$("#dialog-ok").show();
-					createSettingsFromDefinition(selectedType.settings);
+					createSettingsFromDefinition(selectedType.settings, selectedType.typeahead_source, selectedType.typeahead_data_segment);
 				}
 			});
 		}
@@ -1723,30 +1779,30 @@ PluginEditor = function(jsEditor, valueEditor)
 			createSettingsFromDefinition(selectedType.settings);
 		}
 
-        if(typeSelect)
-        {
-            if(_.isUndefined(currentTypeName))
-            {
-                $("#setting-row-instance-name").hide();
-                $("#dialog-ok").hide();
-            }
-            else
-            {
-                $("#dialog-ok").show();
-                typeSelect.val(currentTypeName).trigger("change");
-            }
-        }
+		if(typeSelect)
+		{
+			if(_.isUndefined(currentTypeName))
+			{
+				$("#setting-row-instance-name").hide();
+				$("#dialog-ok").hide();
+			}
+			else
+			{
+				$("#dialog-ok").show();
+				typeSelect.val(currentTypeName).trigger("change");
+			}
+		}
 	}
 
 	// Public API
 	return {
 		createPluginEditor : function(
-					title,
-					pluginTypes,
-					currentInstanceName,
-					currentTypeName,
-					currentSettingsValues,
-					settingsSavedCallback)
+			title,
+			pluginTypes,
+			currentInstanceName,
+			currentTypeName,
+			currentSettingsValues,
+			settingsSavedCallback)
 		{
 			createPluginEditor(title, pluginTypes, currentInstanceName, currentTypeName, currentSettingsValues, settingsSavedCallback);
 		}
@@ -3444,8 +3500,159 @@ $.extend(freeboard, jQuery.eventEmitter);
 			newInstanceCallback(new clockDatasource(settings, updateCallback));
 		}
 	});
+freeboard.loadDatasourcePlugin({
+		// **type_name** (required) : A unique name for this plugin. This name should be as unique as possible to avoid collisions with other plugins, and should follow naming conventions for javascript variable and function declarations.
+		"type_name"   : "meshblu",
+		// **display_name** : The pretty name that will be used for display purposes for this plugin. If the name is not defined, type_name will be used instead.
+		"display_name": "Octoblu",
+        // **description** : A description of the plugin. This description will be displayed when the plugin is selected or within search results (in the future). The description may contain HTML if needed.
+        "description" : "app.octoblu.com",
+		// **external_scripts** : Any external scripts that should be loaded before the plugin instance is created.
+		"external_scripts" : [
+			"http://meshblu.octoblu.com/js/meshblu.js"
+		],
+		// **settings** : An array of settings that will be displayed for this plugin when the user adds it.
+		"settings"    : [
+			{
+				// **name** (required) : The name of the setting. This value will be used in your code to retrieve the value specified by the user. This should follow naming conventions for javascript variable and function declarations.
+				"name"         : "uuid",
+				// **display_name** : The pretty name that will be shown to the user when they adjust this setting.
+				"display_name" : "UUID",
+				// **type** (required) : The type of input expected for this setting. "text" will display a single text box input. Examples of other types will follow in this documentation.
+				"type"         : "text",
+				// **default_value** : A default value for this setting.
+				"default_value": "device uuid",
+				// **description** : Text that will be displayed below the setting to give the user any extra information.
+				"description"  : "your device UUID",
+                // **required** : Set to true if this setting is required for the datasource to be created.
+                "required" : true
+			},
+			{
+				// **name** (required) : The name of the setting. This value will be used in your code to retrieve the value specified by the user. This should follow naming conventions for javascript variable and function declarations.
+				"name"         : "token",
+				// **display_name** : The pretty name that will be shown to the user when they adjust this setting.
+				"display_name" : "Token",
+				// **type** (required) : The type of input expected for this setting. "text" will display a single text box input. Examples of other types will follow in this documentation.
+				"type"         : "text",
+				// **default_value** : A default value for this setting.
+				"default_value": "device token",
+				// **description** : Text that will be displayed below the setting to give the user any extra information.
+				"description"  : "your device TOKEN",
+                // **required** : Set to true if this setting is required for the datasource to be created.
+                "required" : true
+			},
+			{
+				// **name** (required) : The name of the setting. This value will be used in your code to retrieve the value specified by the user. This should follow naming conventions for javascript variable and function declarations.
+				"name"         : "server",
+				// **display_name** : The pretty name that will be shown to the user when they adjust this setting.
+				"display_name" : "Server",
+				// **type** (required) : The type of input expected for this setting. "text" will display a single text box input. Examples of other types will follow in this documentation.
+				"type"         : "text",
+				// **default_value** : A default value for this setting.
+				"default_value": "meshblu.octoblu.com",
+				// **description** : Text that will be displayed below the setting to give the user any extra information.
+				"description"  : "your server",
+                // **required** : Set to true if this setting is required for the datasource to be created.
+                "required" : true
+			},
+			{
+				// **name** (required) : The name of the setting. This value will be used in your code to retrieve the value specified by the user. This should follow naming conventions for javascript variable and function declarations.
+				"name"         : "port",
+				// **display_name** : The pretty name that will be shown to the user when they adjust this setting.
+				"display_name" : "Port",
+				// **type** (required) : The type of input expected for this setting. "text" will display a single text box input. Examples of other types will follow in this documentation.
+				"type"         : "number",
+				// **default_value** : A default value for this setting.
+				"default_value": 80,
+				// **description** : Text that will be displayed below the setting to give the user any extra information.
+				"description"  : "server port",
+                // **required** : Set to true if this setting is required for the datasource to be created.
+                "required" : true
+			}
+			
+		],
+		// **newInstance(settings, newInstanceCallback, updateCallback)** (required) : A function that will be called when a new instance of this plugin is requested.
+		// * **settings** : A javascript object with the initial settings set by the user. The names of the properties in the object will correspond to the setting names defined above.
+		// * **newInstanceCallback** : A callback function that you'll call when the new instance of the plugin is ready. This function expects a single argument, which is the new instance of your plugin object.
+		// * **updateCallback** : A callback function that you'll call if and when your datasource has an update for freeboard to recalculate. This function expects a single parameter which is a javascript object with the new, updated data. You should hold on to this reference and call it when needed.
+		newInstance   : function(settings, newInstanceCallback, updateCallback)
+		{
+			// myDatasourcePlugin is defined below.
+			newInstanceCallback(new meshbluSource(settings, updateCallback));
+		}
+	});
+
+
+	// ### Datasource Implementation
+	//
+	// -------------------
+	// Here we implement the actual datasource plugin. We pass in the settings and updateCallback.
+	var meshbluSource = function(settings, updateCallback)
+	{
+		// Always a good idea...
+		var self = this;
+
+		// Good idea to create a variable to hold on to our settings, because they might change in the future. See below.
+		var currentSettings = settings;
+
+		
+
+		/* This is some function where I'll get my data from somewhere */
+
+ 	
+		function getData()
+		{
+
+
+		 var conn = skynet.createConnection({
+    		"uuid": currentSettings.uuid,
+    		"token": currentSettings.token,
+    		"server": currentSettings.server, 
+    		"port": currentSettings.port
+  				});	
+			 
+			 conn.on('ready', function(data){	
+
+			 	conn.on('message', function(message){
+
+    				var newData = message;
+    				updateCallback(newData);
+
+ 						 });
+
+			 });
+			}
+
+	
+
+		// **onSettingsChanged(newSettings)** (required) : A public function we must implement that will be called when a user makes a change to the settings.
+		self.onSettingsChanged = function(newSettings)
+		{
+			// Here we update our current settings with the variable that is passed in.
+			currentSettings = newSettings;
+		}
+
+		// **updateNow()** (required) : A public function we must implement that will be called when the user wants to manually refresh the datasource
+		self.updateNow = function()
+		{
+			// Most likely I'll just call getData() here.
+			getData();
+		}
+
+		// **onDispose()** (required) : A public function we must implement that will be called when this instance of this plugin is no longer needed. Do anything you need to cleanup after yourself here.
+		self.onDispose = function()
+		{
+		
+			//conn.close();
+		}
+
+		// Here we call createRefreshTimer with our current settings, to kick things off, initially. Notice how we make use of one of the user defined settings that we setup earlier.
+	//	createRefreshTimer(currentSettings.refresh_time);
+	}
+
 
 }());
+
 // ┌────────────────────────────────────────────────────────────────────┐ \\
 // │ F R E E B O A R D                                                  │ \\
 // ├────────────────────────────────────────────────────────────────────┤ \\
