@@ -5,8 +5,8 @@
 	{
 		"title"  : "Tilt",
 		"width"  : 1,
-		"row"    : "1",
-		"col"    : "1",
+		"row"    : { "3": 1 },
+		"col"    : { "3": 1 },
 		"widgets": [
 			{
 				"type"    : "pointer",
@@ -43,8 +43,8 @@
 	{
 		"title"  : "Buttons",
 		"width"  : 1,
-		"row"    : "5",
-		"col"    : "3",
+		"row"    : { "3": 5 },
+		"col"    : { "3": 3 },
 		"widgets": [
 			{
 				"type"    : "indicator",
@@ -75,8 +75,8 @@
 	{
 		"title"  : "Temperature",
 		"width"  : 1,
-		"row"    : "1",
-		"col"    : "2",
+		"row"    : { "3": 1 },
+		"col"    : { "3": 2 },
 		"widgets": [
 			{
 				"type"    : "text_widget",
@@ -104,8 +104,8 @@
 	{
 		"title"  : "Potentiometer",
 		"width"  : 1,
-		"row"    : "1",
-		"col"    : "3",
+		"row"    : { "3": 1 },
+		"col"    : { "3": 3 },
 		"widgets": [
 			{
 				"type"    : "gauge",
@@ -122,8 +122,8 @@
 	{
 		"title"  : "Miscellaneous",
 		"width"  : 1,
-		"row"    : "6",
-		"col"    : "2",
+		"row"    : { "3": 6 },
+		"col"    : { "3": 2 },
 		"widgets": [
 			{
 				"type"    : "text_widget",
