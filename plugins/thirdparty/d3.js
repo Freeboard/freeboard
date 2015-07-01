@@ -26,16 +26,19 @@
       {
         "name"        : "data",
         "display_name": "Data",
+        "description"  : "Bind the widget to a data source.",
         "type"        : "calculated"
       },
       {
         "name"        : "style",
         "display_name": "CSS",
+        "description" : "Stylesheet rules to add to the whole page.",
         "type"        : "text"
       },
       {
         "name"        : "html",
         "display_name": "HTML",
+        "description" : "The HTML to render in the widget.",
         "type"        : "text"
       },
       {
@@ -44,11 +47,13 @@
         // We want the js editor so we can edit the d3.js code. However, we will not be accessing any of the data sources here.
         // Assume that there is a property called 'data' passed into the method, which is the result of the 'data' setting above.
         // Write the d3 code to visualize what is in the data argument.
+        "description" : "Write the d3.js code to update the visualization.",
         "type"        : "calculated"
       },
       {
         "name"        : "sizeInBlocks",
         "display_name": "Size in Blocks (fractions are allowed)",
+        "description" : "Fractions are allowed. eg: 1.5",
         "type"        : "number",
         // Fractions are allowed. Use this to set the appropriate height for the visualiation.
         // This value is in blocks (which is about 60px each).
