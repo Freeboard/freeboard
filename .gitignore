@@ -1,2 +1,6 @@
 .idea
 node_modules
+js/freeboard.min.js
+js/freeboard+plugins.min.js
+js/freeboard.plugins.min.js
+js/freeboard.thirdparty.min.js
