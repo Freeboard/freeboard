@@ -1655,7 +1655,9 @@ ul, ol {
 	float: left;
 }
 
-.form-row {
+.form-row:after {
+	content: '';
+	display: block;
 	clear: both;
 }
 
