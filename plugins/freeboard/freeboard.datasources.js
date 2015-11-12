@@ -199,7 +199,7 @@
 
 		this.updateNow = function () {
 			$.ajax({
-				url: "http://api.openweathermap.org/data/2.5/weather?q=" + encodeURIComponent(currentSettings.location) + "&units=" + currentSettings.units,
+				url: "http://api.openweathermap.org/data/2.5/weather?APPID="+currentSettings.api_key+"&q=" + encodeURIComponent(currentSettings.location) + "&units=" + currentSettings.units,
 				dataType: "JSONP",
 				success: function (data) {
 					// Rejigger our data into something easier to understand
@@ -241,6 +241,12 @@
 		display_name: "Open Weather Map API",
 		settings: [
 			{
+				name: "api_key",
+				display_name: "API Key",
+				type: "text",
+				description: "Your personal API Key from Open Weather Map"
+			},
+            {
 				name: "location",
 				display_name: "Location",
 				type: "text",

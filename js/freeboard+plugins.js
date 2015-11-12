@@ -3222,7 +3222,7 @@ $.extend(freeboard, jQuery.eventEmitter);
 
 		this.updateNow = function () {
 			$.ajax({
-				url: "http://api.openweathermap.org/data/2.5/weather?q=" + encodeURIComponent(currentSettings.location) + "&units=" + currentSettings.units,
+				url: "http://api.openweathermap.org/data/2.5/weather?APPID="+currentSettings.api_key+"&q=" + encodeURIComponent(currentSettings.location) + "&units=" + currentSettings.units,
 				dataType: "JSONP",
 				success: function (data) {
 					// Rejigger our data into something easier to understand
@@ -3264,6 +3264,12 @@ $.extend(freeboard, jQuery.eventEmitter);
 		display_name: "Open Weather Map API",
 		settings: [
 			{
+				name: "api_key",
+				display_name: "API Key",
+				type: "text",
+				description: "Your personal API Key from Open Weather Map"
+			},
+            {
 				name: "location",
 				display_name: "Location",
 				type: "text",
@@ -4476,26 +4482,26 @@ freeboard.loadDatasourcePlugin({
         type_name: "indicator",
         display_name: "Indicator Light",
         settings: [
-            {
-                name: "title",
-                display_name: "Title",
-                type: "text"
-            },
-            {
-                name: "value",
-                display_name: "Value",
-                type: "calculated"
-            },
-            {
-                name: "on_text",
-                display_name: "On Text",
-                type: "calculated"
-            },
-            {
-                name: "off_text",
-                display_name: "Off Text",
-                type: "calculated"
-            }
+	        {
+	            name: "title",
+	            display_name: "Title",
+	            type: "text"
+	        },
+	        {
+	            name: "value",
+	            display_name: "Value",
+	            type: "calculated"
+	        },
+	        {
+	            name: "on_text",
+	            display_name: "On Text",
+	            type: "calculated"
+	        },
+	        {
+	            name: "off_text",
+	            display_name: "Off Text",
+	            type: "calculated"
+	        }
         ],
         newInstance: function (settings, newInstanceCallback) {
             newInstanceCallback(new indicatorWidget(settings));
