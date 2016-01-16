@@ -1,0 +1,128 @@
+{
+	"version": 1,
+	"allow_edit": true,
+	"plugins": [],
+	"panes": [
+		{
+			"title": "libswiftnav",
+			"width": 1,
+			"row": {
+				"3": 1
+			},
+			"col": {
+				"3": 1
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "text_widget",
+					"settings": {
+						"title": "Pull Requests",
+						"size": "regular",
+						"value": "datasources[\"libswiftnav\"][\"num_pull_requests\"]",
+						"animate": true
+					}
+				},
+				{
+					"type": "text_widget",
+					"settings": {
+						"title": "Open Issues",
+						"size": "regular",
+						"value": "datasources[\"libswiftnav\"][\"num_open_issues\"]",
+						"animate": true
+					}
+				},
+				{
+					"type": "indicator",
+					"settings": {
+						"title": "Build Status (master)",
+						"value": "datasources[\"libswiftnav\"][\"build_status\"]",
+						"on_text": "passing"
+					}
+				},
+				{
+					"type": "text_widget",
+					"settings": {
+						"title": "Code Coverage",
+						"size": "regular",
+						"value": "datasources[\"libswiftnav\"][\"code_coverage\"]",
+						"animate": true,
+						"units": "%"
+					}
+				}
+			]
+		},
+		{
+			"title": "piksi_firmware",
+			"width": 1,
+			"row": {
+				"3": 1
+			},
+			"col": {
+				"3": 2
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "text_widget",
+					"settings": {
+						"title": "Pull Requests",
+						"size": "regular",
+						"value": "datasources[\"piksi_firmware\"][\"num_pull_requests\"]",
+						"animate": true
+					}
+				},
+				{
+					"type": "text_widget",
+					"settings": {
+						"title": "Open Issues",
+						"size": "regular",
+						"value": "datasources[\"piksi_firmware\"][\"num_open_issues\"]",
+						"animate": true
+					}
+				},
+				{
+					"type": "indicator",
+					"settings": {
+						"title": "Build Status (master)",
+						"value": "datasources[\"piksi_firmware\"][\"build_status\"]",
+						"on_text": "passing"
+					}
+				}
+			]
+		}
+	],
+	"datasources": [
+		{
+			"name": "libswiftnav",
+			"type": "GitHub",
+			"settings": {
+				"user": "swift-nav",
+				"repo": "libswiftnav",
+				"auth": false,
+				"client_id": "",
+				"client_secret": "",
+				"use_travis": true,
+				"use_coveralls": true,
+				"branch": "master",
+				"refresh": 120
+			}
+		},
+		{
+			"name": "piksi_firmware",
+			"type": "GitHub",
+			"settings": {
+				"user": "swift-nav",
+				"repo": "piksi_firmware",
+				"auth": false,
+				"client_id": "",
+				"client_secret": "",
+				"use_travis": true,
+				"use_coveralls": false,
+				"branch": "master",
+				"refresh": 120
+			}
+		}
+	],
+	"columns": 3
+}
