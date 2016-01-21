@@ -76,7 +76,7 @@ module.exports = function(grunt) {
                 options: {
                     mangle : false,
                     beautify : false,
-                    compress: true
+                    compress: {}
                 },
                 files: {
                     'js/freeboard.thirdparty.min.js' : [ 'js/freeboard.thirdparty.js' ]
