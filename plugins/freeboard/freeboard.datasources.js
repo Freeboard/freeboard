@@ -305,7 +305,7 @@
 		}
 
 		this.onSettingsChanged = function (newSettings) {
-			dweetio.stop_listening();
+			dweetio.stop_listening_for(currentSettings.thing_id);
 
 			currentSettings = newSettings;
 
