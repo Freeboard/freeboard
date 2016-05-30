@@ -73,6 +73,7 @@ if (typeof microgear === "undefined") {
 
     var netpieDatasourcePlugin = function(settings, updateCallback) {
         var self = this;
+        var currentSettings = settings;
         var gconf = {
             key: settings.key,
             secret: settings.secret
@@ -81,14 +82,56 @@ if (typeof microgear === "undefined") {
 
         var data = {};
 
+        function initSubscribe(toparr, toSub) {
+            if (toparr && toparr.length>0) {
+                for (var i=0; i< toparr.length; i++) {
+                    if (toSub) {
+                        self.mg.subscribe(toparr[i]);
+                    }
+                    else {
+                        self.mg.unsubscribe(toparr[i]);
+                    }
+                }
+            }
+        }
+
         self.updateNow = function() {
+
+        }
+
+        self.onSettingsChanged = function(newSettings) {
+            if (currentSettings.alias != newSettings.alias) {
+                self.mg.setAlias(newSettings.alias);
+            }
+
+            if (currentSettings.topics != newSettings.topics) {
+                initSubscribe(currentSettings.topics.trim().split(','), false);
+                initSubscribe(newSettings.topics.trim().split(','), true);
+            }
+
+            if (currentSettings.microgearRef != newSettings.microgearRef) {
+                delete(microgear[currentSettings.microgearRef]);
+                microgear[newSettings.microgearRef] = self.mg;
+            }
+
+            if (currentSettings.appid != newSettings.appid || currentSettings.key != newSettings.key || currentSettings.secret != newSettings.secret) {
+                freeboard.showDialog("Reconfigure AppID, Key or Secret needs a page reloading. Make sure you save the current configuration before processding.", "Warning", "OK", "CANCEL", function() {
+                    location.reload(true);
+                })
+            }
+
+            currentSettings = newSettings;
+        }
+
+        self.onDispose = function() {
+            delete(self.mg);
         }
 
         self.mg = Microgear.create(gconf);
 
         microgear[settings.microgearRef] = self.mg;
+
         self.mg.on('message', function(topic,msg) {
-            //console.log(topic+' : '+msg);
             if (topic && msg) {
                 data[topic] = msg;
                 updateCallback(data);
@@ -96,14 +139,7 @@ if (typeof microgear === "undefined") {
         });
 
         self.mg.on('connected', function() {
-            var topt = settings.topics.trim();
-            if (topt && topt.length>0) {
-                var topics = topt.split(',');
-                for (var i=0; i< topics.length; i++) {
-                    self.mg.subscribe(topics[i]);
-                }
-            }
-
+            initSubscribe(settings.topics.trim().split(','), true);
             if (gconf.alias) {
                 self.mg.setAlias(gconf.alias);
             }
