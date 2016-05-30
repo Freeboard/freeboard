@@ -16,19 +16,24 @@ function runCode(cmd) {
     freeboard.loadWidgetPlugin({
         "type_name"   : "Button",
         "display_name": "Button",
-        "description" : "Some sort of description <strong>with optional html!</strong>",
+        "description" : "A simple button widget that can perform Javascript action.",
         /*"external_scripts": [
         ],*/
         "fill_size" : false,
         "settings"  : [
             {
                 "name"        : "caption",
-                "display_name": "Caption",
+                "display_name": "Button Caption",
+                "type"        : "text"
+            },
+            {
+                "name"        : "text",
+                "display_name": "Label Text",
                 "type"        : "text"
             },
             {
                 "name"        : "color",
-                "display_name": "Color",
+                "display_name": "Button Color",
                 "type"        : "option",
                 "options"     : [
                     {
@@ -61,12 +66,8 @@ function runCode(cmd) {
             {
                 "name"        : "onClick",
                 "display_name": "onClick action",
-                "type"        : "calculated"
-            },
-            {
-                "name"        : "text",
-                "display_name": "Text",
-                "type"        : "text"
+                "type"        : "calculated",
+                "description" : "Add some Javascript here. You can chat and publish with a datasource's microgear like this : microgear[\"mygear\"].chat(\"mylamp\",\"ON\"), where \"mygear\" is a microgear reference." 
             }
         ],
         newInstance   : function(settings, newInstanceCallback) {
