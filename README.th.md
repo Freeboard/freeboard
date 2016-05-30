@@ -21,6 +21,7 @@ NAME - ชื่อของ datasource
 
 ![netpie-freeboard2](https://cloud.githubusercontent.com/assets/7685964/15654634/fbe3c096-26bf-11e6-8ab5-4656839b53ad.jpg)
 
-ในส่วนของ button widget เราสามารถปรับแต่งให้ปุ่ม มีการรันโค้ด Javascript เมื่อเกิดการกดได้ ตามตัวอย่างในรูป โดยที่ mg1 คือ microgear reference ของ datasource netpie1
+ในส่วนของ button widget เราสามารถปรับแต่งให้ปุ่ม มีการรันโค้ด Javascript เมื่อเกิดการกดได้ ตามตัวอย่างในรูป ปุ่มจะถูกกำหนดให้ส่ง chat message ไปยัง thing ที่ชื่อ pieslampher ทุกครั้งที่ถูกกด 
+โดยที่ index 'mg1' คือ microgear reference ของ datasource netpie1 ที่เราได้กำหนดไว้ตอนสร้าง datasource
 
 ![netpie-freeboard3](https://cloud.githubusercontent.com/assets/7685964/15655823/ec23a1f2-26ca-11e6-9968-ee500136b7bc.jpg)
