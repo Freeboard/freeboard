@@ -3,7 +3,7 @@ netpie-freeboard
 
 Freeboard ที่มาพร้อม NETPIE datasource and widget plugins
 
-![netpie-freeboard](https://cloud.githubusercontent.com/assets/7685964/15654676/58211e1c-26c0-11e6-8a53-86c7a2d6de69.jpg)
+![netpie-freeboard1-2](https://cloud.githubusercontent.com/assets/7685964/15770052/ee3c451c-298a-11e6-95ec-a627477e9bd9.jpg)
 
 วิธีติดตั้ง
 
