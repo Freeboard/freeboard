@@ -1,0 +1,45 @@
+.toggle {
+    position: relative; width: 90px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+}
+.toggle-checkbox {
+    display: none;
+}
+.toggle-label {
+    display: block; overflow: hidden; cursor: pointer;
+    border: 2px solid #999999; border-radius: 20px;
+}
+.toggle-inner {
+    display: block; width: 200%; margin-left: -100%;
+    transition: margin 0.3s ease-in 0s;
+}
+.toggle-inner:before, .toggle-inner:after {
+    display: block; float: left; width: 50%; height: 30px; padding: 0; line-height: 30px;
+    font-size: 14px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+    box-sizing: border-box;
+}
+.toggle-inner:before {
+    content: "ON";
+    padding-left: 10px;
+    background-color: #2ecc71; color: #FFFFFF;
+}
+.toggle-inner:after {
+    content: "OFF";
+    padding-right: 10px;
+    background-color: #E74C3C; color: #FFFFFF;
+    text-align: right;
+}
+.toggle-switch {
+    display: block; width: 18px; margin: 6px;
+    background: #FFFFFF;
+    position: absolute; top: 0; bottom: 0;
+    right: 56px;
+    border: 2px solid #999999; border-radius: 20px;
+    transition: all 0.3s ease-in 0s; 
+}
+.toggle-checkbox:checked + .toggle-label .toggle-inner {
+    margin-left: 0;
+}
+.toggle-checkbox:checked + .toggle-label .toggle-switch {
+    right: 0px; 
+}
