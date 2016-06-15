@@ -10,8 +10,22 @@ function runCode(cmd) {
     eval(eval(cmd));
 }
 
+function togglePIE(id, delay) {
+    document.getElementById(id).disabled = true;
+
+    if (document.getElementById(id).checked) {
+        runCode("globalStore['" + id + "']['active']");
+    } else {
+        runCode("globalStore['" + id + "']['deactivate']");
+    }
+
+    setTimeout(function() {
+        document.getElementById(id).disabled = false;
+    }, (delay*1000));
+}
+
 (function() {
-    var bcolor = {red:["#551111","#ee8888"],green:["#115511","#88ee88"],blue:["#111155","#8888ee"],yellow:["#555511","#eeee88"],white:["#222222","#FFFFFF"],grey:["#000000","#666666"]};
+    var bcolor = {red:["#FFF","#e74c3c"],green:["#FFF","#2ecc71"],blue:["#FFF","#3498db"],yellow:["#FFF","#f1c40f"],white:["#454545","#ecf0f1"],grey:["#FFF","#bdc3c7"]};
 
     freeboard.loadWidgetPlugin({
         "type_name"   : "Button",
@@ -103,14 +117,16 @@ function runCode(cmd) {
         buttonElement.css({
             "height" : "36px",
             "width" : "55%",
-            "box-shadow" : "0px 1px 0px 1px #333333",
+            "text-shadow" : "0 1px 2px rgba(0, 0, 0, 0.25)",
             "text-decoration" : "none",
-            "border-radius" : "4px",
             "text-align" : "center",
             "outline" : "none",
             "font-size" : "125%",
             "display" : "inline-block",
             "float" : "left",
+            "border" : "0",
+            "border-bottom" : "2px solid",
+            "margin-top" : "5px"
         });
 
         textElement.css({
@@ -150,4 +166,78 @@ function runCode(cmd) {
         }
     }
 
+freeboard.loadWidgetPlugin({
+        "type_name"   : "Toggle",
+        "display_name": "Toggle",
+        "description" : "A simple toggle widget that can perform Javascript action.",
+        /*"external_scripts": [
+        ],*/
+        "fill_size" : false,
+        "settings"  : [
+            {
+                "name"        : "title",
+                "display_name": "Title",
+                "type"        : "text"
+            },
+            {
+                "name"          : "delay",
+                "display_name"  : "Dalay",
+                "type"          : "text",
+                "default_value" : "0",
+                "description"   : "delay for next toggle."
+            },
+            {
+                "name"        : "gear",
+                "display_name": "MICROGEAR",
+                "type"        : "text",
+                "description" : "microgear reference of datasource."
+            },
+            {
+                "name"        : "alias",
+                "display_name": "ALIAS",
+                "type"        : "text",
+                "description" : "alias of device."
+            }
+        ],
+        newInstance   : function(settings, newInstanceCallback) {
+            newInstanceCallback(new toggleWidgetPlugin(settings));
+        }
+    });
+
+    var toggleWidgetPlugin = function(settings) {
+        var self = this;
+        self.widgetID = randomString(16);
+
+        var titleElement = $("<h2 class=\"section-title\">"+(settings.title?settings.title:"")+"</h2>");
+        var toggleElement = $("<center><div class=\"toggle\"><input type=\"checkbox\" name=\"toggle\" class=\"toggle-checkbox\" id=\""+self.widgetID+"\" onClick=\"togglePIE(this.id, "+settings.delay+")\"><label class=\"toggle-label\" for=\""+self.widgetID+"\"><span class=\"toggle-inner\"></span><span class=\"toggle-switch\"></span></label></div></center>");
+        var currentSettings = settings;
+
+        globalStore[self.widgetID] = {};
+        globalStore[self.widgetID]['active'] = "microgear['"+ settings.gear +"'].chat('"+ settings.alias +"', '1')";
+        globalStore[self.widgetID]['deactivate'] = "microgear['"+ settings.gear +"'].chat('"+ settings.alias +"', '0')";
+
+        self.render = function(containerElement) {
+            $(containerElement).append(titleElement).append(toggleElement);
+        }
+
+        self.getHeight = function() {
+            return 1.2;
+        }
+
+        self.onSettingsChanged = function(newSettings) {
+            currentSettings = newSettings;
+            titleElement.html((_.isUndefined(newSettings.title) ? "" : newSettings.title));
+
+            if(!newSettings.delay)
+                newSettings.delay = 0;
+
+            toggleElement.html("<center><div class=\"toggle\"><input type=\"checkbox\" name=\"toggle\" class=\"toggle-checkbox\" id=\""+self.widgetID+"\" onClick=\"togglePIE(this.id, "+newSettings.delay+")\"><label class=\"toggle-label\" for=\""+self.widgetID+"\"><span class=\"toggle-inner\"></span><span class=\"toggle-switch\"></span></label></div></center>");
+        }
+
+        self.onCalculatedValueChanged = function(settingName, newValue) {
+        }
+
+        self.onDispose = function() {
+        }
+    }
 }());
