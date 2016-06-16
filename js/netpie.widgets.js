@@ -6,22 +6,12 @@ if (typeof globalStore === "undefined") {
     globalStore = {};
 }
 
-function runCode(cmd) {
-    eval(eval(cmd));
+function randomString(length) {
+    return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
 }
 
-function togglePIE(id, delay) {
-    document.getElementById(id).disabled = true;
-
-    if (document.getElementById(id).checked) {
-        runCode("globalStore['" + id + "']['active']");
-    } else {
-        runCode("globalStore['" + id + "']['deactivate']");
-    }
-
-    setTimeout(function() {
-        document.getElementById(id).disabled = false;
-    }, (delay*1000));
+function runCode(cmd) {
+    eval(eval(cmd));
 }
 
 (function() {
@@ -31,8 +21,6 @@ function togglePIE(id, delay) {
         "type_name"   : "Button",
         "display_name": "Button",
         "description" : "A simple button widget that can perform Javascript action.",
-        /*"external_scripts": [
-        ],*/
         "fill_size" : false,
         "settings"  : [
             {
@@ -88,11 +76,6 @@ function togglePIE(id, delay) {
             newInstanceCallback(new buttonWidgetPlugin(settings));
         }
     });
-
-
-    function randomString(length) {
-        return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
-    }
 
     var buttonWidgetPlugin = function(settings) {
         var self = this;
@@ -166,12 +149,10 @@ function togglePIE(id, delay) {
         }
     }
 
-freeboard.loadWidgetPlugin({
+    freeboard.loadWidgetPlugin({
         "type_name"   : "Toggle",
         "display_name": "Toggle",
         "description" : "A simple toggle widget that can perform Javascript action.",
-        /*"external_scripts": [
-        ],*/
         "fill_size" : false,
         "settings"  : [
             {
@@ -180,23 +161,31 @@ freeboard.loadWidgetPlugin({
                 "type"        : "text"
             },
             {
-                "name"          : "delay",
-                "display_name"  : "Dalay",
-                "type"          : "text",
+                "name"          : "state",
+                "display_name"  : "Toggle State",
+                "type"          : "calculated",
                 "default_value" : "0",
-                "description"   : "delay for next toggle."
+                "description"   : "true = on, false = off"
             },
             {
-                "name"        : "gear",
-                "display_name": "MICROGEAR",
-                "type"        : "text",
-                "description" : "microgear reference of datasource."
+                "name"          : "ontext",
+                "display_name"  : "On Text",
+                "type"          : "text",
             },
             {
-                "name"        : "alias",
-                "display_name": "ALIAS",
-                "type"        : "text",
-                "description" : "alias of device."
+                "name"          : "offtext",
+                "display_name"  : "Off Text",
+                "type"          : "text",
+            },
+            {
+                "name"          : "onaction",
+                "display_name"  : "On Action",
+                "type"          : "text",
+            },
+            {
+                "name"          : "offaction",
+                "display_name"  : "Off Action",
+                "type"          : "text",
             }
         ],
         newInstance   : function(settings, newInstanceCallback) {
@@ -209,12 +198,13 @@ freeboard.loadWidgetPlugin({
         self.widgetID = randomString(16);
 
         var titleElement = $("<h2 class=\"section-title\">"+(settings.title?settings.title:"")+"</h2>");
-        var toggleElement = $("<center><div class=\"toggle\"><input type=\"checkbox\" name=\"toggle\" class=\"toggle-checkbox\" id=\""+self.widgetID+"\" onClick=\"togglePIE(this.id, "+settings.delay+")\"><label class=\"toggle-label\" for=\""+self.widgetID+"\"><span class=\"toggle-inner\"></span><span class=\"toggle-switch\"></span></label></div></center>");
+        var toggleElement = $("<center><div class=\"toggle\"><input type=\"checkbox\"  name=\"toggle\" class=\"toggle-checkbox\" id=\""+self.widgetID+"\" onClick=\"runCode(globalStore['"+self.widgetID+"'][this.checked?'onaction':'offaction']); if(globalStore['"+self.widgetID+"']['statesource']!='') {this.checked = !this.checked} ; \"><label class=\"toggle-label\" for=\""+self.widgetID+"\"><span class=\"toggle-inner\"></span><span class=\"toggle-switch\"></span></label></div></center>");
         var currentSettings = settings;
 
-        globalStore[self.widgetID] = {};
-        globalStore[self.widgetID]['active'] = "microgear['"+ settings.gear +"'].chat('"+ settings.alias +"', '1')";
-        globalStore[self.widgetID]['deactivate'] = "microgear['"+ settings.gear +"'].chat('"+ settings.alias +"', '0')";
+        globalStore[self.widgetID] = {};    
+        globalStore[self.widgetID]['onaction'] = settings.onaction;
+        globalStore[self.widgetID]['offaction'] = settings.offaction;
+        globalStore[self.widgetID]['statesource'] = settings.state;
 
         self.render = function(containerElement) {
             $(containerElement).append(titleElement).append(toggleElement);
@@ -226,15 +216,16 @@ freeboard.loadWidgetPlugin({
 
         self.onSettingsChanged = function(newSettings) {
             currentSettings = newSettings;
-            titleElement.html((_.isUndefined(newSettings.title) ? "" : newSettings.title));
 
-            if(!newSettings.delay)
-                newSettings.delay = 0;
-
-            toggleElement.html("<center><div class=\"toggle\"><input type=\"checkbox\" name=\"toggle\" class=\"toggle-checkbox\" id=\""+self.widgetID+"\" onClick=\"togglePIE(this.id, "+newSettings.delay+")\"><label class=\"toggle-label\" for=\""+self.widgetID+"\"><span class=\"toggle-inner\"></span><span class=\"toggle-switch\"></span></label></div></center>");
+            globalStore[self.widgetID]['onaction'] = newSettings.onaction;
+            globalStore[self.widgetID]['offaction'] = newSettings.offaction;
+            globalStore[self.widgetID]['statesource'] = newSettings.state;
         }
 
         self.onCalculatedValueChanged = function(settingName, newValue) {
+            if (settingName == 'state') {
+                document.getElementById(self.widgetID).checked = newValue;
+            }
         }
 
         self.onDispose = function() {
