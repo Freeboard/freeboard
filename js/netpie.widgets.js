@@ -164,7 +164,6 @@ function runCode(cmd) {
                 "name"          : "state",
                 "display_name"  : "Toggle State",
                 "type"          : "calculated",
-                "default_value" : "0",
                 "description"   : "true = on, false = off"
             },
             {
@@ -198,7 +197,7 @@ function runCode(cmd) {
         self.widgetID = randomString(16);
 
         var titleElement = $("<h2 class=\"section-title\">"+(settings.title?settings.title:"")+"</h2>");
-        var toggleElement = $("<center><div class=\"toggle\"><input type=\"checkbox\"  name=\"toggle\" class=\"toggle-checkbox\" id=\""+self.widgetID+"\" onClick=\"runCode(globalStore['"+self.widgetID+"'][this.checked?'onaction':'offaction']); if(globalStore['"+self.widgetID+"']['statesource']!='') {this.checked = !this.checked} ; \"><label class=\"toggle-label\" for=\""+self.widgetID+"\"><span class=\"toggle-inner\"></span><span class=\"toggle-switch\"></span></label></div></center>");
+        var toggleElement = $("<center><div class=\"toggle\"><input type=\"checkbox\"  name=\"toggle\" class=\"toggle-checkbox\" id=\""+self.widgetID+"\" onClick=\"runCode(globalStore['"+self.widgetID+"'][this.checked?'onaction':'offaction']); if(typeof(globalStore['"+self.widgetID+"']['statesource'])!='undefined' && globalStore['"+self.widgetID+"']['statesource']!='') {this.checked = !this.checked} ; \"><label class=\"toggle-label\" for=\""+self.widgetID+"\"><span class=\"toggle-inner\"></span><span class=\"toggle-switch\"></span></label></div></center>");
         var currentSettings = settings;
 
         globalStore[self.widgetID] = {};    
