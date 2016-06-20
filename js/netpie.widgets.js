@@ -136,7 +136,7 @@ function runCode(cmd) {
             updateButtonColor(newSettings.color);
             textElement.text(newSettings.text?newSettings.text:"");
 
-            globalStore[self.widgetID]['onClickAction'] = newSettings.onClickAction;
+            globalStore[self.widgetID]['onClick'] = newSettings.onClick;
         }
 
         self.onCalculatedValueChanged = function(settingName, newValue) {
