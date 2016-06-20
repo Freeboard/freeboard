@@ -178,14 +178,23 @@ function runCode(cmd) {
             },
             {
                 "name"          : "onaction",
-                "display_name"  : "On Action",
+                "display_name"  : "onToggleOn Action",
                 "type"          : "text",
+                "description"   : "JS code to run when a toggle is switched to ON"
             },
             {
                 "name"          : "offaction",
-                "display_name"  : "Off Action",
+                "display_name"  : "onToggleOff Action",
                 "type"          : "text",
+                "description"   : "JS code to run when a toggle is switched to OFF"
+            },
+            {
+                "name"          : "onCreatedAction",
+                "display_name"  : "onCreated Action",
+                "type"          : "text",
+                "description"   : "JS code to run after a toggle is created"
             }
+
         ],
         newInstance   : function(settings, newInstanceCallback) {
             newInstanceCallback(new toggleWidgetPlugin(settings));
@@ -229,5 +238,15 @@ function runCode(cmd) {
 
         self.onDispose = function() {
         }
+
+        if (settings.onCreatedAction) {
+            var timer = setInterval(function() {
+                if (Object.getOwnPropertyNames(microgear).length > 0) {
+                    clearInterval(timer);
+                    eval(settings.onCreatedAction);
+                }
+            },200);
+        }
+
     }
 }());
