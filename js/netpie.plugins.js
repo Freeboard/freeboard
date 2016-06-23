@@ -61,7 +61,13 @@ if (typeof microgear === "undefined") {
                 "description"  : "Topics of the messages that this datasource will consume, the default is /# which means all messages in this app ID.",
                 "default_value": "/#",
                 "required"     : false
-            }
+            },
+            {
+                "name"          : "onConnectedAction",
+                "display_name"  : "onConnected Action",
+                "type"          : "text",
+                "description"   : "JS code to run after a microgear datasource is connected"
+            }            
 
         ],
 
@@ -146,7 +152,22 @@ if (typeof microgear === "undefined") {
             else if (settings.name) {
                 self.mg.setAlias(settings.name);
             }
+
+            if (settings.onConnectedAction) {
+                var timer = setInterval(function() {
+                    if (Object.getOwnPropertyNames(microgear).length > 0) {
+                        clearInterval(timer);
+                        eval(settings.onConnectedAction);
+                    }
+                },200);
+            }
+
+            if (typeof(onConnectedHandler) != 'undefined') {
+                onConnectedHandler(settings.microgearRef);
+            }
         })
+
+
 
         self.mg.connect(settings.appid, function(){
 

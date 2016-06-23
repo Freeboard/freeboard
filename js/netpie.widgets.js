@@ -14,6 +14,10 @@ function runCode(cmd) {
     eval(eval(cmd));
 }
 
+function onConnectedHandler(microgearRef) {
+    /* add code th handle microgearRef connected event */
+}
+
 (function() {
     var bcolor = {red:["#FFF","#e74c3c"],green:["#FFF","#2ecc71"],blue:["#FFF","#3498db"],yellow:["#FFF","#f1c40f"],white:["#454545","#ecf0f1"],grey:["#FFF","#bdc3c7"]};
 
@@ -70,7 +74,14 @@ function runCode(cmd) {
                 "display_name": "onClick action",
                 "type"        : "calculated",
                 "description" : "Add some Javascript here. You can chat and publish with a datasource's microgear like this : microgear[\"mygear\"].chat(\"mylamp\",\"ON\"), where \"mygear\" is a microgear reference." 
+            },
+            {
+                "name"          : "onCreatedAction",
+                "display_name"  : "onCreated Action",
+                "type"          : "text",
+                "description"   : "JS code to run after a button is created"
             }
+
         ],
         newInstance   : function(settings, newInstanceCallback) {
             newInstanceCallback(new buttonWidgetPlugin(settings));
@@ -82,8 +93,9 @@ function runCode(cmd) {
         var currentSettings = settings;
 
         self.widgetID = randomString(16);
-        var buttonElement = $("<input type=\"button\" id=\""+self.widgetID+"\" value=\""+settings.caption+"\" onClick=\"runCode('globalStore[\\'"+self.widgetID+"\\'][\\'onClick\\']')\">");
-        var textElement = $("<div>"+(settings.text?settings.text:"")+"</div>");
+
+        var buttonElement = $("<input type=\"button\" class=\"netpie-button\" id=\""+self.widgetID+"\" value=\""+settings.caption+"\" onClick=\"runCode('globalStore[\\'"+self.widgetID+"\\'][\\'onClick\\']')\">");
+        var textElement = $("<div class=\"netpie-button-text\">"+(settings.text?settings.text:"")+"</div>");
 
         globalStore[self.widgetID] = {};
         globalStore[self.widgetID]['onClick'] = settings.onClick;
@@ -97,27 +109,6 @@ function runCode(cmd) {
             }
         }
 
-        buttonElement.css({
-            "height" : "36px",
-            "width" : "55%",
-            "text-shadow" : "0 1px 2px rgba(0, 0, 0, 0.25)",
-            "text-decoration" : "none",
-            "text-align" : "center",
-            "outline" : "none",
-            "font-size" : "125%",
-            "display" : "inline-block",
-            "float" : "left",
-            "border" : "0",
-            "border-bottom" : "2px solid",
-            "margin-top" : "5px"
-        });
-
-        textElement.css({
-            "vertical-align" : "bottom",
-            "padding" : "8px 0px 0px 10px",
-            "float" : "left"
-        });
-
         updateButtonColor(settings.color);
 
         self.render = function(containerElement) {
@@ -130,12 +121,9 @@ function runCode(cmd) {
 
         self.onSettingsChanged = function(newSettings) {
             currentSettings = newSettings;
-
             document.getElementById(self.widgetID).value = newSettings.caption;
-
             updateButtonColor(newSettings.color);
             textElement.text(newSettings.text?newSettings.text:"");
-
             globalStore[self.widgetID]['onClick'] = newSettings.onClick;
         }
 
@@ -147,6 +135,15 @@ function runCode(cmd) {
 
         self.onDispose = function() {
         }
+
+        if (settings.onCreatedAction) {
+            var timer = setInterval(function() {
+                if (Object.getOwnPropertyNames(microgear).length > 0) {
+                    clearInterval(timer);
+                    eval(settings.onCreatedAction);
+                }
+            },200);
+        }
     }
 
     freeboard.loadWidgetPlugin({
@@ -156,8 +153,8 @@ function runCode(cmd) {
         "fill_size" : false,
         "settings"  : [
             {
-                "name"        : "title",
-                "display_name": "Title",
+                "name"        : "caption",
+                "display_name": "Toggle Caption",
                 "type"        : "text"
             },
             {
@@ -170,11 +167,13 @@ function runCode(cmd) {
                 "name"          : "ontext",
                 "display_name"  : "On Text",
                 "type"          : "text",
+                "default_value" : "ON"
             },
             {
                 "name"          : "offtext",
                 "display_name"  : "Off Text",
                 "type"          : "text",
+                "default_value" : "OFF"
             },
             {
                 "name"          : "onaction",
@@ -205,9 +204,8 @@ function runCode(cmd) {
         var self = this;
         self.widgetID = randomString(16);
 
-        var titleElement = $("<h2 class=\"section-title\">"+(settings.title?settings.title:"")+"</h2>");
-        var toggleElement = $("<center><div class=\"toggle\"><input type=\"checkbox\"  name=\"toggle\" class=\"toggle-checkbox\" id=\""+self.widgetID+"\" onClick=\"runCode(globalStore['"+self.widgetID+"'][this.checked?'onaction':'offaction']); if(typeof(globalStore['"+self.widgetID+"']['statesource'])!='undefined' && globalStore['"+self.widgetID+"']['statesource']!='') {this.checked = !this.checked} ; \"><label class=\"toggle-label\" for=\""+self.widgetID+"\"><span class=\"toggle-inner\"></span><span class=\"toggle-switch\"></span></label></div></center>");
         var currentSettings = settings;
+        var toggleElement = $("<div class=\"netpie-toggle\"><input type=\"checkbox\" name=\"toggle\" class=\"netpie-toggle-checkbox\" id=\""+self.widgetID+"\" onClick=\"runCode(globalStore['"+self.widgetID+"'][this.checked?'onaction':'offaction']); if(typeof(globalStore['"+self.widgetID+"']['statesource'])!='undefined' && globalStore['"+self.widgetID+"']['statesource']!='') {this.checked = !this.checked} ; \"><label class=\"netpie-toggle-label\" for=\""+self.widgetID+"\"><span class=\"netpie-toggle-inner\" ontext=\""+(settings.ontext||'')+"\" offtext=\""+(settings.offtext||'')+"\" id=\""+self.widgetID+"_inner\"></span><span class=\"netpie-toggle-switch\"></span></label></div><div class=\"netpie-toggle-text\" id=\""+self.widgetID+"_toggleText\">"+(settings.caption||"")+"</div>");
 
         globalStore[self.widgetID] = {};    
         globalStore[self.widgetID]['onaction'] = settings.onaction;
@@ -215,11 +213,11 @@ function runCode(cmd) {
         globalStore[self.widgetID]['statesource'] = settings.state;
 
         self.render = function(containerElement) {
-            $(containerElement).append(titleElement).append(toggleElement);
+            $(containerElement).append(toggleElement);
         }
 
         self.getHeight = function() {
-            return 1.2;
+            return 1;
         }
 
         self.onSettingsChanged = function(newSettings) {
@@ -228,6 +226,9 @@ function runCode(cmd) {
             globalStore[self.widgetID]['onaction'] = newSettings.onaction;
             globalStore[self.widgetID]['offaction'] = newSettings.offaction;
             globalStore[self.widgetID]['statesource'] = newSettings.state;
+            $('#'+self.widgetID+'_inner').attr('ontext',newSettings.ontext||'');
+            $('#'+self.widgetID+'_inner').attr('offtext',newSettings.offtext||'');
+            document.getElementById(self.widgetID+'_toggleText').innerHTML = newSettings.caption||'';
         }
 
         self.onCalculatedValueChanged = function(settingName, newValue) {
