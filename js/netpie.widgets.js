@@ -161,7 +161,7 @@ function onConnectedHandler(microgearRef) {
                 "name"          : "state",
                 "display_name"  : "Toggle State",
                 "type"          : "calculated",
-                "description"   : "true = on, false = off"
+                "description"   : "Add a condition to switch a toggle state here. Otherwise it just toggle by click."
             },
             {
                 "name"          : "ontext",
