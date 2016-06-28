@@ -1,3 +1,4 @@
+var chartCounter = 0;
 //Date Axis Chart
 var jqPlotWidgetDateAxisChart = function (settings) {
 

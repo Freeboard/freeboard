@@ -7,8 +7,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="viewport" content = "width = device-width, initial-scale = 1, user-scalable = no" />
-    <link href="css/freeboard.css" rel="stylesheet" />
-    <script src="js/freeboard.thirdparty.min.js"></script>
+    <script type="text/javascript" src="js/freeboard.thirdparty.min.js"></script>
+    <script type="text/javascript" src="plugins/k2view/k2view.freeboard.js"></script>
+    <link href="css/freeboard.css" rel="stylesheet" type="text/css"/>
+    <link href="css/styles.css" rel="stylesheet" type="text/css"/>
     <script type="text/javascript">
         head.js("js/freeboard_plugins.js",
         		'plugins/index.js',
@@ -52,6 +54,15 @@
 <header id="main-header" data-bind="if:allow_edit">
     <div id="admin-bar">
         <div id="admin-menu">
+        	<div id="instanceIdDiv">
+                <h2 class="title">Instance ID</h2>
+				<div id="setting-row-name" class="form-row">
+					<div id="setting-value-container-name" class="form-value">
+						<input type="text" style="width: 100px;border-color:#B88F51;" id="instanceId">
+						<label class="text-button" data-bind="click: loadInstance">Load</label>
+					</div>
+				</div>
+            </div>
             <div id="board-tools">
                 <h1 id="board-logo" class="title bordered">Fabric Dashboard</h1>
                 <div id="board-actions">
