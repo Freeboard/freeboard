@@ -24,9 +24,6 @@
                 });
         
         function loadDashboardFromLocalStorage(){
-        	var hashpattern = window.location.hash.match(/(&|#)source=([^&]+)/);
-            if (hashpattern !== null) {
-                $.getJSON(hashpattern[2], function(data) {
                 	//check browser support for localStorage and sessionStorage
             		if (typeof(Storage) !== "undefined") {
                     	var item = localStorage.getItem('dashboardJson');
@@ -36,8 +33,6 @@
                                 freeboard.setEditing(false);
                             });
             			}
-            		}
-                });
             }
         }
         
