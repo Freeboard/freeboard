@@ -1,15 +1,34 @@
 
+var arr = [];
+$.ajax({
+	url: 'http://'+window.location.hostname+':3213/GetLutList',
+	dataType: "JSON",
+	type: "GET",
+	success: function (jsonObj) {
+		var luOptions = "";
+		for(var i=0;i < jsonObj["data"].length; i++){
+			var map = {'name':jsonObj["data"][i],'value':jsonObj["data"][i]};
+			arr.push(map);
+		}
+	},
+	error: function (xhr, status, error) {
+		alert("Error: Unable to fetch LU list !");
+	}
+});
+
+
 freeboard.loadDatasourcePlugin({
 	type_name: "Fabric DS",
-	settings: [
+	settings: [    
 	           {
-	        	   name: "luName",
-	        	   display_name: "LU Name",
-	        	   type: "text"
-	           },
+             	  "name": "luName",
+             	  "display_name": "LU Name",
+             	  "type": "option",
+             	  "options"     : arr
+               },
 	           {
 	        	   name: "query",
-	        	   display_name: "Query",
+	        	   display_name: "SELECT Query",
 	        	   type: "text"
 	           },
 	           {
@@ -21,6 +40,7 @@ freeboard.loadDatasourcePlugin({
 	           }
 	           ],
 	           newInstance: function (settings, newInstanceCallback, updateCallback) {
+	        	   
 	        	   newInstanceCallback(new fabricDatasource(settings, updateCallback));
 	           }
 });
@@ -62,10 +82,15 @@ var fabricDatasource = function (settings, updateCallback) {
 			dataType: "JSON",
 			type: "GET",
 			success: function (data) {
+				$('.modal-content-mymodal p').text(""); 
+				$( '#myModal' ).css("display", "none");
 				updateCallback(data);
 			},
 			error: function (xhr, status, error) {
-				//TODO
+				$('.modal-content-mymodal p').text(xhr.responseText); 
+				$( '#myModal' ).fadeIn();
+				//empty DS widgets/Gauges
+				updateCallback({"results":[]});
 			}
 		});
 	}

@@ -24,6 +24,9 @@
                 });
         
         function loadDashboardFromLocalStorage(){
+        	var hashpattern = window.location.hash.match(/(&|#)source=([^&]+)/);
+            if (hashpattern !== null) {
+                $.getJSON(hashpattern[2], function(data) {
                 	//check browser support for localStorage and sessionStorage
             		if (typeof(Storage) !== "undefined") {
                     	var item = localStorage.getItem('dashboardJson');
@@ -33,6 +36,8 @@
                                 freeboard.setEditing(false);
                             });
             			}
+            		}
+                });
             }
         }
         
@@ -49,15 +54,6 @@
 <header id="main-header" data-bind="if:allow_edit">
     <div id="admin-bar">
         <div id="admin-menu">
-        	<div id="instanceIdDiv">
-                <h2 class="title">Instance ID</h2>
-				<div id="setting-row-name" class="form-row">
-					<div id="setting-value-container-name" class="form-value">
-						<input type="text" style="width: 100px;border-color:#B88F51;" id="instanceId">
-						<label class="text-button" data-bind="click: loadInstance">Load</label>
-					</div>
-				</div>
-            </div>
             <div id="board-tools">
                 <h1 id="board-logo" class="title bordered">Fabric Dashboard</h1>
                 <div id="board-actions">
@@ -71,6 +67,16 @@
                         <li id="add-pane" data-bind="click: createPane"><i class="icon-plus icon-white"></i><label>Add Pane</label></li>
                     </ul>
                 </div>
+            </div>
+            <div id="instanceIdDiv">
+                <h2 class="title">INSTANCE ID</h2>
+				<div id="setting-row-name" class="form-row">
+					<div id="setting-value-container-name" class="form-value instanceIdInput">
+						<input type="text" style="width:100px;border-color:#B88F51;" id="instanceId">
+						<label class="text-button" data-bind="click: loadInstance">Load</label>
+					</div>
+				</div>
+				<div><span id="resultMsg"></span></div>
             </div>
             <div id="datasources">
                 <h2 class="title">DATASOURCES</h2>
@@ -159,6 +165,16 @@
         </section>
     </li>
 </script>
+
+	<!-- The Modal -->
+	<div id="myModal" class="modalClass">
+	
+	  <!-- Modal content -->
+	  <div class="modal-content-mymodal">
+	    <span class="close">x</span>
+	    <p></p>
+	  </div>
+	</div>
 
 </body>
 </html>

@@ -1245,7 +1245,7 @@ header h1 {
 #admin-menu {
 	left: 0px;
 	right: 0px;
-	width: 950px;
+	width: 100%;
 	top: 20px;
 	margin: 0px auto;
 	padding-left: 10px;

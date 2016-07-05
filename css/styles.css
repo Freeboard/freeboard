@@ -1,6 +1,59 @@
 #instanceIdDiv{
-	width: 33%;
 	float: left;
 	height: 100%;
 	margin-left: 50px;
+	width:200px;
+}
+
+#resultMsg{
+	color: #9F6000;
+	dispaly:none;	
+}
+
+.instanceIdInput{
+	margin-bottom: 5px;
+}
+
+
+
+/* The Modal (background) */
+.modalClass {
+    display: none; /* Hidden by default */
+    position: absolute;
+    bottom:0;
+    left:0;
+    overflow: auto; /* Enable scroll if needed */
+}
+
+/* Modal Content/Box */
+.modal-content-mymodal {
+    background-color: #2a2a2a;
+    padding-left: 10px;
+    border: 1px solid #888;
+    border-color:#a8701c;
+    color:#fff;
+ /*   width:70%;*/
+    display:inline-block;
+}
+.modal-content-mymodal p{
+	/*word-wrap: break-word;
+	text-overflow: ellipsis;*/
+	overflow: auto; /* Enable scroll if needed */
+	padding-left: 10px;
+	padding-right: 10px;
+}
+/* The Close Button */
+.close {
+    color: #aaa;
+    padding-right:5px;
+    float: right;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #aaa;
+    text-decoration: none;
+    cursor: pointer;
 }
