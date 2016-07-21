@@ -72,11 +72,13 @@ var fabricDatasource = function (settings, updateCallback) {
 
 	this.updateNow = function () {
 		var inputQuery = currentSettings.query;
+		alert(inputQuery);
 		var luName =  currentSettings.luName;
 		var hostname = window.location.hostname;
 		var requestUrl = "http://"+hostname+":3213/queryFabric?token="
-			+getQueryString('token')+"&lu="+luName+"&iid="+getQueryString('iid')+"&sql="+inputQuery;
-
+			+getQueryString('token')+"&lu="+encodeURIComponent(luName)
+			+"&iid="+getQueryString('iid')+"&sql="+encodeURIComponent(inputQuery);
+		alert(encodeURIComponent(inputQuery));
 		$.ajax({
 			url: requestUrl,
 			dataType: "JSON",
