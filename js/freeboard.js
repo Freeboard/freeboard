@@ -1725,6 +1725,11 @@ PluginEditor = function(jsEditor, valueEditor)
 					_displayValidationError(settingDef.name, "This is required.");
 					return true;
 				}
+				else if(settingDef.type == "integer" && (newSettings.settings[settingDef.name] % 1 !== 0))
+				{
+					_displayValidationError(settingDef.name, "Must be a whole number.");
+					return true;
+				}
 				else if(settingDef.type == "number" && !_isNumerical(newSettings.settings[settingDef.name]))
 				{
 					_displayValidationError(settingDef.name, "Must be a number.");
@@ -2700,7 +2705,7 @@ var freeboard = (function()
 									{
 										name : "col_width",
 										display_name : "Columns",
-										type : "number",
+										type : "integer",
 										default_value : 1,
 										required : true
 									}

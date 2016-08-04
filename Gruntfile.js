@@ -47,12 +47,12 @@ module.exports = function(grunt) {
                 ],
                 dest : 'js/freeboard.plugins.js'
             },
-            'fb+plugins' : {
+            'fb_plugins' : {
                 src : [
                     'js/freeboard.js',
                     'js/freeboard.plugins.js'
                 ],
-                dest : 'js/freeboard+plugins.js'
+                dest : 'js/freeboard_plugins.js'
             }
         },
         cssmin : {
@@ -76,15 +76,15 @@ module.exports = function(grunt) {
                 options: {
                     mangle : false,
                     beautify : false,
-                    compress: true
+                    compress: {}
                 },
                 files: {
                     'js/freeboard.thirdparty.min.js' : [ 'js/freeboard.thirdparty.js' ]
                 }
             },
-            'fb+plugins': {
+            'fb_plugins': {
                 files: {
-                    'js/freeboard+plugins.min.js' : [ 'js/freeboard+plugins.js' ]
+                    'js/freeboard_plugins.min.js' : [ 'js/freeboard_plugins.js' ]
                 }
             }
         },
@@ -108,5 +108,5 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-string-replace');
-    grunt.registerTask('default', [ 'concat:css', 'cssmin:css', 'concat:fb', 'concat:thirdparty', 'concat:plugins', 'concat:fb+plugins', 'uglify:fb', 'uglify:plugins', 'uglify:fb+plugins', 'uglify:thirdparty', 'string-replace:css' ]);
+    grunt.registerTask('default', [ 'concat:css', 'cssmin:css', 'concat:fb', 'concat:thirdparty', 'concat:plugins', 'concat:fb_plugins', 'uglify:fb', 'uglify:plugins', 'uglify:fb_plugins', 'uglify:thirdparty', 'string-replace:css' ]);
 };
