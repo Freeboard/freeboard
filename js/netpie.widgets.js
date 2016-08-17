@@ -238,6 +238,7 @@ function onConnectedHandler(microgearRef) {
         }
 
         self.onDispose = function() {
+            console.log("sss");
         }
 
         if (settings.onCreatedAction) {
@@ -249,5 +250,289 @@ function onConnectedHandler(microgearRef) {
             },200);
         }
 
+    }
+
+//--------------------
+
+    freeboard.loadWidgetPlugin({
+        "type_name"   : "FeedView",
+        "display_name": "FeedView",
+        "description" : "",
+        "fill_size" : true,
+        "settings"  : [
+            // {
+            //     "name"        : "caption",
+            //     "display_name": "FeedView Caption",
+            //     "type"        : "text"
+            // },
+            {
+                name: "apikey",
+                display_name: "Api Key",
+                type: "text",
+                required : true
+                // "description"   : ""
+            },
+            {
+                name: "granularity",
+                display_name: "Granularity",
+                type: "option",
+                options:[
+                    {
+                        name: "Second",
+                        value: "seconds"
+                    },
+                    {
+                        name: "Minute",
+                        value: "minutes"
+                    },
+                    {
+                        name: "Hour",
+                        value: "hours"
+                    },
+                    {
+                        name: "Day",
+                        value: "days"
+                    },
+                    {
+                        name: "Month",
+                        value: "months"
+                    },
+                    {
+                        name: "Year",
+                        value: "years"
+                    }
+                ]
+            },
+            {
+                name: "data",
+                display_name: "Data",
+                type: "text",
+                required : true
+                // "description"   : ""
+            },
+            {
+                name: "aggregate",
+                display_name: "Aggregate",
+                type: "option",
+                options:[
+                    {
+                        name: "Average",
+                        value: "avg"
+                    }
+                ]
+            },
+            {
+                name: "since",
+                display_name: "Since",
+                type: "text",
+                required : true
+                // "description"   : ""
+            },
+            {
+                name: "type",
+                display_name: "Type of Chart",
+                type: "option",
+                // description: "",
+                options:[
+                    {
+                        name: "Line",
+                        value: "line"
+                    },
+                     {
+                        name: "Step",
+                        value: "step"
+                    }
+                ]
+            },
+            {
+                name: "xaxis",
+                display_name: "Xaxis",
+                type: "text",
+                // "description"   : ""
+            },
+            {
+                name: "yaxis",
+                display_name: "Yaxis",
+                type: "text",
+                // "description"   : ""
+            },
+            {
+                name: "min",
+                display_name: "min of yaxis",
+                type: "text",
+                default_value: "auto"
+                // "description"   : ""
+            },
+            {
+                name: "max",
+                display_name: "max of yaxis",
+                type: "text",
+                default_value: "auto"
+                // "description"   : ""
+            },
+            {
+                name: "color",
+                display_name: "color of yaxis",
+                type: "text",
+                default_value: "auto"
+                // "description"   : ""
+            },
+            {
+                name: "pointer",
+                display_name: "Pointer",
+                type: "boolean",
+            },
+            {
+                name: "hook",
+                display_name: "Hook",
+                type: "boolean"
+            },
+            {
+                name: "refresh",
+                display_name: "refresh every",
+                type: "text",
+                default_value: "10"
+                // "description"   : ""
+            },
+            {
+                name: "height_block",
+                display_name: "Height Blocks",
+                type: "option",
+                // description: "",
+                options:[
+                    {
+                        name: "4",
+                        value: "240"
+                    },
+                     {
+                        name: "5",
+                        value: "300"
+                    },
+                    {
+                        name: "6",
+                        value: "360"
+                    },
+                    {
+                        name: "7",
+                        value: "420"
+                    },
+                    {
+                        name: "8",
+                        value: "480"
+                    },
+                    {
+                        name: "9",
+                        value: "540"
+                    },
+                    {
+                        name: "10",
+                        value: "600"
+                    }
+                ]
+            },
+
+        ],
+        newInstance   : function(settings, newInstanceCallback) {
+            newInstanceCallback(new feedviewWidgetPlugin(settings));
+        }
+
+
+    });
+
+    var feedviewWidgetPlugin = function(settings) {
+        var self = this;
+        var sizeWidth = {"240":"4","300":"5","360":"6","420":"7","480":"8","540":"9","600":"10"}; 
+        self.widgetID = randomString(16);
+        var currentSettings = settings;
+        var feedviewElement = feedviewElement = $("<div id=\"chart"+self.widgetID+"\"></div>");
+        var timer;
+
+        function stopTimer()
+        {
+            if(timer)
+            {
+                clearInterval(timer);
+                timer = null;
+            }
+        }
+
+        self.render = function(containerElement) {
+            
+            currentSettings.height = sizeWidth[currentSettings.height_block];
+            $(containerElement).append(feedviewElement);
+
+            feedviewElement.css({
+                height:currentSettings.height_block+"px",
+            });
+            var option = {
+                // name : "Piesensor Graph",
+                xaxis : currentSettings.xaxis,
+                yaxis : currentSettings.yaxis,
+                hookyaxis : currentSettings.hook,//true,false
+                max:currentSettings.max,
+                min:currentSettings.min,
+                color:currentSettings.color,
+                type : currentSettings.type, //bar,line,step
+                pointer : currentSettings.pointer, //true,false
+            }
+
+            // jQuery(window).ready(function( $ ) {
+            //     $.getJSON( currentSettings.apikey+"&granularity="+currentSettings.granularity+"&timezone=7&data="+currentSettings.data+"&aggregate="+currentSettings.aggregate+"&since="+currentSettings.since, function(datajson) { 
+            //         updateChart('chart'+self.widgetID,datajson,option);
+            //     }); 
+            // });  
+        }
+
+        this.getHeight = function () {
+            if(currentSettings.height===undefined){
+                currentSettings.height = 4;
+            }
+            return Number(currentSettings.height);
+        }
+
+        self.onSettingsChanged = function(newSettings) {
+            currentSettings = newSettings;
+            currentSettings.height = sizeWidth[currentSettings.height_block];
+            feedviewElement.css({
+                height:currentSettings.height_block+"px",
+            });
+            var option = {
+                // name : "Piesensor Graph",
+                xaxis : currentSettings.xaxis,
+                yaxis : currentSettings.yaxis,
+                hookyaxis : currentSettings.hook,//true,false
+                max:currentSettings.max,
+                min:currentSettings.min,
+                color:currentSettings.color,
+                type : currentSettings.type, //bar,line,step
+                pointer : currentSettings.pointer, //true,false
+            }
+            stopTimer();
+            jQuery(window).ready(function( $ ) {
+                $.getJSON( currentSettings.apikey+"&granularity="+currentSettings.granularity+"&timezone=7&data="+currentSettings.data+"&aggregate="+currentSettings.aggregate+"&since="+currentSettings.since, function(datajson) { 
+                    updateChart('chart'+self.widgetID,datajson,option);
+                }); 
+            }); 
+            jQuery(window).ready(function( $ ) {
+                timer = setInterval(function(){
+                    $.getJSON( currentSettings.apikey+"&granularity="+currentSettings.granularity+"&timezone=7&data="+currentSettings.data+"&aggregate="+currentSettings.aggregate+"&since="+currentSettings.since, function(datajson) { 
+                        updateChart('chart'+self.widgetID,datajson,option);
+                    });
+                },Number(newSettings.refresh) * 1000); 
+            });  
+
+        }
+
+        self.onCalculatedValueChanged = function(settingName, newValue) {
+
+        }
+
+        self.onDispose = function() {
+            stopTimer()
+        }
+
+        this.onSettingsChanged(settings);
+
+        
     }
 }());
