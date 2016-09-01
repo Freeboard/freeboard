@@ -9,13 +9,15 @@ function insertChart(api,div,option){
 }
 
 function updateChart(chartDIV,datajson,option) {
-		// var barWidth = {
+
+	// var barWidth = {
 	// 	minutes : 60,
 	// 	hours : 360,
 	// 	days : 9000,
 	// 	months : 270000,
 	// 	years : 3240000
 	// }
+	
 	var defaultGraph = {lines:{show:true,steps:false},points:{show:true,radius:2}};
 	var optionGraph = {};
 	var heightGraph = 95;
@@ -37,26 +39,17 @@ function updateChart(chartDIV,datajson,option) {
 				"vertical-align": 'middle',
 				width : "100%",
 				height:"10%",
-				margin:"auto",
 				textAlign : "center",
 				font: '18px/1.5em "proxima-nova", Helvetica, Arial, sans-serif'
 			}).appendTo("#"+chartDIV);
 		}
-		else{
-			heightGraph = heightGraph - 5;
-			$('<div id="'+chartDIV+'_header"></div>').css({
-				display : 'inline-block',
-				"vertical-align": 'middle',
-				width : "100%",
-				height:"5%",
-				margin:"auto",
-				textAlign : "center",
-				font: '18px/1.5em "proxima-nova", Helvetica, Arial, sans-serif'
-			}).appendTo("#"+chartDIV);
-		}
+		
 		if(option.xaxis === undefined){
+			option.xaxis = " "
 			// heightGraph = heightGraph + 5;
 		}
+		
+
 		if(option.type !== undefined){
 			if(option.type=="bar"){
 				delete datajson[datajson.data[0].values[0]];
@@ -100,24 +93,38 @@ function updateChart(chartDIV,datajson,option) {
 			}
 		}
 		if(option.color !== undefined){
-			color = option.color;
+			if(option.color != "auto" && option.color.trim() !=""){
+				color = option.color.split(",");
+			}				
 		}
 	}
+
+	var width = {"1":300,"2":620,"3":"940"}
+	var curWidth = $("#"+chartDIV).parent().parent().parent().parent().attr('data-sizex'); 
+	var widthGraph = width[curWidth]*0.95+"px";
+	var widthDiv = width[curWidth]+"px"; 
+
 	$("#"+chartDIV).css({
 		'background-color' : "#E5E4E2",
-		height:"100%",
+		width:widthDiv,
 		position:"relative"
 	});
 	$('<div id="'+chartDIV+'_graph" ></div>').css({
-		width: "95%",
+		top:"5px",
+		width: widthGraph,
 		height:heightGraph+"%",
 		margin: "auto",
 		'background-color' : "",
 	}).appendTo("#"+chartDIV);
-	
+	// $('<div id="'+chartDIV+'_legend"></div>').css({
+	// 	padding: "",
+	// 	top : 0,
+	// 	height:"5%",
+	// 	textAlign : "center",
+	// 	position : "relative",
+	// }).appendTo("#"+chartDIV);
 	var chartdata = [];
 	if (datajson) {
-		var numcolor = color.length;
 		for (var i=0; i<datajson.data.length; i++) {
 			// max = 0;
 			var s = {data: [], label: datajson.data[i].attr, points:{symbol:"circle"}}
@@ -139,9 +146,9 @@ function updateChart(chartDIV,datajson,option) {
 				}
 			}
 			chartdata.push(s);
-			if(i>=color.length){
-				color[color.length] = color[i%numcolor];
-		   	}
+			if(option.color !== undefined){
+				color = option.color;
+			}
 		}
 	}
 	if(option !== undefined){
@@ -153,7 +160,7 @@ function updateChart(chartDIV,datajson,option) {
 		}
 	}
 	for (var i=0; i<color.length; i++) {
-		if(option !== undefined && option.multipleaxis !== undefined && option.multipleaxis==false){
+		if(option !== undefined && option.hookyaxis !== undefined && option.hookyaxis==true){
 		   	if(i+1 == color.length){
 		   		yaxes[yaxes.length] = {	font : {size : 11,style : "",weight : "bold",family : "sans-serif",variant : "small-caps",color : "black"},max:max,min:min};
 		   	}
@@ -162,7 +169,13 @@ function updateChart(chartDIV,datajson,option) {
 		   	}
 		}
 		else{
-			yaxes[yaxes.length] = {font : {size:11,style:"",weight:"bold",family:"sans-serif",variant:"small-caps",color : color[i]}};
+			if(datajson.data.length==1){
+				yaxes[yaxes.length] = {font : {size:11,style:"",weight:"bold",family:"sans-serif",variant:"small-caps",color : "black"}};
+			}
+			else{
+				yaxes[yaxes.length] = {font : {size:11,style:"",weight:"bold",family:"sans-serif",variant:"small-caps",color : color[i]}};
+
+			}
 		}
 		if(option !== undefined && option.max !== undefined){
 			if($.isNumeric(option.max)){
@@ -181,6 +194,7 @@ function updateChart(chartDIV,datajson,option) {
 			}
 		}
 	}
+
 	var plot = $.plot("#"+chartDIV+"_graph", chartdata, {
 		legend: {
 			show: true,
@@ -248,25 +262,24 @@ function updateChart(chartDIV,datajson,option) {
 			plot.highlight(item.series, item.datapoint);
 		}
 	});
-
 	if(option !== undefined) {
-		if(option.xaxis === undefined){
-			option.xaxis = ""
-		}
-		var heightx = "96%";
-		if(heightGraph<=85){
-			heightx = "95%";
-		}
-		$('<div id="'+chartDIV+'_x">'+option.xaxis+'</div>').css({
+		// if(option.xaxis !== undefined){
+			$('<div id="'+chartDIV+'_x">'+option.xaxis+'</div>').css({
+				top:"50px",
 				width : "100%",
-				margin: "auto",
 				textAlign : "center",
-				position : "absolute",
-				// height:"5%",
-				top:heightx,
-				font: '1em "proxima-nova", Helvetica, Arial, sans-serif'
-		}).insertAfter("#"+chartDIV+"_graph");
-
+				height:"5%",
+				"font-style": "normal",
+             	"font-variant": "normal",
+             	"font-weight": "normal",
+             	"font-stretch": "normal",
+             	"font-size": "0.7em",
+             	"line-height": "normal",
+             	"font-family": "proxima-nova, Helvetica, Arial, sans-serif",
+             	"color": "black",
+             	// position : "absolute",
+			}).insertAfter("#"+chartDIV+"_graph");
+		// }
 		if(option.yaxis !== undefined){
 			$('<div id="'+chartDIV+'_y">'+option.yaxis+'</div>').css({
 				textAlign : "center",
@@ -275,19 +288,27 @@ function updateChart(chartDIV,datajson,option) {
              	'-ms-transform' : 'rotate(270deg)',
              	'transform' : 'rotate(270deg)',
              	position : "absolute",
-             	font: '1em "proxima-nova", Helvetica, Arial, sans-serif'
+             	// font: '1em "proxima-nova", Helvetica, Arial, sans-serif !important',
+             	"font-style": "normal",
+             	"font-variant": "normal",
+             	"font-weight": "normal",
+             	"font-stretch": "normal",
+             	"font-size": "0.7em",
+             	"line-height": "normal",
+             	"font-family": "proxima-nova, Helvetica, Arial, sans-serif",
+             	"color": "black"
 			}).insertBefore("#"+chartDIV+"_graph");
-			var ydivheight = ($("#"+chartDIV).height()/2-$('#'+chartDIV+'_y').height()/2)-1;
-			if($("#"+chartDIV).width()<=665){
+			var ydivheight = ($("#"+chartDIV).height()/2-$('#'+chartDIV+'_y').height()/2);
+			if($("#"+chartDIV).width()<=300){
 				$('#'+chartDIV+'_y').css({
 					top : ydivheight+"px",
 					left : '-10px'
 				})
 			}
-			else if($("#"+chartDIV).width()<=700){
+			else if($("#"+chartDIV).width()<=620){
 				$('#'+chartDIV+'_y').css({
 					top : ydivheight+"px",
-					left : '-7px'
+					left : '-5px'
 				})
 			}
 			else{
@@ -297,34 +318,21 @@ function updateChart(chartDIV,datajson,option) {
 			}
 		}
 	}
-	if(window.location.hostname!="netpie.io"){
-		$("<a id='netpie_logo_link"+chartDIV+"' href='https://netpie.io'><img id='netpie_logo_"+chartDIV+"' src='https://netpie.io/public/netpieio/assets/images/logo/netpie_logo.png' ></img></a>").css({
-			position : "absolute",
-			display : "none"
-		}).appendTo('#'+chartDIV);
-		$("#netpie_logo_"+chartDIV).css({
-			left : "100%",
-			buttom : "0px",
-			height : "4%",
-			display : "block"
-		});
-		var width = $('#'+chartDIV).width()*0.94-($('#netpie_logo_link'+chartDIV).height()*1038/268);
-		var height = $('#'+chartDIV).height()-$('#netpie_logo_link'+chartDIV).height()-$('#'+chartDIV).height()*0.01;
-		$("#netpie_logo_link"+chartDIV).css({
-			left : width+"px",
-			top : height+"px",
-			display : "block"
-		});
-	}
 
-
-   
-	
-	$(window).resize(function(){
-		updateChart(chartDIV,datajson,option);
+	$(function () {
+	    var prevWidth = $('#'+chartDIV).parent().parent().parent().parent().attr('data-sizex');
+	    $('#'+chartDIV).parent().parent().parent().parent().attrchange({
+	        callback: function (e) {
+	            var curWidth = $('#'+chartDIV).parent().parent().parent().parent().attr('data-sizex');       
+	            if (prevWidth !== curWidth) {
+	                prevWidth = curWidth;
+	                updateChart(chartDIV,datajson,option);
+	            }            
+	        }
+	    }).resizable();
 	});
-}
 
+}
 /* Javascript plotting library for jQuery, version 0.8.3.
 
 Copyright (c) 2007-2014 IOLA and Ole Laursen.
@@ -3493,7 +3501,6 @@ Licensed under the MIT license.
     }
 
 })(jQuery);
-
 /* Flot plugin that adds some extra symbols for plotting points.
 
 Copyright (c) 2007-2014 IOLA and Ole Laursen.
@@ -3565,7 +3572,6 @@ The symbols are accessed as strings through the standard symbol options:
         version: '1.0'
     });
 })(jQuery);
-
 /* Pretty handling of time axes.
 
 Copyright (c) 2007-2014 IOLA and Ole Laursen.
@@ -3998,9 +4004,5 @@ API.txt for details.
 	$.plot.dateGenerator = dateGenerator;
 
 })(jQuery);
-
-
-
-
 
 
