@@ -260,79 +260,21 @@ function onConnectedHandler(microgearRef) {
         "description" : "",
         "fill_size" : true,
         "settings"  : [
-            // {
-            //     "name"        : "caption",
-            //     "display_name": "FeedView Caption",
-            //     "type"        : "text"
-            // },
             {
-                name: "apikey",
-                display_name: "Api Key",
+                 "name"        : "title",
+                 "display_name": "Title",
+                 "type"        : "text"
+            },
+            {
+                name: "field",
+                display_name: "Data Field",
                 type: "text",
-                required : true
-                // "description"   : ""
-            },
-            {
-                name: "granularity",
-                display_name: "Granularity",
-                type: "option",
-                options:[
-                    {
-                        name: "Second",
-                        value: "seconds"
-                    },
-                    {
-                        name: "Minute",
-                        value: "minutes"
-                    },
-                    {
-                        name: "Hour",
-                        value: "hours"
-                    },
-                    {
-                        name: "Day",
-                        value: "days"
-                    },
-                    {
-                        name: "Month",
-                        value: "months"
-                    },
-                    {
-                        name: "Year",
-                        value: "years"
-                    }
-                ]
-            },
-            {
-                name: "data",
-                display_name: "Data",
-                type: "text",
-                required : true
-                // "description"   : ""
-            },
-            {
-                name: "aggregate",
-                display_name: "Aggregate",
-                type: "option",
-                options:[
-                    {
-                        name: "Average",
-                        value: "avg"
-                    }
-                ]
-            },
-            {
-                name: "since",
-                display_name: "Since",
-                type: "text",
-                required : true
-                // "description"   : ""
+                "description" : "Data fields separated with comma e.g. temp,humid,light. Blank means display all fields."
             },
             {
                 name: "type",
                 display_name: "Type of Chart",
                 type: "option",
-                // description: "",
                 options:[
                     {
                         name: "Line",
@@ -346,59 +288,47 @@ function onConnectedHandler(microgearRef) {
             },
             {
                 name: "xaxis",
-                display_name: "Xaxis",
+                display_name: "X axis title",
                 type: "text",
-                // "description"   : ""
             },
             {
                 name: "yaxis",
-                display_name: "Yaxis",
+                display_name: "Y axis title",
                 type: "text",
-                // "description"   : ""
             },
             {
-                name: "min",
-                display_name: "min of yaxis",
+                name: "ymin",
+                display_name: "y axis min",
                 type: "text",
                 default_value: "auto"
-                // "description"   : ""
             },
             {
-                name: "max",
-                display_name: "max of yaxis",
+                name: "ymax",
+                display_name: "y yaxis max",
                 type: "text",
                 default_value: "auto"
-                // "description"   : ""
             },
             {
                 name: "color",
                 display_name: "color of yaxis",
                 type: "text",
-                default_value: "auto"
-                // "description"   : ""
+                default_value: "auto",
+                "description": "auto or array of color codes e.g. [\"#ff0000\",\"#00ff00\",\"#0000ff\"]"
             },
             {
-                name: "pointer",
+                name: "marker",
                 display_name: "Pointer",
                 type: "boolean",
             },
             {
-                name: "hook",
-                display_name: "Hook",
+                name: "multiple axis",
+                display_name: "Multiple Axis",
                 type: "boolean"
-            },
-            {
-                name: "refresh",
-                display_name: "refresh every",
-                type: "text",
-                default_value: "10"
-                // "description"   : ""
             },
             {
                 name: "height_block",
                 display_name: "Height Blocks",
                 type: "option",
-                // description: "",
                 options:[
                     {
                         name: "4",
@@ -468,7 +398,7 @@ function onConnectedHandler(microgearRef) {
                 // name : "Piesensor Graph",
                 xaxis : currentSettings.xaxis,
                 yaxis : currentSettings.yaxis,
-                hookyaxis : currentSettings.hook,//true,false
+                //hookyaxis : currentSettings.hook,//true,false
                 max:currentSettings.max,
                 min:currentSettings.min,
                 color:currentSettings.color,

@@ -460,6 +460,13 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 		}
 	}
 
+	/* netpie-freebaord edit : begin */
+	this.clearFreeboard = function(){
+		window.localStorage.removeItem("netpie.freeboard.dashboard");
+		freeboardUI.clearDashboard();
+	}
+	/* netpie-freebaord edit end */
+
 	this.clearDashboard = function()
 	{
 		freeboardUI.removeAllPanes();
@@ -517,6 +524,9 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 						var textFile = fileReaderEvent.target;
 						var jsonObject = JSON.parse(textFile.result);
 
+						window.localStorage.setItem("netpie.freeboard.dashboard",JSON.stringify(jsonObject));
+						freeboardUI.loadDashboard(jsonObject);
+						freeboardUI.setEditing(!1);
 
 						self.loadDashboard(jsonObject);
 						self.setEditing(false);
@@ -2724,7 +2734,9 @@ var freeboard = (function()
 								theFreeboardModel.addDatasource(newViewModel);
 
 								newViewModel.name(newSettings.settings.name);
-								delete newSettings.settings.name;
+/* netpie-freeboard edit begin */
+//								delete newSettings.settings.name;
+/* netpie-freeboard edit end */
 
 								newViewModel.settings(newSettings.settings);
 								newViewModel.type(newSettings.type);
@@ -2753,7 +2765,9 @@ var freeboard = (function()
 								if(options.type == 'datasource')
 								{
 									viewModel.name(newSettings.settings.name);
-									delete newSettings.settings.name;
+/* netpie-freeboard edit begin */
+									//delete newSettings.settings.name;
+/* netpie-freeboard edit end */
 								}
 
 								viewModel.type(newSettings.type);
