@@ -171,8 +171,6 @@ if (typeof dsstore === "undefined") {
             }
         })
 
-
-
         self.mg.connect(settings.appid, function(){
 
         });
@@ -326,12 +324,12 @@ if (typeof dsstore === "undefined") {
 //         console.log('Hey from '+dsname);
 
             var apiurl = 'https://api2.netpie.io/feed/'+s.feedid+'?apikey='+s.apikey+'&granularity='+s.granularity_value+s.granularity_unit+'&aggregate='+s.aggregate+'&since='+s.since_value+s.since_unit;
-            console.log(apiurl);    
-            console.log(s.name);
+console.log(apiurl);    
+//console.log(s.name);
             $.getJSON( apiurl, function(datajson) {
                 data[currentSettings.name] = datajson;
                 updateCallback(data);
-                console.log(datajson);
+//console.log(datajson);
             });
 
         }

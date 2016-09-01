@@ -266,8 +266,14 @@ function onConnectedHandler(microgearRef) {
                  "type"        : "text"
             },
             {
-                name: "field",
-                display_name: "Data Field",
+                "name"          : "datasource",
+                "display_name"  : "Data Source",
+                "type"          : "calculated",
+                "description"   : ""
+            },
+            {
+                name: "filters",
+                display_name: "Filter",
                 type: "text",
                 "description" : "Data fields separated with comma e.g. temp,humid,light. Blank means display all fields."
             },
@@ -310,7 +316,7 @@ function onConnectedHandler(microgearRef) {
             },
             {
                 name: "color",
-                display_name: "color of yaxis",
+                display_name: "Line Colors",
                 type: "text",
                 default_value: "auto",
                 "description": "auto or array of color codes e.g. [\"#ff0000\",\"#00ff00\",\"#0000ff\"]"
@@ -375,8 +381,9 @@ function onConnectedHandler(microgearRef) {
         self.widgetID = randomString(16);
         var currentSettings = settings;
         var feedviewElement = feedviewElement = $("<div id=\"chart"+self.widgetID+"\"></div>");
-        var timer;
+//        var timer;
 
+/*
         function stopTimer()
         {
             if(timer)
@@ -385,7 +392,7 @@ function onConnectedHandler(microgearRef) {
                 timer = null;
             }
         }
-
+*/
         self.render = function(containerElement) {
             
             currentSettings.height = sizeWidth[currentSettings.height_block];
@@ -406,11 +413,6 @@ function onConnectedHandler(microgearRef) {
                 pointer : currentSettings.pointer, //true,false
             }
 
-            // jQuery(window).ready(function( $ ) {
-            //     $.getJSON( currentSettings.apikey+"&granularity="+currentSettings.granularity+"&timezone=7&data="+currentSettings.data+"&aggregate="+currentSettings.aggregate+"&since="+currentSettings.since, function(datajson) { 
-            //         updateChart('chart'+self.widgetID,datajson,option);
-            //     }); 
-            // });  
         }
 
         this.getHeight = function () {
@@ -426,6 +428,8 @@ function onConnectedHandler(microgearRef) {
             feedviewElement.css({
                 height:currentSettings.height_block+"px",
             });
+
+/*
             var option = {
                 // name : "Piesensor Graph",
                 xaxis : currentSettings.xaxis,
@@ -450,15 +454,29 @@ function onConnectedHandler(microgearRef) {
                     });
                 },Number(newSettings.refresh) * 1000); 
             });  
+*/
 
         }
 
         self.onCalculatedValueChanged = function(settingName, newValue) {
 
+            var option = {
+                name : "Piesensor Graph",
+                xaxis : currentSettings.xaxis,
+                yaxis : currentSettings.yaxis,
+                multipleaxis : false,
+                max:currentSettings.max,
+                min:currentSettings.min,
+                color:currentSettings.color,
+                type : currentSettings.type, //bar,line,step
+                pointer : currentSettings.pointer || true, //true,false
+            }
+console.log(option);
+            updateChart('chart'+self.widgetID,newValue,option);
         }
 
         self.onDispose = function() {
-            stopTimer()
+            //stopTimer()
         }
 
         this.onSettingsChanged(settings);
