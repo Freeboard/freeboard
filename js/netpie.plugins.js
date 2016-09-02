@@ -321,22 +321,21 @@ if (typeof dsstore === "undefined") {
 
 
         function reloadhData(s) {
-//         console.log('Hey from '+dsname);
-
             var apiurl = 'https://api2.netpie.io/feed/'+s.feedid+'?apikey='+s.apikey+'&granularity='+s.granularity_value+s.granularity_unit+'&aggregate='+s.aggregate+'&since='+s.since_value+s.since_unit;
-console.log(apiurl);    
-//console.log(s.name);
             $.getJSON( apiurl, function(datajson) {
-                data[currentSettings.name] = datajson;
+                data['data'] = datajson;
                 updateCallback(data);
-//console.log(datajson);
             });
-
         }
 
         dsstore[currentSettings.name] = {};
 
         if (currentSettings.interval > 0) {
+
+            setTimeout(function() {
+                reloadhData(currentSettings);
+            },500);
+
             dsstore[currentSettings.name]['timer'] = setInterval(function() {
                 reloadhData(currentSettings);
             }, currentSettings.interval*1000);
@@ -347,9 +346,6 @@ console.log(apiurl);
         }
 
         self.onSettingsChanged = function(newSettings) {
-            //console.log(currentSettings);
-            //console.log(newSettings);
-
             if (currentSettings.name != newSettings.name) {
                 dsstore[newSettings.name] = dsstore[currentSettings.name];
                 dsstore[currentSettings.name] = null;
@@ -374,6 +370,10 @@ console.log(apiurl);
             }
 
             currentSettings = newSettings;
+            setTimeout(function(){
+                reloadhData(currentSettings);
+            },500);
+
         }
 
         self.onDispose = function() {

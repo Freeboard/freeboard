@@ -318,8 +318,8 @@ function onConnectedHandler(microgearRef) {
                 name: "color",
                 display_name: "Line Colors",
                 type: "text",
-                default_value: "auto",
-                "description": "auto or array of color codes e.g. [\"#ff0000\",\"#00ff00\",\"#0000ff\"]"
+                default_value: "",
+                "description": "enter the color set separated by comma e.g. #ff0000,#00ff00,#0000ff or leave blank for the default color set"
             },
             {
                 name: "marker",
@@ -327,7 +327,7 @@ function onConnectedHandler(microgearRef) {
                 type: "boolean",
             },
             {
-                name: "multiple axis",
+                name: "multipleaxis",
                 display_name: "Multiple Axis",
                 type: "boolean"
             },
@@ -371,8 +371,6 @@ function onConnectedHandler(microgearRef) {
         newInstance   : function(settings, newInstanceCallback) {
             newInstanceCallback(new feedviewWidgetPlugin(settings));
         }
-
-
     });
 
     var feedviewWidgetPlugin = function(settings) {
@@ -381,38 +379,14 @@ function onConnectedHandler(microgearRef) {
         self.widgetID = randomString(16);
         var currentSettings = settings;
         var feedviewElement = feedviewElement = $("<div id=\"chart"+self.widgetID+"\"></div>");
-//        var timer;
 
-/*
-        function stopTimer()
-        {
-            if(timer)
-            {
-                clearInterval(timer);
-                timer = null;
-            }
-        }
-*/
-        self.render = function(containerElement) {
-            
+        self.render = function(containerElement) {            
             currentSettings.height = sizeWidth[currentSettings.height_block];
             $(containerElement).append(feedviewElement);
 
             feedviewElement.css({
                 height:currentSettings.height_block+"px",
             });
-            var option = {
-                // name : "Piesensor Graph",
-                xaxis : currentSettings.xaxis,
-                yaxis : currentSettings.yaxis,
-                //hookyaxis : currentSettings.hook,//true,false
-                max:currentSettings.max,
-                min:currentSettings.min,
-                color:currentSettings.color,
-                type : currentSettings.type, //bar,line,step
-                pointer : currentSettings.pointer, //true,false
-            }
-
         }
 
         this.getHeight = function () {
@@ -428,59 +402,27 @@ function onConnectedHandler(microgearRef) {
             feedviewElement.css({
                 height:currentSettings.height_block+"px",
             });
-
-/*
-            var option = {
-                // name : "Piesensor Graph",
-                xaxis : currentSettings.xaxis,
-                yaxis : currentSettings.yaxis,
-                hookyaxis : currentSettings.hook,//true,false
-                max:currentSettings.max,
-                min:currentSettings.min,
-                color:currentSettings.color,
-                type : currentSettings.type, //bar,line,step
-                pointer : currentSettings.pointer, //true,false
-            }
-            stopTimer();
-            jQuery(window).ready(function( $ ) {
-                $.getJSON( currentSettings.apikey+"&granularity="+currentSettings.granularity+"&timezone=7&data="+currentSettings.data+"&aggregate="+currentSettings.aggregate+"&since="+currentSettings.since, function(datajson) { 
-                    updateChart('chart'+self.widgetID,datajson,option);
-                }); 
-            }); 
-            jQuery(window).ready(function( $ ) {
-                timer = setInterval(function(){
-                    $.getJSON( currentSettings.apikey+"&granularity="+currentSettings.granularity+"&timezone=7&data="+currentSettings.data+"&aggregate="+currentSettings.aggregate+"&since="+currentSettings.since, function(datajson) { 
-                        updateChart('chart'+self.widgetID,datajson,option);
-                    });
-                },Number(newSettings.refresh) * 1000); 
-            });  
-*/
-
         }
 
         self.onCalculatedValueChanged = function(settingName, newValue) {
-
             var option = {
-                name : "Piesensor Graph",
+                title : currentSettings.title,
                 xaxis : currentSettings.xaxis,
                 yaxis : currentSettings.yaxis,
-                multipleaxis : false,
+                multipleaxis : currentSettings.multipleaxis,
                 max:currentSettings.max,
                 min:currentSettings.min,
-                color:currentSettings.color,
+                color:currentSettings.color.split(','),
                 type : currentSettings.type, //bar,line,step
                 pointer : currentSettings.pointer || true, //true,false
             }
-console.log(option);
             updateChart('chart'+self.widgetID,newValue,option);
         }
 
         self.onDispose = function() {
-            //stopTimer()
+
         }
 
-        this.onSettingsChanged(settings);
-
-        
+        this.onSettingsChanged(settings);        
     }
 }());

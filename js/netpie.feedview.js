@@ -16,13 +16,16 @@ function updateChart(chartDIV,datajson,option) {
 	// 	months : 270000,
 	// 	years : 3240000
 	// }
+
+	const DEFAULTCOLOR = ['#d40000','#1569ea','#ffcc00']
+
 	var defaultGraph = {lines:{show:true,steps:false},points:{show:true,radius:2}};
 	var optionGraph = {};
 	var heightGraph = 95;
 	var yaxes = []
 	var max = 0;
 	var min ;
-	var color = ['#d40000','#1569ea','#ffcc00']
+	var color;
 	if ($("#"+chartDIV).find("#"+chartDIV+"_graph").length > 0){ 
 		$("#"+chartDIV).empty();
 	}
@@ -30,20 +33,20 @@ function updateChart(chartDIV,datajson,option) {
 	 	optionGraph = defaultGraph;
 	 	heightGraph = heightGraph+5;
 	}else{
-		if(option.name !== undefined){
+		if(option.title){
 			heightGraph = heightGraph - 10;
-			$('<div id="'+chartDIV+'_header"><p>'+option.name+'</p></div>').css({
+			$('<div id="'+chartDIV+'_header"><p>'+option.title+'</p></div>').css({
 				display : 'inline-block',
 				"vertical-align": 'middle',
 				width : "100%",
 				height:"10%",
 				margin:"auto",
 				textAlign : "center",
-				font: '18px/1.5em "proxima-nova", Helvetica, Arial, sans-serif'
+				font: '14px/0.8em "proxima-nova", Helvetica, Arial, sans-serif'
 			}).appendTo("#"+chartDIV);
 		}
 		else{
-			heightGraph = heightGraph - 5;
+			heightGraph = heightGraph - 4;
 			$('<div id="'+chartDIV+'_header"></div>').css({
 				display : 'inline-block',
 				"vertical-align": 'middle',
@@ -51,7 +54,7 @@ function updateChart(chartDIV,datajson,option) {
 				height:"5%",
 				margin:"auto",
 				textAlign : "center",
-				font: '18px/1.5em "proxima-nova", Helvetica, Arial, sans-serif'
+				font: '14px/0.8em "proxima-nova", Helvetica, Arial, sans-serif'
 			}).appendTo("#"+chartDIV);
 		}
 		if(option.xaxis === undefined){
@@ -99,8 +102,11 @@ function updateChart(chartDIV,datajson,option) {
 				};
 			}
 		}
-		if(option.color !== undefined){
+		if(option.color !== undefined && typeof(option.color)=='array' && option.color.length>0){
 			color = option.color;
+		}
+		else {
+			color = DEFAULTCOLOR;
 		}
 	}
 	$("#"+chartDIV).css({
@@ -152,6 +158,7 @@ function updateChart(chartDIV,datajson,option) {
 			min = min-5;
 		}
 	}
+
 	for (var i=0; i<color.length; i++) {
 		if(option !== undefined && option.multipleaxis !== undefined && option.multipleaxis==false){
 		   	if(i+1 == color.length){
@@ -297,6 +304,7 @@ function updateChart(chartDIV,datajson,option) {
 			}
 		}
 	}
+
 	/*
 	if(window.location.hostname!="netpie.io"){
 		$("<a id='netpie_logo_link"+chartDIV+"' href='https://netpie.io'><img id='netpie_logo_"+chartDIV+"' src='https://netpie.io/public/netpieio/assets/images/logo/netpie_logo.png' ></img></a>").css({
