@@ -88,20 +88,12 @@ function updateChart(chartDIV,datajson,option) {
 				steps : false
 			};
 		}
-		if(option.pointer !== undefined){
-			if(option.pointer){
-				optionGraph['points'] = {
-					show: true,
-					radius : 2
-				};
-			}
-			else{
-				optionGraph['points'] = {
-					show: false,
-					radius : 2
-				};
-			}
-		}
+
+		optionGraph['points'] = {
+			show: option.marker?true:false,
+			radius : 2
+		};
+
 		if(option.color !== undefined && typeof(option.color)=='array' && option.color.length>0){
 			color = option.color;
 		}
@@ -121,11 +113,20 @@ function updateChart(chartDIV,datajson,option) {
 		'background-color' : "",
 	}).appendTo("#"+chartDIV);
 	
+	var filter = [];
+	if (option && option.filter) filter = option.filter.replace(' ','').split(',');
+
+console.log(option.filter);
+console.log(filter);
+
 	var chartdata = [];
 	if (datajson) {
 		var numcolor = color.length;
 		for (var i=0; i<datajson.data.length; i++) {
 			// max = 0;
+
+			if (filter.length > 0 && filter.indexOf(datajson.data[i].attr) == -1) continue;
+
 			var s = {data: [], label: datajson.data[i].attr, points:{symbol:"circle"}}
 			if (i>0)
 				s.yaxis = i+1;

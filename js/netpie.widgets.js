@@ -272,7 +272,7 @@ function onConnectedHandler(microgearRef) {
                 "description"   : ""
             },
             {
-                name: "filters",
+                name: "filter",
                 display_name: "Filter",
                 type: "text",
                 "description" : "Data fields separated with comma e.g. temp,humid,light. Blank means display all fields."
@@ -323,7 +323,7 @@ function onConnectedHandler(microgearRef) {
             },
             {
                 name: "marker",
-                display_name: "Pointer",
+                display_name: "Maker",
                 type: "boolean",
             },
             {
@@ -414,7 +414,8 @@ function onConnectedHandler(microgearRef) {
                 min:currentSettings.min,
                 color:currentSettings.color.split(','),
                 type : currentSettings.type, //bar,line,step
-                pointer : currentSettings.pointer || true, //true,false
+                marker : currentSettings.marker, //true,false
+                filter : currentSettings.filter
             }
             updateChart('chart'+self.widgetID,newValue,option);
         }
