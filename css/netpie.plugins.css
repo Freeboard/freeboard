@@ -70,3 +70,14 @@
 .netpie-toggle-checkbox:checked + .netpie-toggle-label .netpie-toggle-switch {
     right: 0px; 
 }
+.netpit-feedvew-header {
+    display : inline-block,
+    vertical-align: middle,
+    width : 100%,
+    height: 10%,
+    margin: auto,
+    text-align : center,
+    font: 14px/0.8em "proxima-nova", Helvetica, Arial, sans-serif,
+    color: black,
+    font-weight: bold
+}

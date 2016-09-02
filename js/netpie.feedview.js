@@ -1,3 +1,4 @@
+
 function insertChart(api,div,option){
 	var data = [];
 	for (var i = 0; i <= api.data.length - 1; i++) {
@@ -34,31 +35,41 @@ function updateChart(chartDIV,datajson,option) {
 	}else{
 		if(option.title){
 			heightGraph = heightGraph - 10;
-			$('<div id="'+chartDIV+'_header"><p>'+option.title+'</p></div>').css({
-				display : 'inline-block',
-				"vertical-align": 'middle',
+			$('<div id="'+chartDIV+'_header">'+option.title+'</div>').css({
+				// display : 'inline-block',
+				// "vertical-align": 'middle',
+				"padding-top": "2%",
+				display: "-webkit-flexbox",
+			    display: "-ms-flexbox",
+			    display: "-webkit-flex",
+			    display: "flex",
+			    "-webkit-flex-align": "center",
+			    "-ms-flex-align": "center",
+			    "-webkit-align-items": "center",
+			    "align-items": "center",
+			    "justify-content": "center",
 				width : "100%",
-				height:"10%",
+				height:"7%",
 				margin:"auto",
-				textAlign : "center",
+				// textAlign : "center",
 				font: '14px/0.8em "proxima-nova", Helvetica, Arial, sans-serif',
 				color:"black",
 				"font-weight": "bold"
 			}).appendTo("#"+chartDIV);
 		}
 		else{
-			heightGraph = heightGraph - 4;
-			$('<div id="'+chartDIV+'_header"></div>').css({
-				display : 'inline-block',
-				"vertical-align": 'middle',
-				width : "100%",
-				height:"5%",
-				margin:"auto",
-				textAlign : "center",
-				font: '14px/0.8em "proxima-nova", Helvetica, Arial, sans-serif',
-				color:"black",
-				"font-weight": "bold"
-			}).appendTo("#"+chartDIV);
+			// heightGraph = heightGraph - 4;
+			// $('<div id="'+chartDIV+'_header"></div>').css({
+			// 	display : 'inline-block',
+			// 	"vertical-align": 'middle',
+			// 	width : "100%",
+			// 	height:"5%",
+			// 	margin:"auto",
+			// 	textAlign : "center",
+			// 	font: '14px/0.8em "proxima-nova", Helvetica, Arial, sans-serif',
+			// 	color:"black",
+			// 	"font-weight": "bold"
+			// }).appendTo("#"+chartDIV);
 		}
 		if(option.xaxis === undefined || option.xaxis.trim()==""){
 			heightGraph = heightGraph + 5;
@@ -111,7 +122,7 @@ function updateChart(chartDIV,datajson,option) {
 		position:"relative"
 	});
 	$('<div id="'+chartDIV+'_graph" ></div>').css({
-		top:"5px",
+		// top:"5px",
 		width: widthGraph,
 		height:heightGraph+"%",
 		margin: "auto",
@@ -122,22 +133,21 @@ function updateChart(chartDIV,datajson,option) {
 
 // console.log(option.filter);
 // console.log(filter);
-
+	var colori = [];
 	var chartdata = [];
 	if (datajson) {
 		var numcolor = color.length;
-
+		var count = 0;
 		for (var i=0; i<datajson.data.length; i++) {
 			// max = 0;
-
 			if (filter.length > 0 && filter.indexOf(datajson.data[i].attr) == -1) continue;
-
+			colori[colori.length] = color[filter.indexOf(datajson.data[i].attr)];
 			var s = {data: [], label: datajson.data[i].attr, points:{symbol:"circle"}}
-			if (i>0)
-				s.yaxis = i+1;
+			if (count>0)
+				s.yaxis = count+1;
 			else 
 				s.yaxis = 1;
-			var arr = datajson.data[i].values;
+			var arr = datajson.data[count].values;
 			for (var j=0; j<arr.length; j++) {
 				s.data.push([ arr[j][0], arr[j][1] ]);
 				if(arr[j][1]>max){
@@ -151,9 +161,10 @@ function updateChart(chartDIV,datajson,option) {
 				}
 			}
 			chartdata.push(s);
-			if(i>=color.length){
-				color[color.length] = color[i%numcolor];
-		   	}
+			count = count + 1 ;
+			// if(i>=color.length){
+			// 	color[color.length] = color[i%numcolor];
+		 //   	}
 		}
 	}
 	if(option !== undefined){
@@ -164,8 +175,7 @@ function updateChart(chartDIV,datajson,option) {
 			min = min-5;
 		}
 	}
-
-	for (var i=0; i<color.length; i++) {
+	for (var i=0; i<filter.length; i++) {
 		if(option !== undefined && option.multipleaxis !== undefined && option.multipleaxis==false){
 		   	if(i+1 == color.length){
 		   		yaxes[yaxes.length] = {	font : {size : 11,style : "",weight : "bold",family : "sans-serif",variant : "small-caps",color : "black"},max:max,min:min};
@@ -175,7 +185,7 @@ function updateChart(chartDIV,datajson,option) {
 		   	}
 		}
 		else{
-			yaxes[yaxes.length] = {font : {size:11,style:"",weight:"bold",family:"sans-serif",variant:"small-caps",color : color[i]}};
+			yaxes[yaxes.length] = {font : {size:11,style:"",weight:"bold",family:"sans-serif",variant:"small-caps",color : colori[i]}};
 		}
 		if(option !== undefined && option.max !== undefined){
 			if($.isNumeric(option.max)){
@@ -217,7 +227,7 @@ function updateChart(chartDIV,datajson,option) {
 			clickable: true
 		},
 		yaxes: yaxes,
-		color : color,
+		color : colori,
 		xaxis : {
 			mode : "time",
 			timezone : "browser",
@@ -274,11 +284,8 @@ function updateChart(chartDIV,datajson,option) {
 		if(option.xaxis === undefined){
 			option.xaxis = ""
 		}
-		var heightx = "91%";
-		if(heightGraph<=85){
-			heightx = "92%";
-		}
-		$('<div id="'+chartDIV+'_x">'+option.xaxis+'</div>').css({
+		else{
+			$('<div id="'+chartDIV+'_x">'+option.xaxis+'</div>').css({
 				width : "100%",
 				margin: "auto",
 				textAlign : "center",
@@ -288,7 +295,13 @@ function updateChart(chartDIV,datajson,option) {
 				font: '1em "proxima-nova", Helvetica, Arial, sans-serif',
 				color:"black",
 				"font-weight": "bold"
-		}).insertAfter("#"+chartDIV+"_legend");
+			}).insertAfter("#"+chartDIV+"_legend");
+		}
+		var heightx = "91%";
+		if(heightGraph<=85){
+			heightx = "92%";
+		}
+		
 
 		if(option.yaxis !== undefined){
 			// $("#"+chartDIV+"_graph").css({
@@ -324,6 +337,7 @@ function updateChart(chartDIV,datajson,option) {
 				})
 			}
 		}
+
 	}
 
 	/*
