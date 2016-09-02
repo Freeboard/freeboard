@@ -412,7 +412,7 @@ function onConnectedHandler(microgearRef) {
                 multipleaxis : currentSettings.multipleaxis,
                 max:currentSettings.max,
                 min:currentSettings.min,
-                color:currentSettings.color.split(','),
+                color:currentSettings.color,
                 type : currentSettings.type, //bar,line,step
                 marker : currentSettings.marker, //true,false
                 filter : currentSettings.filter

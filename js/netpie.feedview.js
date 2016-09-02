@@ -94,12 +94,8 @@ function updateChart(chartDIV,datajson,option) {
 			radius : 2
 		};
 
-		if(option.color !== undefined && typeof(option.color)=='array' && option.color.length>0){
-			color = option.color;
-		}
-		else {
-			color = DEFAULTCOLOR;
-		}
+		color = option.color?option.color.replace(' ','').split(','):DEFAULTCOLOR;
+
 	}
 	$("#"+chartDIV).css({
 		'background-color' : "#E5E4E2",
@@ -115,9 +111,6 @@ function updateChart(chartDIV,datajson,option) {
 	
 	var filter = [];
 	if (option && option.filter) filter = option.filter.replace(' ','').split(',');
-
-console.log(option.filter);
-console.log(filter);
 
 	var chartdata = [];
 	if (datajson) {
