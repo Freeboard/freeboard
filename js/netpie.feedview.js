@@ -96,15 +96,16 @@ function updateChart(chartDIV,datajson,option) {
 			show: option.marker?true:false,
 			radius : 2
 		};
-
-		if(option.color !== undefined && typeof(option.color)=='array' && option.color.length>0){
-			color = option.color;
-		}
-		else {
+		console.log(option.color);
+		if(option.color.trim()==""){
 			color = DEFAULTCOLOR;
 		}
+		else{
+			color = option.color
+		}
+		if (option && option.color) color = option.color.replace(' ','').split(',');
 	}
-	var width = {"1":300,"2":620,"3":"940"}
+	var width = {"1":"300","2":"620","3":"940"}
 	var curWidth = $("#"+chartDIV).parent().parent().parent().parent().attr('data-sizex');
 	var widthGraph = width[curWidth]*0.95+"px";
 	var widthDiv = width[curWidth]+"px"; 
@@ -118,7 +119,7 @@ function updateChart(chartDIV,datajson,option) {
 		width: widthGraph,
 		height:heightGraph+"%",
 		margin: "auto",
-		'background-color' : "",
+		// 'background-color' : "",
 	}).appendTo("#"+chartDIV);
 	var filter = [];
 	if (option && option.filter) filter = option.filter.replace(' ','').split(',');

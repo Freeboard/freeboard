@@ -387,7 +387,6 @@ function onConnectedHandler(microgearRef) {
             feedviewElement.css({
                 height:currentSettings.height_block+"px",
             });
-            console.log(feedviewElement.height());
         }
 
         this.getHeight = function () {
@@ -400,13 +399,11 @@ function onConnectedHandler(microgearRef) {
         self.onSettingsChanged = function(newSettings) {
             currentSettings = newSettings;
             insertFeedView();
-            console.log(feedviewElement.height());
         }
 
         self.onCalculatedValueChanged = function(settingName, newValue) {
             valuejson = newValue;
             insertFeedView();
-            console.log(feedviewElement.height());
         }
 
         self.onDispose = function() {
@@ -428,7 +425,7 @@ function onConnectedHandler(microgearRef) {
                     multipleaxis : currentSettings.multipleaxis,
                     max:currentSettings.max,
                     min:currentSettings.min,
-                    color:currentSettings.color.split(','),
+                    color:currentSettings.color,
                     type : currentSettings.type, //bar,line,step
                     marker : currentSettings.marker, //true,false
                     filter : currentSettings.filter
