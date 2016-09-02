@@ -252,8 +252,6 @@ function onConnectedHandler(microgearRef) {
 
     }
 
-//--------------------
-
     freeboard.loadWidgetPlugin({
         "type_name"   : "FeedView",
         "display_name": "FeedView",

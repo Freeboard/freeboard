@@ -96,14 +96,10 @@ function updateChart(chartDIV,datajson,option) {
 			show: option.marker?true:false,
 			radius : 2
 		};
-		console.log(option.color);
-		if(option.color.trim()==""){
-			color = DEFAULTCOLOR;
+		if(option.color.replace(' ','').split(',').length!=0&&option.color.replace(' ','').split(',')[0].trim()!=""){
+			color = option.color.replace(' ','').split(',');
 		}
-		else{
-			color = option.color
-		}
-		if (option && option.color) color = option.color.replace(' ','').split(',');
+		else{color=DEFAULTCOLOR}
 	}
 	var width = {"1":"300","2":"620","3":"940"}
 	var curWidth = $("#"+chartDIV).parent().parent().parent().parent().attr('data-sizex');
@@ -130,6 +126,7 @@ function updateChart(chartDIV,datajson,option) {
 	var chartdata = [];
 	if (datajson) {
 		var numcolor = color.length;
+
 		for (var i=0; i<datajson.data.length; i++) {
 			// max = 0;
 
