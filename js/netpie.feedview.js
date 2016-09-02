@@ -16,12 +16,11 @@ function updateChart(chartDIV,datajson,option) {
 	// 	months : 270000,
 	// 	years : 3240000
 	// }
-
 	const DEFAULTCOLOR = ['#d40000','#1569ea','#ffcc00']
 
 	var defaultGraph = {lines:{show:true,steps:false},points:{show:true,radius:2}};
 	var optionGraph = {};
-	var heightGraph = 95;
+	var heightGraph = 85;
 	var yaxes = []
 	var max = 0;
 	var min ;
@@ -42,7 +41,9 @@ function updateChart(chartDIV,datajson,option) {
 				height:"10%",
 				margin:"auto",
 				textAlign : "center",
-				font: '14px/0.8em "proxima-nova", Helvetica, Arial, sans-serif'
+				font: '14px/0.8em "proxima-nova", Helvetica, Arial, sans-serif',
+				color:"black",
+				"font-weight": "bold"
 			}).appendTo("#"+chartDIV);
 		}
 		else{
@@ -54,11 +55,13 @@ function updateChart(chartDIV,datajson,option) {
 				height:"5%",
 				margin:"auto",
 				textAlign : "center",
-				font: '14px/0.8em "proxima-nova", Helvetica, Arial, sans-serif'
+				font: '14px/0.8em "proxima-nova", Helvetica, Arial, sans-serif',
+				color:"black",
+				"font-weight": "bold"
 			}).appendTo("#"+chartDIV);
 		}
-		if(option.xaxis === undefined){
-			// heightGraph = heightGraph + 5;
+		if(option.xaxis === undefined || option.xaxis.trim()==""){
+			heightGraph = heightGraph + 5;
 		}
 		if(option.type !== undefined){
 			if(option.type=="bar"){
@@ -101,23 +104,27 @@ function updateChart(chartDIV,datajson,option) {
 			color = DEFAULTCOLOR;
 		}
 	}
+	var width = {"1":300,"2":620,"3":"940"}
+	var curWidth = $("#"+chartDIV).parent().parent().parent().parent().attr('data-sizex');
+	var widthGraph = width[curWidth]*0.95+"px";
+	var widthDiv = width[curWidth]+"px"; 
 	$("#"+chartDIV).css({
 		'background-color' : "#E5E4E2",
-		height:"100%",
+		width:widthDiv,
 		position:"relative"
 	});
 	$('<div id="'+chartDIV+'_graph" ></div>').css({
-		width: "95%",
+		top:"5px",
+		width: widthGraph,
 		height:heightGraph+"%",
 		margin: "auto",
 		'background-color' : "",
 	}).appendTo("#"+chartDIV);
-	
 	var filter = [];
 	if (option && option.filter) filter = option.filter.replace(' ','').split(',');
 
-console.log(option.filter);
-console.log(filter);
+// console.log(option.filter);
+// console.log(filter);
 
 	var chartdata = [];
 	if (datajson) {
@@ -189,11 +196,19 @@ console.log(filter);
 			}
 		}
 	}
+	$('<div id="'+chartDIV+'_legend"></div>').css({
+		padding: "",
+		top : 0,
+		height:"5%",
+		textAlign : "center",
+		position : "relative",
+		textAlign : "center",
+	}).appendTo("#"+chartDIV);
 	var plot = $.plot("#"+chartDIV+"_graph", chartdata, {
 		legend: {
 			show: true,
 			noColumns: 5,
-			// container: '#'+chartDIV+'_legend',
+			container: '#'+chartDIV+'_legend',
 			labelFormatter : function(label, series) {
 			    return '&nbsp;'+label+'&nbsp;&nbsp;';
 			}
@@ -256,14 +271,14 @@ console.log(filter);
 			plot.highlight(item.series, item.datapoint);
 		}
 	});
-
+	
 	if(option !== undefined) {
 		if(option.xaxis === undefined){
 			option.xaxis = ""
 		}
-		var heightx = "96%";
+		var heightx = "91%";
 		if(heightGraph<=85){
-			heightx = "95%";
+			heightx = "92%";
 		}
 		$('<div id="'+chartDIV+'_x">'+option.xaxis+'</div>').css({
 				width : "100%",
@@ -272,10 +287,15 @@ console.log(filter);
 				position : "absolute",
 				// height:"5%",
 				top:heightx,
-				font: '1em "proxima-nova", Helvetica, Arial, sans-serif'
-		}).insertAfter("#"+chartDIV+"_graph");
+				font: '1em "proxima-nova", Helvetica, Arial, sans-serif',
+				color:"black",
+				"font-weight": "bold"
+		}).insertAfter("#"+chartDIV+"_legend");
 
 		if(option.yaxis !== undefined){
+			// $("#"+chartDIV+"_graph").css({
+			// 	top:"10%"
+			// });
 			$('<div id="'+chartDIV+'_y">'+option.yaxis+'</div>').css({
 				textAlign : "center",
 				'-webkit-transform' : 'rotate(270deg)',
@@ -283,19 +303,21 @@ console.log(filter);
              	'-ms-transform' : 'rotate(270deg)',
              	'transform' : 'rotate(270deg)',
              	position : "absolute",
-             	font: '1em "proxima-nova", Helvetica, Arial, sans-serif'
+             	font: '1em "proxima-nova", Helvetica, Arial, sans-serif',
+             	color:"black",
+				"font-weight": "bold"
 			}).insertBefore("#"+chartDIV+"_graph");
 			var ydivheight = ($("#"+chartDIV).height()/2-$('#'+chartDIV+'_y').height()/2)-1;
-			if($("#"+chartDIV).width()<=665){
+			if($("#"+chartDIV).width()<=300){
 				$('#'+chartDIV+'_y').css({
 					top : ydivheight+"px",
 					left : '-10px'
 				})
 			}
-			else if($("#"+chartDIV).width()<=700){
+			else if($("#"+chartDIV).width()<=620){
 				$('#'+chartDIV+'_y').css({
 					top : ydivheight+"px",
-					left : '-7px'
+					left : '-5px'
 				})
 			}
 			else{
@@ -330,8 +352,17 @@ console.log(filter);
 
    
 	
-	$(window).resize(function(){
-		updateChart(chartDIV,datajson,option);
+	$(function () {
+	    var prevWidth = $('#'+chartDIV).parent().parent().parent().parent().attr('data-sizex');
+	    $('#'+chartDIV).parent().parent().parent().parent().attrchange({
+	        callback: function (e) {
+	            var curWidth = $('#'+chartDIV).parent().parent().parent().parent().attr('data-sizex');       
+	            if (prevWidth !== curWidth) {
+	                prevWidth = curWidth;
+	                updateChart(chartDIV,datajson,option);
+	            }            
+	        }
+	    }).resizable();
 	});
 }
 

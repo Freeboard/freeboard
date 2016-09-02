@@ -378,15 +378,16 @@ function onConnectedHandler(microgearRef) {
         var sizeWidth = {"240":"4","300":"5","360":"6","420":"7","480":"8","540":"9","600":"10"}; 
         self.widgetID = randomString(16);
         var currentSettings = settings;
-        var feedviewElement = feedviewElement = $("<div id=\"chart"+self.widgetID+"\"></div>");
+        var feedviewElement = $("<div id=\"chart"+self.widgetID+"\"></div>");
+        var valuejson ;
 
         self.render = function(containerElement) {            
             currentSettings.height = sizeWidth[currentSettings.height_block];
             $(containerElement).append(feedviewElement);
-
             feedviewElement.css({
                 height:currentSettings.height_block+"px",
             });
+            console.log(feedviewElement.height());
         }
 
         this.getHeight = function () {
@@ -398,32 +399,45 @@ function onConnectedHandler(microgearRef) {
 
         self.onSettingsChanged = function(newSettings) {
             currentSettings = newSettings;
-            currentSettings.height = sizeWidth[currentSettings.height_block];
-            feedviewElement.css({
-                height:currentSettings.height_block+"px",
-            });
+            insertFeedView();
+            console.log(feedviewElement.height());
         }
 
         self.onCalculatedValueChanged = function(settingName, newValue) {
-            var option = {
-                title : currentSettings.title,
-                xaxis : currentSettings.xaxis,
-                yaxis : currentSettings.yaxis,
-                multipleaxis : currentSettings.multipleaxis,
-                max:currentSettings.max,
-                min:currentSettings.min,
-                color:currentSettings.color.split(','),
-                type : currentSettings.type, //bar,line,step
-                marker : currentSettings.marker, //true,false
-                filter : currentSettings.filter
-            }
-            updateChart('chart'+self.widgetID,newValue,option);
+            valuejson = newValue;
+            insertFeedView();
+            console.log(feedviewElement.height());
         }
 
         self.onDispose = function() {
 
         }
 
-        this.onSettingsChanged(settings);        
+        this.onSettingsChanged(settings);  
+
+        function insertFeedView() {
+            currentSettings.height = sizeWidth[currentSettings.height_block];
+            $("#"+'chart'+self.widgetID).css({
+                height:currentSettings.height_block+"px",
+            });
+            if(valuejson!==undefined){
+                var option = {
+                    title : currentSettings.title,
+                    xaxis : currentSettings.xaxis,
+                    yaxis : currentSettings.yaxis,
+                    multipleaxis : currentSettings.multipleaxis,
+                    max:currentSettings.max,
+                    min:currentSettings.min,
+                    color:currentSettings.color.split(','),
+                    type : currentSettings.type, //bar,line,step
+                    marker : currentSettings.marker, //true,false
+                    filter : currentSettings.filter
+                }
+                // jQuery(window).ready(function() {
+                    updateChart('chart'+self.widgetID,valuejson,option);
+                // });
+                
+            } 
+        }      
     }
 }());
