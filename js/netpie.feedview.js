@@ -10,15 +10,7 @@ function insertChart(api,div,option){
 }
 
 function updateChart(chartDIV,datajson,option) {
-		// var barWidth = {
-	// 	minutes : 60,
-	// 	hours : 360,
-	// 	days : 9000,
-	// 	months : 270000,
-	// 	years : 3240000
-	// }
 	const DEFAULTCOLOR = ['#d40000','#1569ea','#ffcc00']
-
 	var defaultGraph = {lines:{show:true,steps:false},points:{show:true,radius:2}};
 	var optionGraph = {};
 	var heightGraph = 85;
@@ -114,6 +106,7 @@ function updateChart(chartDIV,datajson,option) {
 	}
 	var width = {"1":"300","2":"620","3":"940"}
 	var curWidth = $("#"+chartDIV).parent().parent().parent().parent().attr('data-sizex');
+	var curHeight = $("#"+chartDIV).parent().parent().parent().parent().attr('data-sizey');
 	var widthGraph = width[curWidth]*0.95+"px";
 	var widthDiv = width[curWidth]+"px"; 
 	$("#"+chartDIV).css({
@@ -130,41 +123,67 @@ function updateChart(chartDIV,datajson,option) {
 	}).appendTo("#"+chartDIV);
 	var filter = [];
 	if (option && option.filter) filter = option.filter.replace(' ','').split(',');
-
-// console.log(option.filter);
-// console.log(filter);
-	var colori = [];
+	// console.log(option.filter);
+	// console.log(filter.length);
+	var colori = color;
 	var chartdata = [];
+	var count = 0;
 	if (datajson) {
 		var numcolor = color.length;
-		var count = 0;
 		for (var i=0; i<datajson.data.length; i++) {
 			// max = 0;
-			if (filter.length > 0 && filter.indexOf(datajson.data[i].attr) == -1) continue;
-			colori[colori.length] = color[filter.indexOf(datajson.data[i].attr)];
-			var s = {data: [], label: datajson.data[i].attr, points:{symbol:"circle"}}
-			if (count>0)
-				s.yaxis = count+1;
-			else 
-				s.yaxis = 1;
-			var arr = datajson.data[count].values;
-			for (var j=0; j<arr.length; j++) {
-				s.data.push([ arr[j][0], arr[j][1] ]);
-				if(arr[j][1]>max){
-					max = arr[j][1];
+			if (filter.length > 0 && filter.indexOf(datajson.data[i].attr) != -1){
+				if(i>=color.length){
+					colori[colori.length] = color[i%numcolor];
+			   	}
+			   	else{
+			   		colori[colori.length] = color[filter.indexOf(datajson.data[i].attr)];
+			   	}
+				var s = {data: [], label: datajson.data[i].attr, points:{symbol:"circle"}}
+				if (count>0)
+					s.yaxis = count+1;
+				else 
+					s.yaxis = 1;
+				var arr = datajson.data[count].values;
+				for (var j=0; j<arr.length; j++) {
+					s.data.push([ arr[j][0], arr[j][1] ]);
+					if(arr[j][1]>max){
+						max = arr[j][1];
+					}
+					if(min === undefined){
+						min = arr[j][1];
+					}
+					if(arr[j][1]<min){
+						min = arr[j][1];
+					}
 				}
-				if(min === undefined){
-					min = arr[j][1];
-				}
-				if(arr[j][1]<min){
-					min = arr[j][1];
-				}
+				chartdata[filter.indexOf(datajson.data[i].attr)] = s;
 			}
-			chartdata.push(s);
+			else{
+				var s = {data: [], label: datajson.data[i].attr, points:{symbol:"circle"}}
+				if (i>0)
+					s.yaxis = i+1;
+				else 
+					s.yaxis = 1;
+				var arr = datajson.data[i].values;
+				for (var j=0; j<arr.length; j++) {
+					s.data.push([ arr[j][0], arr[j][1] ]);
+					if(arr[j][1]>max){
+						max = arr[j][1];
+					}
+					if(min === undefined){
+						min = arr[j][1];
+					}
+					if(arr[j][1]<min){
+						min = arr[j][1];
+					}
+				}
+				chartdata.push(s);
+				if(i>=color.length){
+					colori[colori.length] = color[i%numcolor];
+			   	}
+			}
 			count = count + 1 ;
-			// if(i>=color.length){
-			// 	color[color.length] = color[i%numcolor];
-		 //   	}
 		}
 	}
 	if(option !== undefined){
@@ -175,9 +194,9 @@ function updateChart(chartDIV,datajson,option) {
 			min = min-5;
 		}
 	}
-	for (var i=0; i<filter.length; i++) {
+	for (var i=0; i<count; i++) {
 		if(option !== undefined && option.multipleaxis !== undefined && option.multipleaxis==false){
-		   	if(i+1 == color.length){
+		   	if(i+1 == colori.length){
 		   		yaxes[yaxes.length] = {	font : {size : 11,style : "",weight : "bold",family : "sans-serif",variant : "small-caps",color : "black"},max:max,min:min};
 		   	}
 		   	else{
@@ -204,12 +223,15 @@ function updateChart(chartDIV,datajson,option) {
 			}
 		}
 	}
+	console.log(heightGraph)
 	$('<div id="'+chartDIV+'_legend"></div>').css({
 		padding: "",
-		top : 0,
+		top : 85+curHeight*0.3+"%",
 		height:"5%",
+		width : "100%",
+		margin:"auto",
 		textAlign : "center",
-		position : "relative",
+		position : "absolute",
 		textAlign : "center",
 	}).appendTo("#"+chartDIV);
 	var plot = $.plot("#"+chartDIV+"_graph", chartdata, {
