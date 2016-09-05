@@ -13,17 +13,18 @@ function updateChart(chartDIV,datajson,option) {
 	const DEFAULTCOLOR = ['#d40000','#1569ea','#ffcc00']
 	var defaultGraph = {lines:{show:true,steps:false},points:{show:true,radius:2}};
 	var optionGraph = {};
-	var heightGraph = 85;
+	var heightGraph = 95;
+	var topLegend = 95;
 	var yaxes = []
-	var max = 0;
-	var min ;
+	var maxY = [];
+	var minY = [];
 	var color;
 	if ($("#"+chartDIV).find("#"+chartDIV+"_graph").length > 0){ 
 		$("#"+chartDIV).empty();
 	}
 	if(option === undefined) {
 	 	optionGraph = defaultGraph;
-	 	heightGraph = heightGraph+5;
+	 	heightGraph = heightGraph;
 	}else{
 		if(option.title){
 			heightGraph = heightGraph - 10;
@@ -44,27 +45,14 @@ function updateChart(chartDIV,datajson,option) {
 				height:"7%",
 				margin:"auto",
 				// textAlign : "center",
-				font: '14px/0.8em "proxima-nova", Helvetica, Arial, sans-serif',
+				font: '16px/1em "proxima-nova", Helvetica, Arial, sans-serif',
 				color:"black",
 				"font-weight": "bold"
 			}).appendTo("#"+chartDIV);
 		}
-		else{
-			// heightGraph = heightGraph - 4;
-			// $('<div id="'+chartDIV+'_header"></div>').css({
-			// 	display : 'inline-block',
-			// 	"vertical-align": 'middle',
-			// 	width : "100%",
-			// 	height:"5%",
-			// 	margin:"auto",
-			// 	textAlign : "center",
-			// 	font: '14px/0.8em "proxima-nova", Helvetica, Arial, sans-serif',
-			// 	color:"black",
-			// 	"font-weight": "bold"
-			// }).appendTo("#"+chartDIV);
-		}
-		if(option.xaxis === undefined || option.xaxis.trim()==""){
-			heightGraph = heightGraph + 5;
+		if(option.xaxis !== undefined && option.xaxis.trim() != ""){
+			heightGraph = heightGraph - 5;
+			topLegend = topLegend - 5;
 		}
 		if(option.type !== undefined){
 			if(option.type=="bar"){
@@ -94,7 +82,6 @@ function updateChart(chartDIV,datajson,option) {
 				steps : false
 			};
 		}
-
 		optionGraph['points'] = {
 			show: option.marker?true:false,
 			radius : 2
@@ -130,103 +117,135 @@ function updateChart(chartDIV,datajson,option) {
 	var count = 0;
 	if (datajson) {
 		var numcolor = color.length;
+		var data = []
 		for (var i=0; i<datajson.data.length; i++) {
-			// max = 0;
-			if (filter.length > 0 && filter.indexOf(datajson.data[i].attr) != -1){
-				if(i>=color.length){
-					colori[colori.length] = color[i%numcolor];
-			   	}
-			   	else{
-			   		colori[colori.length] = color[filter.indexOf(datajson.data[i].attr)];
-			   	}
-				var s = {data: [], label: datajson.data[i].attr, points:{symbol:"circle"}}
-				if (count>0)
-					s.yaxis = count+1;
-				else 
-					s.yaxis = 1;
-				var arr = datajson.data[count].values;
-				for (var j=0; j<arr.length; j++) {
-					s.data.push([ arr[j][0], arr[j][1] ]);
-					if(arr[j][1]>max){
-						max = arr[j][1];
+			data[data.length] = datajson.data[i].attr;
+		}
+		for (var i=0; i<datajson.data.length; i++) {
+			var maxi = 0;
+			var mini = 0;
+			if (filter.length > 0 ){
+				if(filter.indexOf(datajson.data[i].attr) != -1){
+					if(i>=numcolor){
+						colori[colori.length] = color[i%numcolor];
+				   	}
+				   	else{
+				   		colori[data.indexOf(filter[count])] = color[data.indexOf(filter[count])];
+				   	}
+					var s = {data: [], label: datajson.data[data.indexOf(filter[count])].attr, points:{symbol:"circle"}}
+					if (count>0){
+						s.yaxis = count+1;
 					}
-					if(min === undefined){
-						min = arr[j][1];
+					else {
+						s.yaxis = 1;
 					}
-					if(arr[j][1]<min){
-						min = arr[j][1];
+					var arr = datajson.data[data.indexOf(filter[count])].values;
+					for (var j=0; j<arr.length; j++) {
+						s.data.push([ arr[j][0], arr[j][1] ]);
+						if(parseInt(arr[j][1])>maxi){
+							maxY[data.indexOf(filter[count])] = parseInt(arr[j][1]);
+						}
+						if(parseInt(arr[j][1])<mini){
+							minY[data.indexOf(filter[count])] =parseInt(arr[j][1]);
+						}
 					}
+					chartdata[data.indexOf(filter[count])] = s;
+					count = count + 1 ;
 				}
-				chartdata[filter.indexOf(datajson.data[i].attr)] = s;
+				
 			}
 			else{
 				var s = {data: [], label: datajson.data[i].attr, points:{symbol:"circle"}}
-				if (i>0)
+				if (i>0){
 					s.yaxis = i+1;
-				else 
+				}
+				else {
 					s.yaxis = 1;
+				}
 				var arr = datajson.data[i].values;
 				for (var j=0; j<arr.length; j++) {
 					s.data.push([ arr[j][0], arr[j][1] ]);
-					if(arr[j][1]>max){
-						max = arr[j][1];
+					if(parseInt(arr[j][1])>maxi){
+						maxY[i] = parseInt(arr[j][1]);
 					}
-					if(min === undefined){
-						min = arr[j][1];
-					}
-					if(arr[j][1]<min){
-						min = arr[j][1];
+					if(parseInt(arr[j][1])<mini){
+						minY[i] = parseInt(arr[j][1]);
 					}
 				}
 				chartdata.push(s);
 				if(i>=color.length){
 					colori[colori.length] = color[i%numcolor];
 			   	}
+			   	count = count + 1 ;
 			}
-			count = count + 1 ;
+			
 		}
 	}
-	if(option !== undefined){
-		if(option.max === undefined){
-			max = max+5;
-		}
-		if(option.min === undefined){
-			min = min-5;
+	
+	if(filter.length>0){
+		for (var i = 0; i < chartdata.length; i++) {
+			if(chartdata[i]===undefined){
+				chartdata.splice(i,1);
+				maxY.splice(i,1);
+				minY.splice(i,1);
+			}
 		}
 	}
 	for (var i=0; i<count; i++) {
-		if(option !== undefined && option.multipleaxis !== undefined && option.multipleaxis==false){
-		   	if(i+1 == colori.length){
-		   		yaxes[yaxes.length] = {	font : {size : 11,style : "",weight : "bold",family : "sans-serif",variant : "small-caps",color : "black"},max:max,min:min};
+		if(option !== undefined && option.multipleaxis !== undefined && option.multipleaxis!=true){
+		   	if(i+1 == count){
+		   		yaxes[yaxes.length] = {font : {size : 11,style : "",weight : "bold",family : "sans-serif",variant : "small-caps",color : "black"},max:Math.max.apply(Math, maxY),min:Math.min(minY)};
 		   	}
 		   	else{
-		   		yaxes[yaxes.length] = {show:false,max:max,min:min};
+		   		yaxes[yaxes.length] = {show:false,min:mini,max:Math.max.apply(Math, maxY)};
 		   	}
+		   	if(option.yzero){
+				var mini = Math.min.apply(Math, minY)-1;
+				if( mini>0){
+				 	mini=0;
+				}
+				yaxes[yaxes.length-1].min = mini;
+			}
 		}
 		else{
 			yaxes[yaxes.length] = {font : {size:11,style:"",weight:"bold",family:"sans-serif",variant:"small-caps",color : colori[i]}};
-		}
-		if(option !== undefined && option.max !== undefined){
-			if($.isNumeric(option.max)){
-				yaxes[yaxes.length-1].max = option.max;
+			if(count<=1){
+				yaxes[yaxes.length-1].font.color = "black";  
 			}
-			if(option.min === undefined){
-				yaxes[yaxes.length-1].min = min;
-			}
-		}
-		if( option !== undefined && option.min !== undefined){
-			if($.isNumeric(option.min)){
-				yaxes[yaxes.length-1].min = option.min;
-			}
-			if(option.max === undefined){
-				yaxes[yaxes.length-1].max = max;
+			if(option.yzero){
+				var mini = Math.min.apply(Math, minY)-1;
+				if( mini>0){
+				 	mini=0;
+				}
+				yaxes[yaxes.length-1].min = mini;
 			}
 		}
+		
+
+		// if(option !== undefined){
+		// 	if($.isNumeric(option.max)){
+		// 		yaxes[yaxes.length-1].max = option.max;
+		// 	}
+		// 	if(option.min === undefined){
+		// 		yaxes[yaxes.length-1].min = min;
+		// 	}
+		// }
+		// if( option !== undefined && option.min !== undefined){
+		// 	if($.isNumeric(option.min)){
+		// 		yaxes[yaxes.length-1].min = option.min;
+		// 	}
+		// 	if(option.max === undefined){
+		// 		yaxes[yaxes.length-1].max = max;
+		// 	}
+		// }
 	}
-	console.log(heightGraph)
+	if(curHeight-16<0){
+		topLegend =topLegend+(curHeight-16)/2
+	}
+
 	$('<div id="'+chartDIV+'_legend"></div>').css({
 		padding: "",
-		top : 85+curHeight*0.3+"%",
+		top : topLegend+"%",
 		height:"5%",
 		width : "100%",
 		margin:"auto",
@@ -301,30 +320,22 @@ function updateChart(chartDIV,datajson,option) {
 			plot.highlight(item.series, item.datapoint);
 		}
 	});
-	
+
 	if(option !== undefined) {
-		if(option.xaxis === undefined){
-			option.xaxis = ""
-		}
-		else{
+		if(option.xaxis !== undefined && option.xaxis.trim()!=""){
+			var topX = topLegend+5;
 			$('<div id="'+chartDIV+'_x">'+option.xaxis+'</div>').css({
 				width : "100%",
 				margin: "auto",
 				textAlign : "center",
 				position : "absolute",
 				// height:"5%",
-				top:heightx,
+				top: topX+"%",
 				font: '1em "proxima-nova", Helvetica, Arial, sans-serif',
 				color:"black",
 				"font-weight": "bold"
 			}).insertAfter("#"+chartDIV+"_legend");
 		}
-		var heightx = "91%";
-		if(heightGraph<=85){
-			heightx = "92%";
-		}
-		
-
 		if(option.yaxis !== undefined){
 			// $("#"+chartDIV+"_graph").css({
 			// 	top:"10%"
@@ -344,7 +355,7 @@ function updateChart(chartDIV,datajson,option) {
 			if($("#"+chartDIV).width()<=300){
 				$('#'+chartDIV+'_y').css({
 					top : ydivheight+"px",
-					left : '-10px'
+					left : '-7.5px'
 				})
 			}
 			else if($("#"+chartDIV).width()<=620){

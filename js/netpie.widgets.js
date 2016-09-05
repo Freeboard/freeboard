@@ -301,16 +301,9 @@ function onConnectedHandler(microgearRef) {
                 type: "text",
             },
             {
-                name: "ymin",
-                display_name: "y axis min",
-                type: "text",
-                default_value: "auto"
-            },
-            {
-                name: "ymax",
-                display_name: "y yaxis max",
-                type: "text",
-                default_value: "auto"
+                name: "yzero",
+                display_name: "begin at 0",
+                type: "boolean",
             },
             {
                 name: "color",
@@ -421,8 +414,7 @@ function onConnectedHandler(microgearRef) {
                     xaxis : currentSettings.xaxis,
                     yaxis : currentSettings.yaxis,
                     multipleaxis : currentSettings.multipleaxis,
-                    max:currentSettings.max,
-                    min:currentSettings.min,
+                    yzero:currentSettings.yzero,
                     color:currentSettings.color,
                     type : currentSettings.type, //bar,line,step
                     marker : currentSettings.marker, //true,false
