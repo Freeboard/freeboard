@@ -19,6 +19,11 @@ function updateChart(chartDIV,datajson,option) {
 	var maxY = [];
 	var minY = [];
 	var color;
+	var width = {"1":"300","2":"620","3":"940"}
+	var curWidth = $("#"+chartDIV).parent().parent().parent().parent().attr('data-sizex');
+	var curHeight = $("#"+chartDIV).parent().parent().parent().parent().attr('data-sizey');
+	var widthGraph = width[curWidth]*0.95+"px";
+	var widthDiv = width[curWidth]+"px"; 
 	if ($("#"+chartDIV).find("#"+chartDIV+"_graph").length > 0){ 
 		$("#"+chartDIV).empty();
 	}
@@ -49,6 +54,11 @@ function updateChart(chartDIV,datajson,option) {
 				color:"black",
 				"font-weight": "bold"
 			}).appendTo("#"+chartDIV);
+			if(curWidth==3){
+				$('#'+chartDIV+'_header').css({
+					"padding-top": "1%"
+				})
+			}
 		}
 		if(option.xaxis !== undefined && option.xaxis.trim() != ""){
 			heightGraph = heightGraph - 5;
@@ -91,11 +101,6 @@ function updateChart(chartDIV,datajson,option) {
 		}
 		else{color=DEFAULTCOLOR}
 	}
-	var width = {"1":"300","2":"620","3":"940"}
-	var curWidth = $("#"+chartDIV).parent().parent().parent().parent().attr('data-sizex');
-	var curHeight = $("#"+chartDIV).parent().parent().parent().parent().attr('data-sizey');
-	var widthGraph = width[curWidth]*0.95+"px";
-	var widthDiv = width[curWidth]+"px"; 
 	$("#"+chartDIV).css({
 		'background-color' : "#E5E4E2",
 		width:widthDiv,
@@ -258,7 +263,9 @@ function updateChart(chartDIV,datajson,option) {
 	if(curHeight-16<0){
 		topLegend =topLegend+(curHeight-16)/2
 	}
-
+	if(curWidth==3){
+		topLegend = topLegend+1;
+	}
 	$('<div id="'+chartDIV+'_legend"></div>').css({
 		padding: "",
 		top : topLegend+"%",
