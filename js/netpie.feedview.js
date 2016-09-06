@@ -122,8 +122,8 @@ function updateChart(chartDIV,datajson,option) {
 			data[data.length] = datajson.data[i].attr;
 		}
 		for (var i=0; i<datajson.data.length; i++) {
-			var maxi = 0;
-			var mini = 0;
+			var maxi;
+			var mini;
 			if (filter.length > 0 ){
 				if(filter.indexOf(datajson.data[i].attr) != -1){
 					if(i>=numcolor){
@@ -142,11 +142,19 @@ function updateChart(chartDIV,datajson,option) {
 					var arr = datajson.data[data.indexOf(filter[count])].values;
 					for (var j=0; j<arr.length; j++) {
 						s.data.push([ arr[j][0], arr[j][1] ]);
-						if(parseInt(arr[j][1])>maxi){
-							maxY[data.indexOf(filter[count])] = parseInt(arr[j][1]);
+						if(j==0){
+							maxi = arr[j][1];
+							mini = arr[j][1];
+							maxY[data.indexOf(filter[count])] = arr[j][1];
+							minY[data.indexOf(filter[count])] = arr[j][1];
 						}
-						if(parseInt(arr[j][1])<mini){
-							minY[data.indexOf(filter[count])] =parseInt(arr[j][1]);
+						else{
+							if(parseInt(arr[j][1])>maxi){
+								maxY[data.indexOf(filter[count])] = arr[j][1];
+							}
+							if(parseInt(arr[j][1])<mini){
+								minY[data.indexOf(filter[count])] = arr[j][1];
+							}
 						}
 					}
 					chartdata[data.indexOf(filter[count])] = s;
@@ -165,11 +173,19 @@ function updateChart(chartDIV,datajson,option) {
 				var arr = datajson.data[i].values;
 				for (var j=0; j<arr.length; j++) {
 					s.data.push([ arr[j][0], arr[j][1] ]);
-					if(parseInt(arr[j][1])>maxi){
-						maxY[i] = parseInt(arr[j][1]);
+					if(j==0){
+						maxi = arr[j][1];
+						mini = arr[j][1];
+						maxY[data.indexOf(filter[count])] = arr[j][1];
+						minY[data.indexOf(filter[count])] = arr[j][1];
 					}
-					if(parseInt(arr[j][1])<mini){
-						minY[i] = parseInt(arr[j][1]);
+					else{
+						if(parseInt(arr[j][1])>maxi){
+							maxY[data.indexOf(filter[count])] = arr[j][1];
+						}
+						if(parseInt(arr[j][1])<mini){
+							minY[data.indexOf(filter[count])] = arr[j][1];
+						}
 					}
 				}
 				chartdata.push(s);
@@ -193,19 +209,19 @@ function updateChart(chartDIV,datajson,option) {
 	}
 	for (var i=0; i<count; i++) {
 		if(option !== undefined && option.multipleaxis !== undefined && option.multipleaxis!=true){
-		   	if(i+1 == count){
-		   		yaxes[yaxes.length] = {font : {size : 11,style : "",weight : "bold",family : "sans-serif",variant : "small-caps",color : "black"},max:Math.max.apply(Math, maxY),min:Math.min(minY)};
-		   	}
-		   	else{
-		   		yaxes[yaxes.length] = {show:false,min:mini,max:Math.max.apply(Math, maxY)};
-		   	}
-		   	if(option.yzero){
-				var mini = Math.min.apply(Math, minY)-1;
+			var minYi = Math.min.apply(Math, minY)-1;
+			if(option.yzero){
 				if( mini>0){
 				 	mini=0;
 				}
-				yaxes[yaxes.length-1].min = mini;
 			}
+		   	if(i+1 == count){
+		   		yaxes[yaxes.length] = {font : {size : 11,style : "",weight : "bold",family : "sans-serif",variant : "small-caps",color : "black"},max:Math.max.apply(Math, maxY)+1,min:minYi};
+		   	}
+		   	else{
+		   		yaxes[yaxes.length] = {show:false,min:minYi,max:Math.max.apply(Math, maxY)+1};
+		   	}
+		   	
 		}
 		else{
 			yaxes[yaxes.length] = {font : {size:11,style:"",weight:"bold",family:"sans-serif",variant:"small-caps",color : colori[i]}};
