@@ -320,7 +320,8 @@ function onConnectedHandler(microgearRef) {
             {
                 name: "multipleaxis",
                 display_name: "Multiple Axis",
-                type: "boolean"
+                type: "boolean",
+                default_value: true
             },
             {
                 name: "height_block",

@@ -123,46 +123,48 @@ function updateChart(chartDIV,datajson,option) {
 	if (datajson) {
 		var numcolor = color.length;
 		var data = []
-		for (var i=0; i<datajson.data.length; i++) {
-			data[data.length] = datajson.data[i].attr;
-		}
+		// for (var i=0; i<datajson.data.length; i++) {
+		// 	data[data.length] = datajson.data[i].attr;
+		// }
 		for (var i=0; i<datajson.data.length; i++) {
 			var maxi;
 			var mini;
 			if (filter.length > 0 ){
 				if(filter.indexOf(datajson.data[i].attr) != -1){
-					if(i>=numcolor){
-						colori[colori.length] = color[i%numcolor];
-				   	}
-				   	else{
-				   		colori[data.indexOf(filter[count])] = color[data.indexOf(filter[count])];
-				   	}
-					var s = {data: [], label: datajson.data[data.indexOf(filter[count])].attr, points:{symbol:"circle"}}
+					var s = {data: [], label: filter[filter.indexOf(datajson.data[i].attr)], points:{symbol:"circle"}}
 					if (count>0){
 						s.yaxis = count+1;
 					}
 					else {
 						s.yaxis = 1;
 					}
-					var arr = datajson.data[data.indexOf(filter[count])].values;
+					var arr = datajson.data[i].values;
 					for (var j=0; j<arr.length; j++) {
 						s.data.push([ arr[j][0], arr[j][1] ]);
 						if(j==0){
 							maxi = arr[j][1];
 							mini = arr[j][1];
-							maxY[data.indexOf(filter[count])] = arr[j][1];
-							minY[data.indexOf(filter[count])] = arr[j][1];
+							maxY[count] = arr[j][1];
+							minY[count] = arr[j][1];
 						}
 						else{
-							if(parseInt(arr[j][1])>maxi){
-								maxY[data.indexOf(filter[count])] = arr[j][1];
+							if(arr[j][1]>maxi){
+								maxi = arr[j][1];
+								maxY[count] = arr[j][1];
 							}
-							if(parseInt(arr[j][1])<mini){
-								minY[data.indexOf(filter[count])] = arr[j][1];
+							if(arr[j][1]<mini){
+								mini = arr[j][1];
+								minY[count] = arr[j][1];
 							}
 						}
 					}
-					chartdata[data.indexOf(filter[count])] = s;
+					chartdata[count] = s;
+					if(i>numcolor){
+						colori[count] = color[i%numcolor];
+				   	}
+				   	else{
+				   		colori[count] = color[count];
+				   	}
 					count = count + 1 ;
 				}
 				
@@ -181,15 +183,17 @@ function updateChart(chartDIV,datajson,option) {
 					if(j==0){
 						maxi = arr[j][1];
 						mini = arr[j][1];
-						maxY[data.indexOf(filter[count])] = arr[j][1];
-						minY[data.indexOf(filter[count])] = arr[j][1];
+						maxY[count] = arr[j][1];
+						minY[count] = arr[j][1];
 					}
 					else{
 						if(parseInt(arr[j][1])>maxi){
-							maxY[data.indexOf(filter[count])] = arr[j][1];
+							maxi = arr[j][1];
+							maxY[count] = arr[j][1];
 						}
 						if(parseInt(arr[j][1])<mini){
-							minY[data.indexOf(filter[count])] = arr[j][1];
+							mini = arr[j][1];
+							minY[count] = arr[j][1];
 						}
 					}
 				}
@@ -203,21 +207,12 @@ function updateChart(chartDIV,datajson,option) {
 		}
 	}
 	
-	if(filter.length>0){
-		for (var i = 0; i < chartdata.length; i++) {
-			if(chartdata[i]===undefined){
-				chartdata.splice(i,1);
-				maxY.splice(i,1);
-				minY.splice(i,1);
-			}
-		}
-	}
 	for (var i=0; i<count; i++) {
 		if(option !== undefined && option.multipleaxis !== undefined && option.multipleaxis!=true){
-			var minYi = Math.min.apply(Math, minY)-1;
+			var minYi = (Math.min.apply(Math,minY))-1;
 			if(option.yzero){
-				if( mini>0){
-				 	mini=0;
+				if( (Math.min.apply(Math,minY))>0){
+				 	minYi=0;
 				}
 			}
 		   	if(i+1 == count){
@@ -234,11 +229,11 @@ function updateChart(chartDIV,datajson,option) {
 				yaxes[yaxes.length-1].font.color = "black";  
 			}
 			if(option.yzero){
-				var mini = Math.min.apply(Math, minY)-1;
-				if( mini>0){
-				 	mini=0;
+				var minYi = Math.min.apply(Math, minY);
+				if( minYi>0){
+				 	minYi=0;
 				}
-				yaxes[yaxes.length-1].min = mini;
+				yaxes[yaxes.length-1].min = minYi;
 			}
 		}
 		
