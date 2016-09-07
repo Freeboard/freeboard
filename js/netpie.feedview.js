@@ -96,8 +96,8 @@ function updateChart(chartDIV,datajson,option) {
 			show: option.marker?true:false,
 			radius : 2
 		};
-		if(option.color.replace(' ','').split(',').length!=0&&option.color.replace(' ','').split(',')[0].trim()!=""){
-			color = option.color.replace(' ','').split(',');
+		if(option.color.replace(/ /g,'').split(',').length!=0&&option.color.replace(/ /g,'').split(',')[0].trim()!=""){
+			color = option.color.replace(/ /g,'').split(',');
 		}
 		else{color=DEFAULTCOLOR}
 	}
@@ -114,18 +114,18 @@ function updateChart(chartDIV,datajson,option) {
 		// 'background-color' : "",
 	}).appendTo("#"+chartDIV);
 	var filter = [];
-	if (option && option.filter) filter = option.filter.replace(' ','').split(',');
-	// console.log(option.filter);
-	// console.log(filter.length);
+	if (option && option.filter){
+
+		if(option.filter.replace(/ /g,'').split(',').length!=0&&option.filter.replace(/ /g,'').split(',')[0].trim()!=""){
+				filter = option.filter.replace(/ /g,'').split(',');
+		}
+	}
+	// if (option && option.filter) filter = option.filter.replace(' ','').split(',');
 	var colori = color;
 	var chartdata = [];
 	var count = 0;
 	if (datajson) {
 		var numcolor = color.length;
-		var data = []
-		// for (var i=0; i<datajson.data.length; i++) {
-		// 	data[data.length] = datajson.data[i].attr;
-		// }
 		for (var i=0; i<datajson.data.length; i++) {
 			var maxi;
 			var mini;
@@ -159,12 +159,12 @@ function updateChart(chartDIV,datajson,option) {
 						}
 					}
 					chartdata[count] = s;
-					if(i>numcolor){
+					if(i > numcolor){
 						colori[count] = color[i%numcolor];
 				   	}
-				   	else{
-				   		colori[count] = color[count];
-				   	}
+				   	// else{
+				   	// 	colori[count] = color[count];
+				   	// }
 					count = count + 1 ;
 				}
 				
@@ -236,24 +236,6 @@ function updateChart(chartDIV,datajson,option) {
 				yaxes[yaxes.length-1].min = minYi;
 			}
 		}
-		
-
-		// if(option !== undefined){
-		// 	if($.isNumeric(option.max)){
-		// 		yaxes[yaxes.length-1].max = option.max;
-		// 	}
-		// 	if(option.min === undefined){
-		// 		yaxes[yaxes.length-1].min = min;
-		// 	}
-		// }
-		// if( option !== undefined && option.min !== undefined){
-		// 	if($.isNumeric(option.min)){
-		// 		yaxes[yaxes.length-1].min = option.min;
-		// 	}
-		// 	if(option.max === undefined){
-		// 		yaxes[yaxes.length-1].max = max;
-		// 	}
-		// }
 	}
 	if(curHeight-16<0){
 		topLegend =topLegend+(curHeight-16)/2
@@ -320,10 +302,8 @@ function updateChart(chartDIV,datajson,option) {
 			if (item) {
 				var x = item.datapoint[0].toFixed(2),
 					y = item.datapoint[1].toFixed(2);
-				var newDate = new Date();
-				newDate.setTime(x);
-				dateString = newDate.toUTCString();
-				var tooltiptext = dateString+"<br>"+item.series.label+" = "+y;
+				var newDate = new Date(parseInt(x));
+				var tooltiptext = newDate+"<br>"+item.series.label+" = "+y;
 				$("#tooltip").html(tooltiptext)
 					.css({top: item.pageY+5, left: item.pageX+5})
 					.fadeIn(200);
