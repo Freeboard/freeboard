@@ -8,6 +8,9 @@ function insertChart(api,div,option){
 		updateChart(div,datajson,option);
 	});
 }
+function n(n){
+    return n > 9 ? "" + n: "0" + n;
+}
 
 function updateChart(chartDIV,datajson,option) {
 	const DEFAULTCOLOR = ['#d40000','#1569ea','#ffcc00']
@@ -304,9 +307,9 @@ function updateChart(chartDIV,datajson,option) {
 				var x = item.datapoint[0].toFixed(2),
 					y = item.datapoint[1].toFixed(2);
 				var newDate = new Date(parseInt(x));
-				var listDays = [ 'sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat' ];
+				var listDays = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
 				var listMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-				var tooltiptext = listDays[newDate.getDay()]+" "+listMonths[newDate.getMonth()]+" "+newDate.getDate()+" "+newDate.getFullYear()+" "+newDate.getHours()+":"+newDate.getMinutes()+":"+newDate.getMilliseconds()+"<br>"+item.series.label+" = "+y;
+				var tooltiptext = listDays[newDate.getDay()]+" "+listMonths[newDate.getMonth()]+" "+n(newDate.getDate())+" "+newDate.getFullYear()+" "+n(newDate.getHours())+":"+n(newDate.getMinutes())+":"+n(newDate.getSeconds())+"<br>"+item.series.label+" = "+y;
 				$("#tooltip").html(tooltiptext)
 					.css({top: item.pageY+5, left: item.pageX+5})
 					.fadeIn(200);
