@@ -285,13 +285,14 @@ function updateChart(chartDIV,datajson,option) {
 	$("<div id='tooltip'></div>").css({
 		position: "absolute",
 		display: "none",
-		border: "1px solid #fdd",
+		border: "1px solid #ccc",
 		padding: "2px",
 		"background-color": "#fee",
-		opacity: 0.80,
+		opacity: 1,
 		fontFamily:"sans-serif",
 		fontSize:11,
-		fontWeight:"bold"
+		fontWeight:"bold",
+		color:"black"
 	}).appendTo("body");
 	$('#'+chartDIV+'_graph').bind("plothover", function (event, pos, item) {
 		if ($("#enablePosition:checked").length > 0) {
@@ -303,7 +304,9 @@ function updateChart(chartDIV,datajson,option) {
 				var x = item.datapoint[0].toFixed(2),
 					y = item.datapoint[1].toFixed(2);
 				var newDate = new Date(parseInt(x));
-				var tooltiptext = newDate+"<br>"+item.series.label+" = "+y;
+				var listDays = [ 'sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat' ];
+				var listMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+				var tooltiptext = listDays[newDate.getDay()]+" "+listMonths[newDate.getMonth()]+" "+newDate.getDate()+" "+newDate.getFullYear()+" "+newDate.getHours()+":"+newDate.getMinutes()+":"+newDate.getMilliseconds()+"<br>"+item.series.label+" = "+y;
 				$("#tooltip").html(tooltiptext)
 					.css({top: item.pageY+5, left: item.pageX+5})
 					.fadeIn(200);
