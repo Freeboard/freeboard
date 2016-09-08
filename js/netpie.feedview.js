@@ -13,6 +13,8 @@ function n(n){
 }
 
 function updateChart(chartDIV,datajson,option) {
+	//$.loadCSS('css/netpie.plugins.css');
+	//$('head').append('<link rel="stylesheet" type="text/css" href="css/netpie.plugins.css">');
 	const DEFAULTCOLOR = ['#d40000','#1569ea','#ffcc00']
 	var defaultGraph = {lines:{show:true,steps:false},points:{show:true,radius:2}};
 	var optionGraph = {};
@@ -104,11 +106,11 @@ function updateChart(chartDIV,datajson,option) {
 		}
 		else{color=DEFAULTCOLOR}
 	}
-	$("#"+chartDIV).css({
-		'background-color' : "#E5E4E2",
+	$('#'+chartDIV).css({
 		width:widthDiv,
 		position:"relative"
 	});
+	$('#'+chartDIV).addClass('bg-graph');
 	$('<div id="'+chartDIV+'_graph" ></div>').css({
 		// top:"5px",
 		width: widthGraph,
