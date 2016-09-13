@@ -131,20 +131,73 @@ function updateChart(chartDIV,datajson,option) {
 	var count = 0;
 	if (datajson) {
 		var numcolor = color.length;
-		for (var i=0; i<datajson.data.length; i++) {
-			var maxi;
-			var mini;
-			if (filter.length > 0 ){
-				if(filter.indexOf(datajson.data[i].attr) != -1){
-					var s = {data: [], label: filter[filter.indexOf(datajson.data[i].attr)], points:{symbol:"circle"}}
-					if (count>0){
-						s.yaxis = count+1;
+		console.log(datajson)
+		if(datajson.data.length>1){
+			for (var i=0; i<datajson.data.length; i++) {
+				var maxi;
+				var mini;
+				var test = 0;
+				if (filter.length > 0 ){
+					if(filter.indexOf(datajson.data[i].attr) != -1){
+						var s = {data: [], label: filter[filter.indexOf(datajson.data[i].attr)], points:{symbol:"circle"}}
+						if (count>0){
+							s.yaxis = count+1;
+						}
+						else {
+							s.yaxis = 1;
+						}
+						var arr = datajson.data[i].values;
+						for (var j=0; j<arr.length; j++) {
+							if(j>2 && (arr[j][0]-arr[j-1][0])/(arr[j-1][0]-arr[j-2][0])>2){
+								if(arr[j+1][0]!==undefined){
+									if((arr[j][0]-arr[j-1][0])/(arr[j+1][0]-arr[j][0])>2){
+										s.data.push([ arr[j][0], null ]);
+									}
+								}
+							}
+							s.data.push([ arr[j][0], arr[j][1] ]);
+							if(j==0){
+								maxi = arr[j][1];
+								mini = arr[j][1];
+								maxY[count] = arr[j][1];
+								minY[count] = arr[j][1];
+							}
+							else{
+								if(arr[j][1]>maxi){
+									maxi = arr[j][1];
+									maxY[count] = arr[j][1];
+								}
+								if(arr[j][1]<mini){
+									mini = arr[j][1];
+									minY[count] = arr[j][1];
+								}
+							}
+						}
+						chartdata[count] = s;
+						if(i > numcolor){
+							colori[count] = color[i%numcolor];
+					   	}
+						count = count + 1 ;
+					}
+					
+				}
+				else{
+					var s = {data: [], label: datajson.data[i].attr, points:{symbol:"circle"}}
+					if (i>0){
+						s.yaxis = i+1;
 					}
 					else {
 						s.yaxis = 1;
 					}
 					var arr = datajson.data[i].values;
 					for (var j=0; j<arr.length; j++) {
+						if(j>2 && (arr[j][0]-arr[j-1][0])/(arr[j-1][0]-arr[j-2][0])>2){
+							if(arr[j+1][0]!==undefined){
+								if((arr[j][0]-arr[j-1][0])/(arr[j+1][0]-arr[j][0])>2){
+									s.data.push([ arr[j][0], null ]);
+								}
+							}
+						}
 						s.data.push([ arr[j][0], arr[j][1] ]);
 						if(j==0){
 							maxi = arr[j][1];
@@ -153,62 +206,27 @@ function updateChart(chartDIV,datajson,option) {
 							minY[count] = arr[j][1];
 						}
 						else{
-							if(arr[j][1]>maxi){
+							if(parseInt(arr[j][1])>maxi){
 								maxi = arr[j][1];
 								maxY[count] = arr[j][1];
 							}
-							if(arr[j][1]<mini){
+							if(parseInt(arr[j][1])<mini){
 								mini = arr[j][1];
 								minY[count] = arr[j][1];
 							}
 						}
 					}
-					chartdata[count] = s;
-					if(i > numcolor){
-						colori[count] = color[i%numcolor];
+					chartdata.push(s);
+					if(i>=color.length){
+						colori[colori.length] = color[i%numcolor];
 				   	}
-				   	// else{
-				   	// 	colori[count] = color[count];
-				   	// }
-					count = count + 1 ;
+				   	count = count + 1 ;
 				}
 				
 			}
-			else{
-				var s = {data: [], label: datajson.data[i].attr, points:{symbol:"circle"}}
-				if (i>0){
-					s.yaxis = i+1;
-				}
-				else {
-					s.yaxis = 1;
-				}
-				var arr = datajson.data[i].values;
-				for (var j=0; j<arr.length; j++) {
-					s.data.push([ arr[j][0], arr[j][1] ]);
-					if(j==0){
-						maxi = arr[j][1];
-						mini = arr[j][1];
-						maxY[count] = arr[j][1];
-						minY[count] = arr[j][1];
-					}
-					else{
-						if(parseInt(arr[j][1])>maxi){
-							maxi = arr[j][1];
-							maxY[count] = arr[j][1];
-						}
-						if(parseInt(arr[j][1])<mini){
-							mini = arr[j][1];
-							minY[count] = arr[j][1];
-						}
-					}
-				}
-				chartdata.push(s);
-				if(i>=color.length){
-					colori[colori.length] = color[i%numcolor];
-			   	}
-			   	count = count + 1 ;
-			}
-			
+		}
+		else{
+			chartdata = [[]]
 		}
 	}
 	
@@ -258,6 +276,11 @@ function updateChart(chartDIV,datajson,option) {
 		position : "absolute",
 		textAlign : "center",
 	}).appendTo("#"+chartDIV);
+	var datapoints = [
+    	{ x: true, number: true, required: true },
+    	{ y: true, number: true, required: true }
+	]
+	chartdata
 	var plot = $.plot("#"+chartDIV+"_graph", chartdata, {
 		legend: {
 			show: true,
@@ -275,6 +298,7 @@ function updateChart(chartDIV,datajson,option) {
 		yaxes: yaxes,
 		color : colori,
 		xaxis : {
+			insertGaps: true,
 			mode : "time",
 			timezone : "browser",
 			font : {
@@ -4091,8 +4115,27 @@ API.txt for details.
 
 })(jQuery);
 
-
-
-
-
-
+/**
+ * Flot plugin for adding gaps to the line in a line graph when a certain x threashold has been reached.
+ *
+ * Usage:
+ *
+ * To configure this plugin, values must be added to two areas.
+ * 
+ * The first is in the global x-axis options:
+ * xaxis: {
+ *   insertGaps: true,  // enable or disable this plugin
+ *   gapColor: rgba(100,100,100,0.2) // the color to use for gaps - undefined is no indication
+ * }
+ *
+ * The second is in the series object for a set of data.
+ * var series1 = {
+ *   data: [ ... ],
+ *   label: 'Series 1',
+ *   xGapThresh: 300 // A value of 300 here indicates that a x-gap > 300 will insert a gap
+ * }
+ *
+ * Enjoy!
+ *
+ * @author Joel Oughton
+ */
