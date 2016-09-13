@@ -131,7 +131,7 @@ function updateChart(chartDIV,datajson,option) {
 	var count = 0;
 	if (datajson) {
 		var numcolor = color.length;
-		console.log(datajson)
+		// console.log(datajson)
 		if(datajson.data.length>1){
 			for (var i=0; i<datajson.data.length; i++) {
 				var maxi;
@@ -149,7 +149,7 @@ function updateChart(chartDIV,datajson,option) {
 						var arr = datajson.data[i].values;
 						for (var j=0; j<arr.length; j++) {
 							if(j>2 && (arr[j][0]-arr[j-1][0])/(arr[j-1][0]-arr[j-2][0])>2){
-								if(arr[j+1][0]!==undefined){
+								if(arr[j+1]!==undefined){
 									if((arr[j][0]-arr[j-1][0])/(arr[j+1][0]-arr[j][0])>2){
 										s.data.push([ arr[j][0], null ]);
 									}
@@ -179,7 +179,6 @@ function updateChart(chartDIV,datajson,option) {
 					   	}
 						count = count + 1 ;
 					}
-					
 				}
 				else{
 					var s = {data: [], label: datajson.data[i].attr, points:{symbol:"circle"}}
@@ -192,8 +191,8 @@ function updateChart(chartDIV,datajson,option) {
 					var arr = datajson.data[i].values;
 					for (var j=0; j<arr.length; j++) {
 						if(j>2 && (arr[j][0]-arr[j-1][0])/(arr[j-1][0]-arr[j-2][0])>2){
-							if(arr[j+1][0]!==undefined){
-								if((arr[j][0]-arr[j-1][0])/(arr[j+1][0]-arr[j][0])>2){
+							if(arr[j+1]!==undefined){
+								if((arr[j][0]-arr[j-1][0])/(arr[j+1][0]-arr[j][0]) >2){
 									s.data.push([ arr[j][0], null ]);
 								}
 							}
