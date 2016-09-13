@@ -15,7 +15,7 @@ if (typeof dsstore === "undefined") {
     freeboard.loadDatasourcePlugin({
         "type_name"   : "netpie_microgear",
         "display_name": "NETPIE Microgear",
-        "description" : "Connect to NETPIE as a microgear to communicate real-time with other microgears in the same App ID.",
+        "description" : "Connect to NETPIE as a microgear to communicate real-time with other microgears in the same App ID. The microgear of this datasource is referenced by microgear[DATASOURCENAME]",
         "external_scripts" : [
             "https://cdn.netpie.io/microgear.js"
         ],
@@ -44,12 +44,14 @@ if (typeof dsstore === "undefined") {
             },
             {
                 "name"         : "alias",
-                "display_name" : "Device Alias",
+                "display_name" : "Microgear Alias",
                 "type"         : "text", 
                 "description"  : "A nick name of this freeboard that other device can chat to",
                 "type"         : "text",
+                "default_value": "freeboard",
                 "required"     : false
             },
+/*
             {
                 "name"         : "microgearRef",
                 "display_name" : "Microgear Reference",
@@ -58,6 +60,7 @@ if (typeof dsstore === "undefined") {
                 "type"         : "text",
                 "required"     : false
             },
+*/
             {
                 "name"         : "topics",
                 "display_name" : "Subscribed Topics",
@@ -110,6 +113,17 @@ if (typeof dsstore === "undefined") {
         }
 
         self.onSettingsChanged = function(newSettings) {
+            console.log(currentSettings);
+            console.log(newSettings);
+
+            if (currentSettings.name && (currentSettings.name != newSettings.name)) {
+                newSettings.name = newSettings.name.replace(' ','_').substring(0,16);
+
+                if (microgear[currentSettings.name])
+                    delete(microgear[currentSettings.name]);
+                microgear[newSettings.name] = self.mg;
+            }
+
             if (currentSettings.alias != newSettings.alias) {
                 self.mg.setAlias(newSettings.alias);
             }
@@ -119,17 +133,19 @@ if (typeof dsstore === "undefined") {
                 initSubscribe(newSettings.topics.trim().split(','), true);
             }
 
-            if (currentSettings.microgearRef != newSettings.microgearRef) {
-                delete(microgear[currentSettings.microgearRef]);
+            /*
+            if (newSettings.microgearRef && currentSettings.microgearRef && (currentSettings.microgearRef != newSettings.microgearRef)) {
+                if (microgear[currentSettings.microgearRef])
+                    delete(microgear[currentSettings.microgearRef]);
                 microgear[newSettings.microgearRef] = self.mg;
             }
+            */
 
             if (currentSettings.appid != newSettings.appid || currentSettings.key != newSettings.key || currentSettings.secret != newSettings.secret) {
                 freeboard.showDialog("Reconfigure AppID, Key or Secret needs a page reloading. Make sure you save the current configuration before processding.", "Warning", "OK", "CANCEL", function() {
                     location.reload(true);
                 })
             }
-
             currentSettings = newSettings;
         }
 
@@ -139,7 +155,10 @@ if (typeof dsstore === "undefined") {
 
         self.mg = Microgear.create(gconf);
 
-        microgear[settings.microgearRef] = self.mg;
+        //microgear[settings.microgearRef] = self.mg;
+
+        settings.name = settings.name.replace(' ','_').substring(0,16);
+        microgear[settings.name] = self.mg;
 
         self.mg.on('message', function(topic,msg) {
             if (topic && msg) {
@@ -167,7 +186,8 @@ if (typeof dsstore === "undefined") {
             }
 
             if (typeof(onConnectedHandler) != 'undefined') {
-                onConnectedHandler(settings.microgearRef);
+                //onConnectedHandler(settings.microgearRef);
+                onConnectedHandler(settings.name);
             }
         })
 
