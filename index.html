@@ -11,7 +11,6 @@
 		<link href="css/freeboard.min.css" rel="stylesheet" />
 		<script src="js/freeboard.thirdparty.min.js"></script>
 		<script type="text/javascript">
-<<<<<<< HEAD
 			var access_mode = "^am^";
 			if(access_mode == 'web')
 				var libpath = '^site_root^/public/netpieio/freeboard/';
@@ -21,13 +20,6 @@
 			head.js(libpath+"js/freeboard_plugins.min.js",
 					libpath+"js/netpie.plugins.js",
 					libpath+"js/netpie.widgets.js",
-=======
-			head.js("js/freeboard_plugins.min.js",
-					"js/netpie.feedview.js",
-					"js/netpie.plugins.js",
-					"js/netpie.widgets.js",
-
->>>>>>> 7e654fc75ebcdc780db2850eabcb9cfd9eb1edd2
 					// *** Load more plugins here ***
 					function(){
 						$(function()
@@ -87,7 +79,7 @@
 			<div id="admin-bar">
 				<div id="admin-menu">
 					<div id="board-tools">
-						<h1 id="board-logo" class="title bordered"><img class="logo-netpie" valign="middle"> NETPIE Freeboard</h1>
+						<h1 id="board-logo" class="title bordered"><img src="img/netpie-logo.png" valign="middle"> NETPIE Freeboard</h1>
 						<div id="board-actions">
 							<ul class="board-toolbar vertical">
 								<li data-bind="click: loadDashboardFromLocalFile">
