@@ -216,7 +216,7 @@ function FreeboardModel(a, b, c) {
         $.get(f.href, function(data) {
             
           //update flags for save datasource
-          if(data != cur_datasource){
+        	if(data != cur_datasource){
             tmp_datasource = data;
             
             save_mode = save_mode == 'no' ? 'yes' : save_mode;

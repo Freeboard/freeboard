@@ -11,22 +11,57 @@
 		<link href="css/freeboard.min.css" rel="stylesheet" />
 		<script src="js/freeboard.thirdparty.min.js"></script>
 		<script type="text/javascript">
-			head.js("js/freeboard_plugins.min.js",
-					"js/netpie.feedview.js",
-					"js/netpie.plugins.js",
-					"js/netpie.widgets.js",
+			var access_mode = "^am^";
+			if(access_mode == 'web')
+				var libpath = '^site_root^/public/netpieio/freeboard/';
+			else
+				var libpath = '';
+
+			head.js(libpath+"js/freeboard_plugins.min.js",
+					libpath+"js/netpie.feedview.js",
+					libpath+"js/netpie.plugins.js",
+					libpath+"js/netpie.widgets.js",
 
 					// *** Load more plugins here ***
 					function(){
 						$(function()
 						{ //DOM Ready
 							freeboard.initialize(true);
-							var dashboardPattern = window.localStorage.getItem("netpie.freeboard.dashboard");
-							if (dashboardPattern !== null) {
-								dashboardPattern=JSON.parse(dashboardPattern);
-								freeboard.loadDashboard(dashboardPattern, function() {
-									freeboard.setEditing(false);
-								});
+							if(access_mode == 'web'){ 
+								var http = new XMLHttpRequest();
+									
+								var arr = window.location.pathname.split("/");
+								var url = 'https://api.netpie.io/freeboard/'+arr[arr.length-1];
+								var param = "?sesid=^sid^";
+					
+								http.onreadystatechange = function() {
+									if (http.readyState == 4 && http.status == 200) {
+										var dashboardPattern = http.responseText;
+							
+										if (dashboardPattern !== null) {
+											dashboardPattern=JSON.parse(dashboardPattern);
+											freeboard.loadDashboard(dashboardPattern, function() {
+												freeboard.setEditing(false);
+											});
+										}		
+									}
+									else if (http.readyState == 4 && http.status != 200) {
+										window.location.assign("^site_root^/login/fb_"+arr[arr.length-1]);
+									}
+								};
+								
+								http.open("GET", url+param, true );
+								http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+								http.send();
+							}
+							else{
+								var dashboardPattern = window.localStorage.getItem("netpie.freeboard.dashboard");
+								if (dashboardPattern !== null) {
+									dashboardPattern=JSON.parse(dashboardPattern);
+									freeboard.loadDashboard(dashboardPattern, function() {
+										freeboard.setEditing(false);
+									});
+								}
 							}
 						});
 					});
@@ -55,6 +90,10 @@
 								<li data-bind="click: saveDashboard" data-pretty="true">
 									<i class="icon-download-alt icon-white"></i>
 									<label >Export</label>
+								</li>
+								<li data-bind="click: saveDashboardOnly" data-pretty="true">
+									<i class="icon-ok icon-white"></i>
+									<label >Save</label>
 								</li>
 								<li data-bind="click: clearFreeboard">
 									<i class="icon-folder-close icon-white"></i>
@@ -115,6 +154,9 @@
 			<ul data-bind="template: { name: 'pane-template', foreach: panes}">
 			</ul>
 		</div>
+
+		<input type="hidden" name="sid" id="sid" value="^sid^">
+		<input type="hidden" name="am" id="am" value="^am^">
 
 		<script type="text/html" id="pane-template">
 			<li data-bind="pane: true">
