@@ -16,16 +16,17 @@
 				var libpath = '^site_root^/public/netpieio/freeboard/';
 			else
 				var libpath = '';
-				
+
 			head.js(libpath+"js/freeboard_plugins.min.js",
+					libpath+"js/netpie.feedview.js",
 					libpath+"js/netpie.plugins.js",
 					libpath+"js/netpie.widgets.js",
+
 					// *** Load more plugins here ***
 					function(){
 						$(function()
 						{ //DOM Ready
 							freeboard.initialize(true);
-							
 							if(access_mode == 'web'){ 
 								var http = new XMLHttpRequest();
 									
@@ -53,7 +54,7 @@
 								http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
 								http.send();
 							}
-							else{ 
+							else{
 								var dashboardPattern = window.localStorage.getItem("netpie.freeboard.dashboard");
 								if (dashboardPattern !== null) {
 									dashboardPattern=JSON.parse(dashboardPattern);
@@ -79,7 +80,7 @@
 			<div id="admin-bar">
 				<div id="admin-menu">
 					<div id="board-tools">
-						<h1 id="board-logo" class="title bordered"><img src="img/netpie-logo.png" valign="middle"> NETPIE Freeboard</h1>
+						<h1 id="board-logo" class="title bordered"><img class="logo-netpie" valign="middle"> NETPIE Freeboard</h1>
 						<div id="board-actions">
 							<ul class="board-toolbar vertical">
 								<li data-bind="click: loadDashboardFromLocalFile">
@@ -153,7 +154,7 @@
 			<ul data-bind="template: { name: 'pane-template', foreach: panes}">
 			</ul>
 		</div>
-		
+
 		<input type="hidden" name="sid" id="sid" value="^sid^">
 		<input type="hidden" name="am" id="am" value="^am^">
 
