@@ -91,32 +91,33 @@
 /*css netpie theme*/
 
 #admin-bar {
-    background-color: #3C8DBC;
+    background-color: #1E90FF;
 }
 body {
     background-color: #ECF0F5;
     color: #262626;
 }
 #toggle-header {
-    background-color: #3C8DBC;
+    background-color: #1E90FF;
 }
 .gridster .gs_w {
     background: white;
 }
 .gridster header {
-    background-color: #3C8DBC;
+    background-color: #1E90FF;
 }
 .gridster header h1 {
-    color: #262626;
+    color: white;
 }
 .title {
-    color: #262626;
+    color: white;
 }
 .title.bordered {
-    border: solid 3px #262626;
+    border: solid 3px white;
 }
 .board-toolbar li {
     color: #FFCC00;
+    background-color: #1E90FF;
 }
 .text-button {
     color: #FFCC00;
@@ -128,17 +129,17 @@ a:hover.text-button, a:focus.text-button {
     background: rgba(236, 240, 245, 0.6);
 }
 .modal {
-    background-color: #3C8DBC;
+    background-color: #1E90FF;
 }
 .modal header {
-    background-color: #4f98c2;
+    background-color: #3BA9E8;
 }
 
 .modal footer {
-    background-color: #4f98c2;
+    background-color: #3BA9E8;
 }
 .styled-select select {
-    border: 1px solid #4f98c2;
+    border: 1px solid #3BA9E8;
     background: url(../img/dropdown-arrow-black.png) no-repeat right #ECF0F5;
     color: #262626;
 }
@@ -160,7 +161,7 @@ input[type="color"],
 .uneditable-input {
     color: #262626;
     background-color: #ECF0F5;
-    border: 1px solid #4f98c2;
+    border: 1px solid #3BA9E8;
 }
 
 textarea:focus,
@@ -206,7 +207,7 @@ input:-moz-placeholder, textarea:-moz-placeholder {
     color: #307096;
 }
 .board-toolbar li:hover {
-    background-color: rgba( 79, 152, 194, 1.0);
+    background-color: rgba( 59, 169, 232, 1.0);
     -webkit-transition: 250ms linear;
     -moz-transition: 250ms linear;
     -o-transition: 250ms linear;
@@ -216,21 +217,15 @@ input:-moz-placeholder, textarea:-moz-placeholder {
 .setting-description {
     color: #2e2e2e;
 }
-.icon-white {
-    color: black;
-}
 .bg-graph{
     background-color : #fff
-}
-.logo-netpie{
-    content:url("../img/netpie-logo-black.png");
 }
 ul.value-dropdown {
     height: 75px;
     position: absolute;
     padding: 0px;
     margin: 0px;
-    border: 1px solid #4f98c2;
+    border: 1px solid #3BA9E8;
     overflow-x: hidden;
     overflow-y: auto;
     z-index: 3001;
@@ -244,7 +239,7 @@ ul.value-dropdown li {
 }
 
 ul.value-dropdown li.selected {
-    border: 1px solid #4f98c2;
+    border: 1px solid #3BA9E8;
     background-color:#1E90FF;
     color: #262626;
 }
@@ -259,7 +254,7 @@ ul.value-dropdown li.selected {
 }
 
 .onoffswitch-label {
-    border: 1px solid #3C8DBC;
+    border: 1px solid #1E90FF;
 }
 
 
