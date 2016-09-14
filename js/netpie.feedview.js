@@ -131,7 +131,6 @@ function updateChart(chartDIV,datajson,option) {
 	var count = 0;
 	if (datajson) {
 		var numcolor = color.length;
-		// console.log(datajson)
 		if(datajson.data.length>1){
 			for (var i=0; i<datajson.data.length; i++) {
 				var maxi;
@@ -226,6 +225,7 @@ function updateChart(chartDIV,datajson,option) {
 		}
 		else{
 			chartdata = [[]]
+			count = count + 1 ;
 		}
 	}
 	
@@ -275,11 +275,6 @@ function updateChart(chartDIV,datajson,option) {
 		position : "absolute",
 		textAlign : "center",
 	}).appendTo("#"+chartDIV);
-	var datapoints = [
-    	{ x: true, number: true, required: true },
-    	{ y: true, number: true, required: true }
-	]
-	chartdata
 	var plot = $.plot("#"+chartDIV+"_graph", chartdata, {
 		legend: {
 			show: true,
@@ -297,7 +292,6 @@ function updateChart(chartDIV,datajson,option) {
 		yaxes: yaxes,
 		color : colori,
 		xaxis : {
-			insertGaps: true,
 			mode : "time",
 			timezone : "browser",
 			font : {
