@@ -117,7 +117,7 @@ body {
 }
 .board-toolbar li {
     color: #FFCC00;
-    background-color: #1E90FF;
+    /*background-color: #1E90FF;*/
 }
 .text-button {
     color: #FFCC00;
@@ -255,6 +255,10 @@ ul.value-dropdown li.selected {
 
 .onoffswitch-label {
     border: 1px solid #1E90FF;
+}
+.table thead th {
+    font-size: 11.5px;
+    color: white;
 }
 
 
