@@ -113,9 +113,6 @@ if (typeof dsstore === "undefined") {
         }
 
         self.onSettingsChanged = function(newSettings) {
-            console.log(currentSettings);
-            console.log(newSettings);
-
             if (currentSettings.name && (currentSettings.name != newSettings.name)) {
                 newSettings.name = newSettings.name.replace(' ','_').substring(0,16);
 
@@ -339,7 +336,6 @@ if (typeof dsstore === "undefined") {
         var interval = settings.interval;
         var data = {};
 
-
         function reloadhData(s) {
             var apiurl = 'https://api2.netpie.io/feed/'+s.feedid+'?apikey='+s.apikey+'&granularity='+s.granularity_value+s.granularity_unit+'&aggregate='+s.aggregate+'&since='+s.since_value+s.since_unit;
             $.getJSON( apiurl, function(datajson) {
@@ -367,6 +363,9 @@ if (typeof dsstore === "undefined") {
 
         self.onSettingsChanged = function(newSettings) {
             if (currentSettings.name != newSettings.name) {
+                if (dsstore && dsstore[currentSettings.name] && dsstore[currentSettings.name]['timer']) {
+                    clearInterval(dsstore[currentSettings.name]['timer']);
+                }            
                 dsstore[newSettings.name] = dsstore[currentSettings.name];
                 dsstore[currentSettings.name] = null;
                 delete(dsstore[currentSettings.name]);
@@ -382,7 +381,10 @@ if (typeof dsstore === "undefined") {
                 false ) apiChanged = true;
 
             if (apiChanged) {
-                clearInterval(dsstore[newSettings.name]['timer']);
+                if (dsstore && dsstore[newSettings.name] && dsstore[newSettings.name]['timer']) {
+                    clearInterval(dsstore[newSettings.name]['timer']);
+                }            
+
                 dsstore[newSettings.name]['timer'] = setInterval(function() {
                     reloadhData(newSettings);
                 }, newSettings.interval*1000);
