@@ -4,7 +4,7 @@ function insertChart(api,div,option){
 	for (var i = 0; i <= api.data.length - 1; i++) {
 		data[data.length] = api.data[i];
 	}
-	$.getJSON( "https://api2.netpie.io/feed/"+api.name+"?apikey="+api.key+"&granularity="+api.granularity+"&timezone=7&data="+data+"&aggregate="+api.aggregate+"&since="+api.since, function(datajson) { 
+	$.getJSON( "https://api2.netpie.io/feed/"+api.name+"?apikey="+api.key+"&granularity="+api.granularity+"&timezone=7&data="+data+"&aggregate="+api.aggregate+"&since="+api.since, function(datajson) {
 		updateChart(div,datajson,option);
 	});
 }
@@ -28,8 +28,8 @@ function updateChart(chartDIV,datajson,option) {
 	var curWidth = $("#"+chartDIV).parent().parent().parent().parent().attr('data-sizex');
 	var curHeight = $("#"+chartDIV).parent().parent().parent().parent().attr('data-sizey');
 	var widthGraph = width[curWidth]*0.95+"px";
-	var widthDiv = width[curWidth]+"px"; 
-	if ($("#"+chartDIV).find("#"+chartDIV+"_graph").length > 0){ 
+	var widthDiv = width[curWidth]+"px";
+	if ($("#"+chartDIV).find("#"+chartDIV+"_graph").length > 0){
 		$("#"+chartDIV).empty();
 	}
 	if(option === undefined) {
@@ -147,7 +147,99 @@ function updateChart(chartDIV,datajson,option) {
 						}
 						var arr = datajson.data[i].values;
 						for (var j=0; j<arr.length; j++) {
-							if(j>2 && (arr[j][0]-arr[j-1][0])/(arr[j-1][0]-arr[j-2][0])>2){
+							if(j<0){
+								if(datajson.since[1]=="seconds"){
+									if(arr[j+1]!==undefined){
+										var d = new Date();
+										var second = d.getSeconds();
+										d.setSeconds(d.getSeconds() - parseInt(datajson.since[0]));
+										if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
+											if(j==0){
+												s.data.push([ d.getTime(), null ]);
+											}
+											else{
+												s.data.push([ arr[j+1][0], null ]);
+											}
+										}
+									}
+								}
+								else if(datajson.since[1]=="minutes"){
+									if(arr[j+1]!==undefined){
+										var d = new Date();
+										var minute = d.getMinutes();
+										d.setMinutes(d.getMinutes() - parseInt(datajson.since[0]));
+										if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
+											if(j==0){
+												s.data.push([ d.getTime(), null ]);
+											}
+											else{
+												s.data.push([ arr[j+1][0], null ]);
+											}
+										}
+									}
+								}
+								else if(datajson.since[1]=="hours"){
+									if(arr[j+1]!==undefined){
+										var d = new Date();
+										var minute = d.getHours();
+										d.setHours(d.getHours() - parseInt(datajson.since[0]));
+										if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
+											if(j==0){
+												s.data.push([ d.getTime(), null ]);
+											}
+											else{
+												s.data.push([ arr[j+1][0], null ]);
+											}
+										}
+									}
+								}
+								else if(datajson.since[1]=="days"){
+									if(arr[j+1]!==undefined){
+										var d = new Date();
+										var day = d.getDate();
+										d.setDate(d.getDate() - parseInt(datajson.since[0]));
+										if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
+											if(j==0){
+												s.data.push([ d.getTime(), null ]);
+											}
+											else{
+												s.data.push([ arr[j+1][0], null ]);
+											}
+										}
+									}
+								}
+								else if(datajson.since[1]=="months"){
+									if(arr[j+1]!==undefined){
+										var d = new Date();
+										var month = d.getMonth();
+										d.setMonth(d.getMonth() - parseInt(datajson.since[0]));
+										if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
+											if(j==0){
+												s.data.push([ d.getTime(), null ]);
+											}
+											else{
+												s.data.push([ arr[j+1][0], null ]);
+											}
+										}
+									}
+								}
+								else{
+									if(arr[j+1]!==undefined){
+										var d = new Date();
+										var year = d.getFullYear();
+										d.setFullYear(d.getFullYear() - parseInt(datajson.since[0]));
+										if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
+											if(j==0){
+												s.data.push([ d.getTime(), null ]);
+											}
+											else{
+												s.data.push([ arr[j+1][0], null ]);
+											}
+										}
+									}
+								}
+							}
+							if(j>=2 && (arr[j][0]-arr[j-1][0])/(arr[j-1][0]-arr[j-2][0])>2){
 								if(arr[j+1]!==undefined){
 									if((arr[j][0]-arr[j-1][0])/(arr[j+1][0]-arr[j][0])>2){
 										s.data.push([ arr[j][0], null ]);
@@ -189,7 +281,99 @@ function updateChart(chartDIV,datajson,option) {
 					}
 					var arr = datajson.data[i].values;
 					for (var j=0; j<arr.length; j++) {
-						if(j>2 && (arr[j][0]-arr[j-1][0])/(arr[j-1][0]-arr[j-2][0])>2){
+						if(j<2){
+							if(datajson.since[1]=="seconds"){
+								if(arr[j+1]!==undefined){
+									var d = new Date();
+									var second = d.getSeconds();
+									d.setSeconds(d.getSeconds() - parseInt(datajson.since[0]));
+									if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
+										if(j==0){
+											s.data.push([ d.getTime(), null ]);
+										}
+										else{
+											s.data.push([ arr[j+1][0], null ]);
+										}
+									}
+								}
+							}
+							else if(datajson.since[1]=="minutes"){
+								if(arr[j+1]!==undefined){
+									var d = new Date();
+									var minute = d.getMinutes();
+									d.setMinutes(d.getMinutes() - parseInt(datajson.since[0]));
+									if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
+										if(j==0){
+											s.data.push([ d.getTime(), null ]);
+										}
+										else{
+											s.data.push([ arr[j+1][0], null ]);
+										}
+									}
+								}
+							}
+							else if(datajson.since[1]=="hours"){
+								if(arr[j+1]!==undefined){
+									var d = new Date();
+									var minute = d.getHours();
+									d.setHours(d.getHours() - parseInt(datajson.since[0]));
+									if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
+										if(j==0){
+											s.data.push([ d.getTime(), null ]);
+										}
+										else{
+											s.data.push([ arr[j+1][0], null ]);
+										}
+									}
+								}
+							}
+							else if(datajson.since[1]=="days"){
+								if(arr[j+1]!==undefined){
+									var d = new Date();
+									var day = d.getDate();
+									d.setDate(d.getDate() - parseInt(datajson.since[0]));
+									if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
+										if(j==0){
+											s.data.push([ d.getTime(), null ]);
+										}
+										else{
+											s.data.push([ arr[j+1][0], null ]);
+										}
+									}
+								}
+							}
+							else if(datajson.since[1]=="months"){
+								if(arr[j+1]!==undefined){
+									var d = new Date();
+									var month = d.getMonth();
+									d.setMonth(d.getMonth() - parseInt(datajson.since[0]));
+									if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
+										if(j==0){
+											s.data.push([ d.getTime(), null ]);
+										}
+										else{
+											s.data.push([ arr[j+1][0], null ]);
+										}
+									}
+								}
+							}
+							else{
+								if(arr[j+1]!==undefined){
+									var d = new Date();
+									var year = d.getFullYear();
+									d.setFullYear(d.getFullYear() - parseInt(datajson.since[0]));
+									if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
+										if(j==0){
+											s.data.push([ d.getTime(), null ]);
+										}
+										else{
+											s.data.push([ arr[j+1][0], null ]);
+										}
+									}
+								}
+							}
+						}
+						if(j>=2 && (arr[j][0]-arr[j-1][0])/(arr[j-1][0]-arr[j-2][0])>2){
 							if(arr[j+1]!==undefined){
 								if((arr[j][0]-arr[j-1][0])/(arr[j+1][0]-arr[j][0]) >2){
 									s.data.push([ arr[j][0], null ]);
@@ -220,7 +404,7 @@ function updateChart(chartDIV,datajson,option) {
 				   	}
 				   	count = count + 1 ;
 				}
-				
+
 			}
 		}
 		else{
@@ -228,7 +412,7 @@ function updateChart(chartDIV,datajson,option) {
 			count = count + 1 ;
 		}
 	}
-	
+
 	for (var i=0; i<count; i++) {
 		if(option !== undefined && option.multipleaxis !== undefined && option.multipleaxis!=true){
 			var minYi = (Math.min.apply(Math,minY))-1;
@@ -243,12 +427,12 @@ function updateChart(chartDIV,datajson,option) {
 		   	else{
 		   		yaxes[yaxes.length] = {show:false,min:minYi,max:Math.max.apply(Math, maxY)+1};
 		   	}
-		   	
+
 		}
 		else{
 			yaxes[yaxes.length] = {font : {size:11,style:"",weight:"bold",family:"sans-serif",variant:"small-caps",color : colori[i]}};
 			if(count<=1){
-				yaxes[yaxes.length-1].font.color = "black";  
+				yaxes[yaxes.length-1].font.color = "black";
 			}
 			if(option.yzero){
 				var minYi = Math.min.apply(Math, minY);
@@ -418,17 +602,17 @@ function updateChart(chartDIV,datajson,option) {
 	}
 	*/
 
-   
-	
+
+
 	$(function () {
 	    var prevWidth = $('#'+chartDIV).parent().parent().parent().parent().attr('data-sizex');
 	    $('#'+chartDIV).parent().parent().parent().parent().attrchange({
 	        callback: function (e) {
-	            var curWidth = $('#'+chartDIV).parent().parent().parent().parent().attr('data-sizex');       
+	            var curWidth = $('#'+chartDIV).parent().parent().parent().parent().attr('data-sizex');
 	            if (prevWidth !== curWidth) {
 	                prevWidth = curWidth;
 	                updateChart(chartDIV,datajson,option);
-	            }            
+	            }
 	        }
 	    }).resizable();
 	});
@@ -2446,7 +2630,7 @@ Licensed under the MIT license.
                             ctx.lineTo(xrange.to + subPixel, yrange.to);
                         } else {
                             ctx.moveTo(xrange.from, yrange.to + subPixel);
-                            ctx.lineTo(xrange.to, yrange.to + subPixel);                            
+                            ctx.lineTo(xrange.to, yrange.to + subPixel);
                         }
                         ctx.stroke();
                     } else {
@@ -2961,9 +3145,9 @@ Licensed under the MIT license.
                 radius = series.points.radius,
                 symbol = series.points.symbol;
 
-            // If the user sets the line width to 0, we change it to a very 
+            // If the user sets the line width to 0, we change it to a very
             // small value. A line width of 0 seems to force the default of 1.
-            // Doing the conditional here allows the shadow setting to still be 
+            // Doing the conditional here allows the shadow setting to still be
             // optional even with a lineWidth of 0.
 
             if( lw == 0 )
@@ -3663,11 +3847,11 @@ The symbols are accessed as strings through the standard symbol options:
         if (handlers[s])
             series.points.symbol = handlers[s];
     }
-    
+
     function init(plot) {
         plot.hooks.processDatapoints.push(processRawData);
     }
-    
+
     $.plot.plugins.push({
         init: init,
         name: 'symbols',
@@ -3835,7 +4019,7 @@ API.txt for details.
 			return makeUtcWrapper(new Date(ts));
 		}
 	}
-	
+
 	// map of app. size of time units in milliseconds
 
 	var timeUnitSize = {
@@ -3853,9 +4037,9 @@ API.txt for details.
 
 	var baseSpec = [
 		[1, "second"], [2, "second"], [5, "second"], [10, "second"],
-		[30, "second"], 
+		[30, "second"],
 		[1, "minute"], [2, "minute"], [5, "minute"], [10, "minute"],
-		[30, "minute"], 
+		[30, "minute"],
 		[1, "hour"], [2, "hour"], [4, "hour"],
 		[8, "hour"], [12, "hour"],
 		[1, "day"], [2, "day"], [3, "day"],
@@ -4114,7 +4298,7 @@ API.txt for details.
  * Usage:
  *
  * To configure this plugin, values must be added to two areas.
- * 
+ *
  * The first is in the global x-axis options:
  * xaxis: {
  *   insertGaps: true,  // enable or disable this plugin

@@ -62,13 +62,13 @@
     position: absolute; top: 0; bottom: 0;
     right: 66px;
     border: 2px solid #999999; border-radius: 20px;
-    transition: all 0.1s ease-in 0s; 
+    transition: all 0.1s ease-in 0s;
 }
 .netpie-toggle-checkbox:checked + .netpie-toggle-label .netpie-toggle-inner {
     margin-left: 0;
 }
 .netpie-toggle-checkbox:checked + .netpie-toggle-label .netpie-toggle-switch {
-    right: 0px; 
+    right: 0px;
 }
 .netpit-feedvew-header {
     display : inline-block,
@@ -91,20 +91,20 @@
 /*css netpie theme*/
 
 #admin-bar {
-    background-color: #1E90FF;
+    background-color: #007FFF;
 }
 body {
     background-color: #ECF0F5;
     color: #262626;
 }
 #toggle-header {
-    background-color: #1E90FF;
+    background-color: #007FFF;
 }
 .gridster .gs_w {
     background: white;
 }
 .gridster header {
-    background-color: #1E90FF;
+    background-color: #007FFF;
 }
 .gridster header h1 {
     color: white;
@@ -117,7 +117,7 @@ body {
 }
 .board-toolbar li {
     color: #FFCC00;
-    /*background-color: #1E90FF;*/
+    /*background-color: #007FFF;*/
 }
 .text-button {
     color: #FFCC00;
@@ -129,7 +129,7 @@ a:hover.text-button, a:focus.text-button {
     background: rgba(236, 240, 245, 0.6);
 }
 .modal {
-    background-color: #1E90FF;
+    background-color: #007FFF;
 }
 .modal header {
     background-color: #3BA9E8;
@@ -240,7 +240,7 @@ ul.value-dropdown li {
 
 ul.value-dropdown li.selected {
     border: 1px solid #3BA9E8;
-    background-color:#1E90FF;
+    background-color:#007FFF;
     color: #262626;
 }
 .onoffswitch-inner .on {
@@ -254,7 +254,7 @@ ul.value-dropdown li.selected {
 }
 
 .onoffswitch-label {
-    border: 1px solid #1E90FF;
+    border: 1px solid #007FFF;
 }
 .table thead th {
     font-size: 11.5px;
