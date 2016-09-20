@@ -116,14 +116,14 @@ body {
     border: solid 3px white;
 }
 .board-toolbar li {
-    color: #FFCC00;
+    color: #FED33C;
     /*background-color: #007FFF;*/
 }
 .text-button {
-    color: #FFCC00;
+    color: #FED33C;
 }
 a:hover.text-button, a:focus.text-button {
-    color: #FFCC00;
+    color: #FED33C;
 }
 #modal_overlay {
     background: rgba(236, 240, 245, 0.6);

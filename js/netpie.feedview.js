@@ -13,8 +13,7 @@ function n(n){
 }
 
 function updateChart(chartDIV,datajson,option) {
-	//$.loadCSS('css/netpie.plugins.css');
-	//$('head').append('<link rel="stylesheet" type="text/css" href="css/netpie.plugins.css">');
+	var oldgraph = document.getElementById(chartDIV).innerHTML;
 	const DEFAULTCOLOR = ['#d40000','#1569ea','#ffcc00']
 	var defaultGraph = {lines:{show:true,steps:false},points:{show:true,radius:2}};
 	var optionGraph = {};
@@ -32,57 +31,62 @@ function updateChart(chartDIV,datajson,option) {
 	if ($("#"+chartDIV).find("#"+chartDIV+"_graph").length > 0){
 		$("#"+chartDIV).empty();
 	}
-	if(option === undefined) {
-	 	optionGraph = defaultGraph;
-	 	heightGraph = heightGraph;
-	}else{
-		if(option.title){
-			heightGraph = heightGraph - 10;
-			$('<div id="'+chartDIV+'_header">'+option.title+'</div>').css({
-				// display : 'inline-block',
-				// "vertical-align": 'middle',
-				"padding-top": "2%",
-				display: "-webkit-flexbox",
-			    display: "-ms-flexbox",
-			    display: "-webkit-flex",
-			    display: "flex",
-			    "-webkit-flex-align": "center",
-			    "-ms-flex-align": "center",
-			    "-webkit-align-items": "center",
-			    "align-items": "center",
-			    "justify-content": "center",
-				width : "100%",
-				height:"7%",
-				margin:"auto",
-				// textAlign : "center",
-				font: '16px/1em "proxima-nova", Helvetica, Arial, sans-serif',
-				color:"black",
-				"font-weight": "bold"
-			}).appendTo("#"+chartDIV);
-			if(curWidth==3){
-				$('#'+chartDIV+'_header').css({
-					"padding-top": "1%"
-				})
+	try{
+		if(option === undefined) {
+		 	optionGraph = defaultGraph;
+		}else{
+			if(option.title){
+				heightGraph = heightGraph - 10;
+				$('<div id="'+chartDIV+'_header">'+option.title+'</div>').css({
+					"padding-top": "2%",
+					display: "-webkit-flexbox",
+				    display: "-ms-flexbox",
+				    display: "-webkit-flex",
+				    display: "flex",
+				    "-webkit-flex-align": "center",
+				    "-ms-flex-align": "center",
+				    "-webkit-align-items": "center",
+				    "align-items": "center",
+				    "justify-content": "center",
+					width : "100%",
+					height:"7%",
+					margin:"auto",
+					// textAlign : "center",
+					font: '16px/1em "proxima-nova", Helvetica, Arial, sans-serif',
+					color:"black",
+					"font-weight": "bold"
+				}).appendTo("#"+chartDIV);
+				if(curWidth==3){
+					$('#'+chartDIV+'_header').css({
+						"padding-top": "1%"
+					})
+				}
 			}
-		}
-		if(option.xaxis !== undefined && option.xaxis.trim() != ""){
-			heightGraph = heightGraph - 5;
-			topLegend = topLegend - 5;
-		}
-		if(option.type !== undefined){
-			if(option.type=="bar"){
-				delete datajson[datajson.data[0].values[0]];
-				optionGraph['bars'] = {
-					show: true,
-					barWidth: (datajson.data[0].values[1][0]-datajson.data[0].values[0][0])/2,
-					align: "center"
-				};
+			if(option.xaxis !== undefined && option.xaxis.trim() != ""){
+				heightGraph = heightGraph - 5;
+				topLegend = topLegend - 5;
 			}
-			else if(option.type=="step"){
-				optionGraph['lines'] = {
-					show: true,
-					steps : true
-				};
+			if(option.type !== undefined){
+				if(option.type=="bar"){
+					delete datajson[datajson.data[0].values[0]];
+					optionGraph['bars'] = {
+						show: true,
+						barWidth: (datajson.data[0].values[1][0]-datajson.data[0].values[0][0])/2,
+						align: "center"
+					};
+				}
+				else if(option.type=="step"){
+					optionGraph['lines'] = {
+						show: true,
+						steps : true
+					};
+				}
+				else{
+					optionGraph['lines'] = {
+						show: true,
+						steps : false
+					};
+				}
 			}
 			else{
 				optionGraph['lines'] = {
@@ -90,64 +94,189 @@ function updateChart(chartDIV,datajson,option) {
 					steps : false
 				};
 			}
-		}
-		else{
-			optionGraph['lines'] = {
-				show: true,
-				steps : false
+			optionGraph['points'] = {
+				show: option.marker?true:false,
+				radius : 2
 			};
+			if(option.color.replace(/ /g,'').split(',').length!=0&&option.color.replace(/ /g,'').split(',')[0].trim()!=""){
+				color = option.color.replace(/ /g,'').split(',');
+			}
+			else{color=DEFAULTCOLOR}
 		}
-		optionGraph['points'] = {
-			show: option.marker?true:false,
-			radius : 2
-		};
-		if(option.color.replace(/ /g,'').split(',').length!=0&&option.color.replace(/ /g,'').split(',')[0].trim()!=""){
-			color = option.color.replace(/ /g,'').split(',');
+		$('#'+chartDIV).css({
+			width:widthDiv,
+			position:"relative"
+		});
+		$('#'+chartDIV).addClass('bg-graph');
+		$('<div id="'+chartDIV+'_graph" ></div>').css({
+			// top:"5px",
+			width: widthGraph,
+			height:heightGraph+"%",
+			margin: "auto",
+			// 'background-color' : "",
+		}).appendTo("#"+chartDIV);
+		var filter = [];
+		if (option && option.filter){
+			if(option.filter.replace(/ /g,'').split(',').length!=0&&option.filter.replace(/ /g,'').split(',')[0].trim()!=""){
+					filter = option.filter.replace(/ /g,'').split(',');
+			}
 		}
-		else{color=DEFAULTCOLOR}
-	}
-	$('#'+chartDIV).css({
-		width:widthDiv,
-		position:"relative"
-	});
-	$('#'+chartDIV).addClass('bg-graph');
-	$('<div id="'+chartDIV+'_graph" ></div>').css({
-		// top:"5px",
-		width: widthGraph,
-		height:heightGraph+"%",
-		margin: "auto",
-		// 'background-color' : "",
-	}).appendTo("#"+chartDIV);
-	var filter = [];
-	if (option && option.filter){
-
-		if(option.filter.replace(/ /g,'').split(',').length!=0&&option.filter.replace(/ /g,'').split(',')[0].trim()!=""){
-				filter = option.filter.replace(/ /g,'').split(',');
-		}
-	}
-	// if (option && option.filter) filter = option.filter.replace(' ','').split(',');
-	var colori = color;
-	var chartdata = [];
-	var count = 0;
-	if (datajson) {
-		var numcolor = color.length;
-		if(datajson.data.length>1){
-			for (var i=0; i<datajson.data.length; i++) {
-				var maxi;
-				var mini;
-				var test = 0;
-				if (filter.length > 0 ){
-					if(filter.indexOf(datajson.data[i].attr) != -1){
-						var s = {data: [], label: filter[filter.indexOf(datajson.data[i].attr)], points:{symbol:"circle"}}
-						if (count>0){
-							s.yaxis = count+1;
+		var colori = color;
+		var chartdata = [];
+		var count = 0;
+		if (datajson) {
+			var numcolor = color.length;
+			if(datajson.data.length>1){
+				for (var i=0; i<datajson.data.length; i++) {
+					var maxi;
+					var mini;
+					var test = 0;
+					if (filter.length > 0 ){
+						if(filter.indexOf(datajson.data[i].attr) != -1){
+							var s = {data: [], label: filter[filter.indexOf(datajson.data[i].attr)], points:{symbol:"circle"}}
+							if (count>0){
+								s.yaxis = count+1;
+							}
+							else {
+								s.yaxis = 1;
+							}
+							var arr = datajson.data[i].values;
+							for (var j=0; j<arr.length; j++) {
+								if(j<0){
+									if(datajson.since[1]=="seconds"){
+										if(arr[j+1]!==undefined){
+											var d = new Date();
+											var second = d.getSeconds();
+											d.setSeconds(d.getSeconds() - parseInt(datajson.since[0]));
+											if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
+												if(j==0){
+													s.data.push([ d.getTime(), null ]);
+												}
+												else{
+													s.data.push([ arr[j+1][0], null ]);
+												}
+											}
+										}
+									}
+									else if(datajson.since[1]=="minutes"){
+										if(arr[j+1]!==undefined){
+											var d = new Date();
+											var minute = d.getMinutes();
+											d.setMinutes(d.getMinutes() - parseInt(datajson.since[0]));
+											if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
+												if(j==0){
+													s.data.push([ d.getTime(), null ]);
+												}
+												else{
+													s.data.push([ arr[j+1][0], null ]);
+												}
+											}
+										}
+									}
+									else if(datajson.since[1]=="hours"){
+										if(arr[j+1]!==undefined){
+											var d = new Date();
+											var minute = d.getHours();
+											d.setHours(d.getHours() - parseInt(datajson.since[0]));
+											if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
+												if(j==0){
+													s.data.push([ d.getTime(), null ]);
+												}
+												else{
+													s.data.push([ arr[j+1][0], null ]);
+												}
+											}
+										}
+									}
+									else if(datajson.since[1]=="days"){
+										if(arr[j+1]!==undefined){
+											var d = new Date();
+											var day = d.getDate();
+											d.setDate(d.getDate() - parseInt(datajson.since[0]));
+											if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
+												if(j==0){
+													s.data.push([ d.getTime(), null ]);
+												}
+												else{
+													s.data.push([ arr[j+1][0], null ]);
+												}
+											}
+										}
+									}
+									else if(datajson.since[1]=="months"){
+										if(arr[j+1]!==undefined){
+											var d = new Date();
+											var month = d.getMonth();
+											d.setMonth(d.getMonth() - parseInt(datajson.since[0]));
+											if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
+												if(j==0){
+													s.data.push([ d.getTime(), null ]);
+												}
+												else{
+													s.data.push([ arr[j+1][0], null ]);
+												}
+											}
+										}
+									}
+									else{
+										if(arr[j+1]!==undefined){
+											var d = new Date();
+											var year = d.getFullYear();
+											d.setFullYear(d.getFullYear() - parseInt(datajson.since[0]));
+											if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
+												if(j==0){
+													s.data.push([ d.getTime(), null ]);
+												}
+												else{
+													s.data.push([ arr[j+1][0], null ]);
+												}
+											}
+										}
+									}
+								}
+								if(j>=2 && (arr[j][0]-arr[j-1][0])/(arr[j-1][0]-arr[j-2][0])>2){
+									if(arr[j+1]!==undefined){
+										if((arr[j][0]-arr[j-1][0])/(arr[j+1][0]-arr[j][0])>2){
+											s.data.push([ arr[j][0], null ]);
+										}
+									}
+								}
+								s.data.push([ arr[j][0], arr[j][1] ]);
+								if(j==0){
+									maxi = arr[j][1];
+									mini = arr[j][1];
+									maxY[count] = arr[j][1];
+									minY[count] = arr[j][1];
+								}
+								else{
+									if(arr[j][1]>maxi){
+										maxi = arr[j][1];
+										maxY[count] = arr[j][1];
+									}
+									if(arr[j][1]<mini){
+										mini = arr[j][1];
+										minY[count] = arr[j][1];
+									}
+								}
+							}
+							chartdata[count] = s;
+							if(i > numcolor){
+								colori[count] = color[i%numcolor];
+						   	}
+							count = count + 1 ;
+						}
+					}
+					else{
+						var s = {data: [], label: datajson.data[i].attr, points:{symbol:"circle"}}
+						if (i>0){
+							s.yaxis = i+1;
 						}
 						else {
 							s.yaxis = 1;
 						}
 						var arr = datajson.data[i].values;
 						for (var j=0; j<arr.length; j++) {
-							if(j<0){
+							if(j<2){
 								if(datajson.since[1]=="seconds"){
 									if(arr[j+1]!==undefined){
 										var d = new Date();
@@ -241,7 +370,7 @@ function updateChart(chartDIV,datajson,option) {
 							}
 							if(j>=2 && (arr[j][0]-arr[j-1][0])/(arr[j-1][0]-arr[j-2][0])>2){
 								if(arr[j+1]!==undefined){
-									if((arr[j][0]-arr[j-1][0])/(arr[j+1][0]-arr[j][0])>2){
+									if((arr[j][0]-arr[j-1][0])/(arr[j+1][0]-arr[j][0]) >2){
 										s.data.push([ arr[j][0], null ]);
 									}
 								}
@@ -254,355 +383,222 @@ function updateChart(chartDIV,datajson,option) {
 								minY[count] = arr[j][1];
 							}
 							else{
-								if(arr[j][1]>maxi){
+								if(parseInt(arr[j][1])>maxi){
 									maxi = arr[j][1];
 									maxY[count] = arr[j][1];
 								}
-								if(arr[j][1]<mini){
+								if(parseInt(arr[j][1])<mini){
 									mini = arr[j][1];
 									minY[count] = arr[j][1];
 								}
 							}
 						}
-						chartdata[count] = s;
-						if(i > numcolor){
-							colori[count] = color[i%numcolor];
-					   	}
-						count = count + 1 ;
-					}
-				}
-				else{
-					var s = {data: [], label: datajson.data[i].attr, points:{symbol:"circle"}}
-					if (i>0){
-						s.yaxis = i+1;
-					}
-					else {
-						s.yaxis = 1;
-					}
-					var arr = datajson.data[i].values;
-					for (var j=0; j<arr.length; j++) {
-						if(j<2){
-							if(datajson.since[1]=="seconds"){
-								if(arr[j+1]!==undefined){
-									var d = new Date();
-									var second = d.getSeconds();
-									d.setSeconds(d.getSeconds() - parseInt(datajson.since[0]));
-									if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-										if(j==0){
-											s.data.push([ d.getTime(), null ]);
-										}
-										else{
-											s.data.push([ arr[j+1][0], null ]);
-										}
-									}
-								}
-							}
-							else if(datajson.since[1]=="minutes"){
-								if(arr[j+1]!==undefined){
-									var d = new Date();
-									var minute = d.getMinutes();
-									d.setMinutes(d.getMinutes() - parseInt(datajson.since[0]));
-									if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-										if(j==0){
-											s.data.push([ d.getTime(), null ]);
-										}
-										else{
-											s.data.push([ arr[j+1][0], null ]);
-										}
-									}
-								}
-							}
-							else if(datajson.since[1]=="hours"){
-								if(arr[j+1]!==undefined){
-									var d = new Date();
-									var minute = d.getHours();
-									d.setHours(d.getHours() - parseInt(datajson.since[0]));
-									if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-										if(j==0){
-											s.data.push([ d.getTime(), null ]);
-										}
-										else{
-											s.data.push([ arr[j+1][0], null ]);
-										}
-									}
-								}
-							}
-							else if(datajson.since[1]=="days"){
-								if(arr[j+1]!==undefined){
-									var d = new Date();
-									var day = d.getDate();
-									d.setDate(d.getDate() - parseInt(datajson.since[0]));
-									if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-										if(j==0){
-											s.data.push([ d.getTime(), null ]);
-										}
-										else{
-											s.data.push([ arr[j+1][0], null ]);
-										}
-									}
-								}
-							}
-							else if(datajson.since[1]=="months"){
-								if(arr[j+1]!==undefined){
-									var d = new Date();
-									var month = d.getMonth();
-									d.setMonth(d.getMonth() - parseInt(datajson.since[0]));
-									if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-										if(j==0){
-											s.data.push([ d.getTime(), null ]);
-										}
-										else{
-											s.data.push([ arr[j+1][0], null ]);
-										}
-									}
-								}
-							}
-							else{
-								if(arr[j+1]!==undefined){
-									var d = new Date();
-									var year = d.getFullYear();
-									d.setFullYear(d.getFullYear() - parseInt(datajson.since[0]));
-									if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-										if(j==0){
-											s.data.push([ d.getTime(), null ]);
-										}
-										else{
-											s.data.push([ arr[j+1][0], null ]);
-										}
-									}
-								}
-							}
-						}
-						if(j>=2 && (arr[j][0]-arr[j-1][0])/(arr[j-1][0]-arr[j-2][0])>2){
-							if(arr[j+1]!==undefined){
-								if((arr[j][0]-arr[j-1][0])/(arr[j+1][0]-arr[j][0]) >2){
-									s.data.push([ arr[j][0], null ]);
-								}
-							}
-						}
-						s.data.push([ arr[j][0], arr[j][1] ]);
-						if(j==0){
-							maxi = arr[j][1];
-							mini = arr[j][1];
-							maxY[count] = arr[j][1];
-							minY[count] = arr[j][1];
-						}
-						else{
-							if(parseInt(arr[j][1])>maxi){
-								maxi = arr[j][1];
-								maxY[count] = arr[j][1];
-							}
-							if(parseInt(arr[j][1])<mini){
-								mini = arr[j][1];
-								minY[count] = arr[j][1];
-							}
-						}
-					}
-					chartdata.push(s);
-					if(i>=color.length){
-						colori[colori.length] = color[i%numcolor];
+						chartdata.push(s);
+						if(i>=color.length){
+							colori[colori.length] = color[i%numcolor];
 				   	}
 				   	count = count + 1 ;
+					}
 				}
-
-			}
-		}
-		else{
-			chartdata = [[]]
-			count = count + 1 ;
-		}
-	}
-
-	for (var i=0; i<count; i++) {
-		if(option !== undefined && option.multipleaxis !== undefined && option.multipleaxis!=true){
-			var minYi = (Math.min.apply(Math,minY))-1;
-			if(option.yzero){
-				if( (Math.min.apply(Math,minY))>0){
-				 	minYi=0;
-				}
-			}
-		   	if(i+1 == count){
-		   		yaxes[yaxes.length] = {font : {size : 11,style : "",weight : "bold",family : "sans-serif",variant : "small-caps",color : "black"},max:Math.max.apply(Math, maxY)+1,min:minYi};
-		   	}
-		   	else{
-		   		yaxes[yaxes.length] = {show:false,min:minYi,max:Math.max.apply(Math, maxY)+1};
-		   	}
-
-		}
-		else{
-			yaxes[yaxes.length] = {font : {size:11,style:"",weight:"bold",family:"sans-serif",variant:"small-caps",color : colori[i]}};
-			if(count<=1){
-				yaxes[yaxes.length-1].font.color = "black";
-			}
-			if(option.yzero){
-				var minYi = Math.min.apply(Math, minY);
-				if( minYi>0){
-				 	minYi=0;
-				}
-				yaxes[yaxes.length-1].min = minYi;
-			}
-		}
-	}
-	if(curHeight-16<0){
-		topLegend =topLegend+(curHeight-16)/2
-	}
-	if(curWidth==3){
-		topLegend = topLegend+1;
-	}
-	$('<div id="'+chartDIV+'_legend"></div>').css({
-		padding: "",
-		top : topLegend+"%",
-		height:"5%",
-		width : "100%",
-		margin:"auto",
-		textAlign : "center",
-		position : "absolute",
-		textAlign : "center",
-	}).appendTo("#"+chartDIV);
-	var plot = $.plot("#"+chartDIV+"_graph", chartdata, {
-		legend: {
-			show: true,
-			noColumns: 5,
-			container: '#'+chartDIV+'_legend',
-			labelFormatter : function(label, series) {
-			    return '&nbsp;'+label+'&nbsp;&nbsp;';
-			}
-		},
-		series: optionGraph,
-		grid : {
-			hoverable: true,
-			clickable: true
-		},
-		yaxes: yaxes,
-		color : colori,
-		xaxis : {
-			mode : "time",
-			timezone : "browser",
-			font : {
-		      	size : 11,
-		      	style : "",
-		      	weight : "bold",
-		      	family : "sans-serif",
-		      	variant : "small-caps",
-		      	color : "black"
-		   }
-		}
-	});
-	$("<div id='tooltip'></div>").css({
-		position: "absolute",
-		display: "none",
-		border: "1px solid #ccc",
-		padding: "2px",
-		"background-color": "#fee",
-		opacity: 1,
-		fontFamily:"sans-serif",
-		fontSize:11,
-		fontWeight:"bold",
-		color:"black"
-	}).appendTo("body");
-	$('#'+chartDIV+'_graph').bind("plothover", function (event, pos, item) {
-		if ($("#enablePosition:checked").length > 0) {
-			var str = "(" + pos.x.toFixed(2) + ", " + pos.y.toFixed(2) + ")";
-			$("#hoverdata").text(str);
-		}
-		if (true) {
-			if (item) {
-				var x = item.datapoint[0].toFixed(2),
-					y = item.datapoint[1].toFixed(2);
-				var newDate = new Date(parseInt(x));
-				var listDays = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
-				var listMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-				var tooltiptext = listDays[newDate.getDay()]+" "+listMonths[newDate.getMonth()]+" "+n(newDate.getDate())+" "+newDate.getFullYear()+" "+n(newDate.getHours())+":"+n(newDate.getMinutes())+":"+n(newDate.getSeconds())+"<br>"+item.series.label+" = "+y;
-				$("#tooltip").html(tooltiptext)
-					.css({top: item.pageY+5, left: item.pageX+5})
-					.fadeIn(200);
-			} else {
-				$("#tooltip").hide();
-			}
-		}
-	});
-	$('#'+chartDIV+'_graph').bind("plotclick", function (event, pos, item) {
-		if (item) {
-			$("#clickdata").text(" - click point " + item.dataIndex + " in " + item.series.label);
-			plot.highlight(item.series, item.datapoint);
-		}
-	});
-
-	if(option !== undefined) {
-		if(option.xaxis !== undefined && option.xaxis.trim()!=""){
-			var topX = topLegend+5;
-			$('<div id="'+chartDIV+'_x">'+option.xaxis+'</div>').css({
-				width : "100%",
-				margin: "auto",
-				textAlign : "center",
-				position : "absolute",
-				// height:"5%",
-				top: topX+"%",
-				font: '1em "proxima-nova", Helvetica, Arial, sans-serif',
-				color:"black",
-				"font-weight": "bold"
-			}).insertAfter("#"+chartDIV+"_legend");
-		}
-		if(option.yaxis !== undefined){
-			// $("#"+chartDIV+"_graph").css({
-			// 	top:"10%"
-			// });
-			$('<div id="'+chartDIV+'_y">'+option.yaxis+'</div>').css({
-				textAlign : "center",
-				'-webkit-transform' : 'rotate(270deg)',
-             	'-moz-transform' : 'rotate(270deg)',
-             	'-ms-transform' : 'rotate(270deg)',
-             	'transform' : 'rotate(270deg)',
-             	position : "absolute",
-             	font: '1em "proxima-nova", Helvetica, Arial, sans-serif',
-             	color:"black",
-				"font-weight": "bold"
-			}).insertBefore("#"+chartDIV+"_graph");
-			var ydivheight = ($("#"+chartDIV).height()/2-$('#'+chartDIV+'_y').height()/2)-1;
-			if($("#"+chartDIV).width()<=300){
-				$('#'+chartDIV+'_y').css({
-					top : ydivheight+"px",
-					left : '-7.5px'
-				})
-			}
-			else if($("#"+chartDIV).width()<=620){
-				$('#'+chartDIV+'_y').css({
-					top : ydivheight+"px",
-					left : '-5px'
-				})
 			}
 			else{
-				$('#'+chartDIV+'_y').css({
-					top : ydivheight+"px",
-				})
+				chartdata = [[]]
+				count = count + 1 ;
 			}
 		}
 
-	}
+		for (var i=0; i<count; i++) {
+			if(option !== undefined && option.multipleaxis !== undefined && option.multipleaxis!=true){
+				var minYi = (Math.min.apply(Math,minY))-1;
+				if(option.yzero){
+					if( (Math.min.apply(Math,minY))>0){
+					 	minYi=0;
+					}
+				}
+			   	if(i+1 == count){
+			   		yaxes[yaxes.length] = {font : {size : 11,style : "",weight : "bold",family : "sans-serif",variant : "small-caps",color : "black"},max:Math.max.apply(Math, maxY)+1,min:minYi};
+			   	}
+			   	else{
+			   		yaxes[yaxes.length] = {show:false,min:minYi,max:Math.max.apply(Math, maxY)+1};
+			   	}
 
-	/*
-	if(window.location.hostname!="netpie.io"){
-		$("<a id='netpie_logo_link"+chartDIV+"' href='https://netpie.io'><img id='netpie_logo_"+chartDIV+"' src='https://netpie.io/public/netpieio/assets/images/logo/netpie_logo.png' ></img></a>").css({
+			}
+			else{
+				yaxes[yaxes.length] = {font : {size:11,style:"",weight:"bold",family:"sans-serif",variant:"small-caps",color : colori[i]}};
+				if(count<=1){
+					yaxes[yaxes.length-1].font.color = "black";
+				}
+				if(option.yzero){
+					var minYi = Math.min.apply(Math, minY);
+					if( minYi>0){
+					 	minYi=0;
+					}
+					yaxes[yaxes.length-1].min = minYi;
+				}
+			}
+		}
+		if(curHeight-16<0){
+			topLegend =topLegend+(curHeight-16)/2
+		}
+		if(curWidth==3){
+			topLegend = topLegend+1;
+		}
+		$('<div id="'+chartDIV+'_legend"></div>').css({
+			padding: "",
+			top : topLegend+"%",
+			height:"5%",
+			width : "100%",
+			margin:"auto",
+			textAlign : "center",
 			position : "absolute",
-			display : "none"
-		}).appendTo('#'+chartDIV);
-		$("#netpie_logo_"+chartDIV).css({
-			left : "100%",
-			buttom : "0px",
-			height : "4%",
-			display : "block"
+			textAlign : "center",
+		}).appendTo("#"+chartDIV);
+		var plot = $.plot("#"+chartDIV+"_graph", chartdata, {
+			legend: {
+				show: true,
+				noColumns: 5,
+				container: '#'+chartDIV+'_legend',
+				labelFormatter : function(label, series) {
+				    return '&nbsp;'+label+'&nbsp;&nbsp;';
+				}
+			},
+			series: optionGraph,
+			grid : {
+				hoverable: true,
+				clickable: true
+			},
+			yaxes: yaxes,
+			color : colori,
+			xaxis : {
+				mode : "time",
+				timezone : "browser",
+				font : {
+			      	size : 11,
+			      	style : "",
+			      	weight : "bold",
+			      	family : "sans-serif",
+			      	variant : "small-caps",
+			      	color : "black"
+			   }
+			}
 		});
-		var width = $('#'+chartDIV).width()*0.94-($('#netpie_logo_link'+chartDIV).height()*1038/268);
-		var height = $('#'+chartDIV).height()-$('#netpie_logo_link'+chartDIV).height()-$('#'+chartDIV).height()*0.01;
-		$("#netpie_logo_link"+chartDIV).css({
-			left : width+"px",
-			top : height+"px",
-			display : "block"
+		$("<div id='tooltip'></div>").css({
+			position: "absolute",
+			display: "none",
+			border: "1px solid #ccc",
+			padding: "2px",
+			"background-color": "#fee",
+			opacity: 1,
+			fontFamily:"sans-serif",
+			fontSize:11,
+			fontWeight:"bold",
+			color:"black"
+		}).appendTo("body");
+		$('#'+chartDIV+'_graph').bind("plothover", function (event, pos, item) {
+			if ($("#enablePosition:checked").length > 0) {
+				var str = "(" + pos.x.toFixed(2) + ", " + pos.y.toFixed(2) + ")";
+				$("#hoverdata").text(str);
+			}
+			if (true) {
+				if (item) {
+					var x = item.datapoint[0].toFixed(2),
+						y = item.datapoint[1].toFixed(2);
+					var newDate = new Date(parseInt(x));
+					var listDays = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
+					var listMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+					var tooltiptext = listDays[newDate.getDay()]+" "+listMonths[newDate.getMonth()]+" "+n(newDate.getDate())+" "+newDate.getFullYear()+" "+n(newDate.getHours())+":"+n(newDate.getMinutes())+":"+n(newDate.getSeconds())+"<br>"+item.series.label+" = "+y;
+					$("#tooltip").html(tooltiptext)
+						.css({top: item.pageY+5, left: item.pageX+5})
+						.fadeIn(200);
+				} else {
+					$("#tooltip").hide();
+				}
+			}
 		});
+		$('#'+chartDIV+'_graph').bind("plotclick", function (event, pos, item) {
+			if (item) {
+				$("#clickdata").text(" - click point " + item.dataIndex + " in " + item.series.label);
+				plot.highlight(item.series, item.datapoint);
+			}
+		});
+
+		if(option !== undefined) {
+			if(option.xaxis !== undefined && option.xaxis.trim()!=""){
+				var topX = topLegend+5;
+				$('<div id="'+chartDIV+'_x">'+option.xaxis+'</div>').css({
+					width : "100%",
+					margin: "auto",
+					textAlign : "center",
+					position : "absolute",
+					// height:"5%",
+					top: topX+"%",
+					font: '1em "proxima-nova", Helvetica, Arial, sans-serif',
+					color:"black",
+					"font-weight": "bold"
+				}).insertAfter("#"+chartDIV+"_legend");
+			}
+			if(option.yaxis !== undefined){
+				// $("#"+chartDIV+"_graph").css({
+				// 	top:"10%"
+				// });
+				$('<div id="'+chartDIV+'_y">'+option.yaxis+'</div>').css({
+					textAlign : "center",
+					'-webkit-transform' : 'rotate(270deg)',
+	             	'-moz-transform' : 'rotate(270deg)',
+	             	'-ms-transform' : 'rotate(270deg)',
+	             	'transform' : 'rotate(270deg)',
+	             	position : "absolute",
+	             	font: '1em "proxima-nova", Helvetica, Arial, sans-serif',
+	             	color:"black",
+					"font-weight": "bold"
+				}).insertBefore("#"+chartDIV+"_graph");
+				var ydivheight = ($("#"+chartDIV).height()/2-$('#'+chartDIV+'_y').height()/2)-1;
+				if($("#"+chartDIV).width()<=300){
+					$('#'+chartDIV+'_y').css({
+						top : ydivheight+"px",
+						left : '-7.5px'
+					})
+				}
+				else if($("#"+chartDIV).width()<=620){
+					$('#'+chartDIV+'_y').css({
+						top : ydivheight+"px",
+						left : '-5px'
+					})
+				}
+				else{
+					$('#'+chartDIV+'_y').css({
+						top : ydivheight+"px",
+					})
+				}
+			}
+		}
+
+		/*
+		if(window.location.hostname!="netpie.io"){
+			$("<a id='netpie_logo_link"+chartDIV+"' href='https://netpie.io'><img id='netpie_logo_"+chartDIV+"' src='https://netpie.io/public/netpieio/assets/images/logo/netpie_logo.png' ></img></a>").css({
+				position : "absolute",
+				display : "none"
+			}).appendTo('#'+chartDIV);
+			$("#netpie_logo_"+chartDIV).css({
+				left : "100%",
+				buttom : "0px",
+				height : "4%",
+				display : "block"
+			});
+			var width = $('#'+chartDIV).width()*0.94-($('#netpie_logo_link'+chartDIV).height()*1038/268);
+			var height = $('#'+chartDIV).height()-$('#netpie_logo_link'+chartDIV).height()-$('#'+chartDIV).height()*0.01;
+			$("#netpie_logo_link"+chartDIV).css({
+				left : width+"px",
+				top : height+"px",
+				display : "block"
+			});
+		}
+		*/
 	}
-	*/
-
-
+	catch(err) {
+    document.getElementById(chartDIV).innerHTML = oldgraph;
+		console.log(111)
+	}
 
 	$(function () {
 	    var prevWidth = $('#'+chartDIV).parent().parent().parent().parent().attr('data-sizex');

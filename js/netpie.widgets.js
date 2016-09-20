@@ -73,7 +73,7 @@ function onConnectedHandler(microgearRef) {
                 "name"        : "onClick",
                 "display_name": "onClick action",
                 "type"        : "calculated",
-                "description" : "Add some Javascript here. You can chat and publish with a datasource's microgear like this : microgear[\"mygear\"].chat(\"mylamp\",\"ON\"), where \"mygear\" is a microgear reference." 
+                "description" : "Add some Javascript here. You can chat and publish with a datasource's microgear like this : microgear[\"mygear\"].chat(\"mylamp\",\"ON\"), where \"mygear\" is a microgear reference."
             },
             {
                 "name"          : "onCreatedAction",
@@ -99,7 +99,7 @@ function onConnectedHandler(microgearRef) {
 
         globalStore[self.widgetID] = {};
         globalStore[self.widgetID]['onClick'] = settings.onClick;
-     
+
         function updateButtonColor(color) {
             if (bcolor[color]) {
                 buttonElement.css({
@@ -207,7 +207,7 @@ function onConnectedHandler(microgearRef) {
         var currentSettings = settings;
         var toggleElement = $("<div class=\"netpie-toggle\"><input type=\"checkbox\" name=\"toggle\" class=\"netpie-toggle-checkbox\" id=\""+self.widgetID+"\" onClick=\"runCode(globalStore['"+self.widgetID+"'][this.checked?'onaction':'offaction']); if(typeof(globalStore['"+self.widgetID+"']['statesource'])!='undefined' && globalStore['"+self.widgetID+"']['statesource']!='') {this.checked = !this.checked} ; \"><label class=\"netpie-toggle-label\" for=\""+self.widgetID+"\"><span class=\"netpie-toggle-inner\" ontext=\""+(settings.ontext||'')+"\" offtext=\""+(settings.offtext||'')+"\" id=\""+self.widgetID+"_inner\"></span><span class=\"netpie-toggle-switch\"></span></label></div><div class=\"netpie-toggle-text\" id=\""+self.widgetID+"_toggleText\">"+(settings.caption||"")+"</div>");
 
-        globalStore[self.widgetID] = {};    
+        globalStore[self.widgetID] = {};
         globalStore[self.widgetID]['onaction'] = settings.onaction;
         globalStore[self.widgetID]['offaction'] = settings.offaction;
         globalStore[self.widgetID]['statesource'] = settings.state;
@@ -367,13 +367,13 @@ function onConnectedHandler(microgearRef) {
 
     var feedviewWidgetPlugin = function(settings) {
         var self = this;
-        var sizeWidth = {"240":"4","300":"5","360":"6","420":"7","480":"8","540":"9","600":"10"}; 
+        var sizeWidth = {"240":"4","300":"5","360":"6","420":"7","480":"8","540":"9","600":"10"};
         self.widgetID = randomString(16);
         var currentSettings = settings;
         var feedviewElement = $("<div id=\"chart"+self.widgetID+"\"></div>");
         var valuejson ;
 
-        self.render = function(containerElement) {            
+        self.render = function(containerElement) {
             currentSettings.height = sizeWidth[currentSettings.height_block];
             $(containerElement).append(feedviewElement);
             feedviewElement.css({
@@ -402,7 +402,7 @@ function onConnectedHandler(microgearRef) {
 
         }
 
-        this.onSettingsChanged(settings);  
+        this.onSettingsChanged(settings);
 
         function insertFeedView() {
             currentSettings.height = sizeWidth[currentSettings.height_block];
@@ -417,15 +417,15 @@ function onConnectedHandler(microgearRef) {
                     multipleaxis : currentSettings.multipleaxis,
                     yzero:currentSettings.yzero,
                     color:currentSettings.color,
-                    type : currentSettings.type, //bar,line,step
+                    type : currentSettings.type, //line,step
                     marker : currentSettings.marker, //true,false
                     filter : currentSettings.filter
                 }
                 // jQuery(window).ready(function() {
                     updateChart('chart'+self.widgetID,valuejson,option);
                 // });
-                
-            } 
-        }      
+
+            }
+        }
     }
 }());

@@ -11,7 +11,7 @@ if (typeof dsstore === "undefined") {
 }
 
 (function()
-{    
+{
     freeboard.loadDatasourcePlugin({
         "type_name"   : "netpie_microgear",
         "display_name": "NETPIE Microgear",
@@ -30,14 +30,14 @@ if (typeof dsstore === "undefined") {
             {
                 "name"         : "key",
                 "display_name" : "Key",
-                "type"         : "text", 
+                "type"         : "text",
                 "description"  : "Key",
                 "required"     : true
             },
             {
                 "name"        : "secret",
                 "display_name" : "Secret",
-                "type"         : "text", 
+                "type"         : "text",
                 "description"  : "Secret",
                 "type"         : "text",
                 "required"     : true
@@ -45,7 +45,7 @@ if (typeof dsstore === "undefined") {
             {
                 "name"         : "alias",
                 "display_name" : "Microgear Alias",
-                "type"         : "text", 
+                "type"         : "text",
                 "description"  : "A nick name of this freeboard that other device can chat to",
                 "type"         : "text",
                 "default_value": "freeboard",
@@ -55,7 +55,7 @@ if (typeof dsstore === "undefined") {
             {
                 "name"         : "microgearRef",
                 "display_name" : "Microgear Reference",
-                "type"         : "text", 
+                "type"         : "text",
                 "description"  : "Define a reference for a microgear of this datasource. For example if you set this to 'mygear' you can access the microgear object by microgear['mygear']",
                 "type"         : "text",
                 "required"     : false
@@ -64,7 +64,7 @@ if (typeof dsstore === "undefined") {
             {
                 "name"         : "topics",
                 "display_name" : "Subscribed Topics",
-                "type"         : "text", 
+                "type"         : "text",
                 "description"  : "Topics of the messages that this datasource will consume, the default is /# which means all messages in this app ID.",
                 "default_value": "/#",
                 "required"     : false
@@ -74,7 +74,7 @@ if (typeof dsstore === "undefined") {
                 "display_name"  : "onConnected Action",
                 "type"          : "text",
                 "description"   : "JS code to run after a microgear datasource is connected"
-            }            
+            }
 
         ],
 
@@ -196,7 +196,7 @@ if (typeof dsstore === "undefined") {
 
 
 (function()
-{    
+{
     freeboard.loadDatasourcePlugin({
         "type_name"   : "netpie_feed",
         "display_name": "NETPIE Feed",
@@ -215,14 +215,14 @@ if (typeof dsstore === "undefined") {
             {
                 "name"         : "apikey",
                 "display_name" : "API Key",
-                "type"         : "text", 
+                "type"         : "text",
                 //"description"  : "Key",
                 //"required"     : true
             },
             {
                 "name"         : "granularity_value",
                 "display_name" : "Granularity",
-                "type"         : "text", 
+                "type"         : "text",
                 "default_value": "1",
                 "required"     : false,
             },
@@ -277,7 +277,7 @@ if (typeof dsstore === "undefined") {
             {
                 "name"         : "since_value",
                 "display_name" : "Since",
-                "type"         : "text", 
+                "type"         : "text",
                 "default_value": "1",
                 "required"     : false,
             },
@@ -319,7 +319,7 @@ if (typeof dsstore === "undefined") {
                 "type"          : "text",
                 "description"   : "Data reload interval (seconds)",
                 "default_value" : "15"
-            }            
+            }
 
         ],
 
@@ -365,14 +365,14 @@ if (typeof dsstore === "undefined") {
             if (currentSettings.name != newSettings.name) {
                 if (dsstore && dsstore[currentSettings.name] && dsstore[currentSettings.name]['timer']) {
                     clearInterval(dsstore[currentSettings.name]['timer']);
-                }            
+                }
                 dsstore[newSettings.name] = dsstore[currentSettings.name];
                 dsstore[currentSettings.name] = null;
                 delete(dsstore[currentSettings.name]);
             }
 
             if (
-                newSettings.interval != currentSettings.interval || 
+                newSettings.interval != currentSettings.interval ||
                 newSettings.granularity_value != currentSettings.granularity_value ||
                 newSettings.granularity_unit != currentSettings.granularity_unit ||
                 newSettings.since_value != currentSettings.since_value ||
@@ -383,7 +383,7 @@ if (typeof dsstore === "undefined") {
             if (apiChanged) {
                 if (dsstore && dsstore[newSettings.name] && dsstore[newSettings.name]['timer']) {
                     clearInterval(dsstore[newSettings.name]['timer']);
-                }            
+                }
 
                 dsstore[newSettings.name]['timer'] = setInterval(function() {
                     reloadhData(newSettings);
