@@ -6,6 +6,10 @@ if (typeof globalStore === "undefined") {
     globalStore = {};
 }
 
+if (typeof sliderObject == "undefined") {
+    sliderObject = {};
+}
+
 function randomString(length) {
     return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
 }
@@ -248,6 +252,222 @@ function onConnectedHandler(microgearRef) {
                 }
             },200);
         }
-
     }
+
+    /***** Slider *********************************************************************************************/
+
+    freeboard.loadWidgetPlugin({
+        "type_name"   : "Slider",
+        "display_name": "Slider",
+        "description" : "A slider widget that can perform Javascript action.",
+        "fill_size" : false,
+        "settings"  : [
+            {
+                "name"        : "caption",
+                "display_name": "Slider Caption",
+                "type"        : "text"
+            },
+            {
+                "name"        : "color",
+                "display_name": "Button Color",
+                "type"        : "option",
+                "options"     : [
+                    {
+                        "name" : "Red",
+                        "value": "red"
+                    },
+                    {
+                        "name" : "Green",
+                        "value": "green"
+                    },
+                    {
+                        "name" : "Blue",
+                        "value": "blue"
+                    },
+                    {
+                        "name" : "Yellow",
+                        "value": "yellow"
+                    },
+                    {
+                        "name" : "White",
+                        "value": "white"
+                    },
+                    {
+                        "name" : "Grey",
+                        "value": "grey"
+                    }
+
+                ],
+                "default_value" : "grey"
+            },
+            {
+                "name"          : "min",
+                "display_name"  : "Min Value",
+                "type"          : "text",
+                "default_value" : 0
+            },
+            {
+                "name"          : "max",
+                "display_name"  : "Max Value",
+                "type"          : "text",
+                "default_value" : 100
+            },
+            {
+                "name"          : "step",
+                "display_name"  : "Step",
+                "type"          : "text",
+                "default_value" : 1
+            },
+            {
+                "name"        : "onStart",
+                "display_name": "onStart action",
+                "type"        : "calculated",
+                "description" : "Add some Javascript here. You can access to a slider attribute using variables 'value' and 'percent'."
+            },
+            {
+                "name"        : "onStop",
+                "display_name": "onStop action",
+                "type"        : "calculated",
+                "description" : "Add some Javascript here. You can access to a slider attribute using variables 'value' and 'percent'."
+            },
+            {
+                "name"        : "onSlide",
+                "display_name": "onSlide action",
+                "type"        : "calculated",
+                "description" : "Add some Javascript here. You can access to a slider attribute using variables 'value' and 'percent'."
+            },
+            {
+                "name"          : "onCreatedAction",
+                "display_name"  : "onCreated Action",
+                "type"          : "text",
+                "description"   : "JS code to run after a button is created"
+            }
+
+        ],
+        newInstance   : function(settings, newInstanceCallback) {
+            newInstanceCallback(new sliderWidgetPlugin(settings));
+        }
+    });
+
+    var sliderWidgetPlugin = function(settings) {
+        var self = this;
+        var currentSettings = settings;
+
+        self.widgetID = randomString(16);
+
+        var sliderElement = $("<input id=\""+self.widgetID+"\" type=\"range\" min=\"0\" max=\"100\" step=\"1\" value=\"0\" />");
+
+        var textElement = $("<div>"+(settings.caption?settings.caption:"")+"</div>");
+
+        globalStore[self.widgetID] = {};
+
+        globalStore[self.widgetID]['onStart'] = settings.onStart;
+        globalStore[self.widgetID]['onStop'] = settings.onStop;
+        globalStore[self.widgetID]['onSlide'] = settings.onSlide;
+
+        function updateSliderColor(color) {
+            if (bcolor[color]) {
+                if (document.getElementById(self.widgetID)) {
+                    sliderObject[self.widgetID].setFillColor(bcolor[color][1]);
+                    /*
+                    var c = hexToRgb(bcolor[color][1]);
+                    sliderObject[self.widgetID].setBackgroundColor('rgba('+c.r+','+c.g+','+c.b+',0.14)');
+                    */
+                }
+            }
+        }
+
+        self.render = function(containerElement) {
+            $(containerElement).append(textElement).append(sliderElement);
+
+            self.lastSlideCallback = 0;
+            self.nextSlideCallbackTimer = 0;
+            self.maxCallbackDuration = 200;  //ms
+
+            (function () {
+                var elements = document.getElementById(self.widgetID);
+                // Basic rangeSlider initialization
+                sliderObject[self.widgetID] = rangeSlider.create(elements, {
+                    // Callback function
+                    onInit: function () {
+                    },
+
+                    // Callback function
+                    onSlideStart: function (value, percent, position) {
+                        if (globalStore[self.widgetID]['onStart'])
+                            eval('var value='+value+'; var percent='+percent+';'+globalStore[self.widgetID]['onStart']);
+                        //console.info('onSlideStart', 'value: ' + value, 'percent: ' + percent, 'position: ' + position);
+                    },
+
+                    // Callback function
+                    onSlide: function (value, percent, position) {
+                        if (globalStore[self.widgetID]['onSlide']) {
+                            if (Date.now() - self.lastSlideCallback > self.maxCallbackDuration) {
+                                eval('var value='+value+'; var percent='+percent+';'+globalStore[self.widgetID]['onSlide']);
+                                self.lastSlideCallback = Date.now();
+                            }
+                            else {
+                                if (self.nextSlideCallbackTimer==0) {
+                                    self.nextSlideCallbackTimer = setTimeout( function() {
+                                        eval('var value='+value+'; var percent='+percent+';'+globalStore[self.widgetID]['onSlide']);
+                                        self.lastSlideCallback = Date.now();
+                                        self.nextSlideCallbackTimer=0;
+                                    },self.maxCallbackDuration-(Date.now()-self.lastSlideCallback));
+                                }
+                            }
+                        }
+                        //console.log('onSlide', 'value: ' + value, 'percent: ' + percent, 'position: ' + position);
+                    },
+
+                    // Callback function
+                    onSlideEnd: function (value, percent, position) {
+                        if (globalStore[self.widgetID]['onStop'])
+                            eval('var value='+value+'; var percent='+percent+';'+globalStore[self.widgetID]['onStop']);
+                        //console.warn('onSlideEnd', 'value: ' + value, 'percent: ' + percent, 'position: ' + position);
+                    }
+                });
+            })();
+
+            updateSliderColor(settings.color);
+        }
+
+        self.getHeight = function() {
+            return 1;
+        }
+
+        self.onSettingsChanged = function(newSettings) {
+            currentSettings = newSettings;
+            document.getElementById(self.widgetID).value = newSettings.caption;
+            updateSliderColor(newSettings.color);
+            textElement.text(newSettings.caption?newSettings.caption:"");
+
+            globalStore[self.widgetID]['onStart'] = newSettings.onStart;
+            globalStore[self.widgetID]['onStop'] = newSettings.onStop;
+            globalStore[self.widgetID]['onSlide'] = newSettings.onSlide;
+
+            sliderObject[self.widgetID].update({min: Number(newSettings.min||0), max: Number(newSettings.max||100), step: Number(newSettings.step||1), value: sliderObject[self.widgetID].value||0});
+        }
+
+        self.onCalculatedValueChanged = function(settingName, newValue) {
+            if(settingName == "caption") {
+                $(sliderElement).val(newValue);
+            }
+        }
+
+        self.onDispose = function() {
+        }
+
+        if (settings.onCreatedAction) {
+            var timer = setInterval(function() {
+                if (Object.getOwnPropertyNames(microgear).length > 0) {
+                    clearInterval(timer);
+                    eval(settings.onCreatedAction);
+                }
+            },200);
+        }
+    }
+
+
 }());
+
+
