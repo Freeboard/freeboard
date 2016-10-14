@@ -301,6 +301,12 @@ function onConnectedHandler(microgearRef) {
                 "default_value" : "grey"
             },
             {
+                "name"          : "showvalue",
+                "display_name"  : "Display value",
+                "type"          : "boolean",
+                "default_value" : 1
+            },
+            {
                 "name"          : "min",
                 "display_name"  : "Min Value",
                 "type"          : "text",
@@ -325,14 +331,14 @@ function onConnectedHandler(microgearRef) {
                 "description" : "Add some Javascript here. You can access to a slider attribute using variables 'value' and 'percent'."
             },
             {
-                "name"        : "onStop",
-                "display_name": "onStop action",
+                "name"        : "onSlide",
+                "display_name": "onSlide action",
                 "type"        : "calculated",
                 "description" : "Add some Javascript here. You can access to a slider attribute using variables 'value' and 'percent'."
             },
             {
-                "name"        : "onSlide",
-                "display_name": "onSlide action",
+                "name"        : "onStop",
+                "display_name": "onStop action",
                 "type"        : "calculated",
                 "description" : "Add some Javascript here. You can access to a slider attribute using variables 'value' and 'percent'."
             },
@@ -357,7 +363,11 @@ function onConnectedHandler(microgearRef) {
 
         var sliderElement = $("<input id=\""+self.widgetID+"\" type=\"range\" min=\"0\" max=\"100\" step=\"1\" value=\"0\" />");
 
-        var textElement = $("<div>"+(settings.caption?settings.caption:"")+"</div>");
+        var textElement = $("<span style=\"float:left;\">"+(settings.caption?settings.caption:"")+"</span>");
+        var valueElement = $("<span style=\"float:right;\">0</span>");
+
+        if (settings.showvalue) valueElement.show();
+        else valueElement.hide();
 
         globalStore[self.widgetID] = {};
 
@@ -378,7 +388,7 @@ function onConnectedHandler(microgearRef) {
         }
 
         self.render = function(containerElement) {
-            $(containerElement).append(textElement).append(sliderElement);
+            $(containerElement).append(textElement).append(valueElement).append(sliderElement);
 
             self.lastSlideCallback = 0;
             self.nextSlideCallbackTimer = 0;
@@ -394,6 +404,7 @@ function onConnectedHandler(microgearRef) {
 
                     // Callback function
                     onSlideStart: function (value, percent, position) {
+                        valueElement.text(value);
                         if (globalStore[self.widgetID]['onStart'])
                             eval('var value='+value+'; var percent='+percent+';'+globalStore[self.widgetID]['onStart']);
                         //console.info('onSlideStart', 'value: ' + value, 'percent: ' + percent, 'position: ' + position);
@@ -401,6 +412,8 @@ function onConnectedHandler(microgearRef) {
 
                     // Callback function
                     onSlide: function (value, percent, position) {
+                        valueElement.text(value);
+                        console.log('-->'+value);
                         if (globalStore[self.widgetID]['onSlide']) {
                             if (Date.now() - self.lastSlideCallback > self.maxCallbackDuration) {
                                 eval('var value='+value+'; var percent='+percent+';'+globalStore[self.widgetID]['onSlide']);
@@ -421,6 +434,7 @@ function onConnectedHandler(microgearRef) {
 
                     // Callback function
                     onSlideEnd: function (value, percent, position) {
+                        valueElement.text(value);
                         if (globalStore[self.widgetID]['onStop'])
                             eval('var value='+value+'; var percent='+percent+';'+globalStore[self.widgetID]['onStop']);
                         //console.warn('onSlideEnd', 'value: ' + value, 'percent: ' + percent, 'position: ' + position);
@@ -441,11 +455,20 @@ function onConnectedHandler(microgearRef) {
             updateSliderColor(newSettings.color);
             textElement.text(newSettings.caption?newSettings.caption:"");
 
+            if (newSettings.showvalue) valueElement.show();
+            else valueElement.hide();
+
             globalStore[self.widgetID]['onStart'] = newSettings.onStart;
             globalStore[self.widgetID]['onStop'] = newSettings.onStop;
             globalStore[self.widgetID]['onSlide'] = newSettings.onSlide;
 
-            sliderObject[self.widgetID].update({min: Number(newSettings.min||0), max: Number(newSettings.max||100), step: Number(newSettings.step||1), value: sliderObject[self.widgetID].value||0});
+            var oldvalue = sliderObject[self.widgetID].value;
+
+            /* have to update in 2 steps */
+            sliderObject[self.widgetID].update({min: Number(newSettings.min||0), max: Number(newSettings.max||100), step: Number(newSettings.step||1)});
+            sliderObject[self.widgetID].update({value: oldvalue});
+
+            valueElement.text(oldvalue);
         }
 
         self.onCalculatedValueChanged = function(settingName, newValue) {
