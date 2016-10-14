@@ -325,6 +325,11 @@ function onConnectedHandler(microgearRef) {
                 "default_value" : 1
             },
             {
+                "name"          : "value",
+                "display_name"  : "Value",
+                "type"          : "calculated",
+            },
+            {
                 "name"        : "onStart",
                 "display_name": "onStart action",
                 "type"        : "calculated",
@@ -413,7 +418,6 @@ function onConnectedHandler(microgearRef) {
                     // Callback function
                     onSlide: function (value, percent, position) {
                         valueElement.text(value);
-                        console.log('-->'+value);
                         if (globalStore[self.widgetID]['onSlide']) {
                             if (Date.now() - self.lastSlideCallback > self.maxCallbackDuration) {
                                 eval('var value='+value+'; var percent='+percent+';'+globalStore[self.widgetID]['onSlide']);
@@ -472,8 +476,9 @@ function onConnectedHandler(microgearRef) {
         }
 
         self.onCalculatedValueChanged = function(settingName, newValue) {
-            if(settingName == "caption") {
-                $(sliderElement).val(newValue);
+            if(settingName == "value") {
+                sliderObject[self.widgetID].update({value: newValue});
+                valueElement.text(sliderObject[self.widgetID].value);
             }
         }
 
