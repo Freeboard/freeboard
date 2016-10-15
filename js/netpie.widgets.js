@@ -125,7 +125,6 @@ function onConnectedHandler(microgearRef) {
 
         self.onSettingsChanged = function(newSettings) {
             currentSettings = newSettings;
-//            document.getElementById(self.widgetID).value = newSettings.caption;
             updateButtonColor(newSettings.color);
             textElement.text(newSettings.text?newSettings.text:"");
             globalStore[self.widgetID]['onClick'] = newSettings.onClick;
@@ -453,11 +452,16 @@ function onConnectedHandler(microgearRef) {
                         if (globalStore[self.widgetID]['onStop'])
                             eval('var value='+value+'; var percent='+percent+';'+globalStore[self.widgetID]['onStop']);
 
-                        if (self.linkAutoValue) {
-                            sliderObject[self.widgetID].update({value: self.autoValue});
-                            valueElement.text(sliderObject[self.widgetID].value);
-                        }
-                        self.controlling = false;
+                            if (self.linkAutoValue) {
+                                setTimeout(function() {
+                                    sliderObject[self.widgetID].update({value: self.autoValue});
+                                    valueElement.text(sliderObject[self.widgetID].value);
+                                    self.controlling = false;
+                                },500);
+                            }
+                            else {
+                                self.controlling = false;
+                            }
                     }
                 });
             })();
@@ -471,7 +475,6 @@ function onConnectedHandler(microgearRef) {
 
         self.onSettingsChanged = function(newSettings) {
             currentSettings = newSettings;
-//            document.getElementById(self.widgetID).value = newSettings.caption;
             updateSliderColor(newSettings.color);
             textElement.text(newSettings.caption?newSettings.caption:"");
 
@@ -499,7 +502,6 @@ function onConnectedHandler(microgearRef) {
 
         self.onCalculatedValueChanged = function(settingName, newValue) {
             if(settingName == "autovaluesource") {
-
                 if (self.controlling) {
                     self.autoValue = newValue;
                 }
