@@ -491,7 +491,7 @@ function onConnectedHandler(microgearRef) {
             sliderObject[self.widgetID].update({min: Number(newSettings.min||0), max: Number(newSettings.max||100), step: Number(newSettings.step||1)});
             sliderObject[self.widgetID].update({value: oldvalue});
 
-            valueElement.text(oldvalue);
+            valueElement.text(sliderObject[self.widgetID].value);
 
             self.linkAutoValue = (newSettings.autovaluesource && newSettings.autovaluesource.length > 0);
             if (self.linkAutoValue) {
