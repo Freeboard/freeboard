@@ -125,7 +125,7 @@ function onConnectedHandler(microgearRef) {
 
         self.onSettingsChanged = function(newSettings) {
             currentSettings = newSettings;
-            document.getElementById(self.widgetID).value = newSettings.caption;
+//            document.getElementById(self.widgetID).value = newSettings.caption;
             updateButtonColor(newSettings.color);
             textElement.text(newSettings.text?newSettings.text:"");
             globalStore[self.widgetID]['onClick'] = newSettings.onClick;
@@ -325,10 +325,16 @@ function onConnectedHandler(microgearRef) {
                 "default_value" : 1
             },
             {
-                "name"          : "value",
-                "display_name"  : "Value",
+                "name"          : "initialvalue",
+                "display_name"  : "Initial Value",
+                "type"          : "text",
+                "default_value" : "0"
+            },                      
+            {
+                "name"          : "autovaluesource",
+                "display_name"  : "Auto Updated Value",
                 "type"          : "calculated",
-            },
+            },                      
             {
                 "name"        : "onStart",
                 "display_name": "onStart action",
@@ -366,13 +372,16 @@ function onConnectedHandler(microgearRef) {
 
         self.widgetID = randomString(16);
 
-        var sliderElement = $("<input id=\""+self.widgetID+"\" type=\"range\" min=\"0\" max=\"100\" step=\"1\" value=\"0\" />");
+        var sliderElement = $("<input id=\""+self.widgetID+"\" type=\"range\" min=\""+settings.min+"\" max=\""+settings.max+"\" step=\""+settings.step+"\" value=\""+(settings.initialvalue || 0)+"\" />");
+        self.autoValue = 0;
 
         var textElement = $("<span style=\"float:left;\">"+(settings.caption?settings.caption:"")+"</span>");
-        var valueElement = $("<span style=\"float:right;\">0</span>");
+        var valueElement = $("<span style=\"float:right;\">"+(settings.initialvalue || 0)+"</span>");
 
         if (settings.showvalue) valueElement.show();
         else valueElement.hide();
+
+        self.linkAutoValue = (settings.autovaluesource && settings.autovaluesource.length > 0);
 
         globalStore[self.widgetID] = {};
 
@@ -405,10 +414,12 @@ function onConnectedHandler(microgearRef) {
                 sliderObject[self.widgetID] = rangeSlider.create(elements, {
                     // Callback function
                     onInit: function () {
+                        self.controlling = false;
                     },
 
                     // Callback function
                     onSlideStart: function (value, percent, position) {
+                        self.controlling = true;
                         valueElement.text(value);
                         if (globalStore[self.widgetID]['onStart'])
                             eval('var value='+value+'; var percent='+percent+';'+globalStore[self.widgetID]['onStart']);
@@ -417,6 +428,7 @@ function onConnectedHandler(microgearRef) {
 
                     // Callback function
                     onSlide: function (value, percent, position) {
+                        self.controlling = true;
                         valueElement.text(value);
                         if (globalStore[self.widgetID]['onSlide']) {
                             if (Date.now() - self.lastSlideCallback > self.maxCallbackDuration) {
@@ -433,7 +445,6 @@ function onConnectedHandler(microgearRef) {
                                 }
                             }
                         }
-                        //console.log('onSlide', 'value: ' + value, 'percent: ' + percent, 'position: ' + position);
                     },
 
                     // Callback function
@@ -441,7 +452,12 @@ function onConnectedHandler(microgearRef) {
                         valueElement.text(value);
                         if (globalStore[self.widgetID]['onStop'])
                             eval('var value='+value+'; var percent='+percent+';'+globalStore[self.widgetID]['onStop']);
-                        //console.warn('onSlideEnd', 'value: ' + value, 'percent: ' + percent, 'position: ' + position);
+
+                        if (self.linkAutoValue) {
+                            sliderObject[self.widgetID].update({value: self.autoValue});
+                            valueElement.text(sliderObject[self.widgetID].value);
+                        }
+                        self.controlling = false;
                     }
                 });
             })();
@@ -455,7 +471,7 @@ function onConnectedHandler(microgearRef) {
 
         self.onSettingsChanged = function(newSettings) {
             currentSettings = newSettings;
-            document.getElementById(self.widgetID).value = newSettings.caption;
+//            document.getElementById(self.widgetID).value = newSettings.caption;
             updateSliderColor(newSettings.color);
             textElement.text(newSettings.caption?newSettings.caption:"");
 
@@ -473,12 +489,25 @@ function onConnectedHandler(microgearRef) {
             sliderObject[self.widgetID].update({value: oldvalue});
 
             valueElement.text(oldvalue);
+
+            self.linkAutoValue = (newSettings.autovaluesource && newSettings.autovaluesource.length > 0);
+            if (self.linkAutoValue) {
+                sliderObject[self.widgetID].update({value: self.autoValue});
+                valueElement.text(sliderObject[self.widgetID].value);
+            }
         }
 
         self.onCalculatedValueChanged = function(settingName, newValue) {
-            if(settingName == "value") {
-                sliderObject[self.widgetID].update({value: newValue});
-                valueElement.text(sliderObject[self.widgetID].value);
+            if(settingName == "autovaluesource") {
+
+                if (self.controlling) {
+                    self.autoValue = newValue;
+                }
+                else {
+                    self.autoValue = newValue;
+                    sliderObject[self.widgetID].update({value: newValue});
+                    valueElement.text(sliderObject[self.widgetID].value);
+                }
             }
         }
 
