@@ -374,8 +374,12 @@ function onConnectedHandler(microgearRef) {
         var sliderElement = $("<input id=\""+self.widgetID+"\" type=\"range\" min=\""+settings.min+"\" max=\""+settings.max+"\" step=\""+settings.step+"\" value=\""+(settings.initialvalue || 0)+"\" />");
         self.autoValue = 0;
 
+        var t = settings.initialvalue || 0;
+        if (t > settings.max) t = settings.max;
+        else if (t < settings.min) t = settings.min;
+
         var textElement = $("<span style=\"float:left;\">"+(settings.caption?settings.caption:"")+"</span>");
-        var valueElement = $("<span style=\"float:right;\">"+(settings.initialvalue || 0)+"</span>");
+        var valueElement = $("<span style=\"float:right;\">"+t+"</span>");
 
         if (settings.showvalue) valueElement.show();
         else valueElement.hide();
