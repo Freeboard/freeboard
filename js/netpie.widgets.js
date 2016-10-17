@@ -125,6 +125,7 @@ function onConnectedHandler(microgearRef) {
 
         self.onSettingsChanged = function(newSettings) {
             currentSettings = newSettings;
+            document.getElementById(self.widgetID).value = newSettings.caption;
             updateButtonColor(newSettings.color);
             textElement.text(newSettings.text?newSettings.text:"");
             globalStore[self.widgetID]['onClick'] = newSettings.onClick;
