@@ -268,7 +268,7 @@ function onConnectedHandler(microgearRef) {
             },
             {
                 "name"        : "color",
-                "display_name": "Button Color",
+                "display_name": "Filled Color",
                 "type"        : "option",
                 "options"     : [
                     {
@@ -327,12 +327,14 @@ function onConnectedHandler(microgearRef) {
                 "name"          : "initialvalue",
                 "display_name"  : "Initial Value",
                 "type"          : "text",
-                "default_value" : "0"
+                "default_value" : "0",
+                "description"   : "The default value set only the first time the widget is loaded."
             },                      
             {
                 "name"          : "autovaluesource",
                 "display_name"  : "Auto Updated Value",
                 "type"          : "calculated",
+                "description" : "Slider will be updated upon the change of variables (e.g. other data sources)."
             },                      
             {
                 "name"        : "onStart",
@@ -446,7 +448,7 @@ function onConnectedHandler(microgearRef) {
                                         self.nextSlideCallbackTimer=0;
                                     },self.maxCallbackDuration-(Date.now()-self.lastSlideCallback));
                                 }
-                            }
+                            }   
                         }
                     },
 
