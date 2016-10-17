@@ -441,7 +441,7 @@ function onConnectedHandler(microgearRef) {
                             else {
                                 if (self.nextSlideCallbackTimer==0) {
                                     self.nextSlideCallbackTimer = setTimeout( function() {
-                                        eval('var value='+value+'; var percent='+percent+';'+globalStore[self.widgetID]['onSlide']);
+                                        eval('var value='+sliderObject[self.widgetID].value+'; var percent='+percent+';'+globalStore[self.widgetID]['onSlide']);
                                         self.lastSlideCallback = Date.now();
                                         self.nextSlideCallbackTimer=0;
                                     },self.maxCallbackDuration-(Date.now()-self.lastSlideCallback));
