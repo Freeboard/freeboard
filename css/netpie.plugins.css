@@ -168,16 +168,16 @@
 }
 
 .theme-toggle-inner:before {
-    content: attr(ontext);
-    padding-left: 15px;
+    content: url("../img/moon.png");
+    padding-left: 8px;
     background-color: #313131;
     color: #FFFFFF;
     text-align: left;
 }
 
 .theme-toggle-inner:after {
-    content: attr(offtext);
-    padding-right: 15px;
+    content: url("../img/sun.png");
+    padding-right: 8px;
     background-color: #007FFF;
     color: #FFFFFF;
     text-align: right;
