@@ -32,6 +32,7 @@
 					});
 		</script>
 		<link href="css/netpie.plugins.css" rel="stylesheet" />
+		<link rel="stylesheet" href="css/netpie.theme.css" id="netpie-theme-css">
 	</head>
 	<body ng-app="starter">
 		<div id="board-content">
@@ -96,6 +97,9 @@
 						<span class="text-button table-operation" data-bind="pluginEditor: {operation: 'add', type: 'datasource'}">ADD</span>
 					</div>
 				</div>
+				<div class="theme-toggle" ><input type="checkbox" name="toggle" class="theme-toggle-checkbox" id="theme-toggle" onclick='loadnetpietheme()'><label class="theme-toggle-label" for="theme-toggle">
+						<span class="theme-toggle-inner" ontext="" offtext="" id="theme-toggle_inner"></span>
+						<span class="theme-toggle-switch"></span></label></div>
 			</div>
 			<div id="column-tools" class="responsive-column-width">
 				<ul class="board-toolbar left-columns">

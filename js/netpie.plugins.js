@@ -337,7 +337,7 @@ if (typeof dsstore === "undefined") {
         var data = {};
 
         function reloadhData(s) {
-            var apiurl = 'https://api2.netpie.io/feed/'+s.feedid+'?apikey='+s.apikey+'&granularity='+s.granularity_value+s.granularity_unit+'&aggregate='+s.aggregate+'&since='+s.since_value+s.since_unit;
+            var apiurl = 'https://api.netpie.io/feed/'+s.feedid+'?apikey='+s.apikey+'&granularity='+s.granularity_value+s.granularity_unit+'&aggregate='+s.aggregate+'&since='+s.since_value+s.since_unit;
             $.getJSON( apiurl, function(datajson) {
                 data['data'] = datajson;
                 updateCallback(data);

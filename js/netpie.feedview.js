@@ -1,10 +1,23 @@
-
+function loadnetpietheme() {
+    var stylesheet = document.getElementById('netpie-theme-css');
+    if(stylesheet!=null){
+    	stylesheet.parentNode.removeChild(stylesheet);
+    }
+    else{
+     	var  theme = document.createElement('link');
+		 theme.id = 'netpie-theme-css';
+		 theme.href = 'css/netpie.theme.css';
+		 theme.rel = 'stylesheet';
+		document.head.appendChild(theme);
+    }
+	
+}
 function insertChart(api,div,option){
 	var data = [];
 	for (var i = 0; i <= api.data.length - 1; i++) {
 		data[data.length] = api.data[i];
 	}
-	$.getJSON( "https://api2.netpie.io/feed/"+api.name+"?apikey="+api.key+"&granularity="+api.granularity+"&timezone=7&data="+data+"&aggregate="+api.aggregate+"&since="+api.since, function(datajson) {
+	$.getJSON( "https://api.netpie.io/feed/"+api.name+"?apikey="+api.key+"&granularity="+api.granularity+"&timezone=7&data="+data+"&aggregate="+api.aggregate+"&since="+api.since, function(datajson) {
 		updateChart(div,datajson,option);
 	});
 }
