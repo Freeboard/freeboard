@@ -41,6 +41,7 @@ function updateChart(chartDIV,datajson,option) {
 	var curHeight = $("#"+chartDIV).parent().parent().parent().parent().attr('data-sizey');
 	var widthGraph = width[curWidth]*0.95+"px";
 	var widthDiv = width[curWidth]+"px";
+	var unit =[];
 	if ($("#"+chartDIV).find("#"+chartDIV+"_graph").length > 0){
 		$("#"+chartDIV).empty();
 	}
@@ -141,6 +142,7 @@ function updateChart(chartDIV,datajson,option) {
 			var numcolor = color.length;
 			if(datajson.data.length>1){
 				for (var i=0; i<datajson.data.length; i++) {
+					unit[unit.length] = [datajson.data[i].attr,datajson.data[i].unit];
 					var maxi;
 					var mini;
 					var test = 0;
@@ -450,6 +452,7 @@ function updateChart(chartDIV,datajson,option) {
 				}
 			}
 		}
+
 		if(curHeight-16<0){
 			topLegend =topLegend+(curHeight-16)/2
 		}
@@ -516,10 +519,17 @@ function updateChart(chartDIV,datajson,option) {
 				if (item) {
 					var x = item.datapoint[0].toFixed(2),
 						y = item.datapoint[1].toFixed(2);
+						//console.log(item.series.label)
 					var newDate = new Date(parseInt(x));
 					var listDays = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
 					var listMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-					var tooltiptext = listDays[newDate.getDay()]+" "+listMonths[newDate.getMonth()]+" "+n(newDate.getDate())+" "+newDate.getFullYear()+" "+n(newDate.getHours())+":"+n(newDate.getMinutes())+":"+n(newDate.getSeconds())+"<br>"+item.series.label+" = "+y;
+					uniti = "";
+					for (var i = unit.length - 1; i >= 0; i--) {
+						if(unit[i][0]==item.series.label){
+							uniti =unit[i][1]
+						}
+					}
+					var tooltiptext = listDays[newDate.getDay()]+" "+listMonths[newDate.getMonth()]+" "+n(newDate.getDate())+" "+newDate.getFullYear()+" "+n(newDate.getHours())+":"+n(newDate.getMinutes())+":"+n(newDate.getSeconds())+"<br>"+item.series.label+" = "+y+" "+uniti;
 					$("#tooltip").html(tooltiptext)
 						.css({top: item.pageY+5, left: item.pageX+5})
 						.fadeIn(200);
@@ -610,7 +620,7 @@ function updateChart(chartDIV,datajson,option) {
 	}
 	catch(err) {
     document.getElementById(chartDIV).innerHTML = oldgraph;
-		console.log(111)
+		// console.log(111)
 	}
 
 	$(function () {
