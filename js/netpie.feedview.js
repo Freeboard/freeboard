@@ -475,7 +475,15 @@ function updateChart(chartDIV,datajson,option) {
 				noColumns: 5,
 				container: '#'+chartDIV+'_legend',
 				labelFormatter : function(label, series) {
-				    return '&nbsp;'+label+'&nbsp;&nbsp;';
+				    uniti = "";
+                    for (var i = unit.length - 1; i >= 0; i--) {
+                        if(unit[i][0]==label){
+                            if(unit[i][1].length>0){
+                                uniti = "("+unit[i][1]+")"
+                            }
+                        }
+                    }
+                    return '&nbsp;' + label +uniti;
 				}
 			},
 			series: optionGraph,
