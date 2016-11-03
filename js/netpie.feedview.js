@@ -17,7 +17,7 @@ function insertChart(api,div,option){
 	for (var i = 0; i <= api.data.length - 1; i++) {
 		data[data.length] = api.data[i];
 	}
-	$.getJSON( "https://api.netpie.io/feed/"+api.name+"?apikey="+api.key+"&granularity="+api.granularity+"&timezone=7&data="+data+"&aggregate="+api.aggregate+"&since="+api.since, function(datajson) {
+	$.getJSON( "https://api.netpie.io/feed/"+api.name+"?apikey="+api.key+"&granularity="+api.granularity+"&timezone=7&data="+data+"&aggregate="+api.aggregate+"&since="+api.since+"&format=feedview", function(datajson) {
 		updateChart(div,datajson,option);
 	});
 }

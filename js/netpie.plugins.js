@@ -258,6 +258,7 @@ if (typeof dsstore === "undefined") {
                     }
                 ]
             },
+/*
             {
                 name: "aggregate",
                 display_name: "Aggregate",
@@ -274,6 +275,7 @@ if (typeof dsstore === "undefined") {
                     }
                 ]
             },
+*/
             {
                 "name"         : "since_value",
                 "display_name" : "Since",
@@ -337,7 +339,7 @@ if (typeof dsstore === "undefined") {
         var data = {};
 
         function reloadhData(s) {
-            var apiurl = 'https://api.netpie.io/feed/'+s.feedid+'?apikey='+s.apikey+'&granularity='+s.granularity_value+s.granularity_unit+'&aggregate='+s.aggregate+'&since='+s.since_value+s.since_unit;
+            var apiurl = 'https://api.netpie.io/feed/'+s.feedid+'?apikey='+s.apikey+'&granularity='+s.granularity_value+s.granularity_unit+'&aggregate=avg&since='+s.since_value+s.since_unit;
             $.getJSON( apiurl, function(datajson) {
                 data['data'] = datajson;
                 updateCallback(data);
@@ -377,7 +379,7 @@ if (typeof dsstore === "undefined") {
                 newSettings.granularity_unit != currentSettings.granularity_unit ||
                 newSettings.since_value != currentSettings.since_value ||
                 newSettings.since_unit != currentSettings.since_unit ||
-                newSettings.aggregate != currentSettings.aggregate ||
+//                newSettings.aggregate != currentSettings.aggregate ||
                 false ) apiChanged = true;
 
             if (apiChanged) {
