@@ -12,10 +12,12 @@
 		<script src="js/freeboard.thirdparty.js"></script>
 		<script type="text/javascript">
 			head.js("js/freeboard_plugins.js",
-					"js/netpie.feedview.js",
-					"js/netpie.plugins.js",
-					"js/netpie.widgets.js",
-
+					"js/netpie.plugin.microgear.js",
+					"js/netpie.plugin.feed.js",
+					"js/netpie.widget.button.js",
+					"js/netpie.widget.feedview.js",
+					"js/netpie.widget.toggle.js",
+					"js/netpie.widget.slider.js",
 					// *** Load more plugins here ***
 					function(){
 						$(function()
@@ -87,7 +89,7 @@
 										<ul class="board-toolbar">
 											<li data-bind="click: updateNow"><i class="icon-refresh icon-white"></i></li>
 											<li data-bind="pluginEditor: {operation: 'delete', type: 'datasource'}">
-												<i class="icon-trash icon-white"></i></li>
+												<i class="icon-trash2 icon-grey"></i></li>
 										</ul>
 									</td>
 								</tr>
@@ -146,13 +148,13 @@
 						<div class="sub-section-tools">
 							<ul class="board-toolbar">
 								<!-- ko if:$parent.widgetCanMoveUp($data) -->
-								<li data-bind="click:$parent.moveWidgetUp"><i class="icon-chevron-up icon-white"></i></li>
+								<li data-bind="click:$parent.moveWidgetUp"><i class="icon-chevron-up icon-white icon-grey" ></i></li>
 								<!-- /ko -->
 								<!-- ko if:$parent.widgetCanMoveDown($data) -->
-								<li data-bind="click:$parent.moveWidgetDown"><i class="icon-chevron-down icon-white"></i></li>
+								<li data-bind="click:$parent.moveWidgetDown"><i class="icon-chevron-down icon-white icon-grey" ></i></li>
 								<!-- /ko -->
-								<li data-bind="pluginEditor: {operation: 'edit', type: 'widget'}"><i class="icon-wrench icon-white"></i></li>
-								<li data-bind="pluginEditor: {operation: 'delete', type: 'widget'}"><i class="icon-trash icon-white"></i></li>
+								<li data-bind="pluginEditor: {operation: 'edit', type: 'widget'}"><i class="icon-wrench icon-white icon-grey" ></i></li>
+								<li data-bind="pluginEditor: {operation: 'delete', type: 'widget'}"><i class="icon-trash icon-white icon-grey" ></i></li>
 							</ul>
 						</div>
 					</div>

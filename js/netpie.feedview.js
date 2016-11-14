@@ -1,17 +1,18 @@
-function loadnetpietheme() {
-    var stylesheet = document.getElementById('netpie-theme-css');
-    if(stylesheet!=null){
-    	stylesheet.parentNode.removeChild(stylesheet);
-    }
-    else{
-     	var  theme = document.createElement('link');
-		 theme.id = 'netpie-theme-css';
-		 theme.href = 'css/netpie.theme.css';
-		 theme.rel = 'stylesheet';
-		document.head.appendChild(theme);
-    }
+// function loadnetpietheme() {
+//     var stylesheet = document.getElementById('netpie-theme-css');
+//     if(stylesheet!=null){
+//     	stylesheet.parentNode.removeChild(stylesheet);
+//     }
+//     else{
+//      	var  theme = document.createElement('link');
+// 		 theme.id = 'netpie-theme-css';
+// 		 theme.href = 'css/netpie.theme.css';
+// 		 theme.rel = 'stylesheet';
+// 		document.head.appendChild(theme);
+//     }
 	
-}
+// }
+
 function insertChart(api,div,option){
 	var data = [];
 	for (var i = 0; i <= api.data.length - 1; i++) {
@@ -21,6 +22,7 @@ function insertChart(api,div,option){
 		updateChart(div,datajson,option);
 	});
 }
+
 function n(n){
     return n > 9 ? "" + n: "0" + n;
 }

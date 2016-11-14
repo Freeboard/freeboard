@@ -11,6 +11,7 @@ body {
 
 #toggle-header {
     background-color: #007FFF;
+    box-shadow: 0 0 1px #fff
 }
 
 .gridster .gs_w {
@@ -168,26 +169,6 @@ ul.value-dropdown li.selected {
     color: white;
 }
 
-
-/*.icon-white,
-.nav-pills > .active > a > [class^="icon-"],
-.nav-pills > .active > a > [class*=" icon-"],
-.nav-list > .active > a > [class^="icon-"],
-.nav-list > .active > a > [class*=" icon-"],
-.navbar-inverse .nav > .active > a > [class^="icon-"],
-.navbar-inverse .nav > .active > a > [class*=" icon-"],
-.dropdown-menu > li > a:hover > [class^="icon-"],
-.dropdown-menu > li > a:focus > [class^="icon-"],
-.dropdown-menu > li > a:hover > [class*=" icon-"],
-.dropdown-menu > li > a:focus > [class*=" icon-"],
-.dropdown-menu > .active > a > [class^="icon-"],
-.dropdown-menu > .active > a > [class*=" icon-"],
-.dropdown-submenu:hover > a > [class^="icon-"],
-.dropdown-submenu:focus > a > [class^="icon-"],
-.dropdown-submenu:hover > a > [class*=" icon-"],
-.dropdown-submenu:focus > a > [class*=" icon-"] {
-    background-image: url("../img/glyphicons-halflings.png");
-}*/
 .theme-toggle-label {
     display: block;
     overflow: hidden;
@@ -209,4 +190,30 @@ ul.value-dropdown li.selected {
     border: 2px solid #007FFF;
     border-radius: 20px;
     transition: all 0.1s ease-in 0s;
+}
+
+.datasource-list-container {
+    border-bottom: solid 1px #fff
+}
+.sub-section {
+    border-bottom: solid 1px #ECF0F5;
+}
+.icon-grey,
+.nav-pills>.active>a>[class^=icon-],
+.nav-pills>.active>a>[class*=" icon-"],
+.nav-list>.active>a>[class^=icon-],
+.nav-list>.active>a>[class*=" icon-"],
+.navbar-inverse .nav>.active>a>[class^=icon-],
+.navbar-inverse .nav>.active>a>[class*=" icon-"],
+.dropdown-menu>li>a:hover>[class^=icon-],
+.dropdown-menu>li>a:focus>[class^=icon-],
+.dropdown-menu>li>a:hover>[class*=" icon-"],
+.dropdown-menu>li>a:focus>[class*=" icon-"],
+.dropdown-menu>.active>a>[class^=icon-],
+.dropdown-menu>.active>a>[class*=" icon-"],
+.dropdown-submenu:hover>a>[class^=icon-],
+.dropdown-submenu:focus>a>[class^=icon-],
+.dropdown-submenu:hover>a>[class*=" icon-"],
+.dropdown-submenu:focus>a>[class*=" icon-"] {
+    background-image: url(../img/glyphicons-halflings-grey.png)
 }

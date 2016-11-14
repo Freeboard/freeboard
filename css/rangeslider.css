@@ -1,0 +1,98 @@
+.rangeSlider,
+.rangeSlider__fill {
+    background: #eeeeee;
+    display: block;
+    height: 14px;
+    width: 100%;
+    -webkit-box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.3);
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.rangeSlider {
+    position: relative;
+    top : 23px;
+}
+
+.rangeSlider--disabled {
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);
+    opacity: 0.4;
+}
+
+/*    background : attr(fillcolor); */
+.rangeSlider__fill {
+    background : #ffffff;
+    position: absolute;
+    top: 0;
+    z-index: 2;
+}
+
+
+.rangeSlider__handle {
+    background: white;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    position: absolute;
+    top: -7px;
+    z-index: 3;
+
+    -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    -ms-border-radius: 50%;
+    -o-border-radius: 50%;
+    border-radius: 50%;
+}
+
+.rangeSlider__handle:after {
+    background: #DDDDDD;
+    content: "";
+    display: block;
+    width: 12px;
+    height: 12px;
+    margin: auto;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    -ms-border-radius: 50%;
+    -o-border-radius: 50%;
+    border-radius: 50%;
+}
+
+.rangeSlider__handle:active {
+    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, rgba(0, 0, 0, 0.1)), color-stop(100%, rgba(0, 0, 0, 0.12)));
+    background-image: -webkit-linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.12));
+    background-image: -moz-linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.12));
+    background-image: -o-linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.12));
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.12));
+}
+
+input[type="range"]:focus + .rangeSlider .rangeSlider__handle {
+    -webkit-box-shadow: 0 0 8px rgba(142, 68, 173, 0.9);
+    -moz-box-shadow: 0 0 8px rgba(142, 68, 173, 0.9);
+    box-shadow: 0 0 8px rgba(142, 68, 173, 0.9);
+}
+
+.rangeSlider__buffer {
+    z-index: 1;
+    position: absolute;
+    top: 3px;
+    height: 14px;
+    background: #2c3e50;
+    border-radius: 10px;
+}
