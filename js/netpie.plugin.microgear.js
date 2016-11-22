@@ -2,8 +2,42 @@
 /*  Developed by Chavee Issariyapat                               */
 /*  More information about NETPIE please visit https://netpie.io  */
 
+function toggletheme() {
+    var stylesheet = document.getElementById('netpie-theme-css');
+    if(stylesheet!=null){
+        stylesheet.parentNode.removeChild(stylesheet);
+        np_theme = "default";
+    }
+    else{
+        var  theme = document.createElement('link');
+        theme.id = 'netpie-theme-css';
+        theme.href = 'css/netpie.theme.css';
+        theme.rel = 'stylesheet';
+        document.head.appendChild(theme);
+        np_theme = "netpie";
+    }
+}
+
+function randomString(length) {
+    return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
+}
+
 if (typeof microgear === "undefined") {
     microgear = {};
+}
+
+if (typeof dsstore === "undefined") {
+    dsstore = {};
+}
+
+if (typeof globalStore === "undefined") {
+    globalStore = {};
+}
+
+// loadtheme();
+
+function runCode(cmd) {
+    eval(eval(cmd));
 }
 
 (function()
@@ -11,7 +45,7 @@ if (typeof microgear === "undefined") {
     freeboard.loadDatasourcePlugin({
         "type_name"   : "netpie_microgear",
         "display_name": "NETPIE Microgear",
-        "description" : "Connect to NETPIE as a microgear to communicate real-time with other microgears in the same App ID.",
+        "description" : "Connect to NETPIE as a microgear to communicate real-time with other microgears in the same App ID. The microgear of this datasource is referenced by microgear[DATASOURCENAME]",
         "external_scripts" : [
             "https://cdn.netpie.io/microgear.js"
         ],
@@ -26,38 +60,41 @@ if (typeof microgear === "undefined") {
             {
                 "name"         : "key",
                 "display_name" : "Key",
-                "type"         : "text", 
+                "type"         : "text",
                 "description"  : "Key",
                 "required"     : true
             },
             {
                 "name"        : "secret",
                 "display_name" : "Secret",
-                "type"         : "text", 
+                "type"         : "text",
                 "description"  : "Secret",
                 "type"         : "text",
                 "required"     : true
             },
             {
                 "name"         : "alias",
-                "display_name" : "Device Alias",
-                "type"         : "text", 
+                "display_name" : "Microgear Alias",
+                "type"         : "text",
                 "description"  : "A nick name of this freeboard that other device can chat to",
                 "type"         : "text",
+                "default_value": "freeboard",
                 "required"     : false
             },
+/*
             {
                 "name"         : "microgearRef",
                 "display_name" : "Microgear Reference",
-                "type"         : "text", 
+                "type"         : "text",
                 "description"  : "Define a reference for a microgear of this datasource. For example if you set this to 'mygear' you can access the microgear object by microgear['mygear']",
                 "type"         : "text",
                 "required"     : false
             },
+*/
             {
                 "name"         : "topics",
                 "display_name" : "Subscribed Topics",
-                "type"         : "text", 
+                "type"         : "text",
                 "description"  : "Topics of the messages that this datasource will consume, the default is /# which means all messages in this app ID.",
                 "default_value": "/#",
                 "required"     : false
@@ -67,7 +104,7 @@ if (typeof microgear === "undefined") {
                 "display_name"  : "onConnected Action",
                 "type"          : "text",
                 "description"   : "JS code to run after a microgear datasource is connected"
-            }            
+            }
 
         ],
 
@@ -106,6 +143,14 @@ if (typeof microgear === "undefined") {
         }
 
         self.onSettingsChanged = function(newSettings) {
+            if (currentSettings.name && (currentSettings.name != newSettings.name)) {
+                newSettings.name = newSettings.name.replace(' ','_').substring(0,16);
+
+                if (microgear[currentSettings.name])
+                    delete(microgear[currentSettings.name]);
+                microgear[newSettings.name] = self.mg;
+            }
+
             if (currentSettings.alias != newSettings.alias) {
                 self.mg.setAlias(newSettings.alias);
             }
@@ -115,17 +160,19 @@ if (typeof microgear === "undefined") {
                 initSubscribe(newSettings.topics.trim().split(','), true);
             }
 
-            if (currentSettings.microgearRef != newSettings.microgearRef) {
-                delete(microgear[currentSettings.microgearRef]);
+            /*
+            if (newSettings.microgearRef && currentSettings.microgearRef && (currentSettings.microgearRef != newSettings.microgearRef)) {
+                if (microgear[currentSettings.microgearRef])
+                    delete(microgear[currentSettings.microgearRef]);
                 microgear[newSettings.microgearRef] = self.mg;
             }
+            */
 
             if (currentSettings.appid != newSettings.appid || currentSettings.key != newSettings.key || currentSettings.secret != newSettings.secret) {
                 freeboard.showDialog("Reconfigure AppID, Key or Secret needs a page reloading. Make sure you save the current configuration before processding.", "Warning", "OK", "CANCEL", function() {
                     location.reload(true);
                 })
             }
-
             currentSettings = newSettings;
         }
 
@@ -135,7 +182,12 @@ if (typeof microgear === "undefined") {
 
         self.mg = Microgear.create(gconf);
 
-        microgear[settings.microgearRef] = self.mg;
+        //microgear[settings.microgearRef] = self.mg;
+        if(settings.name !== undefined){
+            settings.name = settings.name.replace(' ','_').substring(0,16);
+        }
+        
+        microgear[settings.name] = self.mg;
 
         self.mg.on('message', function(topic,msg) {
             if (topic && msg) {
@@ -163,14 +215,16 @@ if (typeof microgear === "undefined") {
             }
 
             if (typeof(onConnectedHandler) != 'undefined') {
-                onConnectedHandler(settings.microgearRef);
+                //onConnectedHandler(settings.microgearRef);
+                onConnectedHandler(settings.name);
             }
         })
-
-
 
         self.mg.connect(settings.appid, function(){
 
         });
     }
 }());
+
+
+

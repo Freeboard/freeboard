@@ -1,5 +1,47 @@
 var allow = false;
-var np;
+var arr = window.location.pathname.split("/");
+var fbname = arr[arr.length-1];
+var api_url = "https://api.netpie.io/freeboard/"+fbname;
+var access_mode = document.getElementById("am") ? document.getElementById("am").value : '';
+var http = new XMLHttpRequest();
+var tmp_datasource = '', cur_datasource = '{}';
+var last_saved = new Date().getTime();
+var save_mode = 'no';
+var param;
+var sid = document.getElementById("sid") ? document.getElementById("sid").value : '';
+
+//check for save datasource
+setInterval(function (datasave){ 
+	if(save_mode == 'yes'){
+		if(access_mode == 'web'){	
+			param = {"sesid":sid, "datasource":{}};
+			param.datasource = JSON.parse(tmp_datasource);
+			save_mode = 'process';
+
+			http.onreadystatechange = function() {
+				if (http.readyState == 4 && http.status == 200) {
+					console.log('save successfully : '+http.responseText);
+					save_mode = 'no';
+					cur_datasource = tmp_datasource;
+					last_saved = new Date().getTime();
+				}
+				else if (http.readyState == 4 && http.status != 200) {
+					save_mode = 'no';
+					console.log('save failed : '+http.status);
+				}
+			};
+			
+			http.open("POST", api_url, true);
+			http.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+			http.send(JSON.stringify(param));
+		}
+		else{
+			window.localStorage.setItem("netpie.freeboard.dashboard", tmp_datasource);
+			save_mode = 'no';
+			last_saved = new Date().getTime();
+		}
+	}
+}, 1000);
 
 function DialogBox(a, b, c, d, e) {
     function f() {
@@ -119,7 +161,15 @@ function FreeboardModel(a, b, c) {
                     e.addEventListener("load", function(a) {
                         var b = a.target,
                             c = JSON.parse(b.result);
-                        window.localStorage.setItem("netpie.freeboard.dashboard", JSON.stringify(c));
+                        
+                        //update flags for save datasource
+                        if(JSON.stringify(c) != cur_datasource){
+                        	tmp_datasource = JSON.stringify(c);
+
+                        	save_mode = save_mode == 'no' ? 'yes' : save_mode;
+                        	
+                       	}
+                       	
                         d.loadDashboard(c), d.setEditing(!1)
                     }), e.readAsText(c)
                 }
@@ -139,7 +189,14 @@ function FreeboardModel(a, b, c) {
         });
         document.body.appendChild(f), f.href = window.URL.createObjectURL(g);
         $.get(f.href, function(data) {
-            window.localStorage.setItem("netpie.freeboard.dashboard", data);
+            
+            //update flags for save datasource
+		      	if(data != cur_datasource){
+		          tmp_datasource = data;
+
+		          save_mode = save_mode == 'no' ? 'yes' : save_mode;
+		     
+		        }
         });
         if (c) {
             var g = new Blob([JSON.stringify(d.serialize(), null, " ")], {
@@ -148,6 +205,24 @@ function FreeboardModel(a, b, c) {
             f.href = window.URL.createObjectURL(g);
             f.download = "dashboard.json", f.target = "_self", f.click();
         }
+    }, this.saveDashboardOnly = function(a, b) {
+        var c = $(b.currentTarget).data("pretty"),
+            e = "application/octet-stream",
+            f = document.createElement("a");
+        var g = new Blob([JSON.stringify(d.serialize())], {
+            type: e
+        });
+        document.body.appendChild(f), f.href = window.URL.createObjectURL(g);
+        $.get(f.href, function(data) {
+            
+          //update flags for save datasource
+        	if(data != cur_datasource){
+            tmp_datasource = data;
+            
+            save_mode = save_mode == 'no' ? 'yes' : save_mode;
+            
+          }
+        });
     }, this.saveLocalstorage = function() {
         e = "application/octet-stream", f = document.createElement("a");
         var g = new Blob([JSON.stringify(d.serialize())], {
@@ -155,7 +230,13 @@ function FreeboardModel(a, b, c) {
         });
         document.body.appendChild(f), f.href = window.URL.createObjectURL(g);
         $.get(f.href, function(data) {
-            window.localStorage.setItem("netpie.freeboard.dashboard", data);
+            //update flags for save datasource
+		      	if(data != cur_datasource){
+		          tmp_datasource = data;
+		          
+		          save_mode = save_mode == 'no' ? 'yes' : save_mode;
+		          
+		        }
         });
     }, this.addDatasource = function(a) {
         d.datasources.push(a)
@@ -1221,13 +1302,13 @@ var freeboard = function() {
                             if ("add" == k.operation) {
                                 if ("datasource" == k.type) {
                                     var g = new DatasourceModel(e, b);
-                                    e.addDatasource(g), g.name(f.settings.name), f.settings.name, g.settings(f.settings), g.type(f.type)
+                                    e.addDatasource(g), g.name(f.settings.name), delete f.settings.name, g.settings(f.settings), g.type(f.type)
                                 } else if ("widget" == k.type) {
                                     var g = new WidgetModel(e, c);
                                     g.settings(f.settings), g.type(f.type), i.widgets.push(g), d.attachWidgetEditIcons(a)
                                 }
                             } else {
-                                "edit" == k.operation && ("pane" == k.type ? (i.title(f.settings.title), i.col_width(f.settings.col_width), d.processResize(!1)) : ("datasource" == k.type && (i.name(f.settings.name), f.settings.name), i.type(f.type), i.settings(f.settings)))
+                                "edit" == k.operation && ("pane" == k.type ? (i.title(f.settings.title), i.col_width(f.settings.col_width), d.processResize(!1)) : ("datasource" == k.type && (i.name(f.settings.name), delete f.settings.name), i.type(f.type), i.settings(f.settings)))
                             }
                             e.saveLocalstorage();
                         })
@@ -1883,7 +1964,7 @@ $.extend(freeboard, jQuery.eventEmitter),
                     max: _.isUndefined(i.max_value) ? 0 : i.max_value,
                     label: i.units,
                     showInnerShadow: !1,
-                    valueFontColor: "#fff"
+                    valueFontColor: "#d3d4d4"
                 }))
             }
             var c, d = "gauge-" + h++,

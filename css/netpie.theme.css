@@ -1,0 +1,224 @@
+/*css netpie theme*/
+
+#admin-bar {
+    background-color: #007FFF;
+}
+
+body {
+    background-color: #ECF0F5;
+    color: #262626;
+}
+
+#toggle-header {
+    background-color: #007FFF;
+    box-shadow: 0 0 1px #fff
+}
+
+.gridster .gs_w {
+    background: white;
+}
+
+.gridster header {
+    background-color: #007FFF;
+}
+
+.gridster header h1 {
+    color: white;
+}
+
+.title {
+    color: white;
+}
+
+.title.bordered {
+    border: solid 3px white;
+}
+
+.board-toolbar li {
+    color: #FED33C;
+    /*background-color: #007FFF;*/
+}
+
+.text-button {
+    color: #FED33C;
+}
+
+a:hover.text-button, a:focus.text-button {
+    color: #FED33C;
+}
+
+#modal_overlay {
+    background: rgba(236, 240, 245, 0.6);
+}
+
+.modal {
+    background-color: #007FFF;
+}
+
+.modal header {
+    background-color: #3BA9E8;
+}
+
+.modal footer {
+    background-color: #3BA9E8;
+}
+
+.styled-select select {
+    border: 1px solid #3BA9E8;
+    background: url(../img/dropdown-arrow-black.png) no-repeat right #ECF0F5;
+    color: #262626;
+}
+
+.styled-select option{
+    border: 1px solid #007FFF;
+    background-color: #3BA9E8;
+    color: #262626;
+}
+
+textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {
+    color: #262626;
+    background-color: #ECF0F5;
+    border: 1px solid #3BA9E8;
+}
+
+textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="datetime"]:focus, input[type="datetime-local"]:focus, input[type="date"]:focus, input[type="month"]:focus, input[type="time"]:focus, input[type="week"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="url"]:focus, input[type="search"]:focus, input[type="tel"]:focus, input[type="color"]:focus, .uneditable-input:focus {
+    border-color: rgba(24, 56, 75, 0.6);
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgb(24, 56, 75);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgb(24, 56, 75);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgb(24, 56, 75);
+}
+
+select {
+    width: 220px;
+    background-color: #ECF0F5;
+    height: 27px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #262626;
+}
+
+input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+    color: #307096;
+}
+
+input:-moz-placeholder, textarea:-moz-placeholder {
+    color: #307096;
+}
+
+.board-toolbar li:hover {
+    background-color: rgba( 59, 169, 232, 1.0);
+    -webkit-transition: 250ms linear;
+    -moz-transition: 250ms linear;
+    -o-transition: 250ms linear;
+    -ms-transition: 250ms linear;
+    transition: 250ms linear;
+}
+
+.setting-description {
+    color: #2e2e2e;
+}
+
+.bg-graph {
+    background-color: #fff
+}
+
+ul.value-dropdown {
+    height: 75px;
+    position: absolute;
+    padding: 0px;
+    margin: 0px;
+    border: 1px solid #3BA9E8;
+    overflow-x: hidden;
+    overflow-y: auto;
+    z-index: 3001;
+    background-color: #ECF0F5;
+    color: #262626;
+}
+
+ul.value-dropdown li {
+    padding: 5px;
+    cursor: pointer;
+    /*border: 1px solid #007FFF;*/
+    background-color: #3BA9E8;
+    color: #262626;
+}
+
+ul.value-dropdown li.selected {
+    border: 1px solid #007FFF;
+    background-color: #1E90FF;
+    color: #fff;
+}
+
+.onoffswitch-inner .on {
+    background-color: #ECF0F5;
+    color: #262626;
+}
+
+.onoffswitch-inner .off {
+    background-color: #ECF0F5;
+    color: #262626;
+}
+
+.onoffswitch-label {
+    border: 1px solid #007FFF;
+}
+
+.table thead th {
+    font-size: 11.5px;
+    color: white;
+}
+
+.datasource-list-container {
+    border-bottom: solid 1px #fff
+}
+.sub-section {
+    border-bottom: solid 1px #ECF0F5;
+}
+.icon-grey,
+.nav-pills>.active>a>[class^=icon-],
+.nav-pills>.active>a>[class*=" icon-"],
+.nav-list>.active>a>[class^=icon-],
+.nav-list>.active>a>[class*=" icon-"],
+.navbar-inverse .nav>.active>a>[class^=icon-],
+.navbar-inverse .nav>.active>a>[class*=" icon-"],
+.dropdown-menu>li>a:hover>[class^=icon-],
+.dropdown-menu>li>a:focus>[class^=icon-],
+.dropdown-menu>li>a:hover>[class*=" icon-"],
+.dropdown-menu>li>a:focus>[class*=" icon-"],
+.dropdown-menu>.active>a>[class^=icon-],
+.dropdown-menu>.active>a>[class*=" icon-"],
+.dropdown-submenu:hover>a>[class^=icon-],
+.dropdown-submenu:focus>a>[class^=icon-],
+.dropdown-submenu:hover>a>[class*=" icon-"],
+.dropdown-submenu:focus>a>[class*=" icon-"] {
+    background-image: url(../img/glyphicons-halflings-grey.png)
+}
+
+
+
+.theme-toggle-label {
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid #FFF;
+    border-radius: 20px;
+}
+
+.theme-toggle-switch {
+    display: block;
+    width: 12px;
+    height: 12px;
+    margin: 4px;
+    background: #FFFFFF;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 25px;
+    border: 2px solid #007FFF;
+    border-radius: 20px;
+    transition: all 0.1s ease-in 0s;
+}
+.gauge-widget svg text tspan {
+    fill:#000;
+}
