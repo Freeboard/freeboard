@@ -3,7 +3,8 @@ netpie-freeboard
 
 A freeboard with NETPIE datasource and widget plugins.
 
-![2016-06-24_20-58-53](https://cloud.githubusercontent.com/assets/7685964/16339834/fd5f2fe4-3a4e-11e6-8af5-05a358444507.jpg)
+![netpie-freeboard-screenshot](https://cloud.githubusercontent.com/assets/7685964/19427706/de8aab54-946f-11e6-81ae-bbe8b78910e5.jpg)
+
 
 Installation
 
