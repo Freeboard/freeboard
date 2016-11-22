@@ -2,19 +2,16 @@
 /*  Developed by Chavee Issariyapat                               */
 /*  More information about NETPIE please visit https://netpie.io  */
 
-// if (typeof globalStore === "undefined") {
-//     globalStore = {};
-// }
+if (typeof globalStore === "undefined") {
+     globalStore = {};
+}
 
-// function randomString(length) {
-//     return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
-// }
-
-// function runCode(cmd) {
-//     eval(eval(cmd));
-// }
+if (typeof sliderObject == "undefined") {
+    sliderObject = {};
+}
 
 (function() {
+    var bcolor = {red:["#FFF","#e74c3c"],green:["#FFF","#2ecc71"],blue:["#FFF","#3498db"],yellow:["#FFF","#f1c40f"],white:["#454545","#ecf0f1"],grey:["#FFF","#bdc3c7"]};
 
     freeboard.loadWidgetPlugin({
         "type_name"   : "Slider",
@@ -292,6 +289,7 @@
             },200);
         }
     }
+
 
 
 }());

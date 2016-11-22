@@ -2,13 +2,6 @@
 /*  Developed by Chavee Issariyapat                               */
 /*  More information about NETPIE please visit https://netpie.io  */
 
-// if (typeof globalStore === "undefined") {
-//     globalStore = {};
-// }
-
-// function randomString(length) {
-//     return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
-// }
 
 (function() {
 
@@ -129,6 +122,11 @@
     });
 
     var feedviewWidgetPlugin = function(settings) {
+
+        function randomString(length) {
+            return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
+        }
+
         var self = this;
         var sizeWidth = {"240":"4","300":"5","360":"6","420":"7","480":"8","540":"9","600":"10"};
         self.widgetID = randomString(16);
