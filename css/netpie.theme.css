@@ -219,3 +219,6 @@ ul.value-dropdown li.selected {
     border-radius: 20px;
     transition: all 0.1s ease-in 0s;
 }
+.gauge-widget svg text tspan {
+    fill:#000;
+}

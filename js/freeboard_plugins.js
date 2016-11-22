@@ -157,8 +157,7 @@ function FreeboardModel(a, b, c) {
         $.get(f.href, function(data) {
             window.localStorage.setItem("netpie.freeboard.dashboard", data);
         });
-    },
-     this.addDatasource = function(a) {
+    }, this.addDatasource = function(a) {
         d.datasources.push(a)
     }, this.deleteDatasource = function(a) {
         delete d.datasourceData[a.name()], a.dispose(), d.datasources.remove(a), this.saveLocalstorage()
@@ -1884,7 +1883,7 @@ $.extend(freeboard, jQuery.eventEmitter),
                     max: _.isUndefined(i.max_value) ? 0 : i.max_value,
                     label: i.units,
                     showInnerShadow: !1,
-                    valueFontColor: "#000000"
+                    valueFontColor: "#fff"
                 }))
             }
             var c, d = "gauge-" + h++,

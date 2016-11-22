@@ -16,17 +16,10 @@ function toggletheme() {
         document.head.appendChild(theme);
         np_theme = "netpie";
     }
-    console.log(document.getElementById('theme-toggle').value)
-    console.log(window.localStorage.getItem("netpie.freeboard.dashboard.theme"))
-    window.localStorage.setItem("netpie.freeboard.dashboard.theme",np_theme)
-    console.log(window.localStorage.getItem("netpie.freeboard.dashboard.theme"))
 }
 
 function randomString(length) {
     return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
-}
-if (typeof np_theme === "undefined") {
-    np_theme = "default";
 }
 
 if (typeof microgear === "undefined") {
