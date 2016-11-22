@@ -169,29 +169,6 @@ ul.value-dropdown li.selected {
     color: white;
 }
 
-.theme-toggle-label {
-    display: block;
-    overflow: hidden;
-    cursor: pointer;
-    border: 2px solid #FFF;
-    border-radius: 20px;
-}
-
-.theme-toggle-switch {
-    display: block;
-    width: 12px;
-    height: 12px;
-    margin: 4px;
-    background: #FFFFFF;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 25px;
-    border: 2px solid #007FFF;
-    border-radius: 20px;
-    transition: all 0.1s ease-in 0s;
-}
-
 .datasource-list-container {
     border-bottom: solid 1px #fff
 }
@@ -216,4 +193,29 @@ ul.value-dropdown li.selected {
 .dropdown-submenu:hover>a>[class*=" icon-"],
 .dropdown-submenu:focus>a>[class*=" icon-"] {
     background-image: url(../img/glyphicons-halflings-grey.png)
+}
+
+
+
+.theme-toggle-label {
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid #FFF;
+    border-radius: 20px;
+}
+
+.theme-toggle-switch {
+    display: block;
+    width: 12px;
+    height: 12px;
+    margin: 4px;
+    background: #FFFFFF;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 25px;
+    border: 2px solid #007FFF;
+    border-radius: 20px;
+    transition: all 0.1s ease-in 0s;
 }

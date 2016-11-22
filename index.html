@@ -9,9 +9,11 @@
 		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
 		<meta name="viewport" content = "width = device-width, initial-scale = 1, user-scalable = no" />
 		<link href="css/freeboard.css" rel="stylesheet" />
+		<link href="css/netpie.plugins.css" rel="stylesheet" />
 		<script src="js/freeboard.thirdparty.js"></script>
 		<script type="text/javascript">
-			head.js("js/freeboard_plugins.js",
+			head.js(
+					"js/freeboard_plugins.js",
 					"js/netpie.plugin.microgear.js",
 					"js/netpie.plugin.feed.js",
 					"js/netpie.widget.button.js",
@@ -33,8 +35,6 @@
 						});
 					});
 		</script>
-		<link href="css/netpie.plugins.css" rel="stylesheet" />
-		<link rel="stylesheet" href="css/netpie.theme.css" id="netpie-theme-css">
 	</head>
 	<body ng-app="starter">
 		<div id="board-content">
@@ -100,12 +100,12 @@
 					</div>
 				</div>
 				<div class="theme-toggle" >
-					<input type="checkbox" name="toggle" class="theme-toggle-checkbox" id="theme-toggle" onclick='loadnetpietheme()'>
+					<input type="checkbox" name="toggle" class="theme-toggle-checkbox" id="theme-toggle" onclick="toggletheme()">
 					<label class="theme-toggle-label" for="theme-toggle">
 						<span class="theme-toggle-inner" ontext="" offtext="" id="theme-toggle_inner"></span>
 						<span class="theme-toggle-switch"></span>
 					</label>
-						</div>
+				</div>
 			</div>
 			<div id="column-tools" class="responsive-column-width">
 				<ul class="board-toolbar left-columns">

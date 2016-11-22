@@ -2,28 +2,31 @@
 /*  Developed by Chavee Issariyapat                               */
 /*  More information about NETPIE please visit https://netpie.io  */
 
-function loadnetpietheme() {
+function toggletheme() {
     var stylesheet = document.getElementById('netpie-theme-css');
     if(stylesheet!=null){
         stylesheet.parentNode.removeChild(stylesheet);
-        $("#sub-icon").removeClass("icon-grey");
-        $("#sub-icon").addClass("icon-white");
+        np_theme = "default";
     }
     else{
         var  theme = document.createElement('link');
-         theme.id = 'netpie-theme-css';
-         theme.href = 'css/netpie.theme.css';
-         theme.rel = 'stylesheet';
+        theme.id = 'netpie-theme-css';
+        theme.href = 'css/netpie.theme.css';
+        theme.rel = 'stylesheet';
         document.head.appendChild(theme);
-        $("#sub-icon").removeClass("icon-white");
-        $("#sub-icon").addClass("icon-grey");
-        $("#sub-icon").removeClass("icon-white");
-        $("#sub-icon").addClass("icon-grey");
+        np_theme = "netpie";
     }
+    console.log(document.getElementById('theme-toggle').value)
+    console.log(window.localStorage.getItem("netpie.freeboard.dashboard.theme"))
+    window.localStorage.setItem("netpie.freeboard.dashboard.theme",np_theme)
+    console.log(window.localStorage.getItem("netpie.freeboard.dashboard.theme"))
 }
 
 function randomString(length) {
     return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
+}
+if (typeof np_theme === "undefined") {
+    np_theme = "default";
 }
 
 if (typeof microgear === "undefined") {
@@ -37,6 +40,8 @@ if (typeof dsstore === "undefined") {
 if (typeof globalStore === "undefined") {
     globalStore = {};
 }
+
+// loadtheme();
 
 function runCode(cmd) {
     eval(eval(cmd));

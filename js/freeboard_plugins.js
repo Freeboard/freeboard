@@ -157,7 +157,8 @@ function FreeboardModel(a, b, c) {
         $.get(f.href, function(data) {
             window.localStorage.setItem("netpie.freeboard.dashboard", data);
         });
-    }, this.addDatasource = function(a) {
+    },
+     this.addDatasource = function(a) {
         d.datasources.push(a)
     }, this.deleteDatasource = function(a) {
         delete d.datasourceData[a.name()], a.dispose(), d.datasources.remove(a), this.saveLocalstorage()
