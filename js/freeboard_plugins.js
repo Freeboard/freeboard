@@ -1904,7 +1904,8 @@ $.extend(freeboard, jQuery.eventEmitter),
         freeboard.loadWidgetPlugin({
             type_name: "gauge",
             display_name: "Gauge",
-            external_scripts: ["plugins/thirdparty/raphael.2.1.0.min.js", "plugins/thirdparty/justgage.1.0.1.js"],
+//            external_scripts: ["plugins/thirdparty/raphael.2.1.0.min.js", "plugins/thirdparty/justgage.1.0.1.js"],
+            external_scripts: ["plugins/thirdparty/raphael.2.1.4.min.js", "plugins/thirdparty/justgage.1.2.2.js"],
             settings: [{
                 name: "title",
                 display_name: "Title",
