@@ -42,11 +42,14 @@ function runCode(cmd) {
 
 (function()
 {
+    $('head').append('<link href="plugins/thirdparty/jquery-confirm.min.css" rel="stylesheet" />');
+
     freeboard.loadDatasourcePlugin({
         "type_name"   : "netpie_microgear",
         "display_name": "NETPIE Microgear",
         "description" : "Connect to NETPIE as a microgear to communicate real-time with other microgears in the same App ID. The microgear of this datasource is referenced by microgear[DATASOURCENAME]",
         "external_scripts" : [
+            "plugins/thirdparty/jquery-confirm.min.js",
             "https://cdn.netpie.io/microgear.js"
         ],
         "settings"    : [
@@ -72,6 +75,7 @@ function runCode(cmd) {
                 "type"         : "text",
                 "required"     : true
             },
+/*
             {
                 "name"         : "alias",
                 "display_name" : "Microgear Alias",
@@ -81,7 +85,6 @@ function runCode(cmd) {
                 "default_value": "freeboard",
                 "required"     : false
             },
-/*
             {
                 "name"         : "microgearRef",
                 "display_name" : "Microgear Reference",
@@ -143,30 +146,35 @@ function runCode(cmd) {
         }
 
         self.onSettingsChanged = function(newSettings) {
+
             if (currentSettings.name && (currentSettings.name != newSettings.name)) {
-                newSettings.name = newSettings.name.replace(' ','_').substring(0,16);
+                var modifiedname = newSettings.name.substring(0,16);
 
-                if (microgear[currentSettings.name])
+                if (newSettings.name != modifiedname) {
+                    var text = "The datasource name should not be longer than 16 characters otherwise the associative id will be shorten i.e. now the microgear object is referenced by microgear[\""+modifiedname+"\"] and the microgear device alias is trimmed to \""+modifiedname+"\".";
+                    newSettings.name = modifiedname;
+                    $.alert({
+                        title: 'Alert!',
+                        content: text,
+                        type: 'red',
+                        typeAnimated: true,
+                        boxWidth: '75%',
+                        useBootstrap: false
+                    });
+                }
+
+                if (microgear[currentSettings.name]) {
                     delete(microgear[currentSettings.name]);
+                }
                 microgear[newSettings.name] = self.mg;
-            }
-
-            if (currentSettings.alias != newSettings.alias) {
-                self.mg.setAlias(newSettings.alias);
+  
+                self.mg.setAlias(newSettings.name);
             }
 
             if (currentSettings.topics != newSettings.topics) {
                 initSubscribe(currentSettings.topics.trim().split(','), false);
                 initSubscribe(newSettings.topics.trim().split(','), true);
             }
-
-            /*
-            if (newSettings.microgearRef && currentSettings.microgearRef && (currentSettings.microgearRef != newSettings.microgearRef)) {
-                if (microgear[currentSettings.microgearRef])
-                    delete(microgear[currentSettings.microgearRef]);
-                microgear[newSettings.microgearRef] = self.mg;
-            }
-            */
 
             if (currentSettings.appid != newSettings.appid || currentSettings.key != newSettings.key || currentSettings.secret != newSettings.secret) {
                 freeboard.showDialog("Reconfigure AppID, Key or Secret needs a page reloading. Make sure you save the current configuration before processding.", "Warning", "OK", "CANCEL", function() {
