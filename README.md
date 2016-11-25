@@ -12,12 +12,11 @@ git clone https://github.com/netpieio/netpie-freeboard
 
 To use a freeboard, just open the file index.html in any web browser. Under the DATASOURCE section, click ADD to create a new datasource then select NETPIE Microgear and configure as follows:
 
-- **NAME** - the name of the datasource
+- **NAME** - This is the name of the datasource. It also holds a microgear object that is referenced by microgear[*NAME*]. Moreover this name will be registered as a microgear device alias that you can chat to. 
 - **APP ID** - NETPIE App ID
 - **KEY** - Microgear Key
 - **SECRET** - Secret of the key
 - **DEVICE ALIAS** - If needed you can name the datasource as a microgear so it can be reached by a function chat()
-- **MICROGEAR REFERENCE** - A reference of the microgear object for a local Javascript. If you enter 'mygear' the microgear object of this datasource will be available as microgear['mygear']
 - **SUBSCRIBE TOPICS** - Topics that this datasource will subscribe. Wild cards # and + are allowed. The default value is /# meaning that it subscribes to all topics in this App ID.
 
 ![netpie-freeboard2](https://cloud.githubusercontent.com/assets/7685964/15654634/fbe3c096-26bf-11e6-8ab5-4656839b53ad.jpg)
