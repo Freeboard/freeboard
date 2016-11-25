@@ -16,7 +16,6 @@ git clone https://github.com/netpieio/netpie-freeboard
 - **APP ID** - App ID ของ NETPIE
 - **KEY** - Key ของ microgear
 - **SECRET - Secret** ของ key ข้างต้น
-- **DEVICE ALIAS** - ถ้าต้องการ อาจตั้งชื่อให้ datasource อันนี้ เพื่อที่ thing อื่นจะสามารถ chat มาถึงได้
 - **SUBSCRIBE TOPICS** - เป็น topic ที่จะให้ datasource นี้ subscribe หากมีหลาย topic ให้ใช้ comma คั่น สามารถใช้ wildcard # และ + ได้ ค่าปกติจะเป็น /# คือ subscribe ทุก topic ของ App ID นี้
 
 ![netpie-freeboard2](https://cloud.githubusercontent.com/assets/7685964/15654634/fbe3c096-26bf-11e6-8ab5-4656839b53ad.jpg)
