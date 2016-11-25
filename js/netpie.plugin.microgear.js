@@ -42,14 +42,11 @@ function runCode(cmd) {
 
 (function()
 {
-    $('head').append('<link href="plugins/thirdparty/jquery-confirm.min.css" rel="stylesheet" />');
-
     freeboard.loadDatasourcePlugin({
         "type_name"   : "netpie_microgear",
         "display_name": "NETPIE Microgear",
         "description" : "Connect to NETPIE as a microgear to communicate real-time with other microgears in the same App ID. The microgear of this datasource is referenced by microgear[DATASOURCENAME]",
         "external_scripts" : [
-            "plugins/thirdparty/jquery-confirm.min.js",
             "https://cdn.netpie.io/microgear.js"
         ],
         "settings"    : [
@@ -150,17 +147,11 @@ function runCode(cmd) {
             if (currentSettings.name && (currentSettings.name != newSettings.name)) {
                 var modifiedname = newSettings.name.substring(0,16);
 
+
                 if (newSettings.name != modifiedname) {
                     var text = "The datasource name should not be longer than 16 characters otherwise the associative id will be shorten i.e. now the microgear object is referenced by microgear[\""+modifiedname+"\"] and the microgear device alias is trimmed to \""+modifiedname+"\".";
                     newSettings.name = modifiedname;
-                    $.alert({
-                        title: 'Alert!',
-                        content: text,
-                        type: 'red',
-                        typeAnimated: true,
-                        boxWidth: '75%',
-                        useBootstrap: false
-                    });
+                    freeboard.showDialog(text, "Warning", "I understand");
                 }
 
                 if (microgear[currentSettings.name]) {
@@ -190,7 +181,6 @@ function runCode(cmd) {
 
         self.mg = Microgear.create(gconf);
 
-        //microgear[settings.microgearRef] = self.mg;
         if(settings.name !== undefined){
             settings.name = settings.name.replace(' ','_').substring(0,16);
         }
