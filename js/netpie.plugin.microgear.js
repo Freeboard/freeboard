@@ -77,6 +77,7 @@ function runCode(cmd) {
                 "type"         : "text",
                 "required"     : true
             },
+/*
             {
                 "name"         : "alias",
                 "display_name" : "Microgear Alias",
@@ -86,7 +87,6 @@ function runCode(cmd) {
                 "default_value": "freeboard",
                 "required"     : false
             },
-/*
             {
                 "name"         : "microgearRef",
                 "display_name" : "Microgear Reference",
@@ -148,30 +148,29 @@ function runCode(cmd) {
         }
 
         self.onSettingsChanged = function(newSettings) {
+
             if (currentSettings.name && (currentSettings.name != newSettings.name)) {
-                newSettings.name = newSettings.name.replace(' ','_').substring(0,16);
+                var modifiedname = newSettings.name.substring(0,16);
 
-                if (microgear[currentSettings.name])
+
+                if (newSettings.name != modifiedname) {
+                    var text = "The datasource name should not be longer than 16 characters otherwise the associative id will be shorten i.e. now the microgear object is referenced by microgear[\""+modifiedname+"\"] and the microgear device alias is trimmed to \""+modifiedname+"\".";
+                    newSettings.name = modifiedname;
+                    freeboard.showDialog(text, "Warning", "I understand");
+                }
+
+                if (microgear[currentSettings.name]) {
                     delete(microgear[currentSettings.name]);
+                }
                 microgear[newSettings.name] = self.mg;
-            }
-
-            if (currentSettings.alias != newSettings.alias) {
-                self.mg.setAlias(newSettings.alias);
+  
+                self.mg.setAlias(newSettings.name);
             }
 
             if (currentSettings.topics != newSettings.topics) {
                 initSubscribe(currentSettings.topics.trim().split(','), false);
                 initSubscribe(newSettings.topics.trim().split(','), true);
             }
-
-            /*
-            if (newSettings.microgearRef && currentSettings.microgearRef && (currentSettings.microgearRef != newSettings.microgearRef)) {
-                if (microgear[currentSettings.microgearRef])
-                    delete(microgear[currentSettings.microgearRef]);
-                microgear[newSettings.microgearRef] = self.mg;
-            }
-            */
 
             if (currentSettings.appid != newSettings.appid || currentSettings.key != newSettings.key || currentSettings.secret != newSettings.secret) {
                 freeboard.showDialog("Reconfigure AppID, Key or Secret needs a page reloading. Make sure you save the current configuration before processding.", "Warning", "OK", "CANCEL", function() {
@@ -187,7 +186,6 @@ function runCode(cmd) {
 
         self.mg = Microgear.create(gconf);
 
-        //microgear[settings.microgearRef] = self.mg;
         if(settings.name !== undefined){
             settings.name = settings.name.replace(' ','_').substring(0,16);
         }
