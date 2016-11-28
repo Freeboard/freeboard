@@ -222,3 +222,21 @@ ul.value-dropdown li.selected {
 .gauge-widget svg text tspan {
     fill:#000;
 }
+
+.bg-graph div table tbody tr td {
+    color: #000 !important ;
+    font-family: Trebuchet, Arial, sans-serif !important;
+    font-weight: normal !important;
+}
+
+.bg-graph div .flot-text div {
+    color: #000 !important ;
+    font-family: Trebuchet, Arial, sans-serif !important;
+    font-weight: normal !important;
+}
+
+.bg-graph div {
+    color: #000 !important ;
+    font-family: Trebuchet, Arial, sans-serif !important;
+    font-weight: normal !important;
+}

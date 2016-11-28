@@ -108,7 +108,6 @@
         }
 
         self.onDispose = function() {
-            console.log("sss");
         }
 
         if (settings.onCreatedAction) {

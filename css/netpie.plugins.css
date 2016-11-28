@@ -108,10 +108,6 @@
     display: inline-block, vertical-align: middle, width: 100%, height: 10%, margin: auto, text-align: center, font: 14px/0.8em "proxima-nova", Helvetica, Arial, sans-serif, color: black, font-weight: bold
 }
 
-.bg-graph {
-    background-color: #E5E4E2
-}
-
 .logo-netpie {
     content: url("../img/netpie-logo-white.png");
 }
@@ -206,3 +202,28 @@
     border: 2px solid #999999;
     border-radius: 20px;
 }
+
+.bg-graph {
+    background-color: #2A2A2A;
+}
+
+.bg-graph div table tbody tr td {
+    /*color: #B3B3B3 !important ;*/
+    color: #fff !important ;
+    font-family: Trebuchet, Arial, sans-serif !important;
+    font-weight: normal !important;
+}
+
+.bg-graph div .flot-text div {
+    /*color: #B3B3B3 !important ;*/
+    color: #fff !important ;
+    font-family: Trebuchet, Arial, sans-serif !important;
+    font-weight: normal !important;
+}
+
+.bg-graph div {
+    color: #fff !important ;
+    font-family: Trebuchet, Arial, sans-serif !important;
+    font-weight: normal !important;
+}
+
