@@ -151,7 +151,7 @@
 
         self.onSettingsChanged = function(newSettings) {
             currentSettings = newSettings;
-            insertFeedView();
+            insertFeedView;
         }
 
         self.onCalculatedValueChanged = function(settingName, newValue) {
@@ -163,9 +163,9 @@
 
         }
 
-        this.onSettingsChanged(settings);
+        //this.onSettingsChanged(settings);
 
-        function insertFeedView() {
+        var insertFeedView =function() {
             currentSettings.height = sizeWidth[currentSettings.height_block];
             $("#"+'chart'+self.widgetID).css({
                 height:currentSettings.height_block+"px",
@@ -183,9 +183,8 @@
                     filter : currentSettings.filter
                 }
                 // jQuery(window).ready(function() {
-                    updateChart('chart'+self.widgetID,valuejson,option);
+                updateChart('chart'+self.widgetID,valuejson,option);
                 // });
-
             }
         }
     }

@@ -229,14 +229,30 @@ ul.value-dropdown li.selected {
     font-weight: normal !important;
 }
 
-.bg-graph div .flot-text div {
+.bg-graph div .oneyaxis {
     color: #000 !important ;
+    /*font-family: Trebuchet, Arial, sans-serif !important;
+    font-weight: normal !important;*/
+}
+
+.bg-graph div {
+    /*color: #000 !important ;*/
     font-family: Trebuchet, Arial, sans-serif !important;
     font-weight: normal !important;
 }
 
-.bg-graph div {
+.flot-x-axis div {
     color: #000 !important ;
-    font-family: Trebuchet, Arial, sans-serif !important;
-    font-weight: normal !important;
+}
+
+.header_graph {
+    color: #000 !important ;
+}
+
+.y_graph {
+    color: #000 !important ;
+}
+
+.x_graph {
+    color: #000 !important ;
 }

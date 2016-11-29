@@ -214,16 +214,30 @@
     font-weight: normal !important;
 }
 
-.bg-graph div .flot-text div {
-    /*color: #B3B3B3 !important ;*/
+.bg-graph div .oneyaxis {
     color: #fff !important ;
-    font-family: Trebuchet, Arial, sans-serif !important;
-    font-weight: normal !important;
+    /*font-family: Trebuchet, Arial, sans-serif !important;
+    font-weight: normal !important;*/
 }
 
 .bg-graph div {
-    color: #fff !important ;
+    /*color: #fff !important ;*/
     font-family: Trebuchet, Arial, sans-serif !important;
     font-weight: normal !important;
 }
 
+.flot-x-axis div {
+    color: #fff !important ;
+}
+
+.header_graph {
+    color: #fff !important ;
+}
+
+.y_graph {
+    color: #fff !important ;
+}
+
+.x_graph {
+    color: #fff !important ;
+}

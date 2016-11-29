@@ -16,7 +16,10 @@ function toggletheme() {
         document.head.appendChild(theme);
         np_theme = "netpie";
     }
-    console.log(freeboard)
+    var data = window.localStorage.getItem("netpie.freeboard.dashboard");
+    var datajson = JSON.parse(data);
+    datajson.theme = np_theme;
+    window.localStorage.setItem("netpie.freeboard.dashboard", JSON.stringify(datajson));
 }
 
 function randomString(length) {
@@ -39,7 +42,45 @@ if (typeof globalStore === "undefined") {
     globalStore = {};
 }
 
-// loadtheme();
+if (typeof feedview === "undefined") {
+    feedview = {};
+}
+window.addEventListener('storage', function(storageEvent){
+    // the event seems not to fire on own state changes, only other windows
+    console.log(storageEvent);
+    App.controller.setLoginState(storageEvent.newValue);
+}, false);
+
+window.onbeforeunload = function () {
+    var data = window.localStorage.getItem("netpie.freeboard.dashboard");
+    var datajson = JSON.parse(data);
+    datajson.theme = np_theme;
+    window.localStorage.setItem("netpie.freeboard.dashboard", JSON.stringify(datajson));
+};
+
+function loadtheme() {
+    var stylesheet = document.getElementById('netpie-theme-css');
+    var data = window.localStorage.getItem("netpie.freeboard.dashboard");
+    var datajson = JSON.parse(data);
+    if(datajson.theme=="default" || datajson.theme==="undefined"){
+        if(stylesheet!=null){
+            stylesheet.parentNode.removeChild(stylesheet);
+            np_theme = "default";
+            document.getElementById('theme-toggle').checked = false;
+        }
+    }
+    else{
+        var  theme = document.createElement('link');
+        theme.id = 'netpie-theme-css';
+        theme.href = 'css/netpie.theme.css';
+        theme.rel = 'stylesheet';
+        document.head.appendChild(theme);
+        np_theme = "netpie";
+        document.getElementById('theme-toggle').checked = true;
+    }
+}
+
+loadtheme();
 
 function runCode(cmd) {
     eval(eval(cmd));
