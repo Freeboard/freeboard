@@ -16,6 +16,10 @@ function toggletheme() {
         document.head.appendChild(theme);
         np_theme = "netpie";
     }
+    for (var i = feedview.length - 1; i >= 0; i--) {
+        updateChart('chart'+feedview[i].id,feedview[i].datajson,feedview[i].settings);
+    }
+    
     var data = window.localStorage.getItem("netpie.freeboard.dashboard");
     var datajson = JSON.parse(data);
     datajson.theme = np_theme;
@@ -43,13 +47,8 @@ if (typeof globalStore === "undefined") {
 }
 
 if (typeof feedview === "undefined") {
-    feedview = {};
+    feedview = [];
 }
-window.addEventListener('storage', function(storageEvent){
-    // the event seems not to fire on own state changes, only other windows
-    console.log(storageEvent);
-    App.controller.setLoginState(storageEvent.newValue);
-}, false);
 
 window.onbeforeunload = function () {
     var data = window.localStorage.getItem("netpie.freeboard.dashboard");
