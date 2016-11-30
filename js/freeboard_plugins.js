@@ -65,6 +65,8 @@ function FreeboardModel(a, b, c) {
             a.push(b.serialize())
         });
         var b = [];
+        var data = window.localStorage.getItem("netpie.freeboard.dashboard");
+        var datajson = JSON.parse(data);
         return _.each(d.datasources(), function(a) {
             b.push(a.serialize())
         }), {
@@ -74,7 +76,8 @@ function FreeboardModel(a, b, c) {
             plugins: d.plugins(),
             panes: a,
             datasources: b,
-            columns: c.getUserColumns()
+            columns: c.getUserColumns(),
+            theme:np_theme
         }
     }, this.deserialize = function(e, f) {
         function g() {
@@ -138,9 +141,7 @@ function FreeboardModel(a, b, c) {
             type: e
         });
         document.body.appendChild(f), f.href = window.URL.createObjectURL(g);
-        console.log(window.localStorage.getItem("netpie.freeboard.dashboard"))
         $.get(f.href, function(data) {
-            console.log(data)
             window.localStorage.setItem("netpie.freeboard.dashboard", data);
         });
         if (c) {
