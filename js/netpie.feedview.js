@@ -39,7 +39,7 @@ function updateChart(chartDIV,datajson,option) {
 		}else{
 			if(option.title){
 				heightGraph = heightGraph - 10;
-				$('<div class="header_graph" id="'+chartDIV+'_header">'+option.title+'</div>').css({
+				$('<div class="header_graph" id="'+chartDIV+'_header">'+option.title.toUpperCase()+'</div>').css({
 					"padding-top": "2%",
 					display: "-webkit-flexbox",
 				    display: "-ms-flexbox",
@@ -54,7 +54,7 @@ function updateChart(chartDIV,datajson,option) {
 					height:"7%",
 					margin:"auto",
 					// textAlign : "center",
-					font: '16px/1em "proxima-nova", Helvetica, Arial, sans-serif',
+					font: '14px/0.9em "proxima-nova", Helvetica, Arial, sans-serif',
 					color:"black",
 					"font-weight": "bold"
 				}).appendTo("#"+chartDIV);
@@ -480,7 +480,7 @@ function updateChart(chartDIV,datajson,option) {
                             }
                         }
                     }
-                    return '&nbsp;' + label +uniti;
+                    return '&nbsp;' + label.toUpperCase() +uniti.toUpperCase();
 				}
 			},
 			series: optionGraph,
@@ -552,14 +552,14 @@ function updateChart(chartDIV,datajson,option) {
 		if(option !== undefined) {
 			if(option.xaxis !== undefined && option.xaxis.trim()!=""){
 				var topX = topLegend+5;
-				$('<div class="x_graph" id="'+chartDIV+'_x">'+option.xaxis+'</div>').css({
+				$('<div class="x_graph" id="'+chartDIV+'_x">'+option.xaxis.toUpperCase()+'</div>').css({
 					width : "100%",
 					margin: "auto",
 					textAlign : "center",
 					position : "absolute",
 					// height:"5%",
 					top: topX+"%",
-					font: '1em "proxima-nova", Helvetica, Arial, sans-serif',
+					font: '0.85em "proxima-nova", Helvetica, Arial, sans-serif',
 					color:"black",
 					"font-weight": "bold"
 				}).insertAfter("#"+chartDIV+"_legend");
@@ -568,14 +568,14 @@ function updateChart(chartDIV,datajson,option) {
 				// $("#"+chartDIV+"_graph").css({
 				// 	top:"10%"
 				// });
-				$('<div class="y_graph" id="'+chartDIV+'_y">'+option.yaxis+'</div>').css({
+				$('<div class="y_graph" id="'+chartDIV+'_y">'+option.yaxis.toUpperCase()+'</div>').css({
 					textAlign : "center",
 					'-webkit-transform' : 'rotate(270deg)',
 	             	'-moz-transform' : 'rotate(270deg)',
 	             	'-ms-transform' : 'rotate(270deg)',
 	             	'transform' : 'rotate(270deg)',
 	             	position : "absolute",
-	             	font: '1em "proxima-nova", Helvetica, Arial, sans-serif',
+	             	font: '0.85em "proxima-nova", Helvetica, Arial, sans-serif',
 	             	color:"black",
 					"font-weight": "bold"
 				}).insertBefore("#"+chartDIV+"_graph");

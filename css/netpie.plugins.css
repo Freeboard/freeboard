@@ -241,3 +241,7 @@
 .x_graph {
     color: #fff !important ;
 }
+
+.legendLabel{
+    font-size: 11px !important ;
+}
