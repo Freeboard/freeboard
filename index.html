@@ -20,24 +20,21 @@
 					"js/netpie.widget.feedview.js",
 					"js/netpie.widget.toggle.js",
 					"js/netpie.widget.slider.js",
+					"js/netpie.plugin.theme.js",
 					// *** Load more plugins here ***
 					function(){
 						$(function()
 						{ //DOM Ready
 							freeboard.initialize(true);
 							var dashboardPattern = window.localStorage.getItem("netpie.freeboard.dashboard");
-							var dashboardJson = JSON.parse(dashboardPattern);
 							if (dashboardPattern !== null) {
 								dashboardPattern=JSON.parse(dashboardPattern);
 								freeboard.loadDashboard(dashboardPattern, function() {
 									freeboard.setEditing(false);
 								});
-								var data = window.localStorage.getItem("netpie.freeboard.dashboard");
-						    	var datajson = JSON.parse(data);
-						    	datajson.theme = dashboardJson.theme;
-						    	window.localStorage.setItem("netpie.freeboard.dashboard", JSON.stringify(datajson));
 							}
 						});
+
 					});
 		</script>
 	</head>

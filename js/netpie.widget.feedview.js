@@ -1,7 +1,9 @@
 /*  NETPIE widget plugin for Freeboard                            */
 /*  Developed by Chavee Issariyapat                               */
 /*  More information about NETPIE please visit https://netpie.io  */
-
+if (typeof feedview === "undefined") {
+    feedview = [];
+}
 
 (function() {
 
@@ -159,7 +161,15 @@
         }
 
         self.onDispose = function() {
-
+            for (var i = feedview.length - 1; i >= 0; i--) {
+                if(self.widgetID==feedview[i].id){
+                    check = true;
+                    index = i;
+                }
+            }
+            if(!check){
+                feedview.remove(i);
+            }
         }
 
         //this.onSettingsChanged(settings);

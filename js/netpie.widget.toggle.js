@@ -13,6 +13,9 @@
 // function runCode(cmd) {
 //     eval(eval(cmd));
 // }
+if (typeof globalStore === "undefined") {
+    globalStore = {};
+}
 
 (function() {
 

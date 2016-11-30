@@ -2,98 +2,17 @@
 /*  Developed by Chavee Issariyapat                               */
 /*  More information about NETPIE please visit https://netpie.io  */
 
-function toggletheme() {
-    var stylesheet = document.getElementById('netpie-theme-css');
-    if(stylesheet!=null){
-        stylesheet.parentNode.removeChild(stylesheet);
-        np_theme = "default";
-    }
-    else{
-        var  theme = document.createElement('link');
-        theme.id = 'netpie-theme-css';
-        theme.href = 'css/netpie.theme.css';
-        theme.rel = 'stylesheet';
-        document.head.appendChild(theme);
-        np_theme = "netpie";
-    }
-    for (var i = feedview.length - 1; i >= 0; i--) {
-        updateChart('chart'+feedview[i].id,feedview[i].datajson,feedview[i].settings);
-    }
-    
-    var data = window.localStorage.getItem("netpie.freeboard.dashboard");
-    var datajson = JSON.parse(data);
-    datajson.theme = np_theme;
-    window.localStorage.setItem("netpie.freeboard.dashboard", JSON.stringify(datajson));
+if (typeof microgear === "undefined") {
+    microgear = {};
 }
 
 function randomString(length) {
     return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
 }
 
-if (typeof np_theme === "undefined") {
-    np_theme = "default";
-}
-
-if (typeof microgear === "undefined") {
-    microgear = {};
-}
-
-if (typeof dsstore === "undefined") {
-    dsstore = {};
-}
-
-if (typeof globalStore === "undefined") {
-    globalStore = {};
-}
-
-if (typeof feedview === "undefined") {
-    feedview = [];
-}
-
 function runCode(cmd) {
     eval(eval(cmd));
 }
-
-
-// window.onbeforeunload = function () {
-//     var data = window.localStorage.getItem("netpie.freeboard.dashboard");
-//     var datajson = JSON.parse(data);
-//     datajson.theme = np_theme;
-//     window.localStorage.setItem("netpie.freeboard.dashboard", JSON.stringify(datajson));
-// };
-
-(function()
-{
-    var stylesheet = document.getElementById('netpie-theme-css');
-    var data = window.localStorage.getItem("netpie.freeboard.dashboard");
-    var datajson = JSON.parse(data);
-    if(datajson!==null){
-        if(datajson.theme===null || datajson.theme=="default"){
-            if(stylesheet!=null){
-                stylesheet.parentNode.removeChild(stylesheet);
-            }
-            np_theme = "default";
-            document.getElementById('theme-toggle').checked = false;
-        }
-        else{
-            var  theme = document.createElement('link');
-            theme.id = 'netpie-theme-css';
-            theme.href = 'css/netpie.theme.css';
-            theme.rel = 'stylesheet';
-            document.head.appendChild(theme);
-            np_theme = "netpie";
-            document.getElementById('theme-toggle').checked = true;
-            
-        }
-        datajson.theme = np_theme;
-        window.localStorage.setItem("netpie.freeboard.dashboard", JSON.stringify(datajson));
-    }
-    else{
-        np_theme = "default";
-        document.getElementById('theme-toggle').checked = false;
-    }
-}());
-
 
 (function()
 {
