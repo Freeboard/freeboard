@@ -138,7 +138,9 @@ function FreeboardModel(a, b, c) {
             type: e
         });
         document.body.appendChild(f), f.href = window.URL.createObjectURL(g);
+        console.log(window.localStorage.getItem("netpie.freeboard.dashboard"))
         $.get(f.href, function(data) {
+            console.log(data)
             window.localStorage.setItem("netpie.freeboard.dashboard", data);
         });
         if (c) {
