@@ -274,7 +274,12 @@ function updateChart(chartDIV,datajson,option) {
 			else{
 				yaxes[yaxes.length] = {font : {size:11,style:"",weight:"bold",family:"sans-serif",variant:"small-caps",color : colori[i]}};
 				if(count<=1){
-					yaxes[yaxes.length-1].font.color = "black";
+					if(np_theme=="default" || np_theme==="undefined"){
+		    			yaxes[yaxes.length-1].font.color = "white";
+					}
+					else{
+						yaxes[yaxes.length-1].font.color = "black";
+					}
 				}
 				if(option.yzero){
 					var minYi = Math.min.apply(Math, minY);
