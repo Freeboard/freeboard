@@ -12,6 +12,34 @@ function n(n){
     return n > 9 ? "" + n: "0" + n;
 }
 
+function getdata(datajson,arr,arrnext,index){
+	var timelist ={seconds:1000,minutes:1000*60,hours:1000*60*60,days:1000*60*60*24,months:1000*60*60*24*30,years:1000*60*60*24*30*12}
+	if(arrnext!==undefined){
+		var timesplit = timelist[datajson.granularity[1]]*datajson.granularity[0]*1.5;
+		if(index==0){
+			var timebegin = timelist[datajson.since[1]]*datajson.since[0];
+			var datenow = new Date().getTime();
+			if(arr[0]-(datenow-timebegin)>timesplit){
+				return [ datenow-timebegin, null ];
+			}
+		}
+		else{
+			if(arrnext[0]-arr[0]>timesplit){
+				return [ arrnext[0], null];
+			}
+			return [ arr[0], arr[1] ];
+		}
+	}
+	else{
+		var timesplit = timelist[datajson.granularity[1]]*datajson.granularity[0]*1.5;
+		var datenow = new Date().getTime();
+		if(datenow-arr[0]>timesplit){
+			return [ datenow, null ]
+		}
+		return null
+	}
+
+}
 
 function updateChart(chartDIV,datajson,option) {
 	var oldgraph = document.getElementById(chartDIV).innerHTML;
@@ -154,106 +182,10 @@ function updateChart(chartDIV,datajson,option) {
 							}
 							var arr = datajson.data[i].values;
 							for (var j=0; j<arr.length; j++) {
-								if(j<0){
-									if(datajson.since[1]=="seconds"){
-										if(arr[j+1]!==undefined){
-											var d = new Date();
-											var second = d.getSeconds();
-											d.setSeconds(d.getSeconds() - parseInt(datajson.since[0]));
-											if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-												if(j==0){
-													s.data.push([ d.getTime(), null ]);
-												}
-												else{
-													s.data.push([ arr[j+1][0], null ]);
-												}
-											}
-										}
-									}
-									else if(datajson.since[1]=="minutes"){
-										if(arr[j+1]!==undefined){
-											var d = new Date();
-											var minute = d.getMinutes();
-											d.setMinutes(d.getMinutes() - parseInt(datajson.since[0]));
-											if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-												if(j==0){
-													s.data.push([ d.getTime(), null ]);
-												}
-												else{
-													s.data.push([ arr[j+1][0], null ]);
-												}
-											}
-										}
-									}
-									else if(datajson.since[1]=="hours"){
-										if(arr[j+1]!==undefined){
-											var d = new Date();
-											var minute = d.getHours();
-											d.setHours(d.getHours() - parseInt(datajson.since[0]));
-											if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-												if(j==0){
-													s.data.push([ d.getTime(), null ]);
-												}
-												else{
-													s.data.push([ arr[j+1][0], null ]);
-												}
-											}
-										}
-									}
-									else if(datajson.since[1]=="days"){
-										if(arr[j+1]!==undefined){
-											var d = new Date();
-											var day = d.getDate();
-											d.setDate(d.getDate() - parseInt(datajson.since[0]));
-											if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-												if(j==0){
-													s.data.push([ d.getTime(), null ]);
-												}
-												else{
-													s.data.push([ arr[j+1][0], null ]);
-												}
-											}
-										}
-									}
-									else if(datajson.since[1]=="months"){
-										if(arr[j+1]!==undefined){
-											var d = new Date();
-											var month = d.getMonth();
-											d.setMonth(d.getMonth() - parseInt(datajson.since[0]));
-											if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-												if(j==0){
-													s.data.push([ d.getTime(), null ]);
-												}
-												else{
-													s.data.push([ arr[j+1][0], null ]);
-												}
-											}
-										}
-									}
-									else{
-										if(arr[j+1]!==undefined){
-											var d = new Date();
-											var year = d.getFullYear();
-											d.setFullYear(d.getFullYear() - parseInt(datajson.since[0]));
-											if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-												if(j==0){
-													s.data.push([ d.getTime(), null ]);
-												}
-												else{
-													s.data.push([ arr[j+1][0], null ]);
-												}
-											}
-										}
-									}
+								var datai = getdata(datajson,arr[j],arr[j+1],j)
+								if(datai!=null){
+									s.data.push(datai);
 								}
-								if(j>=2 && (arr[j][0]-arr[j-1][0])/(arr[j-1][0]-arr[j-2][0])>2){
-									if(arr[j+1]!==undefined){
-										if((arr[j][0]-arr[j-1][0])/(arr[j+1][0]-arr[j][0])>2){
-											s.data.push([ arr[j][0], null ]);
-										}
-									}
-								}
-								s.data.push([ arr[j][0], arr[j][1] ]);
 								if(j==0){
 									maxi = arr[j][1];
 									mini = arr[j][1];
@@ -288,106 +220,10 @@ function updateChart(chartDIV,datajson,option) {
 						}
 						var arr = datajson.data[i].values;
 						for (var j=0; j<arr.length; j++) {
-							if(j<2){
-								if(datajson.since[1]=="seconds"){
-									if(arr[j+1]!==undefined){
-										var d = new Date();
-										var second = d.getSeconds();
-										d.setSeconds(d.getSeconds() - parseInt(datajson.since[0]));
-										if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-											if(j==0){
-												s.data.push([ d.getTime(), null ]);
-											}
-											else{
-												s.data.push([ arr[j+1][0], null ]);
-											}
-										}
-									}
-								}
-								else if(datajson.since[1]=="minutes"){
-									if(arr[j+1]!==undefined){
-										var d = new Date();
-										var minute = d.getMinutes();
-										d.setMinutes(d.getMinutes() - parseInt(datajson.since[0]));
-										if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-											if(j==0){
-												s.data.push([ d.getTime(), null ]);
-											}
-											else{
-												s.data.push([ arr[j+1][0], null ]);
-											}
-										}
-									}
-								}
-								else if(datajson.since[1]=="hours"){
-									if(arr[j+1]!==undefined){
-										var d = new Date();
-										var minute = d.getHours();
-										d.setHours(d.getHours() - parseInt(datajson.since[0]));
-										if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-											if(j==0){
-												s.data.push([ d.getTime(), null ]);
-											}
-											else{
-												s.data.push([ arr[j+1][0], null ]);
-											}
-										}
-									}
-								}
-								else if(datajson.since[1]=="days"){
-									if(arr[j+1]!==undefined){
-										var d = new Date();
-										var day = d.getDate();
-										d.setDate(d.getDate() - parseInt(datajson.since[0]));
-										if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-											if(j==0){
-												s.data.push([ d.getTime(), null ]);
-											}
-											else{
-												s.data.push([ arr[j+1][0], null ]);
-											}
-										}
-									}
-								}
-								else if(datajson.since[1]=="months"){
-									if(arr[j+1]!==undefined){
-										var d = new Date();
-										var month = d.getMonth();
-										d.setMonth(d.getMonth() - parseInt(datajson.since[0]));
-										if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-											if(j==0){
-												s.data.push([ d.getTime(), null ]);
-											}
-											else{
-												s.data.push([ arr[j+1][0], null ]);
-											}
-										}
-									}
-								}
-								else{
-									if(arr[j+1]!==undefined){
-										var d = new Date();
-										var year = d.getFullYear();
-										d.setFullYear(d.getFullYear() - parseInt(datajson.since[0]));
-										if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-											if(j==0){
-												s.data.push([ d.getTime(), null ]);
-											}
-											else{
-												s.data.push([ arr[j+1][0], null ]);
-											}
-										}
-									}
-								}
+							var datai = getdata(datajson,arr[j],arr[j+1],j)
+							if(datai!=null){
+								s.data.push(datai);
 							}
-							if(j>=2 && (arr[j][0]-arr[j-1][0])/(arr[j-1][0]-arr[j-2][0])>2){
-								if(arr[j+1]!==undefined){
-									if((arr[j][0]-arr[j-1][0])/(arr[j+1][0]-arr[j][0]) >2){
-										s.data.push([ arr[j][0], null ]);
-									}
-								}
-							}
-							s.data.push([ arr[j][0], arr[j][1] ]);
 							if(j==0){
 								maxi = arr[j][1];
 								mini = arr[j][1];
