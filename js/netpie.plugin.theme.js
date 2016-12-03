@@ -33,8 +33,7 @@ function saveTheme(){
     }    
 }
 
-(function()
-{
+function loadTheme(){
     var stylesheet = document.getElementById('netpie-theme-css');
     var data = window.localStorage.getItem("netpie.freeboard.dashboard");
     var datajson = JSON.parse(data);
@@ -61,4 +60,6 @@ function saveTheme(){
         document.getElementById('theme-toggle').checked = false;
     }
     saveTheme();
-}());
+};
+
+loadTheme();
