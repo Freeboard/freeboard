@@ -42,7 +42,7 @@ function getdata(datajson,arr,arrnext,index){
 }
 
 function updateChart(chartDIV,datajson,option) {
-	var oldgraph = document.getElementById(chartDIV).innerHTML;
+	var oldgraph = null;
 	const DEFAULTCOLOR = ['#d40000','#1569ea','#ffcc00']
 	var defaultGraph = {lines:{show:true,steps:false},points:{show:true,radius:2}};
 	var optionGraph = {};
@@ -59,6 +59,7 @@ function updateChart(chartDIV,datajson,option) {
 	var widthDiv = width[curWidth]+"px";
 	var unit =[];
 	if ($("#"+chartDIV).find("#"+chartDIV+"_graph").length > 0){
+		oldgraph = document.getElementById(chartDIV).innerHTML;
 		$("#"+chartDIV).empty();
 	}
 	try{
@@ -464,7 +465,9 @@ function updateChart(chartDIV,datajson,option) {
 		*/
 	}
 	catch(err) {
-    	document.getElementById(chartDIV).innerHTML = oldgraph;
+		if(oldgraph!=null){
+			document.getElementById(chartDIV).innerHTML = oldgraph;
+		}	
 	}
 
 	$(function () {
