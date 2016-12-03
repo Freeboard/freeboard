@@ -256,3 +256,12 @@ ul.value-dropdown li.selected {
 .x_graph {
     color: #000 !important ;
 }
+
+.indicator-light {
+    background-color: #B3B3B3;
+    border-color: #B3B3B3;
+}
+
+.indicator-light.on {
+    border-color: #FFC773;
+}
