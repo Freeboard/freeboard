@@ -9,7 +9,9 @@
 // if (typeof dsstore === "undefined") {
 //     dsstore = {};
 // }
-
+if (typeof dsstore === "undefined") {
+    dsstore = {};
+}
 
 (function()
 {

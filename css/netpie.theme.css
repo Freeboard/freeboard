@@ -222,3 +222,46 @@ ul.value-dropdown li.selected {
 .gauge-widget svg text tspan {
     fill:#000;
 }
+
+.bg-graph div table tbody tr td {
+    color: #000 !important ;
+    font-family: Trebuchet, Arial, sans-serif !important;
+    font-weight: normal !important;
+}
+
+.bg-graph div .oneyaxis {
+    color: #000 !important ;
+    /*font-family: Trebuchet, Arial, sans-serif !important;
+    font-weight: normal !important;*/
+}
+
+.bg-graph div {
+    /*color: #000 !important ;*/
+    font-family: Trebuchet, Arial, sans-serif !important;
+    font-weight: normal !important;
+}
+
+.flot-x-axis div {
+    color: #000 !important ;
+}
+
+.header_graph {
+    color: #000 !important ;
+}
+
+.y_graph {
+    color: #000 !important ;
+}
+
+.x_graph {
+    color: #000 !important ;
+}
+
+.indicator-light {
+    background-color: #B3B3B3;
+    border-color: #B3B3B3;
+}
+
+.indicator-light.on {
+    border-color: #FFC773;
+}

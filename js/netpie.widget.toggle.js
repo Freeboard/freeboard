@@ -13,6 +13,13 @@
 // function runCode(cmd) {
 //     eval(eval(cmd));
 // }
+function runCode(cmd) {
+    eval(eval(cmd));
+}
+
+if (typeof globalStore === "undefined") {
+    globalStore = {};
+}
 
 (function() {
 
@@ -108,7 +115,6 @@
         }
 
         self.onDispose = function() {
-            console.log("sss");
         }
 
         if (settings.onCreatedAction) {

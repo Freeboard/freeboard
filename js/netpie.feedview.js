@@ -1,18 +1,3 @@
-// function loadnetpietheme() {
-//     var stylesheet = document.getElementById('netpie-theme-css');
-//     if(stylesheet!=null){
-//     	stylesheet.parentNode.removeChild(stylesheet);
-//     }
-//     else{
-//      	var  theme = document.createElement('link');
-// 		 theme.id = 'netpie-theme-css';
-// 		 theme.href = 'css/netpie.theme.css';
-// 		 theme.rel = 'stylesheet';
-// 		document.head.appendChild(theme);
-//     }
-	
-// }
-
 function insertChart(api,div,option){
 	var data = [];
 	for (var i = 0; i <= api.data.length - 1; i++) {
@@ -27,8 +12,37 @@ function n(n){
     return n > 9 ? "" + n: "0" + n;
 }
 
+function getdata(datajson,arr,arrnext,index){
+	var timelist ={seconds:1000,minutes:1000*60,hours:1000*60*60,days:1000*60*60*24,months:1000*60*60*24*30,years:1000*60*60*24*30*12}
+	if(arrnext!==undefined){
+		var timesplit = timelist[datajson.granularity[1]]*datajson.granularity[0]*1.5;
+		if(index==0){
+			var timebegin = timelist[datajson.since[1]]*datajson.since[0];
+			var datenow = new Date().getTime();
+			if(arr[0]-(datenow-timebegin)>timesplit){
+				return [ datenow-timebegin, null ];
+			}
+		}
+		else{
+			if(arrnext[0]-arr[0]>timesplit){
+				return [ arrnext[0], null];
+			}
+			return [ arr[0], arr[1] ];
+		}
+	}
+	else{
+		var timesplit = timelist[datajson.granularity[1]]*datajson.granularity[0]*1.5;
+		var datenow = new Date().getTime();
+		if(datenow-arr[0]>timesplit){
+			return [ datenow, null ]
+		}
+		return null
+	}
+
+}
+
 function updateChart(chartDIV,datajson,option) {
-	var oldgraph = document.getElementById(chartDIV).innerHTML;
+	var oldgraph = null;
 	const DEFAULTCOLOR = ['#d40000','#1569ea','#ffcc00']
 	var defaultGraph = {lines:{show:true,steps:false},points:{show:true,radius:2}};
 	var optionGraph = {};
@@ -45,6 +59,7 @@ function updateChart(chartDIV,datajson,option) {
 	var widthDiv = width[curWidth]+"px";
 	var unit =[];
 	if ($("#"+chartDIV).find("#"+chartDIV+"_graph").length > 0){
+		oldgraph = document.getElementById(chartDIV).innerHTML;
 		$("#"+chartDIV).empty();
 	}
 	try{
@@ -53,7 +68,7 @@ function updateChart(chartDIV,datajson,option) {
 		}else{
 			if(option.title){
 				heightGraph = heightGraph - 10;
-				$('<div id="'+chartDIV+'_header">'+option.title+'</div>').css({
+				$('<div class="header_graph" id="'+chartDIV+'_header">'+option.title.toUpperCase()+'</div>').css({
 					"padding-top": "2%",
 					display: "-webkit-flexbox",
 				    display: "-ms-flexbox",
@@ -68,7 +83,7 @@ function updateChart(chartDIV,datajson,option) {
 					height:"7%",
 					margin:"auto",
 					// textAlign : "center",
-					font: '16px/1em "proxima-nova", Helvetica, Arial, sans-serif',
+					font: '14px/0.9em "proxima-nova", Helvetica, Arial, sans-serif',
 					color:"black",
 					"font-weight": "bold"
 				}).appendTo("#"+chartDIV);
@@ -110,15 +125,24 @@ function updateChart(chartDIV,datajson,option) {
 					steps : false
 				};
 			}
+    		if(np_theme=="default" || np_theme==="undefined"){
+    			colorpoint="#2A2A2A"
+			}
+			else{
+				colorpoint="#fff"
+			}
+				
 			optionGraph['points'] = {
 				show: option.marker?true:false,
-				radius : 2
+				radius : 2,
+				fillColor:colorpoint
 			};
 			if(option.color.replace(/ /g,'').split(',').length!=0&&option.color.replace(/ /g,'').split(',')[0].trim()!=""){
 				color = option.color.replace(/ /g,'').split(',');
 			}
 			else{color=DEFAULTCOLOR}
 		}
+
 		$('#'+chartDIV).css({
 			width:widthDiv,
 			position:"relative"
@@ -159,106 +183,10 @@ function updateChart(chartDIV,datajson,option) {
 							}
 							var arr = datajson.data[i].values;
 							for (var j=0; j<arr.length; j++) {
-								if(j<0){
-									if(datajson.since[1]=="seconds"){
-										if(arr[j+1]!==undefined){
-											var d = new Date();
-											var second = d.getSeconds();
-											d.setSeconds(d.getSeconds() - parseInt(datajson.since[0]));
-											if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-												if(j==0){
-													s.data.push([ d.getTime(), null ]);
-												}
-												else{
-													s.data.push([ arr[j+1][0], null ]);
-												}
-											}
-										}
-									}
-									else if(datajson.since[1]=="minutes"){
-										if(arr[j+1]!==undefined){
-											var d = new Date();
-											var minute = d.getMinutes();
-											d.setMinutes(d.getMinutes() - parseInt(datajson.since[0]));
-											if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-												if(j==0){
-													s.data.push([ d.getTime(), null ]);
-												}
-												else{
-													s.data.push([ arr[j+1][0], null ]);
-												}
-											}
-										}
-									}
-									else if(datajson.since[1]=="hours"){
-										if(arr[j+1]!==undefined){
-											var d = new Date();
-											var minute = d.getHours();
-											d.setHours(d.getHours() - parseInt(datajson.since[0]));
-											if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-												if(j==0){
-													s.data.push([ d.getTime(), null ]);
-												}
-												else{
-													s.data.push([ arr[j+1][0], null ]);
-												}
-											}
-										}
-									}
-									else if(datajson.since[1]=="days"){
-										if(arr[j+1]!==undefined){
-											var d = new Date();
-											var day = d.getDate();
-											d.setDate(d.getDate() - parseInt(datajson.since[0]));
-											if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-												if(j==0){
-													s.data.push([ d.getTime(), null ]);
-												}
-												else{
-													s.data.push([ arr[j+1][0], null ]);
-												}
-											}
-										}
-									}
-									else if(datajson.since[1]=="months"){
-										if(arr[j+1]!==undefined){
-											var d = new Date();
-											var month = d.getMonth();
-											d.setMonth(d.getMonth() - parseInt(datajson.since[0]));
-											if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-												if(j==0){
-													s.data.push([ d.getTime(), null ]);
-												}
-												else{
-													s.data.push([ arr[j+1][0], null ]);
-												}
-											}
-										}
-									}
-									else{
-										if(arr[j+1]!==undefined){
-											var d = new Date();
-											var year = d.getFullYear();
-											d.setFullYear(d.getFullYear() - parseInt(datajson.since[0]));
-											if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-												if(j==0){
-													s.data.push([ d.getTime(), null ]);
-												}
-												else{
-													s.data.push([ arr[j+1][0], null ]);
-												}
-											}
-										}
-									}
+								var datai = getdata(datajson,arr[j],arr[j+1],j)
+								if(datai!=null){
+									s.data.push(datai);
 								}
-								if(j>=2 && (arr[j][0]-arr[j-1][0])/(arr[j-1][0]-arr[j-2][0])>2){
-									if(arr[j+1]!==undefined){
-										if((arr[j][0]-arr[j-1][0])/(arr[j+1][0]-arr[j][0])>2){
-											s.data.push([ arr[j][0], null ]);
-										}
-									}
-								}
-								s.data.push([ arr[j][0], arr[j][1] ]);
 								if(j==0){
 									maxi = arr[j][1];
 									mini = arr[j][1];
@@ -293,106 +221,10 @@ function updateChart(chartDIV,datajson,option) {
 						}
 						var arr = datajson.data[i].values;
 						for (var j=0; j<arr.length; j++) {
-							if(j<2){
-								if(datajson.since[1]=="seconds"){
-									if(arr[j+1]!==undefined){
-										var d = new Date();
-										var second = d.getSeconds();
-										d.setSeconds(d.getSeconds() - parseInt(datajson.since[0]));
-										if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-											if(j==0){
-												s.data.push([ d.getTime(), null ]);
-											}
-											else{
-												s.data.push([ arr[j+1][0], null ]);
-											}
-										}
-									}
-								}
-								else if(datajson.since[1]=="minutes"){
-									if(arr[j+1]!==undefined){
-										var d = new Date();
-										var minute = d.getMinutes();
-										d.setMinutes(d.getMinutes() - parseInt(datajson.since[0]));
-										if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-											if(j==0){
-												s.data.push([ d.getTime(), null ]);
-											}
-											else{
-												s.data.push([ arr[j+1][0], null ]);
-											}
-										}
-									}
-								}
-								else if(datajson.since[1]=="hours"){
-									if(arr[j+1]!==undefined){
-										var d = new Date();
-										var minute = d.getHours();
-										d.setHours(d.getHours() - parseInt(datajson.since[0]));
-										if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-											if(j==0){
-												s.data.push([ d.getTime(), null ]);
-											}
-											else{
-												s.data.push([ arr[j+1][0], null ]);
-											}
-										}
-									}
-								}
-								else if(datajson.since[1]=="days"){
-									if(arr[j+1]!==undefined){
-										var d = new Date();
-										var day = d.getDate();
-										d.setDate(d.getDate() - parseInt(datajson.since[0]));
-										if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-											if(j==0){
-												s.data.push([ d.getTime(), null ]);
-											}
-											else{
-												s.data.push([ arr[j+1][0], null ]);
-											}
-										}
-									}
-								}
-								else if(datajson.since[1]=="months"){
-									if(arr[j+1]!==undefined){
-										var d = new Date();
-										var month = d.getMonth();
-										d.setMonth(d.getMonth() - parseInt(datajson.since[0]));
-										if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-											if(j==0){
-												s.data.push([ d.getTime(), null ]);
-											}
-											else{
-												s.data.push([ arr[j+1][0], null ]);
-											}
-										}
-									}
-								}
-								else{
-									if(arr[j+1]!==undefined){
-										var d = new Date();
-										var year = d.getFullYear();
-										d.setFullYear(d.getFullYear() - parseInt(datajson.since[0]));
-										if((arr[j][0]-d.getTime())/(arr[j+1][0]-arr[j][0])>2){
-											if(j==0){
-												s.data.push([ d.getTime(), null ]);
-											}
-											else{
-												s.data.push([ arr[j+1][0], null ]);
-											}
-										}
-									}
-								}
+							var datai = getdata(datajson,arr[j],arr[j+1],j)
+							if(datai!=null){
+								s.data.push(datai);
 							}
-							if(j>=2 && (arr[j][0]-arr[j-1][0])/(arr[j-1][0]-arr[j-2][0])>2){
-								if(arr[j+1]!==undefined){
-									if((arr[j][0]-arr[j-1][0])/(arr[j+1][0]-arr[j][0]) >2){
-										s.data.push([ arr[j][0], null ]);
-									}
-								}
-							}
-							s.data.push([ arr[j][0], arr[j][1] ]);
 							if(j==0){
 								maxi = arr[j][1];
 								mini = arr[j][1];
@@ -433,7 +265,7 @@ function updateChart(chartDIV,datajson,option) {
 					}
 				}
 			   	if(i+1 == count){
-			   		yaxes[yaxes.length] = {font : {size : 11,style : "",weight : "bold",family : "sans-serif",variant : "small-caps",color : "black"},max:Math.max.apply(Math, maxY)+1,min:minYi};
+			   		yaxes[yaxes.length] = {font : {size : 11,style : "",weight : "bold",family : "sans-serif",variant : "small-caps",color : "black"},max:Math.max.apply(Math, maxY)+1,min:minYi,class:"oneyaxis"};
 			   	}
 			   	else{
 			   		yaxes[yaxes.length] = {show:false,min:minYi,max:Math.max.apply(Math, maxY)+1};
@@ -443,7 +275,12 @@ function updateChart(chartDIV,datajson,option) {
 			else{
 				yaxes[yaxes.length] = {font : {size:11,style:"",weight:"bold",family:"sans-serif",variant:"small-caps",color : colori[i]}};
 				if(count<=1){
-					yaxes[yaxes.length-1].font.color = "black";
+					if(np_theme=="default" || np_theme==="undefined"){
+		    			yaxes[yaxes.length-1].font.color = "white";
+					}
+					else{
+						yaxes[yaxes.length-1].font.color = "black";
+					}
 				}
 				if(option.yzero){
 					var minYi = Math.min.apply(Math, minY);
@@ -485,13 +322,13 @@ function updateChart(chartDIV,datajson,option) {
                             }
                         }
                     }
-                    return '&nbsp;' + label +uniti;
+                    return '&nbsp;' + label.toUpperCase() +uniti.toUpperCase();
 				}
 			},
 			series: optionGraph,
 			grid : {
 				hoverable: true,
-				clickable: true
+				clickable: false
 			},
 			yaxes: yaxes,
 			color : colori,
@@ -529,7 +366,6 @@ function updateChart(chartDIV,datajson,option) {
 				if (item) {
 					var x = item.datapoint[0].toFixed(2),
 						y = item.datapoint[1].toFixed(2);
-						//console.log(item.series.label)
 					var newDate = new Date(parseInt(x));
 					var listDays = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
 					var listMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -558,14 +394,14 @@ function updateChart(chartDIV,datajson,option) {
 		if(option !== undefined) {
 			if(option.xaxis !== undefined && option.xaxis.trim()!=""){
 				var topX = topLegend+5;
-				$('<div id="'+chartDIV+'_x">'+option.xaxis+'</div>').css({
+				$('<div class="x_graph" id="'+chartDIV+'_x">'+option.xaxis.toUpperCase()+'</div>').css({
 					width : "100%",
 					margin: "auto",
 					textAlign : "center",
 					position : "absolute",
 					// height:"5%",
 					top: topX+"%",
-					font: '1em "proxima-nova", Helvetica, Arial, sans-serif',
+					font: '0.85em "proxima-nova", Helvetica, Arial, sans-serif',
 					color:"black",
 					"font-weight": "bold"
 				}).insertAfter("#"+chartDIV+"_legend");
@@ -574,14 +410,14 @@ function updateChart(chartDIV,datajson,option) {
 				// $("#"+chartDIV+"_graph").css({
 				// 	top:"10%"
 				// });
-				$('<div id="'+chartDIV+'_y">'+option.yaxis+'</div>').css({
+				$('<div class="y_graph" id="'+chartDIV+'_y">'+option.yaxis.toUpperCase()+'</div>').css({
 					textAlign : "center",
 					'-webkit-transform' : 'rotate(270deg)',
 	             	'-moz-transform' : 'rotate(270deg)',
 	             	'-ms-transform' : 'rotate(270deg)',
 	             	'transform' : 'rotate(270deg)',
 	             	position : "absolute",
-	             	font: '1em "proxima-nova", Helvetica, Arial, sans-serif',
+	             	font: '0.85em "proxima-nova", Helvetica, Arial, sans-serif',
 	             	color:"black",
 					"font-weight": "bold"
 				}).insertBefore("#"+chartDIV+"_graph");
@@ -629,8 +465,9 @@ function updateChart(chartDIV,datajson,option) {
 		*/
 	}
 	catch(err) {
-    document.getElementById(chartDIV).innerHTML = oldgraph;
-		// console.log(111)
+		if(oldgraph!=null){
+			document.getElementById(chartDIV).innerHTML = oldgraph;
+		}	
 	}
 
 	$(function () {
@@ -644,6 +481,18 @@ function updateChart(chartDIV,datajson,option) {
 	            }
 	        }
 	    }).resizable();
+	    // var prevBgColor = $('#'+chartDIV).css("background-color");
+	    // $('#'+chartDIV+"_graph").attrchange({
+	    // 	trackValues: true,
+	    //     callback: function (e) {
+	    //     	var curBgColor = $('#'+chartDIV).css("background-color");
+	    //     	console.log(prevBgColor !== curBgColor)
+	    //         if (prevBgColor !== curBgColor) {
+	    //             prevBgColor = curBgColor;
+	    //             updateChart(chartDIV,datajson,option);
+	    //         }
+	    //     }
+	    // });
 	});
 }
 
@@ -838,10 +687,8 @@ Licensed under the MIT license.
 
 		for (var layerKey in cache) {
 			if (hasOwnProperty.call(cache, layerKey)) {
-
 				var layer = this.getTextLayer(layerKey),
 					layerCache = cache[layerKey];
-
 				layer.hide();
 
 				for (var styleKey in layerCache) {
@@ -890,7 +737,6 @@ Licensed under the MIT license.
 		var layer = this.text[classes];
 
 		// Create the text layer if it doesn't exist
-
 		if (layer == null) {
 
 			// Create the text layer container, if it doesn't exist
@@ -908,7 +754,6 @@ Licensed under the MIT license.
 					})
 					.insertAfter(this.element);
 			}
-
 			layer = this.text[classes] = $("<div></div>")
 				.addClass(classes)
 				.css({
@@ -920,7 +765,6 @@ Licensed under the MIT license.
 				})
 				.appendTo(this.textContainer);
 		}
-
 		return layer;
 	};
 
@@ -971,7 +815,6 @@ Licensed under the MIT license.
 		// Cast the value to a string, in case we were given a number or such
 
 		text = "" + text;
-
 		// If the font is a font-spec object, generate a CSS font definition
 
 		if (typeof font === "object") {
@@ -999,7 +842,6 @@ Licensed under the MIT license.
 		// If we can't find a matching element in our cache, create a new one
 
 		if (info == null) {
-
 			var element = $("<div></div>").html(text)
 				.css({
 					position: "absolute",
@@ -1007,12 +849,13 @@ Licensed under the MIT license.
 					top: -9999
 				})
 				.appendTo(this.getTextLayer(layer));
-
+			element.addClass(font.class);
 			if (typeof font === "object") {
 				element.css({
 					font: textStyle,
 					color: font.color
 				});
+
 			} else if (typeof font === "string") {
 				element.addClass(font);
 			}
@@ -1633,7 +1476,6 @@ Licensed under the MIT license.
                     direction: axes == xaxes ? "x" : "y",
                     options: $.extend(true, {}, axes == xaxes ? options.xaxis : options.yaxis)
                 };
-
             return axes[number - 1];
         }
 
@@ -2046,7 +1888,10 @@ Licensed under the MIT license.
         }
 
         function measureTickLabels(axis) {
-
+        	var classcolortheme ="";
+        	if(axis.options.class!==undefined){
+				classcolortheme=axis.options.class;
+        	}
             var opts = axis.options,
                 ticks = axis.ticks || [],
                 labelWidth = opts.labelWidth || 0,
@@ -2055,7 +1900,10 @@ Licensed under the MIT license.
                 legacyStyles = axis.direction + "Axis " + axis.direction + axis.n + "Axis",
                 layer = "flot-" + axis.direction + "-axis flot-" + axis.direction + axis.n + "-axis " + legacyStyles,
                 font = opts.font || "flot-tick-label tickLabel";
-
+            var classcolortheme ="";
+        	if(axis.options.class!==undefined){
+				font.class=axis.options.class;
+        	}
             for (var i = 0; i < ticks.length; ++i) {
 
                 var t = ticks[i];
@@ -2064,7 +1912,6 @@ Licensed under the MIT license.
                     continue;
 
                 var info = surface.getTextInfo(layer, t.label, font, null, maxWidth);
-
                 labelWidth = Math.max(labelWidth, info.width);
                 labelHeight = Math.max(labelHeight, info.height);
             }
@@ -2253,6 +2100,10 @@ Licensed under the MIT license.
 
                 $.each(allocatedAxes, function (_, axis) {
                     // make the ticks
+
+                    if (allocatedAxes[allocatedAxes.length-1].options.class !== undefined){
+                    	axis.options.class = allocatedAxes[allocatedAxes.length-1].options.class;
+                    }
                     setupTickGeneration(axis);
                     setTicks(axis);
                     snapRangeToTicks(axis, axis.ticks);
@@ -2331,7 +2182,6 @@ Licensed under the MIT license.
 
         function setupTickGeneration(axis) {
             var opts = axis.options;
-
             // estimate number of ticks
             var noTicks;
             if (typeof opts.ticks == "number" && opts.ticks > 0)

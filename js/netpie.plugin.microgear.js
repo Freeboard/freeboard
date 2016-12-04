@@ -2,42 +2,12 @@
 /*  Developed by Chavee Issariyapat                               */
 /*  More information about NETPIE please visit https://netpie.io  */
 
-function toggletheme() {
-    var stylesheet = document.getElementById('netpie-theme-css');
-    if(stylesheet!=null){
-        stylesheet.parentNode.removeChild(stylesheet);
-        np_theme = "default";
-    }
-    else{
-        var  theme = document.createElement('link');
-        theme.id = 'netpie-theme-css';
-        theme.href = 'css/netpie.theme.css';
-        theme.rel = 'stylesheet';
-        document.head.appendChild(theme);
-        np_theme = "netpie";
-    }
-}
-
-function randomString(length) {
-    return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
-}
-
 if (typeof microgear === "undefined") {
     microgear = {};
 }
 
-if (typeof dsstore === "undefined") {
-    dsstore = {};
-}
-
-if (typeof globalStore === "undefined") {
-    globalStore = {};
-}
-
-// loadtheme();
-
-function runCode(cmd) {
-    eval(eval(cmd));
+function randomString(length) {
+    return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
 }
 
 (function()

@@ -1,7 +1,9 @@
 /*  NETPIE widget plugin for Freeboard                            */
 /*  Developed by Chavee Issariyapat                               */
 /*  More information about NETPIE please visit https://netpie.io  */
-
+if (typeof feedview === "undefined") {
+    feedview = [];
+}
 
 (function() {
 
@@ -123,9 +125,9 @@
 
     var feedviewWidgetPlugin = function(settings) {
 
-        function randomString(length) {
-            return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
-        }
+        // function randomString(length) {
+        //     return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
+        // }
 
         var self = this;
         var sizeWidth = {"240":"4","300":"5","360":"6","420":"7","480":"8","540":"9","600":"10"};
@@ -133,7 +135,6 @@
         var currentSettings = settings;
         var feedviewElement = $("<div id=\"chart"+self.widgetID+"\"></div>");
         var valuejson ;
-
         self.render = function(containerElement) {
             currentSettings.height = sizeWidth[currentSettings.height_block];
             $(containerElement).append(feedviewElement);
@@ -160,12 +161,20 @@
         }
 
         self.onDispose = function() {
-
+            for (var i = feedview.length - 1; i >= 0; i--) {
+                if(self.widgetID==feedview[i].id){
+                    check = true;
+                    index = i;
+                }
+            }
+            if(!check){
+                feedview.remove(i);
+            }
         }
 
-        this.onSettingsChanged(settings);
+        //this.onSettingsChanged(settings);
 
-        function insertFeedView() {
+        var insertFeedView =function() {
             currentSettings.height = sizeWidth[currentSettings.height_block];
             $("#"+'chart'+self.widgetID).css({
                 height:currentSettings.height_block+"px",
@@ -183,10 +192,26 @@
                     filter : currentSettings.filter
                 }
                 // jQuery(window).ready(function() {
-                    updateChart('chart'+self.widgetID,valuejson,option);
+                var check = false;
+                var index = -1 ;
+                for (var i = feedview.length - 1; i >= 0; i--) {
+                    if(self.widgetID==feedview[i].id){
+                        check = true;
+                        index = i;
+                    }
+                }
+                if(!check){
+                    feedview[feedview.length] = {id:self.widgetID,datajson:valuejson,settings:option};
+                }
+                else{
+                    if(feedview[index].datajson!=valuejson || feedview[index].settings!=option){
+                        feedview[index] = {id:self.widgetID,datajson:valuejson,settings:option};
+                    }
+                }
+                updateChart('chart'+self.widgetID,valuejson,option);
                 // });
-
             }
         }
+        
     }
 }());
