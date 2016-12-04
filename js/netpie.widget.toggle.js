@@ -2,25 +2,6 @@
 /*  Developed by Chavee Issariyapat                               */
 /*  More information about NETPIE please visit https://netpie.io  */
 
-// if (typeof globalStore === "undefined") {
-//     globalStore = {};
-// }
-
-// function randomString(length) {
-//     return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
-// }
-
-// function runCode(cmd) {
-//     eval(eval(cmd));
-// }
-function runCode(cmd) {
-    eval(eval(cmd));
-}
-
-if (typeof globalStore === "undefined") {
-    globalStore = {};
-}
-
 (function() {
 
     freeboard.loadWidgetPlugin({

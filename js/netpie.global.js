@@ -1,3 +1,4 @@
+/*  NETPIE global functions                                         */
 
 if (typeof globalStore === "undefined") {
     globalStore = {};
