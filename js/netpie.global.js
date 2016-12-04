@@ -1,3 +1,16 @@
+
+if (typeof globalStore === "undefined") {
+    globalStore = {};
+}
+
+function runCode(cmd) {
+    eval(eval(cmd));
+}
+
+function randomString(length) {
+    return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
+}
+
 function toggletheme() {
     var stylesheet = document.getElementById('netpie-theme-css');
     if(stylesheet!=null){
@@ -12,12 +25,8 @@ function toggletheme() {
         document.head.appendChild(theme);
         np_theme = "netpie";
     }
-    if (typeof feedview !== "undefined") {
-        for (var i = feedview.length - 1; i >= 0; i--) {
-            updateChart('chart'+feedview[i].id,feedview[i].datajson,feedview[i].settings);
-        }
-    }
     saveTheme();
+    freeboard.emit('theme_changed');
 }
 
 if (typeof np_theme === "undefined") {
