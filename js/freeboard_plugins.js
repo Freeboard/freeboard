@@ -516,8 +516,10 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 
 						var textFile = fileReaderEvent.target;
 						var jsonObject = JSON.parse(textFile.result);
-
-
+						
+						// Put the object into storage
+						localStorage.setItem('dashboardJson',JSON.stringify(jsonObject));
+						
 						self.loadDashboard(jsonObject);
 						self.setEditing(false);
 					});
@@ -533,7 +535,12 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 			alert('Unable to load a file in this browser.');
 		}
 	}
-
+	
+	//Relaod page
+	this.reload = function(){
+		location.reload();
+	}
+	
 	this.saveDashboardClicked = function(){
 		var target = $(event.currentTarget);
 		var siblingsShown = target.data('siblings-shown') || false;
@@ -545,21 +552,44 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 		target.data('siblings-shown', !siblingsShown);
 	}
 
+	this.saveDashboardToLocalStorage = function(_thisref, event){
+		//check browser support for localStorage and sessionStorage
+		if (typeof(Storage) !== "undefined") {
+			var pretty = $(event.currentTarget).data('pretty');
+			var jsonStr;
+			if(pretty){
+				jsonStr = JSON.stringify(self.serialize(), null, '\t');
+			}else{
+				jsonStr = JSON.stringify(self.serialize());
+			}
+			// Put the object into storage
+			localStorage.setItem('dashboardJson', jsonStr);
+		}
+	}
+	
 	this.saveDashboard = function(_thisref, event)
 	{
 		var pretty = $(event.currentTarget).data('pretty');
 		var contentType = 'application/octet-stream';
 		var a = document.createElement('a');
+		var jsonStr;
 		if(pretty){
 			var blob = new Blob([JSON.stringify(self.serialize(), null, '\t')], {'type': contentType});
+			jsonStr = JSON.stringify(self.serialize(), null, '\t');
 		}else{
 			var blob = new Blob([JSON.stringify(self.serialize())], {'type': contentType});
+			jsonStr = JSON.stringify(self.serialize());
 		}
 		document.body.appendChild(a);
 		a.href = window.URL.createObjectURL(blob);
 		a.download = "dashboard.json";
 		a.target="_self";
 		a.click();
+		//check browser support for localStorage and sessionStorage
+		if (typeof(Storage) !== "undefined") {
+			// Put the object into storage
+			localStorage.setItem('dashboardJson', jsonStr);
+		}
 	}
 
 	this.addDatasource = function(datasource)

@@ -1217,7 +1217,7 @@ header h1 {
 }
 
 #board-tools {
-	width: 50%;
+	width: 33%;
 	float: left;
 }
 
@@ -1232,9 +1232,9 @@ header h1 {
 }
 
 #datasources {
-	width: 50%;
-	float: right;
+	float: left;
 	height: 100%;
+	margin-left: 15px;
 }
 
 #cam {
@@ -1245,7 +1245,7 @@ header h1 {
 #admin-menu {
 	left: 0px;
 	right: 0px;
-	width: 950px;
+	width: 100%;
 	top: 20px;
 	margin: 0px auto;
 	padding-left: 10px;
@@ -1262,6 +1262,7 @@ header h1 {
 	padding: 0px;
 	margin: 0px;
 	line-height: normal;
+	text-align: center;
 }
 
 .sub-section {
@@ -2330,7 +2331,7 @@ h2.title {
 	}
 
 	#datasources {
-		width: 100%;
+		width: 33%;
 		float: none;
 		clear: both;
 	}

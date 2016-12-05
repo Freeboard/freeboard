@@ -2,32 +2,46 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>freeboard</title>
+    <title>Fabric Dashboard</title>
 	<meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="viewport" content = "width = device-width, initial-scale = 1, user-scalable = no" />
-    <link href="css/freeboard.min.css" rel="stylesheet" />
-    <script src="js/freeboard.thirdparty.min.js"></script>
+    <script type="text/javascript" src="js/freeboard.thirdparty.min.js"></script>
+    <script type="text/javascript" src="plugins/k2view/k2view.freeboard.js"></script>
+    <link href="css/freeboard.css" rel="stylesheet" type="text/css"/>
+    <link href="css/styles.css" rel="stylesheet" type="text/css"/>
     <script type="text/javascript">
-        head.js("js/freeboard_plugins.min.js",
-                // *** Load more plugins here ***
+        head.js("js/freeboard_plugins.js",
+        		'plugins/index.js',
                 function(){
                     $(function()
                     { //DOM Ready
                         freeboard.initialize(true);
-
-                        var hashpattern = window.location.hash.match(/(&|#)source=([^&]+)/);
-                        if (hashpattern !== null) {
-                            $.getJSON(hashpattern[2], function(data) {
-                                freeboard.loadDashboard(data, function() {
-                                    freeboard.setEditing(false);
-                                });
-                            });
-                        }
-
+                        loadDashboardFromLocalStorage();
+                        
                     });
                 });
+        
+        function loadDashboardFromLocalStorage(){
+        	//Load JSON from FreeboardServlet
+        	var hashpattern = window.location.hash.match(/(&|#)source=([^&]+)/);
+            if (hashpattern !== null) {
+                $.getJSON(hashpattern[2], function(data) {
+                	//check browser support for localStorage and sessionStorage
+            		if (typeof(Storage) !== "undefined") {
+                    	var item = localStorage.getItem('dashboardJson');
+            			if(item!=null){
+            				var jsonObject = JSON.parse(item);
+            				freeboard.loadDashboard(jsonObject,function() {
+                                freeboard.setEditing(false);
+                            });
+            			}
+            		}
+                });
+            }
+        }
+        
     </script>
 </head>
 <body>
@@ -42,7 +56,7 @@
     <div id="admin-bar">
         <div id="admin-menu">
             <div id="board-tools">
-                <h1 id="board-logo" class="title bordered">freeboard</h1>
+                <h1 id="board-logo" class="title bordered">Fabric Dashboard</h1>
                 <div id="board-actions">
                     <ul class="board-toolbar vertical">
                         <li data-bind="click: loadDashboardFromLocalFile"><i id="full-screen-icon" class="icon-folder-open icon-white"></i><label id="full-screen">Load Freeboard</label></li>
@@ -54,6 +68,16 @@
                         <li id="add-pane" data-bind="click: createPane"><i class="icon-plus icon-white"></i><label>Add Pane</label></li>
                     </ul>
                 </div>
+            </div>
+            <div id="instanceIdDiv">
+                <h2 class="title">INSTANCE ID</h2>
+				<div id="setting-row-name" class="form-row">
+					<div id="setting-value-container-name" class="form-value instanceIdInput">
+						<input type="text" style="width:100px;border-color:#B88F51;" id="instanceId">
+						<label class="text-button" data-bind="click: loadInstance">Load</label>
+					</div>
+				</div>
+				<div><span id="resultMsg"></span></div>
             </div>
             <div id="datasources">
                 <h2 class="title">DATASOURCES</h2>
@@ -142,6 +166,16 @@
         </section>
     </li>
 </script>
+
+	<!-- The Modal -->
+	<div id="myModal" class="modalClass">
+	
+	  <!-- Modal content -->
+	  <div class="modal-content-mymodal">
+	    <span class="close">x</span>
+	    <p></p>
+	  </div>
+	</div>
 
 </body>
 </html>
