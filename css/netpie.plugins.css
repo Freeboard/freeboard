@@ -1,0 +1,247 @@
+.netpie-button {
+    height: 36px;
+    width: 50%;
+    display: inline-block;
+    box-shadow: 0px 1px 0px 1px #111111;
+    border-radius: 4px;
+    text-decoration: none;
+    text-align: center;
+    outline: none;
+    font-size: 125%;
+    float: left;
+}
+
+.netpie-button-text {
+    vertical-align: bottom;
+    padding: 8px 0px 0px 15px;
+    float: left;
+}
+
+.netpie-toggle {
+    float: left;
+    position: relative;
+    width: 100px;
+    margin-top: 6px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.netpie-toggle-text {
+    vertical-align: top;
+    padding: 15px 0px 0px 15px;
+    float: left;
+}
+
+.netpie-toggle-checkbox {
+    display: none;
+}
+
+.netpie-toggle-label {
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid #999999;
+    border-radius: 20px;
+}
+
+.netpie-toggle-inner {
+    display: block;
+    width: 200%;
+    margin-left: -100%;
+    transition: margin 0.1s ease-in 0s;
+}
+
+.netpie-toggle-inner:before, .netpie-toggle-inner:after {
+    display: block;
+    float: left;
+    width: 50%;
+    height: 30px;
+    padding: 0;
+    line-height: 30px;
+    font-size: 14px;
+    color: white;
+    font-family: Trebuchet, Arial, sans-serif;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+.netpie-toggle-inner:before {
+    content: attr(ontext);
+    padding-left: 15px;
+    background-color: #2ecc71;
+    color: #FFFFFF;
+    text-align: left;
+}
+
+.netpie-toggle-inner:after {
+    content: attr(offtext);
+    padding-right: 15px;
+    background-color: #E74C3C;
+    color: #FFFFFF;
+    text-align: right;
+}
+
+.netpie-toggle-switch {
+    display: block;
+    width: 18px;
+    margin: 6px;
+    background: #FFFFFF;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 66px;
+    border: 2px solid #999999;
+    border-radius: 20px;
+    transition: all 0.1s ease-in 0s;
+}
+
+.netpie-toggle-checkbox:checked + .netpie-toggle-label .netpie-toggle-inner {
+    margin-left: 0;
+}
+
+.netpie-toggle-checkbox:checked + .netpie-toggle-label .netpie-toggle-switch {
+    right: 0px;
+}
+
+.netpit-feedvew-header {
+    display: inline-block, vertical-align: middle, width: 100%, height: 10%, margin: auto, text-align: center, font: 14px/0.8em "proxima-nova", Helvetica, Arial, sans-serif, color: black, font-weight: bold
+}
+
+.logo-netpie {
+    content: url("../img/netpie-logo-white.png");
+}
+
+.theme-toggle {
+    /*float: left;*/
+    position: absolute;
+    top: 18px;
+    right: 1vw;
+    width: 50px;
+    margin: auto;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.theme-toggle-text {
+    vertical-align: top;
+    padding: 15px 0px 0px 15px;
+    float: left;
+}
+
+.theme-toggle-checkbox {
+    display: none;
+}
+
+.theme-toggle-inner {
+    display: block;
+    width: 200%;
+    margin-left: -100%;
+    transition: margin 0.1s ease-in 0s;
+}
+
+.theme-toggle-inner:before, .theme-toggle-inner:after {
+    display: block;
+    float: left;
+    width: 50%;
+    height: 20px;
+    padding: 0;
+    line-height: 30px;
+    font-size: 14px;
+    color: white;
+    font-family: Trebuchet, Arial, sans-serif;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+.theme-toggle-inner:before {
+    content: url("../img/sun.png");
+    padding-left: 8px;
+    background-color: #007FFF;
+    color: #FFFFFF;
+    text-align: left;
+}
+
+.theme-toggle-inner:after {
+    content: url("../img/moon.png");
+    padding-right: 3px;
+    background-color: #313131;
+    color: #FFFFFF;
+    text-align: right;
+}
+
+
+.theme-toggle-checkbox:checked + .theme-toggle-label .theme-toggle-inner {
+    margin-left: 0;
+}
+
+.theme-toggle-checkbox:checked + .theme-toggle-label .theme-toggle-switch {
+    right: 0px;
+}
+
+.theme-toggle-switch {
+    display: block;
+    width: 12px;
+    height: 12px;
+    margin: 4px;
+    background: #FFFFFF;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 25px;
+    border: 2px solid #999999;
+    border-radius: 20px;
+    transition: all 0.1s ease-in 0s;
+}
+
+.theme-toggle-label {
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid #999999;
+    border-radius: 20px;
+}
+
+.bg-graph {
+    background-color: #2A2A2A;
+}
+
+.bg-graph div table tbody tr td {
+    /*color: #B3B3B3 !important ;*/
+    color: #fff !important ;
+    font-family: Trebuchet, Arial, sans-serif !important;
+    font-weight: normal !important;
+}
+
+.bg-graph div .oneyaxis {
+    color: #fff !important ;
+    /*font-family: Trebuchet, Arial, sans-serif !important;
+    font-weight: normal !important;*/
+}
+
+.bg-graph div {
+    /*color: #fff !important ;*/
+    font-family: Trebuchet, Arial, sans-serif !important;
+    font-weight: normal !important;
+}
+
+.flot-x-axis div {
+    color: #fff !important ;
+}
+
+.header_graph {
+    color: #fff !important ;
+}
+
+.y_graph {
+    color: #fff !important ;
+}
+
+.x_graph {
+    color: #fff !important ;
+}
+
+.legendLabel{
+    font-size: 11px !important ;
+}
