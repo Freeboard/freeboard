@@ -2,10 +2,6 @@
 /*  Developed by Chavee Issariyapat                               */
 /*  More information about NETPIE please visit https://netpie.io  */
 
-if (typeof globalStore === "undefined") {
-     globalStore = {};
-}
-
 if (typeof sliderObject == "undefined") {
     sliderObject = {};
 }
