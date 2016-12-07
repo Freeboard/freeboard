@@ -128,7 +128,7 @@ function FreeboardModel(a, b, c) {
                         window.localStorage.setItem("netpie.freeboard.dashboard", JSON.stringify(c));
 
                         d.loadDashboard(c), d.setEditing(!1)
-                        loadTheme();
+                        freeboard.emit('load_theme');
                     }), e.readAsText(c)
                 }
             }), $(a).trigger("click")

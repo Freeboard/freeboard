@@ -43,7 +43,7 @@ function saveTheme(){
     }    
 }
 
-function loadTheme(){
+freeboard.on('load_theme',function() {
     var stylesheet = document.getElementById('netpie-theme-css');
     var data = window.localStorage.getItem("netpie.freeboard.dashboard");
     var datajson = JSON.parse(data);
@@ -70,6 +70,7 @@ function loadTheme(){
         document.getElementById('theme-toggle').checked = false;
     }
     saveTheme();
-};
+});
 
-loadTheme();
+freeboard.emit('load_theme');
+
