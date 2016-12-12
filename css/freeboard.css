@@ -431,6 +431,13 @@ body {
 	margin: 0;
 }
 
+/* Hacky hack. Remove scrollbars for 320 width screens */
+@media screen and (max-width : 320px) {
+	body::-webkit-scrollbar {
+		display: none;
+	}
+}
+
 /* ==========================================================================
    Links
    ========================================================================== */
