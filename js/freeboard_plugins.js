@@ -66,9 +66,12 @@ function FreeboardModel(a, b, c) {
         });
         var b = [];
         var data = window.localStorage.getItem("netpie.freeboard.dashboard");
+        var theme = "default"
         var datajson = JSON.parse(data);
-        if(datajson.theme===undefined){
-            datajson.theme = "default"
+        if(datajson!==null){
+            if(datajson.theme!==undefined){
+                theme = datajson.theme
+            }
         }
         return _.each(d.datasources(), function(a) {
             b.push(a.serialize())
@@ -80,7 +83,7 @@ function FreeboardModel(a, b, c) {
             panes: a,
             datasources: b,
             columns: c.getUserColumns(),
-            theme:datajson.theme
+            theme:theme
         }
     }, this.deserialize = function(e, f) {
         function g() {
