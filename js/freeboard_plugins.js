@@ -66,9 +66,12 @@ function FreeboardModel(a, b, c) {
         });
         var b = [];
         var data = window.localStorage.getItem("netpie.freeboard.dashboard");
+        var theme = "default"
         var datajson = JSON.parse(data);
-        if(datajson.theme===undefined){
-            datajson.theme = "default"
+        if(datajson!==null){
+            if(datajson.theme!==undefined){
+                theme = datajson.theme
+            }
         }
         return _.each(d.datasources(), function(a) {
             b.push(a.serialize())
@@ -80,7 +83,7 @@ function FreeboardModel(a, b, c) {
             panes: a,
             datasources: b,
             columns: c.getUserColumns(),
-            theme:datajson.theme
+            theme:theme
         }
     }, this.deserialize = function(e, f) {
         function g() {
@@ -128,7 +131,7 @@ function FreeboardModel(a, b, c) {
                         window.localStorage.setItem("netpie.freeboard.dashboard", JSON.stringify(c));
 
                         d.loadDashboard(c), d.setEditing(!1)
-                        loadTheme();
+                        freeboard.emit('load_theme');
                     }), e.readAsText(c)
                 }
             }), $(a).trigger("click")
@@ -1912,8 +1915,8 @@ $.extend(freeboard, jQuery.eventEmitter),
         freeboard.loadWidgetPlugin({
             type_name: "gauge",
             display_name: "Gauge",
-//            external_scripts: ["plugins/thirdparty/raphael.2.1.0.min.js", "plugins/thirdparty/justgage.1.0.1.js"],
-            external_scripts: ["plugins/thirdparty/raphael.2.1.4.min.js", "plugins/thirdparty/justgage.1.2.2.js"],
+            external_scripts: ["plugins/thirdparty/raphael.2.1.0.min.js", "plugins/thirdparty/justgage.1.0.1.js"],
+//            external_scripts: ["plugins/thirdparty/raphael.2.1.4.min.js", "plugins/thirdparty/justgage.1.2.2.js"],
             settings: [{
                 name: "title",
                 display_name: "Title",

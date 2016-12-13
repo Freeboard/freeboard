@@ -2,13 +2,6 @@
 /*  Developed by Chavee Issariyapat                               */
 /*  More information about NETPIE please visit https://netpie.io  */
 
-// if (typeof microgear === "undefined") {
-//     microgear = {};
-// }
-
-// if (typeof dsstore === "undefined") {
-//     dsstore = {};
-// }
 if (typeof dsstore === "undefined") {
     dsstore = {};
 }
