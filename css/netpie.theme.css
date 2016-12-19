@@ -258,10 +258,18 @@ ul.value-dropdown li.selected {
 }
 
 .indicator-light {
-    background-color: #B3B3B3;
-    border-color: #B3B3B3;
+    background-color: #DCDCDC;
+    border-color: #DCDCDC;
 }
 
 .indicator-light.on {
     border-color: #FFC773;
+}
+
+.gauge-widget svg path:nth-of-type(1) {
+    fill: #DCDCDC;
+}
+
+.rangeSlider {
+    background-color: #DCDCDC !important;
 }
