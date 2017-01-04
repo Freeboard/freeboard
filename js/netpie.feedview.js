@@ -20,23 +20,26 @@ function getdata(datajson,arr,arrnext,index){
 			var timebegin = timelist[datajson.since[1]]*datajson.since[0];
 			var datenow = new Date().getTime();
 			if(arr[0]-(datenow-timebegin)>timesplit){
-				return [ datenow-timebegin, null ];
+				return [[ datenow-timebegin, null ]];
 			}
 		}
 		else{
 			if(arrnext[0]-arr[0]>timesplit){
-				return [ arrnext[0], null];
+				return [[ arr[0], arr[1] ],[ arrnext[0], null]];
 			}
-			return [ arr[0], arr[1] ];
+			return [[ arr[0], arr[1] ]];
 		}
 	}
 	else{
 		var timesplit = timelist[datajson.granularity[1]]*datajson.granularity[0]*1.5;
 		var datenow = new Date().getTime();
 		if(datenow-arr[0]>timesplit){
-			return [ datenow, null ]
+			return [[ arr[0], arr[1] ],[datenow, null]];
 		}
-		return null
+		else{
+			return [[ arr[0], arr[1] ]]
+		}
+		return null;
 	}
 
 }
@@ -183,10 +186,19 @@ function updateChart(chartDIV,datajson,option) {
 							}
 							var arr = datajson.data[i].values;
 							for (var j=0; j<arr.length; j++) {
-								var datai = getdata(datajson,arr[j],arr[j+1],j)
-								if(datai!=null){
-									s.data.push(datai);
+								var datai = null;
+								if (option && option.autogap){
+									datai = getdata(datajson,arr[j],arr[j+1],j)
 								}
+								else{
+									datai = [[ arr[j][0], arr[j][1] ]];
+								}
+								if(datai!=null){
+									console.log(datai.length)
+									for (var k=0; k<datai.length; k++) {
+										s.data.push(datai[k]);
+									}
+								}s
 								if(j==0){
 									maxi = arr[j][1];
 									mini = arr[j][1];
@@ -221,9 +233,17 @@ function updateChart(chartDIV,datajson,option) {
 						}
 						var arr = datajson.data[i].values;
 						for (var j=0; j<arr.length; j++) {
-							var datai = getdata(datajson,arr[j],arr[j+1],j)
+							var datai = null;
+							if (option && option.autogap){
+								datai = getdata(datajson,arr[j],arr[j+1],j)
+							}
+							else{
+								datai = [[ arr[j][0], arr[j][1] ]];
+							}
 							if(datai!=null){
-								s.data.push(datai);
+								for (var k=0; k<datai.length; k++) {
+									s.data.push(datai[k]);
+								}
 							}
 							if(j==0){
 								maxi = arr[j][1];

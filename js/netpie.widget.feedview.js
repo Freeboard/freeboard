@@ -75,12 +75,19 @@ if (typeof feedview === "undefined") {
                 name: "marker",
                 display_name: "Maker",
                 type: "boolean",
+                default_value: true
             },
             {
                 name: "multipleaxis",
                 display_name: "Multiple Axis",
                 type: "boolean",
                 default_value: true
+            },
+            {
+                name: "autogap",
+                display_name: "Auto Gap",
+                type: "boolean",
+                default_value: false
             },
             {
                 name: "height_block",
@@ -188,7 +195,8 @@ if (typeof feedview === "undefined") {
                     color:currentSettings.color,
                     type : currentSettings.type, //line,step
                     marker : currentSettings.marker, //true,false
-                    filter : currentSettings.filter
+                    filter : currentSettings.filter,
+                    autogap : currentSettings.autogap
                 }
                 // jQuery(window).ready(function() {
                 updateChart('chart'+self.widgetID,self.valuejson,self.option);
