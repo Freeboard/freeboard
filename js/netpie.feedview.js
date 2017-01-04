@@ -187,7 +187,7 @@ function updateChart(chartDIV,datajson,option) {
 							var arr = datajson.data[i].values;
 							for (var j=0; j<arr.length; j++) {
 								var datai = null;
-								if (option && option.timegap){
+								if (option && option.autogap){
 									datai = getdata(datajson,arr[j],arr[j+1],j)
 								}
 								else{
@@ -234,7 +234,7 @@ function updateChart(chartDIV,datajson,option) {
 						var arr = datajson.data[i].values;
 						for (var j=0; j<arr.length; j++) {
 							var datai = null;
-							if (option && option.timegap){
+							if (option && option.autogap){
 								datai = getdata(datajson,arr[j],arr[j+1],j)
 							}
 							else{

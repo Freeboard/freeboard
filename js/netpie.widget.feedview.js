@@ -75,6 +75,7 @@ if (typeof feedview === "undefined") {
                 name: "marker",
                 display_name: "Maker",
                 type: "boolean",
+                default_value: true
             },
             {
                 name: "multipleaxis",
@@ -83,10 +84,10 @@ if (typeof feedview === "undefined") {
                 default_value: true
             },
             {
-                name: "timegap",
-                display_name: "Time Gap",
+                name: "autogap",
+                display_name: "Auto Gap",
                 type: "boolean",
-                default_value: true
+                default_value: false
             },
             {
                 name: "height_block",
@@ -195,7 +196,7 @@ if (typeof feedview === "undefined") {
                     type : currentSettings.type, //line,step
                     marker : currentSettings.marker, //true,false
                     filter : currentSettings.filter,
-                    timegap : currentSettings.timegap
+                    autogap : currentSettings.autogap
                 }
                 // jQuery(window).ready(function() {
                 updateChart('chart'+self.widgetID,self.valuejson,self.option);
