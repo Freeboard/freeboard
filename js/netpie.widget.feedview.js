@@ -83,6 +83,12 @@ if (typeof feedview === "undefined") {
                 default_value: true
             },
             {
+                name: "timegap",
+                display_name: "Time Gap",
+                type: "boolean",
+                default_value: true
+            },
+            {
                 name: "height_block",
                 display_name: "Height Blocks",
                 type: "option",
@@ -188,7 +194,8 @@ if (typeof feedview === "undefined") {
                     color:currentSettings.color,
                     type : currentSettings.type, //line,step
                     marker : currentSettings.marker, //true,false
-                    filter : currentSettings.filter
+                    filter : currentSettings.filter,
+                    timegap : currentSettings.timegap
                 }
                 // jQuery(window).ready(function() {
                 updateChart('chart'+self.widgetID,self.valuejson,self.option);
