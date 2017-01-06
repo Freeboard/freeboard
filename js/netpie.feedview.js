@@ -169,7 +169,7 @@ function updateChart(chartDIV,datajson,option) {
 		var count = 0;
 		if (datajson) {
 			var numcolor = color.length;
-			if(datajson.data.length>1){
+			if(datajson.data.length>=1){
 				for (var i=0; i<datajson.data.length; i++) {
 					unit[unit.length] = [datajson.data[i].attr,datajson.data[i].unit];
 					var maxi;
@@ -194,7 +194,6 @@ function updateChart(chartDIV,datajson,option) {
 									datai = [[ arr[j][0], arr[j][1] ]];
 								}
 								if(datai!=null){
-									console.log(datai.length)
 									for (var k=0; k<datai.length; k++) {
 										s.data.push(datai[k]);
 									}
