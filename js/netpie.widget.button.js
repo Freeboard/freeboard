@@ -57,7 +57,7 @@
                 "name"        : "onClick",
                 "display_name": "onClick action",
                 "type"        : "calculated",
-                "description" : "Add some Javascript here. You can chat and publish with a datasource's microgear like this : microgear[\"mygear\"].chat(\"mylamp\",\"ON\"), where \"mygear\" is a microgear reference."
+                "description" : "Add some Javascript here. You can chat and publish with a datasource's microgear like this : microgear[\"mygear\"].chat(\"mylamp\",\"ON\"), where \"mygear\" is a datasource name."
             },
             {
                 "name"          : "onCreatedAction",
