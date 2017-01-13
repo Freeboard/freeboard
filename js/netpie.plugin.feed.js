@@ -34,7 +34,7 @@ if (typeof dsstore === "undefined") {
                 "name"         : "granularity_value",
                 "display_name" : "Granularity",
                 "type"         : "text",
-                "default_value": "1",
+                "default_value": "5",
                 "required"     : false,
             },
             {
@@ -67,31 +67,14 @@ if (typeof dsstore === "undefined") {
                         name: "Year",
                         value: "years"
                     }
-                ]
+                ],
+                "default_value": "minutes",
             },
-/*
-            {
-                name: "aggregate",
-                display_name: "Aggregate",
-                type: "option",
-                "description"  : "Aggregation method e.g. how to calculate each data point.",
-                options:[
-                    {
-                        name: "Average",
-                        value: "avg"
-                    },
-                    {
-                        name: "Rate",
-                        value: "rate"
-                    }
-                ]
-            },
-*/
             {
                 "name"         : "since_value",
                 "display_name" : "Since",
                 "type"         : "text",
-                "default_value": "1",
+                "default_value": "6",
                 "required"     : false,
             },
             {
@@ -124,7 +107,8 @@ if (typeof dsstore === "undefined") {
                         name: "Year",
                         value: "years"
                     }
-                ]
+                ],
+                "default_value": "hours",
             },
             {
                 "name"          : "interval",
