@@ -568,7 +568,7 @@ freeboard.loadDatasourcePlugin({
                 // **required** : Set to true if this setting is required for the datasource to be created.
                 "required" : true
 			}
-			
+
 		],
 		// **newInstance(settings, newInstanceCallback, updateCallback)** (required) : A function that will be called when a new instance of this plugin is requested.
 		// * **settings** : A javascript object with the initial settings set by the user. The names of the properties in the object will correspond to the setting names defined above.
@@ -594,11 +594,11 @@ freeboard.loadDatasourcePlugin({
 		// Good idea to create a variable to hold on to our settings, because they might change in the future. See below.
 		var currentSettings = settings;
 
-		
+
 
 		/* This is some function where I'll get my data from somewhere */
 
- 	
+
 		function getData()
 		{
 
@@ -606,11 +606,11 @@ freeboard.loadDatasourcePlugin({
 		 var conn = skynet.createConnection({
     		"uuid": currentSettings.uuid,
     		"token": currentSettings.token,
-    		"server": currentSettings.server, 
+    		"server": currentSettings.server,
     		"port": currentSettings.port
-  				});	
-			 
-			 conn.on('ready', function(data){	
+  				});
+
+			 conn.on('ready', function(data){
 
 			 	conn.on('message', function(message){
 
@@ -622,7 +622,7 @@ freeboard.loadDatasourcePlugin({
 			 });
 			}
 
-	
+
 
 		// **onSettingsChanged(newSettings)** (required) : A public function we must implement that will be called when a user makes a change to the settings.
 		self.onSettingsChanged = function(newSettings)
@@ -641,7 +641,7 @@ freeboard.loadDatasourcePlugin({
 		// **onDispose()** (required) : A public function we must implement that will be called when this instance of this plugin is no longer needed. Do anything you need to cleanup after yourself here.
 		self.onDispose = function()
 		{
-		
+
 			//conn.close();
 		}
 
@@ -659,14 +659,14 @@ freeboard.loadDatasourcePlugin({
 		"description" : "Query the Losant API for a device's most recently reported attribute value.",
 		"settings"    : [
 			{
-				"name"         : "applicationKey",
-				"display_name" : "Access Key",
+				"name"         : "applicationId",
+				"display_name" : "Application ID",
 				"type"         : "text",
 				"required" : true
 			},
 			{
-				"name"					: "applicationSecret",
-				"display_name"	: "Access Secret",
+				"name"					: "applicationToken",
+				"display_name"	: "Application Token",
 				"type"					: "text",
 				"required"			: true
 			},
@@ -698,18 +698,12 @@ freeboard.loadDatasourcePlugin({
 	var myDatasourcePlugin = function(settings, updateCallback)
 	{
 		// a constant
-		var tokenTTL = 3600000; // 24 hours. fetch a new token after this amount of time.
-
 		var self = this;
 		var currentSettings = settings;
 
-		var accessToken = {}; // { applicationId, token, expires (now plus tokenTTL)}
-
 		function getData() {
-			return getAccessToken(currentSettings.deviceId, currentSettings.applicationKey, currentSettings.applicationSecret)
-				.then(function(authResult) {
-					return getDeviceData(authResult.applicationId, currentSettings.deviceId, currentSettings.attribute, authResult.token);
-				}).then(function(data) {
+			return getDeviceData(currentSettings.applicationId, currentSettings.deviceId, currentSettings.attribute, currentSettings.applicationToken)
+				.then(function(data) {
 					return updateCallback(data);
 				}).fail(function(err) {
 					return updateCallback({
@@ -745,46 +739,6 @@ freeboard.loadDatasourcePlugin({
 			});
 		}
 
-		function getAccessToken(deviceId, key, secret) {
-			// 1. Do we have a token?
-			// 2. Is the token still fresh?
-			// 3. Do the credentials used to create the token match the credentials currently being passed into the function?
-			// If YES to all three, return the token in memory
-			var now = new Date().getTime();
-			if(accessToken && accessToken.expires > now && accessToken.deviceId === deviceId && accessToken.key === key && accessToken.secret === secret) {
-				var deferred = new $.Deferred();
-				return deferred.resolve(accessToken);
-			} else {
-				// Otherwise, generate a new token
-				var credentials = {
-					deviceId: deviceId,
-					key: key,
-					secret: secret
-				};
-				return $.ajax({
-					type: 'POST',
-					url: 'https://api.losant.com/auth/device',
-					data: JSON.stringify(credentials),
-					dataType: 'json',
-					contentType: 'application/json'
-				}).then(function(data) {
-					if(data.token) {
-						// store the credentials we used to make the request.
-						// we need these to fetch a new token if the user made any changes
-						accessToken = {
-							deviceId: deviceId,
-							key: key,
-							secret: secret,
-							applicationId: data.applicationId,
-							token: data.token,
-							expires: new Date().getTime() + tokenTTL
-						};
-					}
-					return accessToken;
-				});
-			}
-		}
-
 		// You'll probably want to implement some sort of timer to refresh your data every so often.
 		var refreshTimer;
 
@@ -806,7 +760,6 @@ freeboard.loadDatasourcePlugin({
 		self.onSettingsChanged = function(newSettings)
 		{
 			// Here we update our current settings with the variable that is passed in.
-			console.log('changed', newSettings);
 			currentSettings = newSettings;
 		};
 
