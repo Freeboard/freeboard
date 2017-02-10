@@ -90,6 +90,7 @@ if (typeof microgear === "undefined") {
         if (settings.alias) gconf.alias = settings.alias;
 
         var data = {};
+        var aliasList = {};
 
         function initSubscribe(toparr, toSub) {
             if (toparr && toparr.length>0) {
@@ -160,7 +161,45 @@ if (typeof microgear === "undefined") {
             }
         });
 
+        self.mg.on('present', function(m) {
+            var aobj = {
+                token : m.token
+            };
+            var found = 0;
+            if (typeof(aliasList[m.alias]) != 'undefined') {
+                for (var k=0; k<aliasList[m.alias].length; k++) {
+                    if (aliasList[m.alias][k].token == m.token) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            else {
+                aliasList[m.alias] = [];
+            }
+            if (!found) {
+                aliasList[m.alias].push(aobj);
+            }
+            data['alias'] = aliasList;
+            updateCallback(data);
+        });
+
+        self.mg.on('absent', function(m) {
+            if (typeof(aliasList[m.alias]) != 'undefined') {
+                for (var k=0; k<aliasList[m.alias].length; k++) {
+                    if (aliasList[m.alias][k].token == m.token) {
+                        aliasList[m.alias].splice(k,1);
+                        break;
+                    }
+                }
+            }
+            data['alias'] = aliasList;
+            updateCallback(data);
+        });
+
         self.mg.on('connected', function() {
+            onlineList = {};
+
             initSubscribe(settings.topics.trim().split(','), true);
             if (gconf.alias) {
                 self.mg.setAlias(gconf.alias);
