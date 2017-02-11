@@ -162,13 +162,16 @@ if (typeof microgear === "undefined") {
         });
 
         self.mg.on('present', function(m) {
+            //console.log('p---> '+JSON.stringify(m));
+
+            var mtoken = m.gear;
             var aobj = {
-                token : m.token
+                token : mtoken
             };
-            var found = 0;
+            var found = false;
             if (typeof(aliasList[m.alias]) != 'undefined') {
                 for (var k=0; k<aliasList[m.alias].length; k++) {
-                    if (aliasList[m.alias][k].token == m.token) {
+                    if (aliasList[m.alias][k].token == mtoken) {
                         found = true;
                         break;
                     }
@@ -177,17 +180,34 @@ if (typeof microgear === "undefined") {
             else {
                 aliasList[m.alias] = [];
             }
+
             if (!found) {
+                // if the alias changed, remove the old one located under the old alias name
+                if (m.type=='alias') {
+                    for (var _alias in aliasList) {
+                        for (var k=0; k<aliasList[_alias].length; k++) {
+                            if (aliasList[_alias][k].token == mtoken) {
+                                aliasList[_alias].splice(k,1);
+                            }
+                        }
+                    }
+                }
+
                 aliasList[m.alias].push(aobj);
             }
             data['alias'] = aliasList;
             updateCallback(data);
         });
 
+
         self.mg.on('absent', function(m) {
+            //console.log('a---> '+JSON.stringify(m));
+
+            var mtoken = m.gear;
+
             if (typeof(aliasList[m.alias]) != 'undefined') {
                 for (var k=0; k<aliasList[m.alias].length; k++) {
-                    if (aliasList[m.alias][k].token == m.token) {
+                    if (aliasList[m.alias][k].token == mtoken) {
                         aliasList[m.alias].splice(k,1);
                         break;
                     }
@@ -226,6 +246,7 @@ if (typeof microgear === "undefined") {
         self.mg.connect(settings.appid, function(){
 
         });
+
     }
 }());
 
