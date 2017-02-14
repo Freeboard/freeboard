@@ -201,14 +201,13 @@ if (typeof microgear === "undefined") {
 
 
         self.mg.on('absent', function(m) {
-            //console.log('a---> '+JSON.stringify(m));
-
             var mtoken = m.gear;
 
             if (typeof(aliasList[m.alias]) != 'undefined') {
                 for (var k=0; k<aliasList[m.alias].length; k++) {
                     if (aliasList[m.alias][k].token == mtoken) {
                         aliasList[m.alias].splice(k,1);
+                        if (aliasList[m.alias].length == 0) delete aliasList[m.alias];
                         break;
                     }
                 }
