@@ -3696,7 +3696,7 @@ freeboard.loadDatasourcePlugin({
 				"name"					: "applicationToken",
 				"display_name"	: "Application Token",
 				"type"					: "text",
-				"description"  : "Token must have \"Read\" permissions for devices.",
+				"description"  : "Token must have permission to perform last value queries.",
 				"required"			: true
 			},
 			{
