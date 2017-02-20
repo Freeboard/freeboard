@@ -180,10 +180,9 @@ if (typeof microgear === "undefined") {
             else {
                 aliasList[m.alias] = [];
             }
-
             if (!found) {
                 // if the alias changed, remove the old one located under the old alias name
-                if (m.type=='alias') {
+                if (m.type=='aliased') {
                     for (var _alias in aliasList) {
                         for (var k=0; k<aliasList[_alias].length; k++) {
                             if (aliasList[_alias][k].token == mtoken) {
@@ -195,6 +194,15 @@ if (typeof microgear === "undefined") {
 
                 aliasList[m.alias].push(aobj);
             }
+
+
+            for (var _alias in aliasList) {
+                        if (aliasList[_alias].length == 0) {
+                            console.log();
+                            delete aliasList[_alias];
+                        }
+            }
+
             data['alias'] = aliasList;
             updateCallback(data);
         });
