@@ -225,7 +225,9 @@ if (typeof microgear === "undefined") {
         });
 
         self.mg.on('connected', function() {
-            onlineList = {};
+            aliasList = {};
+            data['alias'] = aliasList;
+            updateCallback(data);
 
             initSubscribe(settings.topics.trim().split(','), true);
             if (gconf.alias) {
@@ -250,6 +252,12 @@ if (typeof microgear === "undefined") {
             }
         })
 
+        self.mg.on('disconnected', function() {
+            aliasList = {};
+            data['alias'] = aliasList;
+            updateCallback(data);
+        });
+    
         self.mg.connect(settings.appid, function(){
 
         });
