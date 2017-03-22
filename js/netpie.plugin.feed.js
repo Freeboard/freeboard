@@ -222,7 +222,7 @@ if (typeof dsstore === "undefined") {
                     }
                      
                 }
-                if(s.to_value>timenow){
+                if(timelastitem+s.granularity_value*timelist[s.granularity_unit]<s.to_value){
                     var apiurl = 'https://api.netpie.io/feed/'+s.feedid+'?apikey='+s.apikey+'&granularity='+s.granularity_value+s.granularity_unit+'&aggregate=avg&from='+timelastitem+'&to='+s.to_value;
                     $.getJSON( apiurl, function(datajson) {
                         if(typeof datajson['lastest_data'] !== "undefined"){
