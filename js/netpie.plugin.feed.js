@@ -154,6 +154,7 @@ if (typeof dsstore === "undefined") {
         function reloadhData(s) {
             if(typeof data['data'] !== "undefined"){
                 var timenow = new Date().getTime();
+                var lasttime;
                 for (var i = 0; i<data['data']['lastest_data'].length ; i++) {
                     for (var j = 0; j<data['data']['data'][i]['values'].length; j++) {
                         if(typeof data['data']['data'][i]['values'][j] !== "undefined"){
