@@ -299,8 +299,13 @@ if (typeof dsstore === "undefined") {
         if (currentSettings.interval > 0) {
 
             setTimeout(function() {
-                if(currentSettings.from_value.length!=0 &&currentSettings.to_value.length!=0){
-                    reloadiData(currentSettings);
+                if(typeof currentSettings.from_value !== "undefined" && typeof currentSettings.to_value!== "undefined"){
+                    if(currentSettings.from_value.length!=0&&currentSettings.to_value!=0){
+                        reloadiData(currentSettings);
+                    }
+                    else{
+                        reloadhData(currentSettings);
+                    }
                 }
                 else{
                     reloadhData(currentSettings);
