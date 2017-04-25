@@ -13,35 +13,54 @@ function n(n){
 }
 
 function getdata(datajson,arr,arrnext,index){
-	var timelist ={seconds:1000,minutes:1000*60,hours:1000*60*60,days:1000*60*60*24,months:1000*60*60*24*30,years:1000*60*60*24*30*12}
-	if(arrnext!==undefined){
-		var timesplit = timelist[datajson.granularity[1]]*datajson.granularity[0]*1.5;
-		if(index==0){
-			var timebegin = timelist[datajson.since[1]]*datajson.since[0];
-			var datenow = new Date().getTime();
-			if(arr[0]-(datenow-timebegin)>timesplit){
-				return [[ datenow-timebegin, null ]];
-			}
-		}
-		else{
-			if(arrnext[0]-arr[0]>timesplit){
-				return [[ arr[0], arr[1] ],[ arrnext[0], null]];
-			}
-			return [[ arr[0], arr[1] ]];
-		}
-	}
-	else{
-		var timesplit = timelist[datajson.granularity[1]]*datajson.granularity[0]*1.5;
-		var datenow = new Date().getTime();
-		if(datenow-arr[0]>timesplit){
-			return [[ arr[0], arr[1] ],[datenow, null]];
-		}
-		else{
-			return [[ arr[0], arr[1] ]]
-		}
-		return null;
-	}
-
+    var timelist ={seconds:1000,minutes:1000*60,hours:1000*60*60,days:1000*60*60*24,months:1000*60*60*24*30,years:1000*60*60*24*30*12}
+    if(arrnext!==undefined){
+        var timesplit = timelist[datajson.granularity[1]]*datajson.granularity[0]*1.5;
+        if(index==0){
+            if(datajson.since == undefined){
+                var timebegin = datajson.from;
+                if(arr[0]-timebegin>timesplit){
+                    return [[ timebegin, null ]];
+                }
+                
+            }
+            else{
+                var timebegin = timelist[datajson.since[1]]*datajson.since[0];
+                var datenow = new Date().getTime();
+                if(arr[0]-(datenow-timebegin)>timesplit){
+                    return [[ datenow-timebegin, null ]];
+                }
+            }
+        }
+        else{
+            if(arrnext[0]-arr[0]>timesplit){
+            	if(datajson.since == undefined){
+            		return [[ arr[0], arr[1] ],[ datajson.to, null]];
+            	}
+            	else{
+            		return [[ arr[0], arr[1] ],[ arrnext[0], null]];
+            	}
+            }
+            return [[ arr[0], arr[1] ]];
+        }
+    }
+    else{
+        var timesplit = timelist[datajson.granularity[1]]*datajson.granularity[0]*1.5;
+        var datenow = new Date().getTime();
+        if(datenow-arr[0]>timesplit){
+            if(datajson.since == undefined){
+                return [[ arr[0], arr[1] ],[datajson.to, null]];
+            }
+            else{
+                return [[ arr[0], arr[1] ],[datenow, null]];
+            }
+            
+        }
+        else{
+            return [[ arr[0], arr[1] ]]
+        }
+        return null;
+    }
 }
 
 function updateChart(chartDIV,datajson,option) {
@@ -264,7 +283,7 @@ function updateChart(chartDIV,datajson,option) {
 						chartdata.push(s);
 						if(i>=color.length){
 							colori[colori.length] = color[i%numcolor];
-				   	}
+				   		}
 				   	count = count + 1 ;
 					}
 				}

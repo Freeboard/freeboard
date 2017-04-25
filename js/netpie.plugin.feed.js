@@ -111,6 +111,22 @@ if (typeof dsstore === "undefined") {
                 "default_value": "hours",
             },
             {
+                "name"         : "from_value",
+                "display_name" : "From",
+                "type"         : "text",
+                "default_value": "",
+                "description"  : "Timestamp in milliseconds.",
+                "required"     : false,
+            },
+            {
+                "name"         : "to_value",
+                "display_name" : "To",
+                "type"         : "text",
+                "default_value": "",
+                "description"  : "Timestamp in milliseconds",
+                "required"     : false,
+            },
+            {
                 "name"          : "interval",
                 "display_name"  : "Reload Every",
                 "type"          : "text",
@@ -132,25 +148,182 @@ if (typeof dsstore === "undefined") {
         var currentSettings = settings;
         var interval = settings.interval;
         var data = {};
+        dsstore[currentSettings.name] = {};
+        var timelist ={seconds:1000,minutes:1000*60,hours:1000*60*60,days:1000*60*60*24,months:1000*60*60*24*30,years:1000*60*60*24*30*12}
 
         function reloadhData(s) {
-            var apiurl = 'https://api.netpie.io/feed/'+s.feedid+'?apikey='+s.apikey+'&granularity='+s.granularity_value+s.granularity_unit+'&aggregate=avg&since='+s.since_value+s.since_unit;
-            $.getJSON( apiurl, function(datajson) {
-                data['data'] = datajson;
-                updateCallback(data);
-            });
+            if(typeof data['data'] !== "undefined"){
+                var timenow = new Date().getTime();
+                var lasttime;
+                for (var i = 0; i<data['data']['lastest_data'].length ; i++) {
+                    for (var j = 0; j<data['data']['data'][i]['values'].length; j++) {
+                        if(typeof data['data']['data'][i]['values'][j] !== "undefined"){
+                            if(data['data']['data'][i]['values'][j][0]+s.since_value*timelist[s.since_unit]<timenow){
+                                data['data']['data'][i]['values'].splice(j, 1)
+                            }
+                        }
+                        lasttime = data['data']['data'][i]['values'][data['data']['data'][i]['values'].length-1][0];
+                    }
+                }
+
+                var apiurl = 'https://api.netpie.io/feed/'+s.feedid+'?apikey='+s.apikey+'&granularity='+s.granularity_value+s.granularity_unit+'&aggregate=avg&from='+lasttime+'&to='+timenow;
+                $.getJSON( apiurl, function(datajson) {
+                    if(typeof datajson['lastest_data'] !== "undefined"){
+                        for (var i = 0; i<data['data']['lastest_data'].length ; i++) {
+                            data['data']['data'][i]['values'].splice(data['data']['data'][i]['values'].length-1, 1)
+                            data['data']['data'][i]['values'] = data['data']['data'][i]['values'].concat(datajson['data'][i]['values']);
+                        }
+                        data['data']['to'] = timenow;
+                        updateCallback(data);
+                    }
+                });
+            }
+            else{
+                var apiurl = 'https://api.netpie.io/feed/'+s.feedid+'?apikey='+s.apikey+'&granularity='+s.granularity_value+s.granularity_unit+'&aggregate=avg&since='+s.since_value+s.since_unit;
+                $.getJSON( apiurl, function(datajson) {
+                    data['data'] = datajson;
+                    var newfrom;
+                    var newto;
+                    if(typeof data['data']['lastest_data'] !== "undefined"){
+                        for (var i = 0; i<data['data']['lastest_data'].length ; i++) {
+                            var timelastitem = data['data']['data'][i]['values'][data['data']['data'][i]['values'].length-1][0];
+                            if(data['data']['lastest_data'][i]['values'][0][0]>timelastitem+timelist[data['data']['granularity'][1]]*data['data']['granularity'][0]){
+                                if(typeof newfrom === "undefined"){
+                                    newfrom = timelastitem+1000;
+                                    newto = data['data']['lastest_data'][i]['values'][0][0];
+                                }
+                                else{
+                                    if(newfrom>timelastitem){
+                                        newfrom = timelastitem;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    updateCallback(data);
+                    if(typeof newfrom !== "undefined"){
+                        reloadjData(s,newfrom,newto)
+                    }                
+                });
+            }
+        }
+        function reloadiData(s) {
+            if(typeof data['data'] !== "undefined"){
+                var timenow = new Date().getTime();
+                var timelastitem;
+                for (var i = 0; i<data['data']['lastest_data'].length ; i++) {
+                    if(typeof timelastitem === "undefined"){
+                        timelastitem = data['data']['data'][i]['values'][data['data']['data'][i]['values'].length-1][0];
+                    }
+                    else{
+                        if(timelastitem<data['data']['data'][i]['values'][data['data']['data'][i]['values'].length-1][0]){
+                            timelastitem = data['data']['data'][i]['values'][data['data']['data'][i]['values'].length-1][0];
+                        }
+                    }
+                     
+                }
+                if(timelastitem+s.granularity_value*timelist[s.granularity_unit]<s.to_value){
+                    var apiurl = 'https://api.netpie.io/feed/'+s.feedid+'?apikey='+s.apikey+'&granularity='+s.granularity_value+s.granularity_unit+'&aggregate=avg&from='+timelastitem+'&to='+s.to_value;
+                    $.getJSON( apiurl, function(datajson) {
+                        if(typeof datajson['lastest_data'] !== "undefined"){
+                            for (var i = 0; i<data['data']['lastest_data'].length ; i++) {
+                                data['data']['data'][i]['values'].splice(data['data']['data'][i]['values'].length-1, 1)
+                                data['data']['data'][i]['values'] = data['data']['data'][i]['values'].concat(datajson['data'][i]['values']);
+                            }
+                            updateCallback(data);
+                        }
+                    });
+                }
+                
+            }
+            else{
+                var apiurl = 'https://api.netpie.io/feed/'+s.feedid+'?apikey='+s.apikey+'&granularity='+s.granularity_value+s.granularity_unit+'&aggregate=avg&from='+s.from_value+'&to='+s.to_value;
+                $.getJSON( apiurl, function(datajson) {
+                    data['data'] = datajson;
+                    var newfrom;
+                    var newto;
+                    if(typeof data['data']['lastest_data'] !== "undefined"){
+                        for (var i = 0; i<data['data']['lastest_data'].length ; i++) {
+                            var timelastitem = data['data']['data'][i]['values'][data['data']['data'][i]['values'].length-1][0];
+                            if(data['data']['lastest_data'][i]['values'][0][0]>timelastitem+timelist[data['data']['granularity'][1]]*data['data']['granularity'][0]){
+                                if(typeof newfrom === "undefined"){
+                                    newfrom = timelastitem+1000;
+                                    newto = data['data']['lastest_data'][i]['values'][0][0];
+                                }
+                                else{
+                                    if(newfrom>timelastitem){
+                                        newfrom = timelastitem;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    updateCallback(data);
+                    if(typeof newfrom !== "undefined"){
+                        reloadjData(s,newfrom,newto)
+                    }                
+                });
+            }
         }
 
-        dsstore[currentSettings.name] = {};
+        function reloadjData(s,from,to) {
+            var apiurl = 'https://api.netpie.io/feed/'+s.feedid+'?apikey='+s.apikey+'&granularity='+s.granularity_value+s.granularity_unit+'&aggregate=avg&from='+from+'&to='+to;
+            $.getJSON( apiurl, function(datajson) {
+                for (var i = 0; i<data['data']['lastest_data'].length ; i++) {
+                    data['data']['data'][i]['values'] = data['data']['data'][i]['values'].concat(datajson['data'][i]['values']);
+                }
+                var newfrom;
+                var newto;
+                for (var i = 0; i<data['data']['lastest_data'].length ; i++) {
+                    var timelastitem = data['data']['data'][i]['values'][data['data']['data'][i]['values'].length-1][0];
+                    if(data['data']['lastest_data'][i]['values'][0][0]>timelastitem+timelist[data['data']['granularity'][1]]*data['data']['granularity'][0]){
+                        if(typeof newfrom === "undefined"){
+                            newfrom = timelastitem+1000;
+                            newto = data['data']['lastest_data'][i]['values'][0][0];
+                            //data['data']['to'] = newto;
+                        }
+                        else{
+                            if(newfrom>timelastitem){
+                                newfrom = timelastitem;
+                            }
+                        }
+                    }
+                }
+                updateCallback(data);
+                if(typeof newfrom !== "undefined"){
+                    reloadjData(s,newfrom,newto)
+                }
+            });
+        }
 
         if (currentSettings.interval > 0) {
 
             setTimeout(function() {
-                reloadhData(currentSettings);
+                if(typeof currentSettings.from_value !== "undefined" && typeof currentSettings.to_value!== "undefined"){
+                    if(currentSettings.from_value.length!=0&&currentSettings.to_value!=0){
+                        reloadiData(currentSettings);
+                    }
+                    else{
+                        reloadhData(currentSettings);
+                    }
+                }
+                else{
+                    reloadhData(currentSettings);
+                }
             },500);
 
             dsstore[currentSettings.name]['timer'] = setInterval(function() {
-                reloadhData(currentSettings);
+                if(typeof currentSettings.from_value !== "undefined" && typeof currentSettings.to_value!== "undefined"){
+                    if(currentSettings.from_value.length!=0&&currentSettings.to_value!=0){
+                        reloadiData(currentSettings);
+                    }
+                    else{
+                        reloadhData(currentSettings);
+                    }
+                }
+                else{
+                    reloadhData(currentSettings);
+                }
             }, currentSettings.interval*1000);
         }
 
@@ -174,23 +347,34 @@ if (typeof dsstore === "undefined") {
                 newSettings.granularity_unit != currentSettings.granularity_unit ||
                 newSettings.since_value != currentSettings.since_value ||
                 newSettings.since_unit != currentSettings.since_unit ||
-//                newSettings.aggregate != currentSettings.aggregate ||
+                newSettings.from_value != currentSettings.from_value ||
+                newSettings.to_value != currentSettings.to_value ||
                 false ) apiChanged = true;
 
             if (apiChanged) {
                 if (dsstore && dsstore[newSettings.name] && dsstore[newSettings.name]['timer']) {
                     clearInterval(dsstore[newSettings.name]['timer']);
                 }
-
                 dsstore[newSettings.name]['timer'] = setInterval(function() {
-                    reloadhData(newSettings);
+                    if(currentSettings.from_value.length!=0 &&currentSettings.to_value.length!=0){
+                        reloadiData(currentSettings);
+                    }
+                    else{
+                        reloadhData(currentSettings);
+                    }
                 }, newSettings.interval*1000);
                 apiChanged = false;
             }
 
             currentSettings = newSettings;
             setTimeout(function(){
-                reloadhData(currentSettings);
+                data = {};
+                if(currentSettings.from_value.length!=0 &&currentSettings.to_value.length!=0){
+                    reloadiData(currentSettings);
+                }
+                else{
+                    reloadhData(currentSettings);
+                }
             },500);
 
         }
