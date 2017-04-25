@@ -38,25 +38,6 @@ if (typeof microgear === "undefined") {
                 "type"         : "text",
                 "required"     : true
             },
-/*
-            {
-                "name"         : "alias",
-                "display_name" : "Microgear Alias",
-                "type"         : "text",
-                "description"  : "A nick name of this freeboard that other device can chat to",
-                "type"         : "text",
-                "default_value": "freeboard",
-                "required"     : false
-            },
-            {
-                "name"         : "microgearRef",
-                "display_name" : "Microgear Reference",
-                "type"         : "text",
-                "description"  : "Define a reference for a microgear of this datasource. For example if you set this to 'mygear' you can access the microgear object by microgear['mygear']",
-                "type"         : "text",
-                "required"     : false
-            },
-*/
             {
                 "name"         : "topics",
                 "display_name" : "Subscribed Topics",
@@ -66,10 +47,16 @@ if (typeof microgear === "undefined") {
                 "required"     : false
             },
             {
+                "name"          : "onCreatedAction",
+                "display_name"  : "onCreated Action",
+                "type"          : "text",
+                "description"   : "JS code to run after a datasource is created"
+            },
+            {
                 "name"          : "onConnectedAction",
                 "display_name"  : "onConnected Action",
                 "type"          : "text",
-                "description"   : "JS code to run after a microgear datasource is connected"
+                "description"   : "JS code to run after a microgear datasource is connected to NETPIE"
             }
 
         ],
@@ -113,7 +100,6 @@ if (typeof microgear === "undefined") {
 
             if (currentSettings.name && (currentSettings.name != newSettings.name)) {
                 var modifiedname = newSettings.name.substring(0,16);
-
 
                 if (newSettings.name != modifiedname) {
                     var text = "The datasource name should not be longer than 16 characters otherwise the associative id will be shorten i.e. now the microgear object is referenced by microgear[\""+modifiedname+"\"] and the microgear device alias is trimmed to \""+modifiedname+"\".";
@@ -162,8 +148,6 @@ if (typeof microgear === "undefined") {
         });
 
         self.mg.on('present', function(m) {
-            //console.log('p---> '+JSON.stringify(m));
-
             var mtoken = m.gear;
             var aobj = {
                 token : mtoken
@@ -197,10 +181,10 @@ if (typeof microgear === "undefined") {
 
 
             for (var _alias in aliasList) {
-                        if (aliasList[_alias].length == 0) {
-                            console.log();
-                            delete aliasList[_alias];
-                        }
+                if (aliasList[_alias].length == 0) {
+                    console.log();
+                    delete aliasList[_alias];
+                }
             }
 
             data['alias'] = aliasList;
@@ -247,7 +231,6 @@ if (typeof microgear === "undefined") {
             }
 
             if (typeof(onConnectedHandler) != 'undefined') {
-                //onConnectedHandler(settings.microgearRef);
                 onConnectedHandler(settings.name);
             }
         })
@@ -257,13 +240,13 @@ if (typeof microgear === "undefined") {
             data['alias'] = aliasList;
             updateCallback(data);
         });
+
+        if (settings.onCreatedAction) {
+            eval(settings.onCreatedAction);
+        }
     
         self.mg.connect(settings.appid, function(){
 
         });
-
     }
 }());
-
-
-
