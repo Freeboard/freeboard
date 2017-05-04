@@ -110,6 +110,7 @@ if (typeof dsstore === "undefined") {
                 ],
                 "default_value": "hours",
             },
+/*
             {
                 "name"         : "from_value",
                 "display_name" : "From",
@@ -126,6 +127,7 @@ if (typeof dsstore === "undefined") {
                 "description"  : "Timestamp in milliseconds",
                 "required"     : false,
             },
+*/
             {
                 "name"          : "interval",
                 "display_name"  : "Reload Every",
