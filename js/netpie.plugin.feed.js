@@ -371,7 +371,7 @@ if (typeof dsstore === "undefined") {
             currentSettings = newSettings;
             setTimeout(function(){
                 data = {};
-                if(currentSettings.from_value.length!=0 &&currentSettings.to_value.length!=0){
+                if(typeof currentSettings.from_value != 'undefined' && typeof currentSettings.to_value != 'undefined' && currentSettings.from_value.length!=0 &&currentSettings.to_value.length!=0){
                     reloadiData(currentSettings);
                 }
                 else{
