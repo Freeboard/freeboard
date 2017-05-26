@@ -273,3 +273,7 @@ ul.value-dropdown li.selected {
 .rangeSlider {
     background-color: #DCDCDC !important;
 }
+
+.tw-value {
+    color: #000 !important ;
+}
