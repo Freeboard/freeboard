@@ -159,10 +159,8 @@ function updateChart(chartDIV,datajson,option) {
 				radius : 2,
 				fillColor:colorpoint
 			};
-			console.log(option.color)
 			if(option.color.replace(/ /g,'').split(',').length!=0&&option.color.replace(/ /g,'').split(',')[0].trim()!=""){
 				color = option.color.replace(/ /g,'').split(',');
-				console.log(color)
 			}
 			else{color=DEFAULTCOLOR}
 		}
@@ -183,7 +181,6 @@ function updateChart(chartDIV,datajson,option) {
 		if (option && option.filter){
 			if(option.filter.replace(/ /g,'').split(',').length!=0&&option.filter.replace(/ /g,'').split(',')[0].trim()!=""){
 					filter = option.filter.replace(/ /g,'').split(',');
-					console.log(filter)
 			}
 		}
 		var colori = [];
