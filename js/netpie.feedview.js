@@ -159,8 +159,10 @@ function updateChart(chartDIV,datajson,option) {
 				radius : 2,
 				fillColor:colorpoint
 			};
+			console.log(option.color)
 			if(option.color.replace(/ /g,'').split(',').length!=0&&option.color.replace(/ /g,'').split(',')[0].trim()!=""){
 				color = option.color.replace(/ /g,'').split(',');
+				console.log(color)
 			}
 			else{color=DEFAULTCOLOR}
 		}
@@ -181,9 +183,10 @@ function updateChart(chartDIV,datajson,option) {
 		if (option && option.filter){
 			if(option.filter.replace(/ /g,'').split(',').length!=0&&option.filter.replace(/ /g,'').split(',')[0].trim()!=""){
 					filter = option.filter.replace(/ /g,'').split(',');
+					console.log(filter)
 			}
 		}
-		var colori = color;
+		var colori = [];
 		var chartdata = [];
 		var count = 0;
 		if (datajson) {
@@ -235,8 +238,11 @@ function updateChart(chartDIV,datajson,option) {
 								}
 							}
 							chartdata[count] = s;
-							if(i > numcolor){
+							if(count+1 > numcolor){
 								colori[count] = color[i%numcolor];
+						   	}
+						   	else{
+						   		colori[count] = color[filter.indexOf(datajson.data[i].attr)]
 						   	}
 							count = count + 1 ;
 						}
@@ -281,8 +287,11 @@ function updateChart(chartDIV,datajson,option) {
 							}
 						}
 						chartdata.push(s);
-						if(i>=color.length){
+						if(count>=color.length){
 							colori[colori.length] = color[i%numcolor];
+				   		}
+				   		else{
+				   			colori[count] = color[count]
 				   		}
 				   	count = count + 1 ;
 					}
