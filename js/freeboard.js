@@ -670,14 +670,12 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 	}
 }
 
-function FreeboardUI()
+function FreeboardUI(pane_margin, pane_width, min_columns)
 {
-	var PANE_MARGIN = 10;
-	var PANE_WIDTH = 300;
-	var MIN_COLUMNS = 3;
-	var COLUMN_WIDTH = PANE_MARGIN + PANE_WIDTH + PANE_MARGIN;
 
-	var userColumns = MIN_COLUMNS;
+	var column_width = pane_margin + pane_width + pane_margin;
+
+	var userColumns = min_columns;
 
 	var loadingIndicator = $('<div class="wrapperloading"><div class="loading up" ></div><div class="loading down"></div></div>');
 	var grid;
@@ -778,9 +776,9 @@ function FreeboardUI()
 	{
 		var col_controls = $(".column-tool");
 		var available_width = $("#board-content").width();
-		var max_columns = Math.floor(available_width / COLUMN_WIDTH);
+		var max_columns = Math.floor(available_width / column_width);
 
-		if(grid.cols <= MIN_COLUMNS)
+		if(grid.cols <= min_columns)
 		{
 			col_controls.addClass("min");
 		}
@@ -802,14 +800,14 @@ function FreeboardUI()
 	function getMaxDisplayableColumnCount()
 	{
 		var available_width = $("#board-content").width();
-		return Math.floor(available_width / COLUMN_WIDTH);
+		return Math.floor(available_width / column_width);
 	}
 
 	function updateGridWidth(newCols)
 	{
-		if(newCols === undefined || newCols < MIN_COLUMNS)
+		if(newCols === undefined || newCols < min_columns)
 		{
-			newCols = MIN_COLUMNS;
+			newCols = min_columns;
 		}
 
 		var max_columns = getMaxDisplayableColumnCount();
@@ -819,7 +817,7 @@ function FreeboardUI()
 		}
 
 		// +newCols to account for scaling on zoomed browsers
-		var new_width = (COLUMN_WIDTH * newCols) + newCols;
+		var new_width = (column_width * newCols) + newCols;
 		$(".responsive-column-width").css("max-width", new_width);
 
 		if(newCols === grid.cols)
@@ -843,7 +841,7 @@ function FreeboardUI()
 		rootElement.find("> li").each(repositionFunction);
 
 		grid.init();
-		$(".responsive-column-width").css("width", grid.cols * PANE_WIDTH + (grid.cols * PANE_MARGIN * 2));
+		$(".responsive-column-width").css("width", grid.cols * pane_width + (grid.cols * pane_margin * 2));
 	}
 
 	function getUserColumns()
@@ -853,7 +851,7 @@ function FreeboardUI()
 
 	function setUserColumns(numCols)
 	{
-		userColumns = Math.max(MIN_COLUMNS, numCols);
+		userColumns = Math.max(min_columns, numCols);
 	}
 
 	ko.bindingHandlers.grid = {
@@ -861,8 +859,8 @@ function FreeboardUI()
 		{
 			// Initialize our grid
 			grid = $(element).gridster({
-				widget_margins        : [PANE_MARGIN, PANE_MARGIN],
-				widget_base_dimensions: [PANE_WIDTH, 10],
+				widget_margins        : [pane_margin, pane_margin],
+				widget_base_dimensions: [pane_width, 10],
 				resize: {
 					enabled : false,
 					axes : "x"
@@ -2591,7 +2589,7 @@ var freeboard = (function()
 	var datasourcePlugins = {};
 	var widgetPlugins = {};
 
-	var freeboardUI = new FreeboardUI();
+	var freeboardUI = new FreeboardUI(10, 300, 3);
 	var theFreeboardModel = new FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI);
 
 	var jsEditor = new JSEditor();
