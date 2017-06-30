@@ -176,6 +176,7 @@ if (typeof dsstore === "undefined") {
                             data['data']['data'][i]['values'] = data['data']['data'][i]['values'].concat(datajson['data'][i]['values']);
                         }
                         data['data']['to'] = timenow;
+                        data['data']['lastest_data'] = datajson['lastest_data'];
                         updateCallback(data);
                     }
                 });
@@ -202,6 +203,7 @@ if (typeof dsstore === "undefined") {
                             }
                         }
                     }
+                    data['data']['lastest_data'] = datajson['lastest_data'];
                     updateCallback(data);
                     if(typeof newfrom !== "undefined"){
                         reloadjData(s,newfrom,newto)
@@ -232,6 +234,8 @@ if (typeof dsstore === "undefined") {
                                 data['data']['data'][i]['values'].splice(data['data']['data'][i]['values'].length-1, 1)
                                 data['data']['data'][i]['values'] = data['data']['data'][i]['values'].concat(datajson['data'][i]['values']);
                             }
+                            data['data']['lastest_data'] = datajson['lastest_data'];
+                            console.log(datajson['lastest_data'])
                             updateCallback(data);
                         }
                     });
@@ -260,6 +264,7 @@ if (typeof dsstore === "undefined") {
                             }
                         }
                     }
+                    data['data']['lastest_data'] = datajson['lastest_data'];
                     updateCallback(data);
                     if(typeof newfrom !== "undefined"){
                         reloadjData(s,newfrom,newto)
@@ -291,6 +296,7 @@ if (typeof dsstore === "undefined") {
                         }
                     }
                 }
+                data['data']['lastest_data'] = datajson['lastest_data'];
                 updateCallback(data);
                 if(typeof newfrom !== "undefined"){
                     reloadjData(s,newfrom,newto)
@@ -358,7 +364,7 @@ if (typeof dsstore === "undefined") {
                     clearInterval(dsstore[newSettings.name]['timer']);
                 }
                 dsstore[newSettings.name]['timer'] = setInterval(function() {
-                    if(currentSettings.from_value.length!=0 &&currentSettings.to_value.length!=0){
+                     if(typeof currentSettings.from_value != 'undefined' && typeof currentSettings.to_value != 'undefined' && currentSettings.from_value.length!=0 &&currentSettings.to_value.length!=0){
                         reloadiData(currentSettings);
                     }
                     else{
