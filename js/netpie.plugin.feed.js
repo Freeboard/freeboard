@@ -172,8 +172,11 @@ if (typeof dsstore === "undefined") {
                 $.getJSON( apiurl, function(datajson) {
                     if(typeof datajson['lastest_data'] !== "undefined"){
                         for (var i = 0; i<data['data']['lastest_data'].length ; i++) {
-                            data['data']['data'][i]['values'].splice(data['data']['data'][i]['values'].length-1, 1)
-                            data['data']['data'][i]['values'] = data['data']['data'][i]['values'].concat(datajson['data'][i]['values']);
+                            if(typeof datajson['data'][i] !== "undefined"){
+                                data['data']['data'][i]['values'].splice(data['data']['data'][i]['values'].length-1, 1)
+                                data['data']['data'][i]['values'] = data['data']['data'][i]['values'].concat(datajson['data'][i]['values']);
+                            }
+                           
                         }
                         data['data']['to'] = timenow;
                         data['data']['lastest_data'] = datajson['lastest_data'];
