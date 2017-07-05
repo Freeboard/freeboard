@@ -176,6 +176,11 @@ if (typeof dsstore === "undefined") {
                                 if(data['data']['data'][i].attr==datajson['data'][j].attr){
                                     data['data']['data'][i]['values'].splice(data['data']['data'][i]['values'].length-1, 1)
                                     data['data']['data'][i]['values'] = data['data']['data'][i]['values'].concat(datajson['data'][j]['values']);
+                                    var byTimestamp = data['data']['data'][i]['values'].slice(0);
+                                    byTimestamp.sort(function(a,b) {
+                                        return a[0] - b[0];
+                                    });
+                                    data['data']['data'][i]['values'] = byTimestamp;
                                     break;
                                 }
                             }
@@ -240,6 +245,11 @@ if (typeof dsstore === "undefined") {
                                     if(data['data']['data'][i].attr==datajson['data'][j].attr){
                                         data['data']['data'][i]['values'].splice(data['data']['data'][i]['values'].length-1, 1)
                                         data['data']['data'][i]['values'] = data['data']['data'][i]['values'].concat(datajson['data'][j]['values']);
+                                        var byTimestamp = data['data']['data'][i]['values'].slice(0);
+                                        byTimestamp.sort(function(a,b) {
+                                            return a[0] - b[0];
+                                        });
+                                        data['data']['data'][i]['values'] = byTimestamp;
                                         break;
                                     }
                                 }
@@ -296,7 +306,6 @@ if (typeof dsstore === "undefined") {
                         if(typeof newfrom === "undefined"){
                             newfrom = timelastitem+1000;
                             newto = data['data']['lastest_data'][i]['values'][0][0];
-                            //data['data']['to'] = newto;
                         }
                         else{
                             if(newfrom>timelastitem){
