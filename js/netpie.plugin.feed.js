@@ -172,11 +172,13 @@ if (typeof dsstore === "undefined") {
                 $.getJSON( apiurl, function(datajson) {
                     if(typeof datajson['lastest_data'] !== "undefined"){
                         for (var i = 0; i<data['data']['lastest_data'].length ; i++) {
-                            if(typeof datajson['data'][i] !== "undefined"){
-                                data['data']['data'][i]['values'].splice(data['data']['data'][i]['values'].length-1, 1)
-                                data['data']['data'][i]['values'] = data['data']['data'][i]['values'].concat(datajson['data'][i]['values']);
+                            for (var j = datajson['data'].length - 1; j >= 0; j--) {
+                                if(data['data']['data'][i].attr==datajson['data'][j].attr){
+                                    data['data']['data'][i]['values'].splice(data['data']['data'][i]['values'].length-1, 1)
+                                    data['data']['data'][i]['values'] = data['data']['data'][i]['values'].concat(datajson['data'][j]['values']);
+                                    break;
+                                }
                             }
-                           
                         }
                         data['data']['to'] = timenow;
                         data['data']['lastest_data'] = datajson['lastest_data'];
@@ -234,11 +236,15 @@ if (typeof dsstore === "undefined") {
                     $.getJSON( apiurl, function(datajson) {
                         if(typeof datajson['lastest_data'] !== "undefined"){
                             for (var i = 0; i<data['data']['lastest_data'].length ; i++) {
-                                data['data']['data'][i]['values'].splice(data['data']['data'][i]['values'].length-1, 1)
-                                data['data']['data'][i]['values'] = data['data']['data'][i]['values'].concat(datajson['data'][i]['values']);
+                                for (var j = datajson['data'].length - 1; j >= 0; j--) {
+                                    if(data['data']['data'][i].attr==datajson['data'][j].attr){
+                                        data['data']['data'][i]['values'].splice(data['data']['data'][i]['values'].length-1, 1)
+                                        data['data']['data'][i]['values'] = data['data']['data'][i]['values'].concat(datajson['data'][j]['values']);
+                                        break;
+                                    }
+                                }
                             }
                             data['data']['lastest_data'] = datajson['lastest_data'];
-                            console.log(datajson['lastest_data'])
                             updateCallback(data);
                         }
                     });
