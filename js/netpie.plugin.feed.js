@@ -164,7 +164,13 @@ if (typeof dsstore === "undefined") {
                                 data['data']['data'][i]['values'].splice(j, 1)
                             }
                         }
+                    }
+                    if(i==0){
                         lasttime = data['data']['data'][i]['values'][data['data']['data'][i]['values'].length-1][0];
+                    }else{
+                        if(lasttime>data['data']['data'][i]['values'][data['data']['data'][i]['values'].length-1][0]){
+                            lasttime = data['data']['data'][i]['values'][data['data']['data'][i]['values'].length-1][0];
+                        }
                     }
                 }
 
@@ -172,10 +178,15 @@ if (typeof dsstore === "undefined") {
                 $.getJSON( apiurl, function(datajson) {
                     if(typeof datajson['lastest_data'] !== "undefined"){
                         for (var i = 0; i<data['data']['lastest_data'].length ; i++) {
-                            for (var j = datajson['data'].length - 1; j >= 0; j--) {
+                            for (var j = 0; j<datajson['data'].length ; j++) {
                                 if(data['data']['data'][i].attr==datajson['data'][j].attr){
-                                    data['data']['data'][i]['values'].splice(data['data']['data'][i]['values'].length-1, 1)
-                                    data['data']['data'][i]['values'] = data['data']['data'][i]['values'].concat(datajson['data'][j]['values']);
+                                    for (var k = 0; k<datajson['data'][j]['values'].length ; k++) {
+                                        if(data['data']['data'][i]['values'][data['data']['data'][i]['values'].length-1][0]<datajson['data'][j]['values'][k][0]){
+                                            datajson['data'][j]['values'].splice(0,k)
+                                            data['data']['data'][i]['values'] = data['data']['data'][i]['values'].concat(datajson['data'][j]['values']);
+                                            break;
+                                        }
+                                    }
                                     var byTimestamp = data['data']['data'][i]['values'].slice(0);
                                     byTimestamp.sort(function(a,b) {
                                         return a[0] - b[0];
@@ -241,10 +252,15 @@ if (typeof dsstore === "undefined") {
                     $.getJSON( apiurl, function(datajson) {
                         if(typeof datajson['lastest_data'] !== "undefined"){
                             for (var i = 0; i<data['data']['lastest_data'].length ; i++) {
-                                for (var j = datajson['data'].length - 1; j >= 0; j--) {
+                                for (var j = 0; j<datajson['data'].length ; j++) {
                                     if(data['data']['data'][i].attr==datajson['data'][j].attr){
-                                        data['data']['data'][i]['values'].splice(data['data']['data'][i]['values'].length-1, 1)
-                                        data['data']['data'][i]['values'] = data['data']['data'][i]['values'].concat(datajson['data'][j]['values']);
+                                        for (var k = 0; k<datajson['data'][j]['values'].length ; k++) {
+                                            if(data['data']['data'][i]['values'][data['data']['data'][i]['values'].length-1][0]<datajson['data'][j]['values'][k][0]){
+                                                datajson['data'][j]['values'].splice(0,k)
+                                                data['data']['data'][i]['values'] = data['data']['data'][i]['values'].concat(datajson['data'][j]['values']);
+                                                break;
+                                            }
+                                        }
                                         var byTimestamp = data['data']['data'][i]['values'].slice(0);
                                         byTimestamp.sort(function(a,b) {
                                             return a[0] - b[0];
