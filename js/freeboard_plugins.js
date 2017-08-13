@@ -1,6 +1,5 @@
 var allow = false;
 var np;
-
 function DialogBox(a, b, c, d, e) {
     function f() {
         g.fadeOut(200, function() {
@@ -86,6 +85,7 @@ function FreeboardModel(a, b, c) {
             theme:theme
         }
     }, this.deserialize = function(e, f) {
+        
         function g() {
             c.setUserColumns(e.columns), _.isUndefined(e.allow_edit) ? d.allow_edit(!0) : d.allow_edit(e.allow_edit), d.version = e.version || 0, d.header_image(e.header_image), _.each(e.datasources, function(b) {
                 var c = new DatasourceModel(d, a);

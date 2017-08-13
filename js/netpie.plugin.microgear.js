@@ -62,6 +62,7 @@ if (typeof microgear === "undefined") {
         ],
 
         newInstance : function(settings, newInstanceCallback, updateCallback) {
+            // settings.name = settings.name.replace(' ','_').substring(0,16);
             newInstanceCallback(new netpieDatasourcePlugin(settings, updateCallback));
         }
     });
@@ -104,15 +105,18 @@ if (typeof microgear === "undefined") {
                 if (newSettings.name != modifiedname) {
                     var text = "The datasource name should not be longer than 16 characters otherwise the associative id will be shorten i.e. now the microgear object is referenced by microgear[\""+modifiedname+"\"] and the microgear device alias is trimmed to \""+modifiedname+"\".";
                     newSettings.name = modifiedname;
-                    freeboard.showDialog(text, "Warning", "I understand");
+                    freeboard.showDialog(text, "Warning", "I understand", "CANCEL", function() {
+                        if (microgear[currentSettings.name]) {
+                            delete(microgear[currentSettings.name]);
+                        }
+                        microgear[newSettings.name] = self.mg;
+          
+                        self.mg.setAlias(newSettings.name);
+                        location.reload(true);
+                    })
                 }
 
-                if (microgear[currentSettings.name]) {
-                    delete(microgear[currentSettings.name]);
-                }
-                microgear[newSettings.name] = self.mg;
-  
-                self.mg.setAlias(newSettings.name);
+                
             }
 
             if (currentSettings.topics != newSettings.topics) {
@@ -135,10 +139,21 @@ if (typeof microgear === "undefined") {
         self.mg = Microgear.create(gconf);
 
         if(settings.name !== undefined){
-            settings.name = settings.name.replace(' ','_').substring(0,16);
+            var modifiedname = settings.name.substring(0,16);
+            if (settings.name != modifiedname) {
+                var text = "The datasource name should not be longer than 16 characters otherwise the associative id will be shorten i.e. now the microgear object is referenced by microgear[\""+modifiedname+"\"] and the microgear device alias is trimmed to \""+modifiedname+"\".";
+                settings.name = modifiedname;
+                freeboard.showDialog(text, "Warning", "I understand", "CANCEL", function() {
+                    if (microgear[settings.name]) {
+                        delete(microgear[settings.name]);
+                    }
+                    microgear[modifiedname.name] = self.mg;
+      
+                    self.mg.setAlias(modifiedname.name);
+                    location.reload(true);
+                })
+            }
         }
-        
-        microgear[settings.name] = self.mg;
 
         self.mg.on('message', function(topic,msg) {
             if (topic && msg) {
@@ -182,7 +197,6 @@ if (typeof microgear === "undefined") {
 
             for (var _alias in aliasList) {
                 if (aliasList[_alias].length == 0) {
-                    console.log();
                     delete aliasList[_alias];
                 }
             }

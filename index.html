@@ -29,6 +29,11 @@
 							var dashboardPattern = window.localStorage.getItem("netpie.freeboard.dashboard");
 							if (dashboardPattern !== null) {
 								dashboardPattern=JSON.parse(dashboardPattern);
+								for (var i = dashboardPattern.datasources.length - 1; i >= 0; i--) {
+									if(dashboardPattern.datasources[i].type == "netpie_microgear"){
+										dashboardPattern.datasources[i].name = checkName(dashboardPattern.datasources[i].name)
+									}
+								}
 								freeboard.loadDashboard(dashboardPattern, function() {
 									freeboard.setEditing(false);
 								});
