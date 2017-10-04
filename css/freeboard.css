@@ -763,14 +763,14 @@ freeboard
 ============*/
 
 html {
-	background-color: #101214;
+	background-color: #1C538A; /*101214*/
 	height: 100%;
 	overflow: hidden;
 }
 
 body {
-	background-color: #101214;
-	color: #8b8b8b;
+	background-color: #FFFFFF; /*101214*/
+	color: #5369C0; /*8b8b8b*/
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-size: 14px;
 	line-height: 20px;
@@ -1122,7 +1122,7 @@ a:focus {
 	height: 30px;
 	margin: 0;
 	padding: 0 10px 0 10px;
-	color: #8b8b8b;
+	color: #851D1D; /*8b8b8b*/
 	text-transform: uppercase;
 }
 
@@ -1161,7 +1161,7 @@ header h1 {
 }
 
 #admin-bar {
-	background-color: #313131;
+	background-color: #3c84c3;
 	width: 100%;
 	height: 200px;
 	position: relative;
@@ -1174,7 +1174,7 @@ header h1 {
 	left: 0;
 	right: 0;
 	width: 50px;
-	background-color: #313131;
+	background-color: #606060;
 	text-align: center;
 	cursor: pointer;
 }
