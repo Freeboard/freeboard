@@ -1163,7 +1163,7 @@ header h1 {
 #admin-bar {
 	background-color: #3473aa;
 	width: 100%;
-	height: 200px;
+	height: 140px;
 	position: relative;
 	z-index: -1;
 	-webkit-box-shadow: 0 0 5px #000;
@@ -1256,12 +1256,18 @@ header h1 {
 	z-index: 100;
 	-webkit-box-shadow: 0 0 5px #000;
 	box-shadow: 0 0 5px #000;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 #board-title{
 	width: 100%;
 	padding-top: 20px;
 	padding-bottom: 5px;
+	margin-left: auto;
+	margin-right: auto;
+	
 }
 
 #admin-menu {
@@ -2135,7 +2141,7 @@ ul.board-toolbar.vertical {
 }
 
 .board-toolbar li {
-	color: #B88F51;
+	color: #e0e0e0;
 	float: left;
 	cursor: pointer;
 	margin: 0px 0px 0px 5px;
@@ -2173,7 +2179,7 @@ ul.board-toolbar.vertical {
 }
 
 .text-button {
-	color: #B88F51;
+	color: #e0e0e0;
 	cursor: pointer;
 	text-transform: uppercase;
 }
