@@ -769,7 +769,7 @@ html {
 }
 
 body {
-	background-color: #FFFFFF; /*101214*/
+	background-color: #8590a0; /*101214*/
 	color: #5369C0; /*8b8b8b*/
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-size: 14px;
@@ -1161,10 +1161,11 @@ header h1 {
 }
 
 #admin-bar {
-	background-color: #3c84c3;
+	background-color: #3473aa;
 	width: 100%;
 	height: 200px;
 	position: relative;
+	z-index: -1;
 	-webkit-box-shadow: 0 0 5px #000;
 	box-shadow: 0 0 5px #000;
 }
@@ -1247,6 +1248,20 @@ header h1 {
 #cam {
 	height: 100%;
 	background-size: cover;
+}
+
+#title-header{
+	background-color: #3c84c3;
+	position: relative;
+	z-index: 100;
+	-webkit-box-shadow: 0 0 5px #000;
+	box-shadow: 0 0 5px #000;
+}
+
+#board-title{
+	width: 100%;
+	padding-top: 20px;
+	padding-bottom: 5px;
 }
 
 #admin-menu {
@@ -2254,15 +2269,16 @@ ul.datasource-input-suffix {
 }
 
 .title {
-	font-family: 'Helvetica-Neue', 'Helvetica', 'Arial', sans-serif;
+	/*font-family: 'Helvetica-Neue', 'Helvetica', 'Arial', sans-serif;*/
+	font-family: 'Ubuntu', sans-serif;
 	vertical-align: baseline;
 	-webkit-font-smoothing: antialiased;
 	font-style: normal;
-	color: #d3d4d4;
+	color: #fafafa;
 }
 
 .title.bordered {
-	border: solid 3px #d3d4d4;
+	border: solid 1px #f5f5f5;
 	display: inline-block;
 	padding: 2px 17px 2px 17px;
 	line-height: 39px;

@@ -7,10 +7,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="viewport" content = "width = device-width, initial-scale = 1, user-scalable = no" />
+    <link href="https://fonts.googleapis.com/css?family=Oswald:300|Ubuntu:300" rel="stylesheet">
     <link href="css/freeboard.css" rel="stylesheet" />
-    <script src="js/freeboard.thirdparty.min.js"></script>
+    <script src="js/freeboard.thirdparty.js"></script>
     <script type="text/javascript">
-        head.js("js/freeboard_plugins.min.js",
+        head.js("js/freeboard_plugins.js",
                 // *** Load more plugins here ***
                 function(){
                     $(function()
@@ -31,6 +32,11 @@
     </script>
 </head>
 <body>
+    <header id=title-header>
+    <div id="board-title" align="center">
+        <h1 id="board-logo" class="title bordered" >eChook Live Data</h1> 
+    </div>
+</header>
 <div id="board-content">
     <img id="dash-logo" data-bind="attr:{src: header_image}, visible:header_image()">
     <div class="gridster responsive-column-width">
@@ -38,11 +44,13 @@
         </ul>
     </div>
 </div>
+
+    
 <header id="main-header" data-bind="if:allow_edit">
     <div id="admin-bar">
-        <div id="admin-menu">
+        
+        <div id="admin-menu">            
             <div id="board-tools">
-                <h1 id="board-logo" class="title bordered">eChook Live Data</h1>
                 <div id="board-actions">
                     <ul class="board-toolbar vertical">
                         <li data-bind="click: loadDashboardFromLocalFile"><i id="full-screen-icon" class="icon-folder-open icon-white"></i><label id="full-screen">Load Freeboard</label></li>
