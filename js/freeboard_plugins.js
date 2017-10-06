@@ -645,7 +645,7 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 			$("#toggle-header-icon").addClass("icon-wrench").removeClass("icon-chevron-up");
 			$(".gridster .gs_w").css({cursor: "default"});
 			$("#main-header").animate({"top": "-" + (barHeight - titleHeight) + "px"}, animateLength);
-			$("#board-content").animate({"top": "20"}, animateLength);
+			$("#board-content").animate({"top": (titleHeight +20) + "px"}, animateLength);
 			$("#main-header").data().shown = false;
 			$(".sub-section").unbind();
 			freeboardUI.disableGrid();
@@ -655,7 +655,7 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 			$("#toggle-header-icon").addClass("icon-chevron-up").removeClass("icon-wrench");
 			$(".gridster .gs_w").css({cursor: "pointer"});
 			$("#main-header").animate({"top": titleHeight + "px"}, animateLength);
-			$("#board-content").animate({"top": (barHeight + 20) + "px"}, animateLength);
+			$("#board-content").animate({"top": (barHeight + titleHeight + 20) + "px"}, animateLength);
 			$("#main-header").data().shown = true;
 			freeboardUI.attachWidgetEditIcons($(".sub-section"));
 			freeboardUI.enableGrid();
@@ -675,7 +675,7 @@ function FreeboardUI()
 {
 	var PANE_MARGIN = 10;
 	var PANE_WIDTH = 300;
-	var MIN_COLUMNS = 3;
+	var MIN_COLUMNS = 4;
 	var COLUMN_WIDTH = PANE_MARGIN + PANE_WIDTH + PANE_MARGIN;
 
 	var userColumns = MIN_COLUMNS;
@@ -2604,7 +2604,7 @@ var freeboard = (function()
 	var currentStyle = {
 		values: {
 			"font-family": '"HelveticaNeue-UltraLight", "Helvetica Neue Ultra Light", "Helvetica Neue", sans-serif',
-			"color"      : "#d3d4d4",
+			"color"      : "#6d6d6d",
 			"font-weight": 100
 		}
 	};
@@ -3743,7 +3743,7 @@ freeboard.loadDatasourcePlugin({
 
 		freeboard.addStyle('.sparkline-legend', "margin:5px;");
 		freeboard.addStyle('.sparkline-legend-value',
-			'color:white; font:10px arial,san serif; float:left; overflow:hidden; width:50%;');
+			'color:#606060; font:10px arial,san serif; float:left; overflow:hidden; width:50%;');
 		freeboard.addStyle('.sparkline-legend-value span',
 			'font-weight:bold; padding-right:5px;');
 	}
