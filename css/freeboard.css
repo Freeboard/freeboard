@@ -49,7 +49,7 @@
 }
 
 .cm-s-ambiance .CodeMirror-gutters {
-  background: #3D3D3D;
+  background: #3c83c3;
   border-right: 1px solid #4D4D4D;
   box-shadow: 0 10px 20px black;
 }
@@ -770,7 +770,7 @@ html {
 
 body {
 	background-color: #8590a0; /*101214*/
-	color: #5369C0; /*8b8b8b*/
+	color: #606060; /*8b8b8b*/
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-size: 14px;
 	line-height: 20px;
@@ -781,7 +781,7 @@ body {
 
 .modal {
 	position: absolute;
-	background-color: #2a2a2a;
+	background-color: #f9f9f9;
 	top: 120px;
 	width: 900px;
 	margin: auto;
@@ -796,19 +796,19 @@ body {
 }
 
 .modal header {
-	background-color: #272727;
+	background-color: #3c83c3;
 	height: 40px;
 	margin: 0;
 	padding: 0 10px 0 10px;
-	color: #8b8b8b;
+	color: #606060;
 	text-transform: uppercase;
 }
 
 .modal footer {
-	background-color: #272727;
+	background-color: #f9f9f9;
 	height: 40px;
 	margin: 0;
-	color: #8b8b8b;
+	color: #606060;
 	text-transform: uppercase;
 	clear: both;
 }
@@ -908,7 +908,7 @@ input[type="color"],
 	padding: 4px 6px;
 	font-size: 14px;
 	line-height: 20px;
-	color: #d3d4d4;
+	color: #606060;
 	vertical-align: middle;
 	-webkit-border-radius: 0px;
 	-moz-border-radius: 0px;
@@ -946,8 +946,8 @@ input[type="search"],
 input[type="tel"],
 input[type="color"],
 .uneditable-input {
-	background-color: #272727;
-	border: 1px solid #3d3d3d;
+	background-color: #f9f9f9;
+	border: 1px solid #3c83c3;
 	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 	-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
@@ -985,7 +985,7 @@ input[type="color"]:focus,
 
 select {
 	width: 220px;
-	background-color: #272727;
+	background-color: #f9f9f9;
 	height: 27px;
 }
 
@@ -1097,7 +1097,7 @@ a:focus {
 	left: 0px;
 	height: 100%;
 	width: 100%;
-	background: rgba(0, 0, 0, 0.8);
+	background: rgba(200, 200, 200, 0.9);
 	overflow-y: auto;
 }
 
@@ -1117,14 +1117,7 @@ a:focus {
 	text-decoration: underline;
 }
 
-.gridster header {
-	background-color: #272727;
-	height: 30px;
-	margin: 0;
-	padding: 0 10px 0 10px;
-	color: #851D1D; /*8b8b8b*/
-	text-transform: uppercase;
-}
+
 
 header h1 {
 	font-size: 12px;
@@ -1235,7 +1228,7 @@ header h1 {
 }
 
 .table td {
-	border-top: solid 1px #3d3d3d;
+	border-top: solid 1px #3c83c3;
 	color: #d3d4d4;
 }
 
@@ -1399,8 +1392,21 @@ ul, ol {
 	top: 0;
 }
 
+/*Panes*/
+
+/*Pane header*/
+.gridster header {
+	background-color: #3c83c3;
+	height: 30px;
+	margin: 0;
+	padding: 0 10px 0 10px;
+	color: #851D1D; /*8b8b8b*/
+	text-transform: uppercase;
+
+}
+
 .gridster .gs_w {
-	background: #2a2a2a;
+	background: #f9f9f9;
 	padding: 0px;
 	margin: 0px;
 	overflow: hidden;
@@ -1411,6 +1417,8 @@ ul, ol {
 	-moz-user-select: text;
 	-ms-user-select: text;
 	user-select: text;
+	-webkit-box-shadow: 0 0 3px #101010;
+	box-shadow: 0 0 3px #101010;
 }
 
 .gridster .preview-holder {
@@ -1453,6 +1461,26 @@ ul, ol {
 .dropdown-submenu:hover > a > [class*=" icon-"],
 .dropdown-submenu:focus > a > [class*=" icon-"] {
 	background-image: url("../img/glyphicons-halflings-white.png");
+}
+
+.icon-grey,
+.nav-pills > .active > a > [class^="icon-"],
+.nav-pills > .active > a > [class*=" icon-"],
+.nav-list > .active > a > [class^="icon-"],
+.nav-list > .active > a > [class*=" icon-"],
+.navbar-inverse .nav > .active > a > [class^="icon-"],
+.navbar-inverse .nav > .active > a > [class*=" icon-"],
+.dropdown-menu > li > a:hover > [class^="icon-"],
+.dropdown-menu > li > a:focus > [class^="icon-"],
+.dropdown-menu > li > a:hover > [class*=" icon-"],
+.dropdown-menu > li > a:focus > [class*=" icon-"],
+.dropdown-menu > .active > a > [class^="icon-"],
+.dropdown-menu > .active > a > [class*=" icon-"],
+.dropdown-submenu:hover > a > [class^="icon-"],
+.dropdown-submenu:focus > a > [class^="icon-"],
+.dropdown-submenu:hover > a > [class*=" icon-"],
+.dropdown-submenu:focus > a > [class*=" icon-"] {
+	background-image: url("../img/glyphicons-halflings.png");
 }
 
 .icon-glass {
@@ -2060,7 +2088,7 @@ input.table-row-value {
 	max-height: 110px;
 	overflow-x: hidden;
 	overflow-y: auto;
-	border-bottom: solid 1px #3d3d3d;
+	border-bottom: solid 1px #3c83c3;
 	width: 414px;
 }
 
@@ -2068,7 +2096,7 @@ input.table-row-value {
 	max-height: 110px;
 	overflow-x: hidden;
 	overflow-y: auto;
-	border-bottom: solid 1px #3d3d3d;
+	border-bottom: solid 1px #3c83c3;
 }
 
 ul.value-dropdown {
@@ -2076,7 +2104,7 @@ ul.value-dropdown {
 	position: absolute;
 	padding: 0px;
 	margin: 0px;
-	background-color: #272727;
+	background-color: #f9f9f9;
 	border: 1px solid rgba(255, 153, 0, 0.8);
 	overflow-x: hidden;
 	overflow-y: auto;
@@ -2143,7 +2171,7 @@ ul.board-toolbar.vertical {
 }
 
 .board-toolbar li {
-	color: #e0e0e0;
+	color: #f6f6f6;
 	float: left;
 	cursor: pointer;
 	margin: 0px 0px 0px 5px;
@@ -2181,7 +2209,7 @@ ul.board-toolbar.vertical {
 }
 
 .text-button {
-	color: #e0e0e0;
+	color: #f6f6f6;
 	cursor: pointer;
 	text-transform: uppercase;
 }
@@ -2272,8 +2300,8 @@ ul.datasource-input-suffix {
 	width: 414px;
 	height: 30px;
 	-webkit-appearance: none;
-	border: 1px solid #3d3d3d;
-	background: url(../img/dropdown-arrow.png) no-repeat right #272727;
+	border: 1px solid #3c83c3;
+	background: url(../img/dropdown-arrow-grey.png) no-repeat right #f9f9f9;
 }
 
 .title {
@@ -2662,7 +2690,7 @@ input:-moz-placeholder, textarea:-moz-placeholder {
 	display: block;
 	overflow: hidden;
 	cursor: pointer;
-	border: 1px solid #3D3D3D;
+	border: 1px solid #3c83c3;
 	border-radius: 0px;
 }
 
@@ -2705,7 +2733,7 @@ input:-moz-placeholder, textarea:-moz-placeholder {
 	width: 21px;
 	margin: 4px;
 	background: #A1A1A1;
-	border: 1px solid #3D3D3D;
+	border: 1px solid #3c83c3;
 	border-radius: 0px;
 	position: absolute;
 	top: 0;
