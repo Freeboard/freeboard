@@ -1259,6 +1259,7 @@ header h1 {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
+	height: fit-content;
 }
 
 #board-title{
@@ -1267,6 +1268,7 @@ header h1 {
 	padding-bottom: 5px;
 	margin-left: auto;
 	margin-right: auto;
+	
 	
 }
 
@@ -1330,7 +1332,7 @@ header h1 {
 }
 
 .section-title {
-	min-height: 7px;
+	min-height: 100px;
 }
 
 .small-text {
@@ -2292,8 +2294,7 @@ ul.datasource-input-suffix {
 
 h1.title {
 	margin-bottom: 10px;
-	font-size: 23px;
-	letter-spacing: -1px;
+	font-size: 23px;	
 }
 
 h2.title {
@@ -2323,9 +2324,9 @@ h2.title {
 }
 
 @media screen and (max-width : 960px) {
-	#add-pane {
+	/*#add-pane {
 		padding-top: 10px;
-	}
+	}*/
 
 	.text-button {
 		font-size: 14px;
@@ -2333,16 +2334,41 @@ h2.title {
 	}
 
 	h1.title {
-		margin-bottom: 0px;
+		margin-bottom: 0px;		
 		font-size: 13px;
 		letter-spacing: 0px;
+		
 	}
 
+	/*h3.title{
+		padding-top: 0;
+		width: 90%;
+		align-content: center;
+	}*/
+
 	.title.bordered {
-		padding: 1px 8px;
+		padding: 1px 5px;
 		line-height: 25px;
 		border-width: 2px;
 	}
+
+	#title-header{
+		padding-top: 0px;
+		align-content: center;
+		align-items: center;
+		align-self: center;
+		height: 50px;
+	}
+
+	#board-title{
+		
+		padding-top: 0px;
+		padding-bottom: 0px;
+		align-self: centre;
+		align-content: center;
+		margin-left: auto;
+		margin-right: auto;		
+	}		
 
 	#admin-menu {
 		width: 100%;
@@ -2368,9 +2394,7 @@ h2.title {
 		float: left;
 	}
 
-	#board-logo {
-		float: left;
-	}
+	
 
 	.modal header {
 		height: 30px;

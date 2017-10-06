@@ -638,7 +638,7 @@ function FreeboardModel(datasourcePlugins, widgetPlugins, freeboardUI)
 
 		var animateLength = (animate) ? 250 : 0;
 		var barHeight = $("#admin-bar").outerHeight();
-		var titleHeight = $("#board-title").outerHeight();
+		var titleHeight = $("#title-header").outerHeight();
 
 		if(!editing)
 		{
