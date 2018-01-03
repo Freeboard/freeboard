@@ -1259,7 +1259,7 @@ function PaneModel(theFreeboardModel, widgetPlugins) {
 			width: self.width(),
 			row: self.row,
 			col: self.col,
-			col_width: self.col_width(),
+			col_width: Number(self.col_width()),
 			widgets: widgets
 		};
 	}
