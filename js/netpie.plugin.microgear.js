@@ -153,6 +153,10 @@ if (typeof microgear === "undefined") {
                     location.reload(true);
                 })
             }
+            else {
+                microgear[settings.name] = self.mg;
+                self.mg.setAlias(settings.name);
+            }
         }
 
         self.mg.on('message', function(topic,msg) {
