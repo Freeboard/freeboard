@@ -12,13 +12,13 @@
         "fill_size" : false,
         "settings"  : [
             {
-                "name"        : "caption",
-                "display_name": "Shoutbox Caption",
+                "name"        : "label",
+                "display_name": "Label Text",
                 "type"        : "text"
             },
             {
-                "name"        : "text",
-                "display_name": "Label Text",
+                "name"        : "caption",
+                "display_name": "Shoutbox Caption",
                 "type"        : "text"
             },
             {
@@ -54,10 +54,16 @@
                 ]
             },
             {
+                "name"          : "clearValue",
+                "display_name"  : "Clear value",
+                "type"          : "boolean",
+                "default_value" : 0
+            },
+            {
                 "name"        : "onClick",
                 "display_name": "onClick action",
-                "type"        : "calculated",
-                "description" : "Add some Javascript here. You can chat and publish with a datasource's microgear like this : microgear[\"mygear\"].chat(\"mylamp\",\"ON\"), where \"mygear\" is a datasource name."
+                "type"        : "text",
+                "description" : "Add some Javascript here. You can chat and publish with a datasource's microgear like this : microgear[\"mygear\"].chat(\"mylamp\", value), where \"mygear\" is a datasource name."
             },
             {
                 "name"          : "onCreatedAction",
@@ -78,8 +84,9 @@
 
         self.widgetID = randomString(16);
 
-        var inputElement = $('<input id="v'+self.widgetID+'" type="text" value="" style="margin: 10px; width: 54%;">');
-        var buttonElement = $('<input id="'+self.widgetID+'"  type="button" value="'+settings.caption+'" style="width: 30%; height: 28px;" onClick="runCode(globalStore[\''+self.widgetID+'\'][\'onClick\'])">');
+        var labelElement = $('<label>'+(settings.label?settings.label:"")+'</label><br>');
+        var inputElement = $('<input id="v'+self.widgetID+'" type="text" value="" style="width: 55%;">');
+        var buttonElement = $('<input id="'+self.widgetID+'"  type="button" value="'+settings.caption+'" style="margin-left: 10px; margin-top: 5px; width: 36%; height: 30px;" onClick="runCode(globalStore[\''+self.widgetID+'\'][\'onClick\'])">');
 
         globalStore[self.widgetID] = {};
 
@@ -92,11 +99,15 @@
             }
         }
 
+        function setOnAction(settings) {
+            globalStore[self.widgetID]['onClick'] = 'var value=document.getElementById("v'+self.widgetID+'").value;'+(settings.clearValue?'document.getElementById("v'+self.widgetID+'").value="";':'')+settings.onClick;
+        }
+
         updateShoutboxColor(settings.color);
 
         self.render = function(containerElement) {
-            $(containerElement).append(inputElement).append(buttonElement);
-            globalStore[self.widgetID]['onClick'] = 'var value=document.getElementById("v'+self.widgetID+'").value;'+settings.onClick;
+            $(containerElement).append(labelElement).append(inputElement).append(buttonElement);
+            setOnAction(settings);
         }
 
         self.getHeight = function() {
@@ -105,9 +116,10 @@
 
         self.onSettingsChanged = function(newSettings) {
             currentSettings = newSettings;
+            labelElement.text(newSettings.label?newSettings.label:"");
             document.getElementById(self.widgetID).value = newSettings.caption;
             updateShoutboxColor(newSettings.color);
-            globalStore[self.widgetID]['onClick'] = 'var value=document.getElementById("v'+self.widgetID+'").value;'+newSettings.onClick;
+            setOnAction(newSettings);
         }
 
         self.onCalculatedValueChanged = function(settingName, newValue) {
