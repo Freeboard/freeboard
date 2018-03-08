@@ -1,0 +1,42 @@
+{
+	"version": 1,
+	"allow_edit": true,
+	"plugins": [],
+	"panes": [
+		{
+			"title": "JIRA A-Nerds Issues Created in the last 30 days",
+			"width": 1,
+			"row": {
+				"3": 1
+			},
+			"col": {
+				"3": 1
+			},
+			"col_width": 2,
+			"widgets": [
+				{
+					"type": "mach_d3_plugin",
+					"settings": {
+						"data": "datasources[\"JIRA ANerds Issues\"][\"results\"]",
+						"html": "<svg class=\"chartVertical\"/>",
+						"code": "var getResolved = function(d) { return d.data.resolved.count; };\nvar getCreated = function(d) { return d.data.created.count; };\nvar getTrend = function(d){return d.data.unresolvedTrend.count;};\n\nvar width = 600,\n    height = 600;\n\nvar y = d3.scale.linear()\n    .range([height, 0]);\n\nvar chart = d3.select(\".chartVertical\")\n    .attr(\"width\", width)\n    .attr(\"height\", height);\n\n\n  y.domain([0, d3.max(data, getCreated)]);\n\n  var barWidth = width / data.length;\n\n  var bar = chart.selectAll(\"g\")\n      .data(data)\n    .enter().append(\"g\")\n      .attr(\"transform\", function(d, i) { return \"translate(\" + i * barWidth + \",0)\"; });\n\n  bar.append(\"rect\")\n      .attr(\"y\", function(d) { return y(getCreated(d)); })\n      .attr(\"height\", function(d) { return height - y(getCreated(d)); })\n      .attr(\"width\", barWidth - 1)\n  .style(\"fill\", function(d){return d3.hsl(getCreated(d),0.9,0.5);});",
+						"sizeInBlocks": 10
+					}
+				}
+			]
+		}
+	],
+	"datasources": [
+		{
+			"name": "JIRA ANerds Issues",
+			"type": "JSON",
+			"settings": {
+				"url": "https://jira.atlassian.com/rest/gadget/1.0/dateCountInPeriod?jql=project=ANERDS&period=daily&daysprevious=30&operation=cumulative&field=created&field=resolved&field=unresolvedTrend",
+				"use_thingproxy": true,
+				"refresh": 600,
+				"method": "GET"
+			}
+		}
+	],
+	"columns": 3
+}
