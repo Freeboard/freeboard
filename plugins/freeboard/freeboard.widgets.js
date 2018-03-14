@@ -663,15 +663,19 @@
             }
         }
 
-        function updateImage()
+				function updateImage()
         {
             if(widgetElement && imageURL)
             {
-                var cacheBreakerURL = imageURL + (imageURL.indexOf("?") == -1 ? "?" : "&") + Date.now();
+                var cacheBreakerURL = imageURL + (imageURL.indexOf("?") == -1 ? "?" : "&") + Date.now(),
+										img = new Image();
 
-                $(widgetElement).css({
-                    "background-image" :  "url(" + cacheBreakerURL + ")"
-                });
+								img.onload = function() {
+									$(widgetElement).css({
+											"background-image" :  "url(" + cacheBreakerURL + ")"
+									});
+								}
+								img.src = cacheBreakerURL;
             }
         }
 
