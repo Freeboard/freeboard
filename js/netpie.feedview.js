@@ -1,543 +1,674 @@
-function insertChart(api,div,option){
-	var data = [];
-	for (var i = 0; i <= api.data.length - 1; i++) {
-		data[data.length] = api.data[i];
-	}
-	$.getJSON( "https://api.netpie.io/feed/"+api.name+"?apikey="+api.key+"&granularity="+api.granularity+"&timezone=7&data="+data+"&aggregate="+api.aggregate+"&since="+api.since+"&format=feedview", function(datajson) {
-		updateChart(div,datajson,option);
-	});
-}
-
-function n(n){
-    return n > 9 ? "" + n: "0" + n;
-}
-
-function getdata(datajson,arr,arrnext,index){
-    var timelist ={seconds:1000,minutes:1000*60,hours:1000*60*60,days:1000*60*60*24,months:1000*60*60*24*30,years:1000*60*60*24*30*12}
-    if(arrnext!==undefined){
-        var timesplit = timelist[datajson.granularity[1]]*datajson.granularity[0]*1.5;
-        if(index==0){
-            if(datajson.since == undefined){
-                var timebegin = datajson.from;
-                if(arr[0]-timebegin>timesplit){
-                    return [[ timebegin, null ]];
-                }
-                
-            }
-            else{
-                var timebegin = timelist[datajson.since[1]]*datajson.since[0];
-                var datenow = new Date().getTime();
-                if(arr[0]-(datenow-timebegin)>timesplit){
-                    return [[ datenow-timebegin, null ]];
-                }
-            }
-        }
-        else{
-            if(arrnext[0]-arr[0]>timesplit){
-            	if(datajson.since == undefined){
-            		return [[ arr[0], arr[1] ],[ datajson.to, null]];
-            	}
-            	else{
-            		return [[ arr[0], arr[1] ],[ arrnext[0], null]];
-            	}
-            }
-            return [[ arr[0], arr[1] ]];
-        }
+function insertChart(api, div, option) {
+    var data = [];
+    for (var i = 0; i <= api.data.length - 1; i++) {
+        data[data.length] = api.data[i];
     }
-    else{
-        var timesplit = timelist[datajson.granularity[1]]*datajson.granularity[0]*1.5;
-        var datenow = new Date().getTime();
-        if(datenow-arr[0]>timesplit){
-            if(datajson.since == undefined){
-                return [[ arr[0], arr[1] ],[datajson.to, null]];
+    $.getJSON("https://api.netpie.io/feed/" + api.name + "?apikey=" + api.key + "&granularity=" + api.granularity + "&timezone=7&data=" + data + "&aggregate=" + api.aggregate + "&since=" + api.since + "&format=feedview", function(datajson) {
+        updateChart(div, datajson, option);
+    });
+}
+
+function n(n) {
+    return n > 9 ? "" + n : "0" + n;
+}
+
+function getdata(datajson, arr, arrnext, index) {
+    var timelist = { seconds: 1000, minutes: 1000 * 60, hours: 1000 * 60 * 60, days: 1000 * 60 * 60 * 24, months: 1000 * 60 * 60 * 24 * 30, years: 1000 * 60 * 60 * 24 * 30 * 12 }
+    if (arrnext !== undefined) {
+        var timesplit = timelist[datajson.granularity[1]] * datajson.granularity[0] * 1.5;
+        if (index == 0) {
+            if (datajson.since == undefined) {
+                var timebegin = datajson.from;
+                if (arr[0] - timebegin > timesplit) {
+                    return [
+                        [timebegin, null]
+                    ];
+                }
+
+            } else {
+                var timebegin = timelist[datajson.since[1]] * datajson.since[0];
+                var datenow = new Date().getTime();
+                if (arr[0] - (datenow - timebegin) > timesplit) {
+                    return [
+                        [datenow - timebegin, null]
+                    ];
+                }
             }
-            else{
-                return [[ arr[0], arr[1] ],[datenow, null]];
+        } else {
+            if (arrnext[0] - arr[0] > timesplit) {
+                if (datajson.since == undefined) {
+                    return [
+                        [arr[0], arr[1]],
+                        [datajson.to, null]
+                    ];
+                } else {
+                    return [
+                        [arr[0], arr[1]],
+                        [arrnext[0], null]
+                    ];
+                }
             }
-            
+            return [
+                [arr[0], arr[1]]
+            ];
         }
-        else{
-            return [[ arr[0], arr[1] ]]
+    } else {
+        var timesplit = timelist[datajson.granularity[1]] * datajson.granularity[0] * 1.5;
+        var datenow = new Date().getTime();
+        if (datenow - arr[0] > timesplit) {
+            if (datajson.since == undefined) {
+                return [
+                    [arr[0], arr[1]],
+                    [datajson.to, null]
+                ];
+            } else {
+                return [
+                    [arr[0], arr[1]],
+                    [datenow, null]
+                ];
+            }
+
+        } else {
+            return [
+                [arr[0], arr[1]]
+            ]
         }
         return null;
     }
 }
 
-function updateChart(chartDIV,datajson,option) {
-	var oldgraph = null;
-	const DEFAULTCOLOR = ['#d40000','#1569ea','#ffcc00']
-	var defaultGraph = {lines:{show:true,steps:false},points:{show:true,radius:2}};
-	var optionGraph = {};
-	var heightGraph = 95;
-	var topLegend = 95;
-	var yaxes = []
-	var maxY = [];
-	var minY = [];
-	var color;
-	var width = {"1":"300","2":"620","3":"940"}
-	var curWidth = $("#"+chartDIV).parent().parent().parent().parent().attr('data-sizex');
-	var curHeight = $("#"+chartDIV).parent().parent().parent().parent().attr('data-sizey');
-	var widthGraph = width[curWidth]*0.95+"px";
-	var widthDiv = width[curWidth]+"px";
-	var unit =[];
-	if ($("#"+chartDIV).find("#"+chartDIV+"_graph").length > 0){
-		oldgraph = document.getElementById(chartDIV).innerHTML;
-		$("#"+chartDIV).empty();
-	}
-	try{
-		if(option === undefined) {
-		 	optionGraph = defaultGraph;
-		}else{
-			if(option.title){
-				heightGraph = heightGraph - 10;
-				$('<div class="header_graph" id="'+chartDIV+'_header">'+option.title.toUpperCase()+'</div>').css({
-					"padding-top": "2%",
-					display: "-webkit-flexbox",
-				    display: "-ms-flexbox",
-				    display: "-webkit-flex",
-				    display: "flex",
-				    "-webkit-flex-align": "center",
-				    "-ms-flex-align": "center",
-				    "-webkit-align-items": "center",
-				    "align-items": "center",
-				    "justify-content": "center",
-					width : "100%",
-					height:"7%",
-					margin:"auto",
-					// textAlign : "center",
-					font: '14px/0.9em "proxima-nova", Helvetica, Arial, sans-serif',
-					color:"black",
-					"font-weight": "bold"
-				}).appendTo("#"+chartDIV);
-				if(curWidth==3){
-					$('#'+chartDIV+'_header').css({
-						"padding-top": "1%"
-					})
-				}
-			}
-			if(option.xaxis !== undefined && option.xaxis.trim() != ""){
-				heightGraph = heightGraph - 5;
-				topLegend = topLegend - 5;
-			}
-			if(option.type !== undefined){
-				if(option.type=="bar"){
-					delete datajson[datajson.data[0].values[0]];
-					optionGraph['bars'] = {
-						show: true,
-						barWidth: (datajson.data[0].values[1][0]-datajson.data[0].values[0][0])/2,
-						align: "center"
-					};
-				}
-				else if(option.type=="step"){
-					optionGraph['lines'] = {
-						show: true,
-						steps : true
-					};
-				}
-				else{
-					optionGraph['lines'] = {
-						show: true,
-						steps : false
-					};
-				}
-			}
-			else{
-				optionGraph['lines'] = {
-					show: true,
-					steps : false
-				};
-			}
-    		if(np_theme=="default" || np_theme==="undefined"){
-    			colorpoint="#2A2A2A"
-			}
-			else{
-				colorpoint="#fff"
-			}
-				
-			optionGraph['points'] = {
-				show: option.marker?true:false,
-				radius : 2,
-				fillColor:colorpoint
-			};
-			if(option.color.replace(/ /g,'').split(',').length!=0&&option.color.replace(/ /g,'').split(',')[0].trim()!=""){
-				color = option.color.replace(/ /g,'').split(',');
-			}
-			else{color=DEFAULTCOLOR}
-		}
+function updateChart(chartDIV, datajson, option) {
+    var oldgraph = null;
+    const DEFAULTCOLOR = ['#d40000', '#1569ea', '#ffcc00']
+    var defaultGraph = { lines: { show: true, steps: false }, points: { show: true, radius: 2 } };
+    var optionGraph = {};
+    var heightGraph = 95;
+    var topLegend = 95;
+    var yaxes = []
+    var maxY = [];
+    var minY = [];
+    var color;
+    var width = { "1": "300", "2": "620", "3": "940" }
+    var curWidth = $("#" + chartDIV).parent().parent().parent().parent().attr('data-sizex');
+    var curHeight = $("#" + chartDIV).parent().parent().parent().parent().attr('data-sizey');
+    var widthGraph = width[curWidth] * 0.95 + "px";
+    var widthDiv = width[curWidth] + "px";
+    var unit = [];
+    var baseline = [];
+    if ($("#" + chartDIV).find("#" + chartDIV + "_graph").length > 0) {
+        oldgraph = document.getElementById(chartDIV).innerHTML;
+        $("#" + chartDIV).empty();
+    }
+    try {
+        if (option === undefined) {
+            optionGraph = defaultGraph;
+        } else {
+            if (option.title) {
+                heightGraph = heightGraph - 10;
+                $('<div class="header_graph" id="' + chartDIV + '_header">' + option.title.toUpperCase() + '</div>').css({
+                    "padding-top": "2%",
+                    display: "-webkit-flexbox",
+                    display: "-ms-flexbox",
+                    display: "-webkit-flex",
+                    display: "flex",
+                    "-webkit-flex-align": "center",
+                    "-ms-flex-align": "center",
+                    "-webkit-align-items": "center",
+                    "align-items": "center",
+                    "justify-content": "center",
+                    width: "100%",
+                    height: "7%",
+                    margin: "auto",
+                    // textAlign : "center",
+                    font: '14px/0.9em "proxima-nova", Helvetica, Arial, sans-serif',
+                    color: "black",
+                    "font-weight": "bold"
+                }).appendTo("#" + chartDIV);
+                if (curWidth == 3) {
+                    $('#' + chartDIV + '_header').css({
+                        "padding-top": "1%"
+                    })
+                }
+            }
+            if (option.xaxis !== undefined && option.xaxis.trim() != "") {
+                heightGraph = heightGraph - 5;
+                topLegend = topLegend - 5;
+            }
+            if (option.type !== undefined) {
+                if (option.type == "bar") {
+                    delete datajson[datajson.data[0].values[0]];
+                }
+            }
+            if (np_theme == "default" || np_theme === "undefined") {
+                colorpoint = "#2A2A2A"
+            } else {
+                colorpoint = "#fff"
+            }
+            optionGraph['points'] = {
+                show: option.marker ? true : false,
+                radius: 2,
+                fillColor: colorpoint
+            };
+            if (option.color.replace(/ /g, '').split(',').length != 0 && option.color.replace(/ /g, '').split(',')[0].trim() != "") {
+                color = option.color.replace(/ /g, '').split(',');
+            } else { color = DEFAULTCOLOR }
+            if (option.baseline !== undefined) {
+                if (option.baseline.replace(/ /g, '').split(',').length != 0 && option.baseline.replace(/ /g, '').split(',')[0].trim() != "") {
+                    baseline = option.baseline.replace(/ /g, '').split(',');
+                }
+            }
+        }
 
-		$('#'+chartDIV).css({
-			width:widthDiv,
-			position:"relative"
-		});
-		$('#'+chartDIV).addClass('bg-graph');
-		$('<div id="'+chartDIV+'_graph" ></div>').css({
-			// top:"5px",
-			width: widthGraph,
-			height:heightGraph+"%",
-			margin: "auto",
-			// 'background-color' : "",
-		}).appendTo("#"+chartDIV);
-		var filter = [];
-		if (option && option.filter){
-			if(option.filter.replace(/ /g,'').split(',').length!=0&&option.filter.replace(/ /g,'').split(',')[0].trim()!=""){
-					filter = option.filter.replace(/ /g,'').split(',');
-			}
-		}
-		var colori = [];
-		var chartdata = [];
-		var count = 0;
-		if (datajson) {
-			var numcolor = color.length;
-			if(datajson.data.length>=1){
-				for (var i=0; i<datajson.data.length; i++) {
-					unit[unit.length] = [datajson.data[i].attr,datajson.data[i].unit];
-					var maxi;
-					var mini;
-					var test = 0;
-					if (filter.length > 0 ){
-						if(filter.indexOf(datajson.data[i].attr) != -1){
-							var s = {data: [], label: filter[filter.indexOf(datajson.data[i].attr)], points:{symbol:"circle"}}
-							if (count>0){
-								s.yaxis = count+1;
-							}
-							else {
-								s.yaxis = 1;
-							}
-							var arr = datajson.data[i].values;
-							for (var j=0; j<arr.length; j++) {
-								var datai = null;
-								if (option && option.autogap){
-									datai = getdata(datajson,arr[j],arr[j+1],j)
-								}
-								else{
-									datai = [[ arr[j][0], arr[j][1] ]];
-								}
-								if(datai!=null){
-									for (var k=0; k<datai.length; k++) {
-										s.data.push(datai[k]);
-									}
-								}s
-								if(j==0){
-									maxi = arr[j][1];
-									mini = arr[j][1];
-									maxY[count] = arr[j][1];
-									minY[count] = arr[j][1];
-								}
-								else{
-									if(arr[j][1]>maxi){
-										maxi = arr[j][1];
-										maxY[count] = arr[j][1];
-									}
-									if(arr[j][1]<mini){
-										mini = arr[j][1];
-										minY[count] = arr[j][1];
-									}
-								}
-							}
-							chartdata[count] = s;
-							if(count+1 > numcolor){
-								colori[count] = color[i%numcolor];
-						   	}
-						   	else{
-						   		colori[count] = color[filter.indexOf(datajson.data[i].attr)]
-						   	}
-							count = count + 1 ;
-						}
-					}
-					else{
-						var s = {data: [], label: datajson.data[i].attr, points:{symbol:"circle"}}
-						if (i>0){
-							s.yaxis = i+1;
-						}
-						else {
-							s.yaxis = 1;
-						}
-						var arr = datajson.data[i].values;
-						for (var j=0; j<arr.length; j++) {
-							var datai = null;
-							if (option && option.autogap){
-								datai = getdata(datajson,arr[j],arr[j+1],j)
-							}
-							else{
-								datai = [[ arr[j][0], arr[j][1] ]];
-							}
-							if(datai!=null){
-								for (var k=0; k<datai.length; k++) {
-									s.data.push(datai[k]);
-								}
-							}
-							if(j==0){
-								maxi = arr[j][1];
-								mini = arr[j][1];
-								maxY[count] = arr[j][1];
-								minY[count] = arr[j][1];
-							}
-							else{
-								if(parseInt(arr[j][1])>maxi){
-									maxi = arr[j][1];
-									maxY[count] = arr[j][1];
-								}
-								if(parseInt(arr[j][1])<mini){
-									mini = arr[j][1];
-									minY[count] = arr[j][1];
-								}
-							}
-						}
-						chartdata.push(s);
-						if(count>=color.length){
-							colori[colori.length] = color[i%numcolor];
-				   		}
-				   		else{
-				   			colori[count] = color[count]
-				   		}
-				   	count = count + 1 ;
-					}
-				}
-			}
-			else{
-				chartdata = [[]]
-				count = count + 1 ;
-			}
-		}
+        $('#' + chartDIV).css({
+            width: widthDiv,
+            position: "relative"
+        });
+        $('#' + chartDIV).addClass('bg-graph');
+        $('<div id="' + chartDIV + '_graph" ></div>').css({
+            // top:"5px",
+            width: widthGraph,
+            height: heightGraph + "%",
+            margin: "auto",
+            // 'background-color' : "",
+        }).appendTo("#" + chartDIV);
+        var filter = [];
+        if (option && option.filter) {
+            if (option.filter.replace(/ /g, '').split(',').length != 0 && option.filter.replace(/ /g, '').split(',')[0].trim() != "") {
+                filter = option.filter.replace(/ /g, '').split(',');
+            }
+        }
+        var colori = [];
+        var chartdata = [];
+        var count = 0;
+        if (datajson) {
+            var numcolor = color.length;
+            var fill = false;
+            if (option.fill !== undefined) {
+                fill = option.fill ? true : false
+            }
+            if (datajson.data.length >= 1) {
+                for (var i = 0; i < datajson.data.length; i++) {
+                    unit[unit.length] = [datajson.data[i].attr, datajson.data[i].unit];
+                    var maxi;
+                    var mini;
+                    var test = 0;
+                    var s = {};
 
-		for (var i=0; i<count; i++) {
-			if(option !== undefined && option.multipleaxis !== undefined && option.multipleaxis!=true){
-				var minYi = (Math.min.apply(Math,minY))-1;
-				if(option.yzero){
-					if( (Math.min.apply(Math,minY))>0){
-					 	minYi=0;
-					}
-				}
-			   	if(i+1 == count){
-			   		yaxes[yaxes.length] = {font : {size : 11,style : "",weight : "bold",family : "sans-serif",variant : "small-caps",color : "black"},max:Math.max.apply(Math, maxY)+1,min:minYi,class:"oneyaxis"};
-			   	}
-			   	else{
-			   		yaxes[yaxes.length] = {show:false,min:minYi,max:Math.max.apply(Math, maxY)+1};
-			   	}
+                    if (option.type !== undefined) {
+                        if (option.type == "bar") {
+                            if (fill) {
+                                s = {
+                                    data: [],
+                                    points: { symbol: "circle" },
+                                    bars: {
+                                        show: true,
+                                        barWidth: (datajson.data[0].values[1][0] - datajson.data[0].values[0][0]) / 2,
+                                        align: "center",
+                                        fill: true
+                                    }
+                                }
+                            } else {
+                                s = {
+                                    data: [],
+                                    points: { symbol: "circle" },
+                                    bars: {
+                                        show: true,
+                                        barWidth: (datajson.data[0].values[1][0] - datajson.data[0].values[0][0]) / 2,
+                                        align: "center"
+                                    }
+                                }
+                            }
 
-			}
-			else{
-				yaxes[yaxes.length] = {font : {size:11,style:"",weight:"bold",family:"sans-serif",variant:"small-caps",color : colori[i]}};
-				if(count<=1){
-					if(np_theme=="default" || np_theme==="undefined"){
-		    			yaxes[yaxes.length-1].font.color = "white";
-					}
-					else{
-						yaxes[yaxes.length-1].font.color = "black";
-					}
-				}
-				if(option.yzero){
-					var minYi = Math.min.apply(Math, minY);
-					if( minYi>0){
-					 	minYi=0;
-					}
-					yaxes[yaxes.length-1].min = minYi;
-				}
-			}
-		}
 
-		if(curHeight-16<0){
-			topLegend =topLegend+(curHeight-16)/2
-		}
-		if(curWidth==3){
-			topLegend = topLegend+1;
-		}
-		$('<div id="'+chartDIV+'_legend"></div>').css({
-			padding: "",
-			top : topLegend+"%",
-			height:"5%",
-			width : "100%",
-			margin:"auto",
-			textAlign : "center",
-			position : "absolute",
-			textAlign : "center",
-		}).appendTo("#"+chartDIV);
-		var plot = $.plot("#"+chartDIV+"_graph", chartdata, {
-			legend: {
-				show: true,
-				noColumns: 5,
-				container: '#'+chartDIV+'_legend',
-				labelFormatter : function(label, series) {
-				    uniti = "";
-                    for (var i = unit.length - 1; i >= 0; i--) {
-                        if(unit[i][0]==label){
-                            if(unit[i][1].length>0){
-                                uniti = "("+unit[i][1]+")"
+                        } else if (option.type == "step") {
+                            if (fill) {
+                                s = {
+                                    data: [],
+                                    points: { symbol: "circle" },
+                                    lines: {
+                                        show: true,
+                                        steps: true,
+                                        fill: true
+                                    }
+                                }
+                            } else {
+                                s = {
+                                    data: [],
+                                    points: { symbol: "circle" },
+                                    lines: {
+                                        show: true,
+                                        steps: true
+                                    }
+                                }
+                            }
+
+                        } else {
+                            if (fill) {
+                                s = {
+                                    data: [],
+                                    points: { symbol: "circle" },
+                                    lines: {
+                                        show: true,
+                                        steps: false,
+                                        fill: true
+                                    }
+                                }
+                            } else {
+                                s = {
+                                    data: [],
+                                    points: { symbol: "circle" },
+                                    lines: {
+                                        show: true,
+                                        steps: false
+                                    }
+                                }
+                            }
+
+                        }
+                    } else {
+                        if (fill) {
+                            s = {
+                                data: [],
+                                points: { symbol: "circle" },
+                                lines: {
+                                    show: true,
+                                    steps: false,
+                                    fill: true
+                                }
+                            }
+                        } else {
+                            s = {
+                                data: [],
+                                points: { symbol: "circle" },
+                                lines: {
+                                    show: true,
+                                    steps: false
+                                }
                             }
                         }
                     }
-                    return '&nbsp;' + label.toUpperCase() +uniti.toUpperCase();
-				}
-			},
-			series: optionGraph,
-			grid : {
-				hoverable: true,
-				clickable: false
-			},
-			yaxes: yaxes,
-			color : colori,
-			xaxis : {
-				mode : "time",
-				timezone : "browser",
-				font : {
-			      	size : 11,
-			      	style : "",
-			      	weight : "bold",
-			      	family : "sans-serif",
-			      	variant : "small-caps",
-			      	color : "black"
-			   }
-			}
-		});
-		$("<div id='tooltip'></div>").css({
-			position: "absolute",
-			display: "none",
-			border: "1px solid #ccc",
-			padding: "2px",
-			"background-color": "#fee",
-			opacity: 1,
-			fontFamily:"sans-serif",
-			fontSize:11,
-			fontWeight:"bold",
-			color:"black"
-		}).appendTo("body");
-		$('#'+chartDIV+'_graph').bind("plothover", function (event, pos, item) {
-			if ($("#enablePosition:checked").length > 0) {
-				var str = "(" + pos.x.toFixed(2) + ", " + pos.y.toFixed(2) + ")";
-				$("#hoverdata").text(str);
-			}
-			if (true) {
-				if (item) {
-					var x = item.datapoint[0].toFixed(2),
-						y = item.datapoint[1].toFixed(2);
-					var newDate = new Date(parseInt(x));
-					var listDays = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
-					var listMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-					uniti = "";
-					for (var i = unit.length - 1; i >= 0; i--) {
-						if(unit[i][0]==item.series.label){
-							uniti =unit[i][1]
-						}
-					}
-					var tooltiptext = listDays[newDate.getDay()]+" "+listMonths[newDate.getMonth()]+" "+n(newDate.getDate())+" "+newDate.getFullYear()+" "+n(newDate.getHours())+":"+n(newDate.getMinutes())+":"+n(newDate.getSeconds())+"<br>"+item.series.label+" = "+y+" "+uniti;
-					$("#tooltip").html(tooltiptext)
-						.css({top: item.pageY+5, left: item.pageX+5})
-						.fadeIn(200);
-				} else {
-					$("#tooltip").hide();
-				}
-			}
-		});
-		$('#'+chartDIV+'_graph').bind("plotclick", function (event, pos, item) {
-			if (item) {
-				$("#clickdata").text(" - click point " + item.dataIndex + " in " + item.series.label);
-				plot.highlight(item.series, item.datapoint);
-			}
-		});
+                    if (filter.length > 0) {
+                        s.label = filter[filter.indexOf(datajson.data[i].attr)];
+                        if (filter.indexOf(datajson.data[i].attr) != -1) {
+                            if (count > 0) {
+                                s.yaxis = count + 1;
+                            } else {
+                                s.yaxis = 1;
+                            }
+                            var arr = datajson.data[i].values;
+                            for (var j = 0; j < arr.length; j++) {
+                                var datai = null;
+                                if (option && option.autogap) {
+                                    datai = getdata(datajson, arr[j], arr[j + 1], j)
+                                } else {
+                                    datai = [
+                                        [arr[j][0], arr[j][1]]
+                                    ];
+                                }
+                                if (datai != null) {
+                                    for (var k = 0; k < datai.length; k++) {
+                                        s.data.push(datai[k]);
+                                    }
+                                }
 
-		if(option !== undefined) {
-			if(option.xaxis !== undefined && option.xaxis.trim()!=""){
-				var topX = topLegend+5;
-				$('<div class="x_graph" id="'+chartDIV+'_x">'+option.xaxis.toUpperCase()+'</div>').css({
-					width : "100%",
-					margin: "auto",
-					textAlign : "center",
-					position : "absolute",
-					// height:"5%",
-					top: topX+"%",
-					font: '0.85em "proxima-nova", Helvetica, Arial, sans-serif',
-					color:"black",
-					"font-weight": "bold"
-				}).insertAfter("#"+chartDIV+"_legend");
-			}
-			if(option.yaxis !== undefined){
-				// $("#"+chartDIV+"_graph").css({
-				// 	top:"10%"
-				// });
-				$('<div class="y_graph" id="'+chartDIV+'_y">'+option.yaxis.toUpperCase()+'</div>').css({
-					textAlign : "center",
-					'-webkit-transform' : 'rotate(270deg)',
-	             	'-moz-transform' : 'rotate(270deg)',
-	             	'-ms-transform' : 'rotate(270deg)',
-	             	'transform' : 'rotate(270deg)',
-	             	position : "absolute",
-	             	font: '0.85em "proxima-nova", Helvetica, Arial, sans-serif',
-	             	color:"black",
-					"font-weight": "bold"
-				}).insertBefore("#"+chartDIV+"_graph");
-				var ydivheight = ($("#"+chartDIV).height()/2-$('#'+chartDIV+'_y').height()/2)-1;
-				if($("#"+chartDIV).width()<=300){
-					$('#'+chartDIV+'_y').css({
-						top : ydivheight+"px",
-						left : '-7.5px'
-					})
-				}
-				else if($("#"+chartDIV).width()<=620){
-					$('#'+chartDIV+'_y').css({
-						top : ydivheight+"px",
-						left : '-5px'
-					})
-				}
-				else{
-					$('#'+chartDIV+'_y').css({
-						top : ydivheight+"px",
-					})
-				}
-			}
-		}
+                                if (j == 0) {
+                                    maxi = arr[j][1];
+                                    mini = arr[j][1];
+                                    maxY[count] = arr[j][1];
+                                    minY[count] = arr[j][1];
+                                } else {
+                                    if (arr[j][1] > maxi) {
+                                        maxi = arr[j][1];
+                                        maxY[count] = arr[j][1];
+                                    }
+                                    if (arr[j][1] < mini) {
+                                        mini = arr[j][1];
+                                        minY[count] = arr[j][1];
+                                    }
+                                }
+                            }
+                            chartdata[count] = s;
+                            if (count + 1 > numcolor) {
+                                colori[count] = color[i % numcolor];
+                            } else {
+                                colori[count] = color[filter.indexOf(datajson.data[i].attr)]
+                            }
+                            count = count + 1;
+                        }
+                    } else {
+                        s.label = datajson.data[i].attr;
+                        if (i > 0) {
+                            s.yaxis = i + 1;
+                        } else {
+                            s.yaxis = 1;
+                        }
+                        var arr = datajson.data[i].values;
+                        for (var j = 0; j < arr.length; j++) {
+                            var datai = null;
+                            if (option && option.autogap) {
+                                datai = getdata(datajson, arr[j], arr[j + 1], j)
 
-		/*
-		if(window.location.hostname!="netpie.io"){
-			$("<a id='netpie_logo_link"+chartDIV+"' href='https://netpie.io'><img id='netpie_logo_"+chartDIV+"' src='https://netpie.io/public/netpieio/assets/images/logo/netpie_logo.png' ></img></a>").css({
-				position : "absolute",
-				display : "none"
-			}).appendTo('#'+chartDIV);
-			$("#netpie_logo_"+chartDIV).css({
-				left : "100%",
-				buttom : "0px",
-				height : "4%",
-				display : "block"
-			});
-			var width = $('#'+chartDIV).width()*0.94-($('#netpie_logo_link'+chartDIV).height()*1038/268);
-			var height = $('#'+chartDIV).height()-$('#netpie_logo_link'+chartDIV).height()-$('#'+chartDIV).height()*0.01;
-			$("#netpie_logo_link"+chartDIV).css({
-				left : width+"px",
-				top : height+"px",
-				display : "block"
-			});
-		}
-		*/
-	}
-	catch(err) {
-		if(oldgraph!=null){
-			document.getElementById(chartDIV).innerHTML = oldgraph;
-		}	
-	}
+                            } else {
+                                datai = [
+                                    [arr[j][0], arr[j][1]]
+                                ];
+                            }
+                            if (datai != null) {
+                                for (var k = 0; k < datai.length; k++) {
+                                    s.data.push(datai[k]);
+                                }
+                            }
+                            if (j == 0) {
+                                maxi = arr[j][1];
+                                mini = arr[j][1];
+                                maxY[count] = arr[j][1];
+                                minY[count] = arr[j][1];
+                            } else {
+                                if (parseInt(arr[j][1]) > maxi) {
+                                    maxi = arr[j][1];
+                                    maxY[count] = arr[j][1];
+                                }
+                                if (parseInt(arr[j][1]) < mini) {
+                                    mini = arr[j][1];
+                                    minY[count] = arr[j][1];
+                                }
+                            }
+                        }
+                        chartdata.push(s);
+                        if (count >= color.length) {
+                            colori[colori.length] = color[i % numcolor];
+                        } else {
+                            colori[count] = color[count]
+                        }
+                        count = count + 1;
+                    }
+                }
+            } else {
+                chartdata = [
+                    []
+                ]
+                count = count + 1;
+            }
+        }
 
-	$(function () {
-	    var prevWidth = $('#'+chartDIV).parent().parent().parent().parent().attr('data-sizex');
-	    $('#'+chartDIV).parent().parent().parent().parent().attrchange({
-	        callback: function (e) {
-	            var curWidth = $('#'+chartDIV).parent().parent().parent().parent().attr('data-sizex');
-	            if (prevWidth !== curWidth) {
-	                prevWidth = curWidth;
-	                updateChart(chartDIV,datajson,option);
-	            }
-	        }
-	    }).resizable();
-	    // var prevBgColor = $('#'+chartDIV).css("background-color");
-	    // $('#'+chartDIV+"_graph").attrchange({
-	    // 	trackValues: true,
-	    //     callback: function (e) {
-	    //     	var curBgColor = $('#'+chartDIV).css("background-color");
-	    //     	console.log(prevBgColor !== curBgColor)
-	    //         if (prevBgColor !== curBgColor) {
-	    //             prevBgColor = curBgColor;
-	    //             updateChart(chartDIV,datajson,option);
-	    //         }
-	    //     }
-	    // });
-	});
+        for (var i = 0; i < count; i++) {
+            if (option !== undefined && option.multipleaxis !== undefined && option.multipleaxis != true) {
+                var minYi = (Math.min.apply(Math, minY)) - 1;
+                if (option.yzero) {
+                    if ((Math.min.apply(Math, minY)) > 0) {
+                        minYi = 0;
+                    }
+                }
+                if (i + 1 == count) {
+                    yaxes[yaxes.length] = { font: { size: 11, style: "", weight: "bold", family: "sans-serif", variant: "small-caps", color: "black" }, max: Math.max.apply(Math, maxY) + 1, min: minYi, class: "oneyaxis" };
+                } else {
+                    yaxes[yaxes.length] = { show: false, min: minYi, max: Math.max.apply(Math, maxY) + 1 };
+                }
+
+            } else {
+                yaxes[yaxes.length] = { font: { size: 11, style: "", weight: "bold", family: "sans-serif", variant: "small-caps", color: colori[i] } };
+                if (count <= 1) {
+                    if (np_theme == "default" || np_theme === "undefined") {
+                        yaxes[yaxes.length - 1].font.color = "white";
+                    } else {
+                        yaxes[yaxes.length - 1].font.color = "black";
+                    }
+                }
+                if (option.yzero) {
+                    var minYi = Math.min.apply(Math, minY);
+                    if (minYi > 0) {
+                        minYi = 0;
+                    }
+                    yaxes[yaxes.length - 1].min = minYi;
+                }
+            }
+        }
+
+        if (curHeight - 16 < 0) {
+            topLegend = topLegend + (curHeight - 16) / 2
+        }
+        if (curWidth == 3) {
+            topLegend = topLegend + 1;
+        }
+        $('<div id="' + chartDIV + '_legend"></div>').css({
+            padding: "",
+            top: topLegend + "%",
+            height: "5%",
+            width: "100%",
+            margin: "auto",
+            textAlign: "center",
+            position: "absolute",
+            textAlign: "center",
+        }).appendTo("#" + chartDIV);
+        if (baseline.length != 0) {
+            var first = chartdata[0]["data"][0][0];
+            var last = chartdata[0]["data"][chartdata[0]["data"].length - 1][0];
+            for (var i = 0; i <= chartdata.length - 1; i++) {
+                if (chartdata[i]["data"][0][0] < first) {
+                    first = chartdata[i]["data"][0][0];
+                }
+                if (chartdata[i]["data"][chartdata[i]["data"].length - 1][0] > last) {
+                    last = chartdata[i]["data"][chartdata[0]["data"].length - 1][0];
+                }
+            }
+            for (var i = 0; i <= baseline.length - 1; i++) {
+                var baselinedata = {
+                    data: [
+                        [first, baseline[i]],
+                        [last, baseline[i]]
+                    ],
+                    lines: { show: true, fill: false }
+                }
+                chartdata.push(baselinedata)
+                if (count >= color.length) {
+                    colori[colori.length] = color[i % numcolor];
+                } else {
+                    colori[count] = color[count]
+                }
+                count = count + 1;
+            }
+        }
+        var plot = $.plot("#" + chartDIV + "_graph", chartdata, {
+            legend: {
+                show: true,
+                noColumns: 5,
+                container: '#' + chartDIV + '_legend',
+                labelFormatter: function(label, series) {
+                    uniti = "";
+                    for (var i = unit.length - 1; i >= 0; i--) {
+                        if (unit[i][0] == label) {
+                            if (unit[i][1].length > 0) {
+                                uniti = "(" + unit[i][1] + ")"
+                            }
+                        }
+                    }
+                    return '&nbsp;' + label.toUpperCase() + uniti.toUpperCase();
+                }
+            },
+            series: optionGraph,
+            grid: {
+                hoverable: true,
+                clickable: false
+            },
+            yaxes: yaxes,
+            color: colori,
+            xaxis: {
+                mode: "time",
+                timezone: "browser",
+                font: {
+                    size: 11,
+                    style: "",
+                    weight: "normal",
+                    family: "Trebuchet, Arial, sans-serif",
+                    variant: "small-caps",
+                    color: "black"
+                }
+            }
+        });
+        $("<div id='tooltip'></div>").css({
+            position: "absolute",
+            display: "none",
+            border: "1px solid #ccc",
+            padding: "2px",
+            "background-color": "#fee",
+            opacity: 1,
+            fontFamily: "sans-serif",
+            fontSize: 11,
+            fontWeight: "bold",
+            color: "black"
+        }).appendTo("body");
+        $('#' + chartDIV + '_graph').bind("plothover", function(event, pos, item) {
+            if ($("#enablePosition:checked").length > 0) {
+                var str = "(" + pos.x.toFixed(2) + ", " + pos.y.toFixed(2) + ")";
+                $("#hoverdata").text(str);
+            }
+            if (true) {
+                if (item) {
+                    var x = item.datapoint[0].toFixed(2),
+                        y = item.datapoint[1].toFixed(2);
+                    var newDate = new Date(parseInt(x));
+                    var listDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                    var listMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                    var uniti = "";
+                    var lastindex = item.series.data.length - 1;
+                    for (var i = unit.length - 1; i >= 0; i--) {
+                        if (unit[i][0] == item.series.label) {
+                            uniti = unit[i][1];
+                        }
+                    }
+                    var tooltiptext;
+                    if (item.series.label !== undefined) {
+                        tooltiptext = listDays[newDate.getDay()] + " " + listMonths[newDate.getMonth()] + " " + n(newDate.getDate()) + " " + newDate.getFullYear() + " " + n(newDate.getHours()) + ":" + n(newDate.getMinutes()) + ":" + n(newDate.getSeconds()) + "<br>" + item.series.label + " = " + y + " " + uniti;
+                        if (item.dataIndex + 2 > lastindex) {
+                            $("#tooltip").html(tooltiptext).css({
+                                top: item.pageY + 15,
+                                left: item.pageX - 70
+                            }).fadeIn(200);
+                        } else {
+                            $("#tooltip").html(tooltiptext).css({
+                                top: item.pageY + 15,
+                                left: item.pageX + 5
+                            }).fadeIn(200);
+                        }
+                    } else {
+                        tooltiptext = "baseline" + " = " + y;
+
+                        $("#tooltip").html(tooltiptext).css({
+                            top: item.pageY + 15,
+                            left: item.pageX - 50
+                        }).fadeIn(200);
+                    }
+                } else {
+                    $("#tooltip").hide();
+                }
+            }
+        });
+        $('#' + chartDIV + '_graph').bind("plotclick", function(event, pos, item) {
+            if (item) {
+                $("#clickdata").text(" - click point " + item.dataIndex + " in " + item.series.label);
+                plot.highlight(item.series, item.datapoint);
+            }
+        });
+        if (option !== undefined) {
+            if (option.xaxis !== undefined && option.xaxis.trim() != "") {
+                var topX = topLegend + 5;
+                $('<div class="x_graph" id="' + chartDIV + '_x">' + option.xaxis.toUpperCase() + '</div>').css({
+                    width: "100%",
+                    margin: "auto",
+                    textAlign: "center",
+                    position: "absolute",
+                    // height:"5%",
+                    top: topX + "%",
+                    font: '0.85em "proxima-nova", Helvetica, Arial, sans-serif',
+                    color: "black",
+                    "font-weight": "bold"
+                }).insertAfter("#" + chartDIV + "_legend");
+            }
+            if (option.yaxis !== undefined) {
+                // $("#"+chartDIV+"_graph").css({
+                //  top:"10%"
+                // });
+                $('<div class="y_graph" id="' + chartDIV + '_y">' + option.yaxis.toUpperCase() + '</div>').css({
+                    textAlign: "center",
+                    '-webkit-transform': 'rotate(270deg)',
+                    '-moz-transform': 'rotate(270deg)',
+                    '-ms-transform': 'rotate(270deg)',
+                    'transform': 'rotate(270deg)',
+                    position: "absolute",
+                    font: '0.85em "proxima-nova", Helvetica, Arial, sans-serif',
+                    color: "black",
+                    "font-weight": "bold"
+                }).insertBefore("#" + chartDIV + "_graph");
+                var ydivheight = ($("#" + chartDIV).height() / 2 - $('#' + chartDIV + '_y').height() / 2) - 1;
+                if ($("#" + chartDIV).width() <= 300) {
+                    $('#' + chartDIV + '_y').css({
+                        top: ydivheight + "px",
+                        left: '-7.5px'
+                    })
+                } else if ($("#" + chartDIV).width() <= 620) {
+                    $('#' + chartDIV + '_y').css({
+                        top: ydivheight + "px",
+                        left: '-5px'
+                    })
+                } else {
+                    $('#' + chartDIV + '_y').css({
+                        top: ydivheight + "px",
+                    })
+                }
+            }
+        }
+
+        /*
+        if(window.location.hostname!="netpie.io"){
+            $("<a id='netpie_logo_link"+chartDIV+"' href='https://netpie.io'><img id='netpie_logo_"+chartDIV+"' src='https://netpie.io/public/netpieio/assets/images/logo/netpie_logo.png' ></img></a>").css({
+                position : "absolute",
+                display : "none"
+            }).appendTo('#'+chartDIV);
+            $("#netpie_logo_"+chartDIV).css({
+                left : "100%",
+                buttom : "0px",
+                height : "4%",
+                display : "block"
+            });
+            var width = $('#'+chartDIV).width()*0.94-($('#netpie_logo_link'+chartDIV).height()*1038/268);
+            var height = $('#'+chartDIV).height()-$('#netpie_logo_link'+chartDIV).height()-$('#'+chartDIV).height()*0.01;
+            $("#netpie_logo_link"+chartDIV).css({
+                left : width+"px",
+                top : height+"px",
+                display : "block"
+            });
+        }
+        */
+    } catch (err) {
+        if (oldgraph != null) {
+            document.getElementById(chartDIV).innerHTML = oldgraph;
+        }
+    }
+
+    $(function() {
+        var prevWidth = $('#' + chartDIV).parent().parent().parent().parent().attr('data-sizex');
+        $('#' + chartDIV).parent().parent().parent().parent().attrchange({
+            callback: function(e) {
+                var curWidth = $('#' + chartDIV).parent().parent().parent().parent().attr('data-sizex');
+                if (prevWidth !== curWidth) {
+                    prevWidth = curWidth;
+                    updateChart(chartDIV, datajson, option);
+                }
+            }
+        }).resizable();
+        // var prevBgColor = $('#'+chartDIV).css("background-color");
+        // $('#'+chartDIV+"_graph").attrchange({
+        //  trackValues: true,
+        //     callback: function (e) {
+        //      var curBgColor = $('#'+chartDIV).css("background-color");
+        //      console.log(prevBgColor !== curBgColor)
+        //         if (prevBgColor !== curBgColor) {
+        //             prevBgColor = curBgColor;
+        //             updateChart(chartDIV,datajson,option);
+        //         }
+        //     }
+        // });
+    });
 }
 
 /* Javascript plotting library for jQuery, version 0.8.3.
@@ -571,14 +702,58 @@ Licensed under the MIT license.
  * V. 1.1: Fix error handling so e.g. parsing an empty string does
  * produce a color rather than just crashing.
  */
-(function($){$.color={};$.color.make=function(r,g,b,a){var o={};o.r=r||0;o.g=g||0;o.b=b||0;o.a=a!=null?a:1;o.add=function(c,d){for(var i=0;i<c.length;++i)o[c.charAt(i)]+=d;return o.normalize()};o.scale=function(c,f){for(var i=0;i<c.length;++i)o[c.charAt(i)]*=f;return o.normalize()};o.toString=function(){if(o.a>=1){return"rgb("+[o.r,o.g,o.b].join(",")+")"}else{return"rgba("+[o.r,o.g,o.b,o.a].join(",")+")"}};o.normalize=function(){function clamp(min,value,max){return value<min?min:value>max?max:value}o.r=clamp(0,parseInt(o.r),255);o.g=clamp(0,parseInt(o.g),255);o.b=clamp(0,parseInt(o.b),255);o.a=clamp(0,o.a,1);return o};o.clone=function(){return $.color.make(o.r,o.b,o.g,o.a)};return o.normalize()};$.color.extract=function(elem,css){var c;do{c=elem.css(css).toLowerCase();if(c!=""&&c!="transparent")break;elem=elem.parent()}while(elem.length&&!$.nodeName(elem.get(0),"body"));if(c=="rgba(0, 0, 0, 0)")c="transparent";return $.color.parse(c)};$.color.parse=function(str){var res,m=$.color.make;if(res=/rgb\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*\)/.exec(str))return m(parseInt(res[1],10),parseInt(res[2],10),parseInt(res[3],10));if(res=/rgba\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]+(?:\.[0-9]+)?)\s*\)/.exec(str))return m(parseInt(res[1],10),parseInt(res[2],10),parseInt(res[3],10),parseFloat(res[4]));if(res=/rgb\(\s*([0-9]+(?:\.[0-9]+)?)\%\s*,\s*([0-9]+(?:\.[0-9]+)?)\%\s*,\s*([0-9]+(?:\.[0-9]+)?)\%\s*\)/.exec(str))return m(parseFloat(res[1])*2.55,parseFloat(res[2])*2.55,parseFloat(res[3])*2.55);if(res=/rgba\(\s*([0-9]+(?:\.[0-9]+)?)\%\s*,\s*([0-9]+(?:\.[0-9]+)?)\%\s*,\s*([0-9]+(?:\.[0-9]+)?)\%\s*,\s*([0-9]+(?:\.[0-9]+)?)\s*\)/.exec(str))return m(parseFloat(res[1])*2.55,parseFloat(res[2])*2.55,parseFloat(res[3])*2.55,parseFloat(res[4]));if(res=/#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})/.exec(str))return m(parseInt(res[1],16),parseInt(res[2],16),parseInt(res[3],16));if(res=/#([a-fA-F0-9])([a-fA-F0-9])([a-fA-F0-9])/.exec(str))return m(parseInt(res[1]+res[1],16),parseInt(res[2]+res[2],16),parseInt(res[3]+res[3],16));var name=$.trim(str).toLowerCase();if(name=="transparent")return m(255,255,255,0);else{res=lookupColors[name]||[0,0,0];return m(res[0],res[1],res[2])}};var lookupColors={aqua:[0,255,255],azure:[240,255,255],beige:[245,245,220],black:[0,0,0],blue:[0,0,255],brown:[165,42,42],cyan:[0,255,255],darkblue:[0,0,139],darkcyan:[0,139,139],darkgrey:[169,169,169],darkgreen:[0,100,0],darkkhaki:[189,183,107],darkmagenta:[139,0,139],darkolivegreen:[85,107,47],darkorange:[255,140,0],darkorchid:[153,50,204],darkred:[139,0,0],darksalmon:[233,150,122],darkviolet:[148,0,211],fuchsia:[255,0,255],gold:[255,215,0],green:[0,128,0],indigo:[75,0,130],khaki:[240,230,140],lightblue:[173,216,230],lightcyan:[224,255,255],lightgreen:[144,238,144],lightgrey:[211,211,211],lightpink:[255,182,193],lightyellow:[255,255,224],lime:[0,255,0],magenta:[255,0,255],maroon:[128,0,0],navy:[0,0,128],olive:[128,128,0],orange:[255,165,0],pink:[255,192,203],purple:[128,0,128],violet:[128,0,128],red:[255,0,0],silver:[192,192,192],white:[255,255,255],yellow:[255,255,0]}})(jQuery);
+(function($) {
+    $.color = {};
+    $.color.make = function(r, g, b, a) {
+        var o = {};
+        o.r = r || 0;
+        o.g = g || 0;
+        o.b = b || 0;
+        o.a = a != null ? a : 1;
+        o.add = function(c, d) { for (var i = 0; i < c.length; ++i) o[c.charAt(i)] += d; return o.normalize() };
+        o.scale = function(c, f) { for (var i = 0; i < c.length; ++i) o[c.charAt(i)] *= f; return o.normalize() };
+        o.toString = function() { if (o.a >= 1) { return "rgb(" + [o.r, o.g, o.b].join(",") + ")" } else { return "rgba(" + [o.r, o.g, o.b, o.a].join(",") + ")" } };
+        o.normalize = function() {
+            function clamp(min, value, max) { return value < min ? min : value > max ? max : value } o.r = clamp(0, parseInt(o.r), 255);
+            o.g = clamp(0, parseInt(o.g), 255);
+            o.b = clamp(0, parseInt(o.b), 255);
+            o.a = clamp(0, o.a, 1);
+            return o
+        };
+        o.clone = function() { return $.color.make(o.r, o.b, o.g, o.a) };
+        return o.normalize()
+    };
+    $.color.extract = function(elem, css) {
+        var c;
+        do {
+            c = elem.css(css).toLowerCase();
+            if (c != "" && c != "transparent") break;
+            elem = elem.parent()
+        } while (elem.length && !$.nodeName(elem.get(0), "body"));
+        if (c == "rgba(0, 0, 0, 0)") c = "transparent";
+        return $.color.parse(c)
+    };
+    $.color.parse = function(str) {
+        var res, m = $.color.make;
+        if (res = /rgb\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*\)/.exec(str)) return m(parseInt(res[1], 10), parseInt(res[2], 10), parseInt(res[3], 10));
+        if (res = /rgba\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]+(?:\.[0-9]+)?)\s*\)/.exec(str)) return m(parseInt(res[1], 10), parseInt(res[2], 10), parseInt(res[3], 10), parseFloat(res[4]));
+        if (res = /rgb\(\s*([0-9]+(?:\.[0-9]+)?)\%\s*,\s*([0-9]+(?:\.[0-9]+)?)\%\s*,\s*([0-9]+(?:\.[0-9]+)?)\%\s*\)/.exec(str)) return m(parseFloat(res[1]) * 2.55, parseFloat(res[2]) * 2.55, parseFloat(res[3]) * 2.55);
+        if (res = /rgba\(\s*([0-9]+(?:\.[0-9]+)?)\%\s*,\s*([0-9]+(?:\.[0-9]+)?)\%\s*,\s*([0-9]+(?:\.[0-9]+)?)\%\s*,\s*([0-9]+(?:\.[0-9]+)?)\s*\)/.exec(str)) return m(parseFloat(res[1]) * 2.55, parseFloat(res[2]) * 2.55, parseFloat(res[3]) * 2.55, parseFloat(res[4]));
+        if (res = /#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})/.exec(str)) return m(parseInt(res[1], 16), parseInt(res[2], 16), parseInt(res[3], 16));
+        if (res = /#([a-fA-F0-9])([a-fA-F0-9])([a-fA-F0-9])/.exec(str)) return m(parseInt(res[1] + res[1], 16), parseInt(res[2] + res[2], 16), parseInt(res[3] + res[3], 16));
+        var name = $.trim(str).toLowerCase();
+        if (name == "transparent") return m(255, 255, 255, 0);
+        else { res = lookupColors[name] || [0, 0, 0]; return m(res[0], res[1], res[2]) }
+    };
+    var lookupColors = { aqua: [0, 255, 255], azure: [240, 255, 255], beige: [245, 245, 220], black: [0, 0, 0], blue: [0, 0, 255], brown: [165, 42, 42], cyan: [0, 255, 255], darkblue: [0, 0, 139], darkcyan: [0, 139, 139], darkgrey: [169, 169, 169], darkgreen: [0, 100, 0], darkkhaki: [189, 183, 107], darkmagenta: [139, 0, 139], darkolivegreen: [85, 107, 47], darkorange: [255, 140, 0], darkorchid: [153, 50, 204], darkred: [139, 0, 0], darksalmon: [233, 150, 122], darkviolet: [148, 0, 211], fuchsia: [255, 0, 255], gold: [255, 215, 0], green: [0, 128, 0], indigo: [75, 0, 130], khaki: [240, 230, 140], lightblue: [173, 216, 230], lightcyan: [224, 255, 255], lightgreen: [144, 238, 144], lightgrey: [211, 211, 211], lightpink: [255, 182, 193], lightyellow: [255, 255, 224], lime: [0, 255, 0], magenta: [255, 0, 255], maroon: [128, 0, 0], navy: [0, 0, 128], olive: [128, 128, 0], orange: [255, 165, 0], pink: [255, 192, 203], purple: [128, 0, 128], violet: [128, 0, 128], red: [255, 0, 0], silver: [192, 192, 192], white: [255, 255, 255], yellow: [255, 255, 0] }
+})(jQuery);
 
 // the actual Flot code
 (function($) {
 
-	// Cache the prototype hasOwnProperty for faster access
+    // Cache the prototype hasOwnProperty for faster access
 
-	var hasOwnProperty = Object.prototype.hasOwnProperty;
+    var hasOwnProperty = Object.prototype.hasOwnProperty;
 
     // A shim to provide 'detach' to jQuery versions prior to 1.4.  Using a DOM
     // operation produces the same effect as detach, i.e. removing the element
@@ -590,456 +765,456 @@ Licensed under the MIT license.
         $.fn.detach = function() {
             return this.each(function() {
                 if (this.parentNode) {
-                    this.parentNode.removeChild( this );
+                    this.parentNode.removeChild(this);
                 }
             });
         };
     }
 
-	///////////////////////////////////////////////////////////////////////////
-	// The Canvas object is a wrapper around an HTML5 <canvas> tag.
-	//
-	// @constructor
-	// @param {string} cls List of classes to apply to the canvas.
-	// @param {element} container Element onto which to append the canvas.
-	//
-	// Requiring a container is a little iffy, but unfortunately canvas
-	// operations don't work unless the canvas is attached to the DOM.
+    ///////////////////////////////////////////////////////////////////////////
+    // The Canvas object is a wrapper around an HTML5 <canvas> tag.
+    //
+    // @constructor
+    // @param {string} cls List of classes to apply to the canvas.
+    // @param {element} container Element onto which to append the canvas.
+    //
+    // Requiring a container is a little iffy, but unfortunately canvas
+    // operations don't work unless the canvas is attached to the DOM.
 
-	function Canvas(cls, container) {
+    function Canvas(cls, container) {
 
-		var element = container.children("." + cls)[0];
+        var element = container.children("." + cls)[0];
 
-		if (element == null) {
+        if (element == null) {
 
-			element = document.createElement("canvas");
-			element.className = cls;
+            element = document.createElement("canvas");
+            element.className = cls;
 
-			$(element).css({ direction: "ltr", position: "absolute", left: 0, top: 0 })
-				.appendTo(container);
+            $(element).css({ direction: "ltr", position: "absolute", left: 0, top: 0 })
+                .appendTo(container);
 
-			// If HTML5 Canvas isn't available, fall back to [Ex|Flash]canvas
+            // If HTML5 Canvas isn't available, fall back to [Ex|Flash]canvas
 
-			if (!element.getContext) {
-				if (window.G_vmlCanvasManager) {
-					element = window.G_vmlCanvasManager.initElement(element);
-				} else {
-					throw new Error("Canvas is not available. If you're using IE with a fall-back such as Excanvas, then there's either a mistake in your conditional include, or the page has no DOCTYPE and is rendering in Quirks Mode.");
-				}
-			}
-		}
+            if (!element.getContext) {
+                if (window.G_vmlCanvasManager) {
+                    element = window.G_vmlCanvasManager.initElement(element);
+                } else {
+                    throw new Error("Canvas is not available. If you're using IE with a fall-back such as Excanvas, then there's either a mistake in your conditional include, or the page has no DOCTYPE and is rendering in Quirks Mode.");
+                }
+            }
+        }
 
-		this.element = element;
+        this.element = element;
 
-		var context = this.context = element.getContext("2d");
+        var context = this.context = element.getContext("2d");
 
-		// Determine the screen's ratio of physical to device-independent
-		// pixels.  This is the ratio between the canvas width that the browser
-		// advertises and the number of pixels actually present in that space.
+        // Determine the screen's ratio of physical to device-independent
+        // pixels.  This is the ratio between the canvas width that the browser
+        // advertises and the number of pixels actually present in that space.
 
-		// The iPhone 4, for example, has a device-independent width of 320px,
-		// but its screen is actually 640px wide.  It therefore has a pixel
-		// ratio of 2, while most normal devices have a ratio of 1.
+        // The iPhone 4, for example, has a device-independent width of 320px,
+        // but its screen is actually 640px wide.  It therefore has a pixel
+        // ratio of 2, while most normal devices have a ratio of 1.
 
-		var devicePixelRatio = window.devicePixelRatio || 1,
-			backingStoreRatio =
-				context.webkitBackingStorePixelRatio ||
-				context.mozBackingStorePixelRatio ||
-				context.msBackingStorePixelRatio ||
-				context.oBackingStorePixelRatio ||
-				context.backingStorePixelRatio || 1;
+        var devicePixelRatio = window.devicePixelRatio || 1,
+            backingStoreRatio =
+            context.webkitBackingStorePixelRatio ||
+            context.mozBackingStorePixelRatio ||
+            context.msBackingStorePixelRatio ||
+            context.oBackingStorePixelRatio ||
+            context.backingStorePixelRatio || 1;
 
-		this.pixelRatio = devicePixelRatio / backingStoreRatio;
+        this.pixelRatio = devicePixelRatio / backingStoreRatio;
 
-		// Size the canvas to match the internal dimensions of its container
+        // Size the canvas to match the internal dimensions of its container
 
-		this.resize(container.width(), container.height());
+        this.resize(container.width(), container.height());
 
-		// Collection of HTML div layers for text overlaid onto the canvas
+        // Collection of HTML div layers for text overlaid onto the canvas
 
-		this.textContainer = null;
-		this.text = {};
+        this.textContainer = null;
+        this.text = {};
 
-		// Cache of text fragments and metrics, so we can avoid expensively
-		// re-calculating them when the plot is re-rendered in a loop.
+        // Cache of text fragments and metrics, so we can avoid expensively
+        // re-calculating them when the plot is re-rendered in a loop.
 
-		this._textCache = {};
-	}
+        this._textCache = {};
+    }
 
-	// Resizes the canvas to the given dimensions.
-	//
-	// @param {number} width New width of the canvas, in pixels.
-	// @param {number} width New height of the canvas, in pixels.
+    // Resizes the canvas to the given dimensions.
+    //
+    // @param {number} width New width of the canvas, in pixels.
+    // @param {number} width New height of the canvas, in pixels.
 
-	Canvas.prototype.resize = function(width, height) {
+    Canvas.prototype.resize = function(width, height) {
 
-		if (width <= 0 || height <= 0) {
-			throw new Error("Invalid dimensions for plot, width = " + width + ", height = " + height);
-		}
+        if (width <= 0 || height <= 0) {
+            throw new Error("Invalid dimensions for plot, width = " + width + ", height = " + height);
+        }
 
-		var element = this.element,
-			context = this.context,
-			pixelRatio = this.pixelRatio;
+        var element = this.element,
+            context = this.context,
+            pixelRatio = this.pixelRatio;
 
-		// Resize the canvas, increasing its density based on the display's
-		// pixel ratio; basically giving it more pixels without increasing the
-		// size of its element, to take advantage of the fact that retina
-		// displays have that many more pixels in the same advertised space.
+        // Resize the canvas, increasing its density based on the display's
+        // pixel ratio; basically giving it more pixels without increasing the
+        // size of its element, to take advantage of the fact that retina
+        // displays have that many more pixels in the same advertised space.
 
-		// Resizing should reset the state (excanvas seems to be buggy though)
+        // Resizing should reset the state (excanvas seems to be buggy though)
 
-		if (this.width != width) {
-			element.width = width * pixelRatio;
-			element.style.width = width + "px";
-			this.width = width;
-		}
-
-		if (this.height != height) {
-			element.height = height * pixelRatio;
-			element.style.height = height + "px";
-			this.height = height;
-		}
-
-		// Save the context, so we can reset in case we get replotted.  The
-		// restore ensure that we're really back at the initial state, and
-		// should be safe even if we haven't saved the initial state yet.
-
-		context.restore();
-		context.save();
-
-		// Scale the coordinate space to match the display density; so even though we
-		// may have twice as many pixels, we still want lines and other drawing to
-		// appear at the same size; the extra pixels will just make them crisper.
-
-		context.scale(pixelRatio, pixelRatio);
-	};
-
-	// Clears the entire canvas area, not including any overlaid HTML text
-
-	Canvas.prototype.clear = function() {
-		this.context.clearRect(0, 0, this.width, this.height);
-	};
-
-	// Finishes rendering the canvas, including managing the text overlay.
-
-	Canvas.prototype.render = function() {
-
-		var cache = this._textCache;
-
-		// For each text layer, add elements marked as active that haven't
-		// already been rendered, and remove those that are no longer active.
-
-		for (var layerKey in cache) {
-			if (hasOwnProperty.call(cache, layerKey)) {
-				var layer = this.getTextLayer(layerKey),
-					layerCache = cache[layerKey];
-				layer.hide();
-
-				for (var styleKey in layerCache) {
-					if (hasOwnProperty.call(layerCache, styleKey)) {
-						var styleCache = layerCache[styleKey];
-						for (var key in styleCache) {
-							if (hasOwnProperty.call(styleCache, key)) {
-
-								var positions = styleCache[key].positions;
-
-								for (var i = 0, position; position = positions[i]; i++) {
-									if (position.active) {
-										if (!position.rendered) {
-											layer.append(position.element);
-											position.rendered = true;
-										}
-									} else {
-										positions.splice(i--, 1);
-										if (position.rendered) {
-											position.element.detach();
-										}
-									}
-								}
-
-								if (positions.length == 0) {
-									delete styleCache[key];
-								}
-							}
-						}
-					}
-				}
-
-				layer.show();
-			}
-		}
-	};
-
-	// Creates (if necessary) and returns the text overlay container.
-	//
-	// @param {string} classes String of space-separated CSS classes used to
-	//     uniquely identify the text layer.
-	// @return {object} The jQuery-wrapped text-layer div.
-
-	Canvas.prototype.getTextLayer = function(classes) {
-
-		var layer = this.text[classes];
-
-		// Create the text layer if it doesn't exist
-		if (layer == null) {
-
-			// Create the text layer container, if it doesn't exist
-
-			if (this.textContainer == null) {
-				this.textContainer = $("<div class='flot-text'></div>")
-					.css({
-						position: "absolute",
-						top: 0,
-						left: 0,
-						bottom: 0,
-						right: 0,
-						'font-size': "smaller",
-						color: "#545454"
-					})
-					.insertAfter(this.element);
-			}
-			layer = this.text[classes] = $("<div></div>")
-				.addClass(classes)
-				.css({
-					position: "absolute",
-					top: 0,
-					left: 0,
-					bottom: 0,
-					right: 0
-				})
-				.appendTo(this.textContainer);
-		}
-		return layer;
-	};
-
-	// Creates (if necessary) and returns a text info object.
-	//
-	// The object looks like this:
-	//
-	// {
-	//     width: Width of the text's wrapper div.
-	//     height: Height of the text's wrapper div.
-	//     element: The jQuery-wrapped HTML div containing the text.
-	//     positions: Array of positions at which this text is drawn.
-	// }
-	//
-	// The positions array contains objects that look like this:
-	//
-	// {
-	//     active: Flag indicating whether the text should be visible.
-	//     rendered: Flag indicating whether the text is currently visible.
-	//     element: The jQuery-wrapped HTML div containing the text.
-	//     x: X coordinate at which to draw the text.
-	//     y: Y coordinate at which to draw the text.
-	// }
-	//
-	// Each position after the first receives a clone of the original element.
-	//
-	// The idea is that that the width, height, and general 'identity' of the
-	// text is constant no matter where it is placed; the placements are a
-	// secondary property.
-	//
-	// Canvas maintains a cache of recently-used text info objects; getTextInfo
-	// either returns the cached element or creates a new entry.
-	//
-	// @param {string} layer A string of space-separated CSS classes uniquely
-	//     identifying the layer containing this text.
-	// @param {string} text Text string to retrieve info for.
-	// @param {(string|object)=} font Either a string of space-separated CSS
-	//     classes or a font-spec object, defining the text's font and style.
-	// @param {number=} angle Angle at which to rotate the text, in degrees.
-	//     Angle is currently unused, it will be implemented in the future.
-	// @param {number=} width Maximum width of the text before it wraps.
-	// @return {object} a text info object.
-
-	Canvas.prototype.getTextInfo = function(layer, text, font, angle, width) {
-
-		var textStyle, layerCache, styleCache, info;
-
-		// Cast the value to a string, in case we were given a number or such
-
-		text = "" + text;
-		// If the font is a font-spec object, generate a CSS font definition
-
-		if (typeof font === "object") {
-			textStyle = font.style + " " + font.variant + " " + font.weight + " " + font.size + "px/" + font.lineHeight + "px " + font.family;
-		} else {
-			textStyle = font;
-		}
-
-		// Retrieve (or create) the cache for the text's layer and styles
-
-		layerCache = this._textCache[layer];
-
-		if (layerCache == null) {
-			layerCache = this._textCache[layer] = {};
-		}
-
-		styleCache = layerCache[textStyle];
-
-		if (styleCache == null) {
-			styleCache = layerCache[textStyle] = {};
-		}
-
-		info = styleCache[text];
-
-		// If we can't find a matching element in our cache, create a new one
-
-		if (info == null) {
-			var element = $("<div></div>").html(text)
-				.css({
-					position: "absolute",
-					'max-width': width,
-					top: -9999
-				})
-				.appendTo(this.getTextLayer(layer));
-			element.addClass(font.class);
-			if (typeof font === "object") {
-				element.css({
-					font: textStyle,
-					color: font.color
-				});
-
-			} else if (typeof font === "string") {
-				element.addClass(font);
-			}
-
-			info = styleCache[text] = {
-				width: element.outerWidth(true),
-				height: element.outerHeight(true),
-				element: element,
-				positions: []
-			};
-
-			element.detach();
-		}
-
-		return info;
-	};
-
-	// Adds a text string to the canvas text overlay.
-	//
-	// The text isn't drawn immediately; it is marked as rendering, which will
-	// result in its addition to the canvas on the next render pass.
-	//
-	// @param {string} layer A string of space-separated CSS classes uniquely
-	//     identifying the layer containing this text.
-	// @param {number} x X coordinate at which to draw the text.
-	// @param {number} y Y coordinate at which to draw the text.
-	// @param {string} text Text string to draw.
-	// @param {(string|object)=} font Either a string of space-separated CSS
-	//     classes or a font-spec object, defining the text's font and style.
-	// @param {number=} angle Angle at which to rotate the text, in degrees.
-	//     Angle is currently unused, it will be implemented in the future.
-	// @param {number=} width Maximum width of the text before it wraps.
-	// @param {string=} halign Horizontal alignment of the text; either "left",
-	//     "center" or "right".
-	// @param {string=} valign Vertical alignment of the text; either "top",
-	//     "middle" or "bottom".
-
-	Canvas.prototype.addText = function(layer, x, y, text, font, angle, width, halign, valign) {
-
-		var info = this.getTextInfo(layer, text, font, angle, width),
-			positions = info.positions;
-
-		// Tweak the div's position to match the text's alignment
-
-		if (halign == "center") {
-			x -= info.width / 2;
-		} else if (halign == "right") {
-			x -= info.width;
-		}
-
-		if (valign == "middle") {
-			y -= info.height / 2;
-		} else if (valign == "bottom") {
-			y -= info.height;
-		}
-
-		// Determine whether this text already exists at this position.
-		// If so, mark it for inclusion in the next render pass.
-
-		for (var i = 0, position; position = positions[i]; i++) {
-			if (position.x == x && position.y == y) {
-				position.active = true;
-				return;
-			}
-		}
-
-		// If the text doesn't exist at this position, create a new entry
-
-		// For the very first position we'll re-use the original element,
-		// while for subsequent ones we'll clone it.
-
-		position = {
-			active: true,
-			rendered: false,
-			element: positions.length ? info.element.clone() : info.element,
-			x: x,
-			y: y
-		};
-
-		positions.push(position);
-
-		// Move the element to its final position within the container
-
-		position.element.css({
-			top: Math.round(y),
-			left: Math.round(x),
-			'text-align': halign	// In case the text wraps
-		});
-	};
-
-	// Removes one or more text strings from the canvas text overlay.
-	//
-	// If no parameters are given, all text within the layer is removed.
-	//
-	// Note that the text is not immediately removed; it is simply marked as
-	// inactive, which will result in its removal on the next render pass.
-	// This avoids the performance penalty for 'clear and redraw' behavior,
-	// where we potentially get rid of all text on a layer, but will likely
-	// add back most or all of it later, as when redrawing axes, for example.
-	//
-	// @param {string} layer A string of space-separated CSS classes uniquely
-	//     identifying the layer containing this text.
-	// @param {number=} x X coordinate of the text.
-	// @param {number=} y Y coordinate of the text.
-	// @param {string=} text Text string to remove.
-	// @param {(string|object)=} font Either a string of space-separated CSS
-	//     classes or a font-spec object, defining the text's font and style.
-	// @param {number=} angle Angle at which the text is rotated, in degrees.
-	//     Angle is currently unused, it will be implemented in the future.
-
-	Canvas.prototype.removeText = function(layer, x, y, text, font, angle) {
-		if (text == null) {
-			var layerCache = this._textCache[layer];
-			if (layerCache != null) {
-				for (var styleKey in layerCache) {
-					if (hasOwnProperty.call(layerCache, styleKey)) {
-						var styleCache = layerCache[styleKey];
-						for (var key in styleCache) {
-							if (hasOwnProperty.call(styleCache, key)) {
-								var positions = styleCache[key].positions;
-								for (var i = 0, position; position = positions[i]; i++) {
-									position.active = false;
-								}
-							}
-						}
-					}
-				}
-			}
-		} else {
-			var positions = this.getTextInfo(layer, text, font, angle).positions;
-			for (var i = 0, position; position = positions[i]; i++) {
-				if (position.x == x && position.y == y) {
-					position.active = false;
-				}
-			}
-		}
-	};
-
-	///////////////////////////////////////////////////////////////////////////
-	// The top-level container for the entire plot.
+        if (this.width != width) {
+            element.width = width * pixelRatio;
+            element.style.width = width + "px";
+            this.width = width;
+        }
+
+        if (this.height != height) {
+            element.height = height * pixelRatio;
+            element.style.height = height + "px";
+            this.height = height;
+        }
+
+        // Save the context, so we can reset in case we get replotted.  The
+        // restore ensure that we're really back at the initial state, and
+        // should be safe even if we haven't saved the initial state yet.
+
+        context.restore();
+        context.save();
+
+        // Scale the coordinate space to match the display density; so even though we
+        // may have twice as many pixels, we still want lines and other drawing to
+        // appear at the same size; the extra pixels will just make them crisper.
+
+        context.scale(pixelRatio, pixelRatio);
+    };
+
+    // Clears the entire canvas area, not including any overlaid HTML text
+
+    Canvas.prototype.clear = function() {
+        this.context.clearRect(0, 0, this.width, this.height);
+    };
+
+    // Finishes rendering the canvas, including managing the text overlay.
+
+    Canvas.prototype.render = function() {
+
+        var cache = this._textCache;
+
+        // For each text layer, add elements marked as active that haven't
+        // already been rendered, and remove those that are no longer active.
+
+        for (var layerKey in cache) {
+            if (hasOwnProperty.call(cache, layerKey)) {
+                var layer = this.getTextLayer(layerKey),
+                    layerCache = cache[layerKey];
+                layer.hide();
+
+                for (var styleKey in layerCache) {
+                    if (hasOwnProperty.call(layerCache, styleKey)) {
+                        var styleCache = layerCache[styleKey];
+                        for (var key in styleCache) {
+                            if (hasOwnProperty.call(styleCache, key)) {
+
+                                var positions = styleCache[key].positions;
+
+                                for (var i = 0, position; position = positions[i]; i++) {
+                                    if (position.active) {
+                                        if (!position.rendered) {
+                                            layer.append(position.element);
+                                            position.rendered = true;
+                                        }
+                                    } else {
+                                        positions.splice(i--, 1);
+                                        if (position.rendered) {
+                                            position.element.detach();
+                                        }
+                                    }
+                                }
+
+                                if (positions.length == 0) {
+                                    delete styleCache[key];
+                                }
+                            }
+                        }
+                    }
+                }
+
+                layer.show();
+            }
+        }
+    };
+
+    // Creates (if necessary) and returns the text overlay container.
+    //
+    // @param {string} classes String of space-separated CSS classes used to
+    //     uniquely identify the text layer.
+    // @return {object} The jQuery-wrapped text-layer div.
+
+    Canvas.prototype.getTextLayer = function(classes) {
+
+        var layer = this.text[classes];
+
+        // Create the text layer if it doesn't exist
+        if (layer == null) {
+
+            // Create the text layer container, if it doesn't exist
+
+            if (this.textContainer == null) {
+                this.textContainer = $("<div class='flot-text'></div>")
+                    .css({
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        bottom: 0,
+                        right: 0,
+                        'font-size': "smaller",
+                        color: "#545454"
+                    })
+                    .insertAfter(this.element);
+            }
+            layer = this.text[classes] = $("<div></div>")
+                .addClass(classes)
+                .css({
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0
+                })
+                .appendTo(this.textContainer);
+        }
+        return layer;
+    };
+
+    // Creates (if necessary) and returns a text info object.
+    //
+    // The object looks like this:
+    //
+    // {
+    //     width: Width of the text's wrapper div.
+    //     height: Height of the text's wrapper div.
+    //     element: The jQuery-wrapped HTML div containing the text.
+    //     positions: Array of positions at which this text is drawn.
+    // }
+    //
+    // The positions array contains objects that look like this:
+    //
+    // {
+    //     active: Flag indicating whether the text should be visible.
+    //     rendered: Flag indicating whether the text is currently visible.
+    //     element: The jQuery-wrapped HTML div containing the text.
+    //     x: X coordinate at which to draw the text.
+    //     y: Y coordinate at which to draw the text.
+    // }
+    //
+    // Each position after the first receives a clone of the original element.
+    //
+    // The idea is that that the width, height, and general 'identity' of the
+    // text is constant no matter where it is placed; the placements are a
+    // secondary property.
+    //
+    // Canvas maintains a cache of recently-used text info objects; getTextInfo
+    // either returns the cached element or creates a new entry.
+    //
+    // @param {string} layer A string of space-separated CSS classes uniquely
+    //     identifying the layer containing this text.
+    // @param {string} text Text string to retrieve info for.
+    // @param {(string|object)=} font Either a string of space-separated CSS
+    //     classes or a font-spec object, defining the text's font and style.
+    // @param {number=} angle Angle at which to rotate the text, in degrees.
+    //     Angle is currently unused, it will be implemented in the future.
+    // @param {number=} width Maximum width of the text before it wraps.
+    // @return {object} a text info object.
+
+    Canvas.prototype.getTextInfo = function(layer, text, font, angle, width) {
+
+        var textStyle, layerCache, styleCache, info;
+
+        // Cast the value to a string, in case we were given a number or such
+
+        text = "" + text;
+        // If the font is a font-spec object, generate a CSS font definition
+
+        if (typeof font === "object") {
+            textStyle = font.style + " " + font.variant + " " + font.weight + " " + font.size + "px/" + font.lineHeight + "px " + font.family;
+        } else {
+            textStyle = font;
+        }
+
+        // Retrieve (or create) the cache for the text's layer and styles
+
+        layerCache = this._textCache[layer];
+
+        if (layerCache == null) {
+            layerCache = this._textCache[layer] = {};
+        }
+
+        styleCache = layerCache[textStyle];
+
+        if (styleCache == null) {
+            styleCache = layerCache[textStyle] = {};
+        }
+
+        info = styleCache[text];
+
+        // If we can't find a matching element in our cache, create a new one
+
+        if (info == null) {
+            var element = $("<div></div>").html(text)
+                .css({
+                    position: "absolute",
+                    'max-width': width,
+                    top: -9999
+                })
+                .appendTo(this.getTextLayer(layer));
+            element.addClass(font.class);
+            if (typeof font === "object") {
+                element.css({
+                    font: textStyle,
+                    color: font.color
+                });
+
+            } else if (typeof font === "string") {
+                element.addClass(font);
+            }
+
+            info = styleCache[text] = {
+                width: element.outerWidth(true),
+                height: element.outerHeight(true),
+                element: element,
+                positions: []
+            };
+
+            element.detach();
+        }
+
+        return info;
+    };
+
+    // Adds a text string to the canvas text overlay.
+    //
+    // The text isn't drawn immediately; it is marked as rendering, which will
+    // result in its addition to the canvas on the next render pass.
+    //
+    // @param {string} layer A string of space-separated CSS classes uniquely
+    //     identifying the layer containing this text.
+    // @param {number} x X coordinate at which to draw the text.
+    // @param {number} y Y coordinate at which to draw the text.
+    // @param {string} text Text string to draw.
+    // @param {(string|object)=} font Either a string of space-separated CSS
+    //     classes or a font-spec object, defining the text's font and style.
+    // @param {number=} angle Angle at which to rotate the text, in degrees.
+    //     Angle is currently unused, it will be implemented in the future.
+    // @param {number=} width Maximum width of the text before it wraps.
+    // @param {string=} halign Horizontal alignment of the text; either "left",
+    //     "center" or "right".
+    // @param {string=} valign Vertical alignment of the text; either "top",
+    //     "middle" or "bottom".
+
+    Canvas.prototype.addText = function(layer, x, y, text, font, angle, width, halign, valign) {
+
+        var info = this.getTextInfo(layer, text, font, angle, width),
+            positions = info.positions;
+
+        // Tweak the div's position to match the text's alignment
+
+        if (halign == "center") {
+            x -= info.width / 2;
+        } else if (halign == "right") {
+            x -= info.width;
+        }
+
+        if (valign == "middle") {
+            y -= info.height / 2;
+        } else if (valign == "bottom") {
+            y -= info.height;
+        }
+
+        // Determine whether this text already exists at this position.
+        // If so, mark it for inclusion in the next render pass.
+
+        for (var i = 0, position; position = positions[i]; i++) {
+            if (position.x == x && position.y == y) {
+                position.active = true;
+                return;
+            }
+        }
+
+        // If the text doesn't exist at this position, create a new entry
+
+        // For the very first position we'll re-use the original element,
+        // while for subsequent ones we'll clone it.
+
+        position = {
+            active: true,
+            rendered: false,
+            element: positions.length ? info.element.clone() : info.element,
+            x: x,
+            y: y
+        };
+
+        positions.push(position);
+
+        // Move the element to its final position within the container
+
+        position.element.css({
+            top: Math.round(y),
+            left: Math.round(x),
+            'text-align': halign // In case the text wraps
+        });
+    };
+
+    // Removes one or more text strings from the canvas text overlay.
+    //
+    // If no parameters are given, all text within the layer is removed.
+    //
+    // Note that the text is not immediately removed; it is simply marked as
+    // inactive, which will result in its removal on the next render pass.
+    // This avoids the performance penalty for 'clear and redraw' behavior,
+    // where we potentially get rid of all text on a layer, but will likely
+    // add back most or all of it later, as when redrawing axes, for example.
+    //
+    // @param {string} layer A string of space-separated CSS classes uniquely
+    //     identifying the layer containing this text.
+    // @param {number=} x X coordinate of the text.
+    // @param {number=} y Y coordinate of the text.
+    // @param {string=} text Text string to remove.
+    // @param {(string|object)=} font Either a string of space-separated CSS
+    //     classes or a font-spec object, defining the text's font and style.
+    // @param {number=} angle Angle at which the text is rotated, in degrees.
+    //     Angle is currently unused, it will be implemented in the future.
+
+    Canvas.prototype.removeText = function(layer, x, y, text, font, angle) {
+        if (text == null) {
+            var layerCache = this._textCache[layer];
+            if (layerCache != null) {
+                for (var styleKey in layerCache) {
+                    if (hasOwnProperty.call(layerCache, styleKey)) {
+                        var styleCache = layerCache[styleKey];
+                        for (var key in styleCache) {
+                            if (hasOwnProperty.call(styleCache, key)) {
+                                var positions = styleCache[key].positions;
+                                for (var i = 0, position; position = positions[i]; i++) {
+                                    position.active = false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            var positions = this.getTextInfo(layer, text, font, angle).positions;
+            for (var i = 0, position; position = positions[i]; i++) {
+                if (position.x == x && position.y == y) {
+                    position.active = false;
+                }
+            }
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // The top-level container for the entire plot.
 
     function Plot(feedviewer, data_, options_, plugins) {
         // data is on the form:
@@ -1049,7 +1224,7 @@ Licensed under the MIT license.
         var series = [],
             options = {
                 // the color theme used for graphs
-//                colors: ["#edc240", "#afd8f8", "#cb4b4b", "#4da74d", "#9440ed"],
+                //                colors: ["#edc240", "#afd8f8", "#cb4b4b", "#4da74d", "#9440ed"],
                 colors: options_.color,
                 legend: {
                     show: true,
@@ -1061,7 +1236,7 @@ Licensed under the MIT license.
                     margin: 5, // distance from grid edge to default legend container within plot
                     backgroundColor: null, // null means auto-detect
                     backgroundOpacity: 0.85, // set to 0 to avoid background
-                    sorted: null    // default to no legend sorting
+                    sorted: null // default to no legend sorting
                 },
                 xaxis: {
                     show: null, // null = auto-detect, true = always, false = never
@@ -1146,30 +1321,33 @@ Licensed under the MIT license.
                     mouseActiveRadius: 10 // how far the mouse can be away to activate an item
                 },
                 interaction: {
-                    redrawOverlayInterval: 1000/60 // time between updates, -1 means in same flow
+                    redrawOverlayInterval: 1000 / 60 // time between updates, -1 means in same flow
                 },
                 hooks: {}
             },
-        surface = null,     // the canvas for the plot itself
-        overlay = null,     // canvas for interactive stuff on top of plot
-        eventHolder = null, // jQuery object that events should be bound to
-        ctx = null, octx = null,
-        xaxes = [], yaxes = [],
-        plotOffset = { left: 0, right: 0, top: 0, bottom: 0},
-        plotWidth = 0, plotHeight = 0,
-        hooks = {
-            processOptions: [],
-            processRawData: [],
-            processDatapoints: [],
-            processOffset: [],
-            drawBackground: [],
-            drawSeries: [],
-            draw: [],
-            bindEvents: [],
-            drawOverlay: [],
-            shutdown: []
-        },
-        plot = this;
+            surface = null, // the canvas for the plot itself
+            overlay = null, // canvas for interactive stuff on top of plot
+            eventHolder = null, // jQuery object that events should be bound to
+            ctx = null,
+            octx = null,
+            xaxes = [],
+            yaxes = [],
+            plotOffset = { left: 0, right: 0, top: 0, bottom: 0 },
+            plotWidth = 0,
+            plotHeight = 0,
+            hooks = {
+                processOptions: [],
+                processRawData: [],
+                processDatapoints: [],
+                processOffset: [],
+                drawBackground: [],
+                drawSeries: [],
+                draw: [],
+                bindEvents: [],
+                drawOverlay: [],
+                shutdown: []
+            },
+            plot = this;
 
         // public functions
         plot.setData = setData;
@@ -1178,28 +1356,29 @@ Licensed under the MIT license.
         plot.getFeedviewer = function() { return feedviewer; };
         plot.getCanvas = function() { return surface.element; };
         plot.getPlotOffset = function() { return plotOffset; };
-        plot.width = function () { return plotWidth; };
-        plot.height = function () { return plotHeight; };
-        plot.offset = function () {
+        plot.width = function() { return plotWidth; };
+        plot.height = function() { return plotHeight; };
+        plot.offset = function() {
             var o = eventHolder.offset();
             o.left += plotOffset.left;
             o.top += plotOffset.top;
             return o;
         };
-        plot.getData = function () { return series; };
-        plot.getAxes = function () {
-            var res = {}, i;
-            $.each(xaxes.concat(yaxes), function (_, axis) {
+        plot.getData = function() { return series; };
+        plot.getAxes = function() {
+            var res = {},
+                i;
+            $.each(xaxes.concat(yaxes), function(_, axis) {
                 if (axis)
                     res[axis.direction + (axis.n != 1 ? axis.n : "") + "axis"] = axis;
             });
             return res;
         };
-        plot.getXAxes = function () { return xaxes; };
-        plot.getYAxes = function () { return yaxes; };
+        plot.getXAxes = function() { return xaxes; };
+        plot.getYAxes = function() { return yaxes; };
         plot.c2p = canvasToAxisCoords;
         plot.p2c = axisToCanvasCoords;
-        plot.getOptions = function () { return options; };
+        plot.getOptions = function() { return options; };
         plot.highlight = highlight;
         plot.unhighlight = unhighlight;
         plot.triggerRedrawOverlay = triggerRedrawOverlay;
@@ -1210,7 +1389,7 @@ Licensed under the MIT license.
             };
         };
         plot.shutdown = shutdown;
-        plot.destroy = function () {
+        plot.destroy = function() {
             shutdown();
             feedviewer.removeData("plot").empty();
 
@@ -1227,9 +1406,9 @@ Licensed under the MIT license.
             highlights = [];
             plot = null;
         };
-        plot.resize = function () {
-        	var width = feedviewer.width(),
-        		height = feedviewer.height();
+        plot.resize = function() {
+            var width = feedviewer.width(),
+                height = feedviewer.height();
             surface.resize(width, height);
             overlay.resize(width, height);
         };
@@ -1279,7 +1458,7 @@ Licensed under the MIT license.
             // not expected behavior; avoid it by replacing them here.
 
             if (opts && opts.colors) {
-            	options.colors = opts.colors;
+                options.colors = opts.colors;
             }
 
             if (options.xaxis.color == null)
@@ -1432,8 +1611,7 @@ Licensed under the MIT license.
                     $.extend(true, s, d[i]);
 
                     d[i].data = s.data;
-                }
-                else
+                } else
                     s.data = d[i];
                 res.push(s);
             }
@@ -1452,12 +1630,13 @@ Licensed under the MIT license.
 
         function allAxes() {
             // return flat array without annoying null entries
-            return $.grep(xaxes.concat(yaxes), function (a) { return a; });
+            return $.grep(xaxes.concat(yaxes), function(a) { return a; });
         }
 
         function canvasToAxisCoords(pos) {
             // return an object with x/y corresponding to all used axes
-            var res = {}, i, axis;
+            var res = {},
+                i, axis;
             for (i = 0; i < xaxes.length; ++i) {
                 axis = xaxes[i];
                 if (axis && axis.used)
@@ -1480,7 +1659,8 @@ Licensed under the MIT license.
 
         function axisToCanvasCoords(pos) {
             // get canvas coords from the first pair of x/y found in pos
-            var res = {}, i, axis, key;
+            var res = {},
+                i, axis, key;
 
             for (i = 0; i < xaxes.length; ++i) {
                 axis = xaxes[i];
@@ -1525,7 +1705,9 @@ Licensed under the MIT license.
 
         function fillInSeriesOptions() {
 
-            var neededColors = series.length, maxIndex = -1, i;
+            var neededColors = series.length,
+                maxIndex = -1,
+                i;
 
             // Subtract the number of series that already have fixed colors or
             // color indexes from the number that we still need to generate.
@@ -1550,8 +1732,10 @@ Licensed under the MIT license.
             // Generate all the colors, using first the option colors and then
             // variations on those colors once they're exhausted.
 
-            var c, colors = [], colorPool = options.colors,
-                colorPoolSize = colorPool.length, variation = 0;
+            var c, colors = [],
+                colorPool = options.colors,
+                colorPoolSize = colorPool.length,
+                variation = 0;
 
             for (i = 0; i < neededColors; i++) {
 
@@ -1578,7 +1762,8 @@ Licensed under the MIT license.
 
             // Finalize the series options, filling in their colors
 
-            var colori = 0, s;
+            var colori = 0,
+                s;
             for (i = 0; i < series.length; ++i) {
                 s = series[i];
 
@@ -1586,8 +1771,7 @@ Licensed under the MIT license.
                 if (s.color == null) {
                     s.color = colors[colori].toString();
                     ++colori;
-                }
-                else if (typeof s.color == "number")
+                } else if (typeof s.color == "number")
                     s.color = colors[s.color].toString();
 
                 // turn on lines automatically in case nothing is set
@@ -1630,7 +1814,7 @@ Licensed under the MIT license.
                     axis.datamax = max;
             }
 
-            $.each(allAxes(), function (_, axis) {
+            $.each(allAxes(), function(_, axis) {
                 // init axis
                 axis.datamin = topSentry;
                 axis.datamax = bottomSentry;
@@ -1641,7 +1825,7 @@ Licensed under the MIT license.
                 s = series[i];
                 s.datapoints = { points: [] };
 
-                executeHooks(hooks.processRawData, [ s, s.data, s.datapoints ]);
+                executeHooks(hooks.processRawData, [s, s.data, s.datapoints]);
             }
 
             // first pass: clean and copy data
@@ -1730,15 +1914,14 @@ Licensed under the MIT license.
                             }
                             points[k + m] = null;
                         }
-                    }
-                    else {
+                    } else {
                         // a little bit of line specific stuff that
                         // perhaps shouldn't be here, but lacking
                         // better means...
-                        if (insertSteps && k > 0
-                            && points[k - ps] != null
-                            && points[k - ps] != points[k]
-                            && points[k - ps + 1] != points[k + 1]) {
+                        if (insertSteps && k > 0 &&
+                            points[k - ps] != null &&
+                            points[k - ps] != points[k] &&
+                            points[k - ps + 1] != points[k + 1]) {
                             // copy the point to make room for a middle point
                             for (m = 0; m < ps; ++m)
                                 points[k + ps + m] = points[k + m];
@@ -1757,7 +1940,7 @@ Licensed under the MIT license.
             for (i = 0; i < series.length; ++i) {
                 s = series[i];
 
-                executeHooks(hooks.processDatapoints, [ s, s.datapoints]);
+                executeHooks(hooks.processDatapoints, [s, s.datapoints]);
             }
 
             // second pass: find datamax/datamin for auto-scaling
@@ -1767,8 +1950,10 @@ Licensed under the MIT license.
                 ps = s.datapoints.pointsize;
                 format = s.datapoints.format;
 
-                var xmin = topSentry, ymin = topSentry,
-                    xmax = bottomSentry, ymax = bottomSentry;
+                var xmin = topSentry,
+                    ymin = topSentry,
+                    xmax = bottomSentry,
+                    ymax = bottomSentry;
 
                 for (j = 0; j < points.length; j += ps) {
                     if (points[j] == null)
@@ -1813,8 +1998,7 @@ Licensed under the MIT license.
                     if (s.bars.horizontal) {
                         ymin += delta;
                         ymax += delta + s.bars.barWidth;
-                    }
-                    else {
+                    } else {
                         xmin += delta;
                         xmax += delta + s.bars.barWidth;
                     }
@@ -1824,7 +2008,7 @@ Licensed under the MIT license.
                 updateAxis(s.yaxis, ymin, ymax);
             }
 
-            $.each(allAxes(), function (_, axis) {
+            $.each(allAxes(), function(_, axis) {
                 if (axis.datamin == topSentry)
                     axis.datamin = null;
                 if (axis.datamax == bottomSentry)
@@ -1838,7 +2022,7 @@ Licensed under the MIT license.
             // from a previous plot in this container that we'll try to re-use.
 
             feedviewer.css("padding", 0) // padding messes up the positioning
-                .children().filter(function(){
+                .children().filter(function() {
                     return !$(this).hasClass("flot-overlay") && !$(this).hasClass('flot-base');
                 }).remove();
 
@@ -1912,8 +2096,7 @@ Licensed under the MIT license.
             if (axis.direction == "x") {
                 s = axis.scale = plotWidth / Math.abs(t(axis.max) - t(axis.min));
                 m = Math.min(t(axis.max), t(axis.min));
-            }
-            else {
+            } else {
                 s = axis.scale = plotHeight / Math.abs(t(axis.max) - t(axis.min));
                 s = -s;
                 m = Math.max(t(axis.max), t(axis.min));
@@ -1921,21 +2104,21 @@ Licensed under the MIT license.
 
             // data point to canvas coordinate
             if (t == identity) // slight optimization
-                axis.p2c = function (p) { return (p - m) * s; };
+                axis.p2c = function(p) { return (p - m) * s; };
             else
-                axis.p2c = function (p) { return (t(p) - m) * s; };
+                axis.p2c = function(p) { return (t(p) - m) * s; };
             // canvas coordinate to data point
             if (!it)
-                axis.c2p = function (c) { return m + c / s; };
+                axis.c2p = function(c) { return m + c / s; };
             else
-                axis.c2p = function (c) { return it(m + c / s); };
+                axis.c2p = function(c) { return it(m + c / s); };
         }
 
         function measureTickLabels(axis) {
-        	var classcolortheme ="";
-        	if(axis.options.class!==undefined){
-				classcolortheme=axis.options.class;
-        	}
+            var classcolortheme = "";
+            if (axis.options.class !== undefined) {
+                classcolortheme = axis.options.class;
+            }
             var opts = axis.options,
                 ticks = axis.ticks || [],
                 labelWidth = opts.labelWidth || 0,
@@ -1944,10 +2127,10 @@ Licensed under the MIT license.
                 legacyStyles = axis.direction + "Axis " + axis.direction + axis.n + "Axis",
                 layer = "flot-" + axis.direction + "-axis flot-" + axis.direction + axis.n + "-axis " + legacyStyles,
                 font = opts.font || "flot-tick-label tickLabel";
-            var classcolortheme ="";
-        	if(axis.options.class!==undefined){
-				font.class=axis.options.class;
-        	}
+            var classcolortheme = "";
+            if (axis.options.class !== undefined) {
+                font.class = axis.options.class;
+            }
             for (var i = 0; i < ticks.length; ++i) {
 
                 var t = ticks[i];
@@ -2023,26 +2206,23 @@ Licensed under the MIT license.
                 if (pos == "bottom") {
                     plotOffset.bottom += lh + axisMargin;
                     axis.box = { top: surface.height - plotOffset.bottom, height: lh };
-                }
-                else {
+                } else {
                     axis.box = { top: plotOffset.top + axisMargin, height: lh };
                     plotOffset.top += lh + axisMargin;
                 }
-            }
-            else {
+            } else {
                 lw += padding;
 
                 if (pos == "left") {
                     axis.box = { left: plotOffset.left + axisMargin, width: lw };
                     plotOffset.left += lw + axisMargin;
-                }
-                else {
+                } else {
                     plotOffset.right += lw + axisMargin;
                     axis.box = { left: surface.width - plotOffset.right, width: lw };
                 }
             }
 
-             // save for future reference
+            // save for future reference
             axis.position = pos;
             axis.tickLength = tickLength;
             axis.box.padding = padding;
@@ -2055,8 +2235,7 @@ Licensed under the MIT license.
             if (axis.direction == "x") {
                 axis.box.left = plotOffset.left - axis.labelWidth / 2;
                 axis.box.width = surface.width - plotOffset.left - plotOffset.right + axis.labelWidth;
-            }
-            else {
+            } else {
                 axis.box.top = plotOffset.top - axis.labelHeight / 2;
                 axis.box.height = surface.height - plotOffset.bottom - plotOffset.top + axis.labelHeight;
             }
@@ -2075,7 +2254,7 @@ Licensed under the MIT license.
             if (minMargin == null) {
                 minMargin = 0;
                 for (i = 0; i < series.length; ++i)
-                    minMargin = Math.max(minMargin, 2 * (series[i].points.radius + series[i].points.lineWidth/2));
+                    minMargin = Math.max(minMargin, 2 * (series[i].points.radius + series[i].points.lineWidth / 2));
             }
 
             var margins = {
@@ -2088,7 +2267,7 @@ Licensed under the MIT license.
             // check axis labels, note we don't check the actual
             // labels but instead use the overall width/height to not
             // jump as much around with replots
-            $.each(allAxes(), function (_, axis) {
+            $.each(allAxes(), function(_, axis) {
                 if (axis.reserveSpace && axis.ticks && axis.ticks.length) {
                     if (axis.direction === "x") {
                         margins.left = Math.max(margins.left, axis.labelWidth / 2);
@@ -2107,7 +2286,8 @@ Licensed under the MIT license.
         }
 
         function setupGrid() {
-            var i, axes = allAxes(), showGrid = options.grid.show;
+            var i, axes = allAxes(),
+                showGrid = options.grid.show;
 
             // Initialize the plot's offset from the edge of the canvas
 
@@ -2121,15 +2301,14 @@ Licensed under the MIT license.
             // If the grid is visible, add its border width to the offset
 
             for (var a in plotOffset) {
-                if(typeof(options.grid.borderWidth) == "object") {
+                if (typeof(options.grid.borderWidth) == "object") {
                     plotOffset[a] += showGrid ? options.grid.borderWidth[a] : 0;
-                }
-                else {
+                } else {
                     plotOffset[a] += showGrid ? options.grid.borderWidth : 0;
                 }
             }
 
-            $.each(axes, function (_, axis) {
+            $.each(axes, function(_, axis) {
                 var axisOpts = axis.options;
                 axis.show = axisOpts.show == null ? axis.used : axisOpts.show;
                 axis.reserveSpace = axisOpts.reserveSpace == null ? axis.show : axisOpts.reserveSpace;
@@ -2138,15 +2317,15 @@ Licensed under the MIT license.
 
             if (showGrid) {
 
-                var allocatedAxes = $.grep(axes, function (axis) {
+                var allocatedAxes = $.grep(axes, function(axis) {
                     return axis.show || axis.reserveSpace;
                 });
 
-                $.each(allocatedAxes, function (_, axis) {
+                $.each(allocatedAxes, function(_, axis) {
                     // make the ticks
 
-                    if (allocatedAxes[allocatedAxes.length-1].options.class !== undefined){
-                    	axis.options.class = allocatedAxes[allocatedAxes.length-1].options.class;
+                    if (allocatedAxes[allocatedAxes.length - 1].options.class !== undefined) {
+                        axis.options.class = allocatedAxes[allocatedAxes.length - 1].options.class;
                     }
                     setupTickGeneration(axis);
                     setTicks(axis);
@@ -2165,7 +2344,7 @@ Licensed under the MIT license.
                 // might stick out
                 adjustLayoutForThingsStickingOut();
 
-                $.each(allocatedAxes, function (_, axis) {
+                $.each(allocatedAxes, function(_, axis) {
                     allocateAxisBoxSecondPhase(axis);
                 });
             }
@@ -2174,7 +2353,7 @@ Licensed under the MIT license.
             plotHeight = surface.height - plotOffset.bottom - plotOffset.top;
 
             // now we got the proper plot dimensions, we can compute the scaling
-            $.each(axes, function (_, axis) {
+            $.each(axes, function(_, axis) {
                 setTransformationHelpers(axis);
             });
 
@@ -2201,8 +2380,7 @@ Licensed under the MIT license.
                 // don't fall into min == max which doesn't work
                 if (opts.max == null || opts.min != null)
                     max += widen;
-            }
-            else {
+            } else {
                 // consider autoscaling
                 var margin = opts.autoscaleMargin;
                 if (margin != null) {
@@ -2284,7 +2462,7 @@ Licensed under the MIT license.
 
             if (!axis.tickGenerator) {
 
-                axis.tickGenerator = function (axis) {
+                axis.tickGenerator = function(axis) {
 
                     var ticks = [],
                         start = floorInBase(axis.min, axis.tickSize),
@@ -2301,28 +2479,28 @@ Licensed under the MIT license.
                     return ticks;
                 };
 
-				axis.tickFormatter = function (value, axis) {
+                axis.tickFormatter = function(value, axis) {
 
-					var factor = axis.tickDecimals ? Math.pow(10, axis.tickDecimals) : 1;
-					var formatted = "" + Math.round(value * factor) / factor;
+                    var factor = axis.tickDecimals ? Math.pow(10, axis.tickDecimals) : 1;
+                    var formatted = "" + Math.round(value * factor) / factor;
 
-					// If tickDecimals was specified, ensure that we have exactly that
-					// much precision; otherwise default to the value's own precision.
+                    // If tickDecimals was specified, ensure that we have exactly that
+                    // much precision; otherwise default to the value's own precision.
 
-					if (axis.tickDecimals != null) {
-						var decimal = formatted.indexOf(".");
-						var precision = decimal == -1 ? 0 : formatted.length - decimal - 1;
-						if (precision < axis.tickDecimals) {
-							return (precision ? formatted : formatted + ".") + ("" + factor).substr(1, axis.tickDecimals - precision);
-						}
-					}
+                    if (axis.tickDecimals != null) {
+                        var decimal = formatted.indexOf(".");
+                        var precision = decimal == -1 ? 0 : formatted.length - decimal - 1;
+                        if (precision < axis.tickDecimals) {
+                            return (precision ? formatted : formatted + ".") + ("" + factor).substr(1, axis.tickDecimals - precision);
+                        }
+                    }
 
                     return formatted;
                 };
             }
 
             if ($.isFunction(opts.tickFormatter))
-                axis.tickFormatter = function (v, axis) { return "" + opts.tickFormatter(v, axis); };
+                axis.tickFormatter = function(v, axis) { return "" + opts.tickFormatter(v, axis); };
 
             if (opts.alignTicksWithAxis != null) {
                 var otherAxis = (axis.direction == "x" ? xaxes : yaxes)[opts.alignTicksWithAxis - 1];
@@ -2336,9 +2514,10 @@ Licensed under the MIT license.
                             axis.max = Math.max(axis.max, niceTicks[niceTicks.length - 1]);
                     }
 
-                    axis.tickGenerator = function (axis) {
+                    axis.tickGenerator = function(axis) {
                         // copy ticks, scaled to this axis
-                        var ticks = [], v, i;
+                        var ticks = [],
+                            v, i;
                         for (i = 0; i < otherAxis.ticks.length; ++i) {
                             v = (otherAxis.ticks[i].v - otherAxis.min) / (otherAxis.max - otherAxis.min);
                             v = axis.min + v * (axis.max - axis.min);
@@ -2364,7 +2543,8 @@ Licensed under the MIT license.
         }
 
         function setTicks(axis) {
-            var oticks = axis.options.ticks, ticks = [];
+            var oticks = axis.options.ticks,
+                ticks = [];
             if (oticks == null || (typeof oticks == "number" && oticks > 0))
                 ticks = axis.tickGenerator(axis);
             else if (oticks) {
@@ -2385,8 +2565,7 @@ Licensed under the MIT license.
                     v = +t[0];
                     if (t.length > 1)
                         label = t[1];
-                }
-                else
+                } else
                     v = +t;
                 if (label == null)
                     label = axis.tickFormatter(v, axis);
@@ -2559,8 +2738,8 @@ Licensed under the MIT license.
                     } else {
                         ctx.fillStyle = m.color || options.grid.markingsColor;
                         ctx.fillRect(xrange.from, yrange.to,
-                                     xrange.to - xrange.from,
-                                     yrange.from - yrange.to);
+                            xrange.to - xrange.from,
+                            yrange.from - yrange.to);
                     }
                 }
             }
@@ -2570,8 +2749,10 @@ Licensed under the MIT license.
             bw = options.grid.borderWidth;
 
             for (var j = 0; j < axes.length; ++j) {
-                var axis = axes[j], box = axis.box,
-                    t = axis.tickLength, x, y, xoff, yoff;
+                var axis = axes[j],
+                    box = axis.box,
+                    t = axis.tickLength,
+                    x, y, xoff, yoff;
                 if (!axis.show || axis.ticks.length == 0)
                     continue;
 
@@ -2584,8 +2765,7 @@ Licensed under the MIT license.
                         y = (axis.position == "top" ? 0 : plotHeight);
                     else
                         y = box.top - plotOffset.top + (axis.position == "top" ? box.height : 0);
-                }
-                else {
+                } else {
                     y = 0;
                     if (t == "full")
                         x = (axis.position == "left" ? 0 : plotWidth);
@@ -2628,9 +2808,10 @@ Licensed under the MIT license.
 
                     if (isNaN(v) || v < axis.min || v > axis.max
                         // skip those lying on the axes if we got a border
-                        || (t == "full"
-                            && ((typeof bw == "object" && bw[axis.position] > 0) || bw > 0)
-                            && (v == axis.min || v == axis.max)))
+                        ||
+                        (t == "full" &&
+                            ((typeof bw == "object" && bw[axis.position] > 0) || bw > 0) &&
+                            (v == axis.min || v == axis.max)))
                         continue;
 
                     if (axis.direction == "x") {
@@ -2639,8 +2820,7 @@ Licensed under the MIT license.
 
                         if (axis.position == "top")
                             yoff = -yoff;
-                    }
-                    else {
+                    } else {
                         y = axis.p2c(v);
                         xoff = t == "full" ? -plotWidth : t;
 
@@ -2668,20 +2848,20 @@ Licensed under the MIT license.
                 // If either borderWidth or borderColor is an object, then draw the border
                 // line by line instead of as one rectangle
                 bc = options.grid.borderColor;
-                if(typeof bw == "object" || typeof bc == "object") {
+                if (typeof bw == "object" || typeof bc == "object") {
                     if (typeof bw !== "object") {
-                        bw = {top: bw, right: bw, bottom: bw, left: bw};
+                        bw = { top: bw, right: bw, bottom: bw, left: bw };
                     }
                     if (typeof bc !== "object") {
-                        bc = {top: bc, right: bc, bottom: bc, left: bc};
+                        bc = { top: bc, right: bc, bottom: bc, left: bc };
                     }
 
                     if (bw.top > 0) {
                         ctx.strokeStyle = bc.top;
                         ctx.lineWidth = bw.top;
                         ctx.beginPath();
-                        ctx.moveTo(0 - bw.left, 0 - bw.top/2);
-                        ctx.lineTo(plotWidth, 0 - bw.top/2);
+                        ctx.moveTo(0 - bw.left, 0 - bw.top / 2);
+                        ctx.lineTo(plotWidth, 0 - bw.top / 2);
                         ctx.stroke();
                     }
 
@@ -2707,15 +2887,14 @@ Licensed under the MIT license.
                         ctx.strokeStyle = bc.left;
                         ctx.lineWidth = bw.left;
                         ctx.beginPath();
-                        ctx.moveTo(0 - bw.left/2, plotHeight + bw.bottom);
-                        ctx.lineTo(0- bw.left/2, 0);
+                        ctx.moveTo(0 - bw.left / 2, plotHeight + bw.bottom);
+                        ctx.lineTo(0 - bw.left / 2, 0);
                         ctx.stroke();
                     }
-                }
-                else {
+                } else {
                     ctx.lineWidth = bw;
                     ctx.strokeStyle = options.grid.borderColor;
-                    ctx.strokeRect(-bw/2, -bw/2, plotWidth + bw, plotHeight + bw);
+                    ctx.strokeRect(-bw / 2, -bw / 2, plotWidth + bw, plotHeight + bw);
                 }
             }
 
@@ -2724,7 +2903,7 @@ Licensed under the MIT license.
 
         function drawAxisLabels() {
 
-            $.each(allAxes(), function (_, axis) {
+            $.each(allAxes(), function(_, axis) {
                 var box = axis.box,
                     legacyStyles = axis.direction + "Axis " + axis.direction + axis.n + "Axis",
                     layer = "flot-" + axis.direction + "-axis flot-" + axis.direction + axis.n + "-axis " + legacyStyles,
@@ -2784,12 +2963,15 @@ Licensed under the MIT license.
             function plotLine(datapoints, xoffset, yoffset, axisx, axisy) {
                 var points = datapoints.points,
                     ps = datapoints.pointsize,
-                    prevx = null, prevy = null;
+                    prevx = null,
+                    prevy = null;
 
                 ctx.beginPath();
                 for (var i = ps; i < points.length; i += ps) {
-                    var x1 = points[i - ps], y1 = points[i - ps + 1],
-                        x2 = points[i], y2 = points[i + 1];
+                    var x1 = points[i - ps],
+                        y1 = points[i - ps + 1],
+                        x2 = points[i],
+                        y2 = points[i + 1];
 
                     if (x1 == null || x2 == null)
                         continue;
@@ -2797,12 +2979,11 @@ Licensed under the MIT license.
                     // clip with ymin
                     if (y1 <= y2 && y1 < axisy.min) {
                         if (y2 < axisy.min)
-                            continue;   // line segment is outside
+                            continue; // line segment is outside
                         // compute new intersection point
                         x1 = (axisy.min - y1) / (y2 - y1) * (x2 - x1) + x1;
                         y1 = axisy.min;
-                    }
-                    else if (y2 <= y1 && y2 < axisy.min) {
+                    } else if (y2 <= y1 && y2 < axisy.min) {
                         if (y1 < axisy.min)
                             continue;
                         x2 = (axisy.min - y1) / (y2 - y1) * (x2 - x1) + x1;
@@ -2815,8 +2996,7 @@ Licensed under the MIT license.
                             continue;
                         x1 = (axisy.max - y1) / (y2 - y1) * (x2 - x1) + x1;
                         y1 = axisy.max;
-                    }
-                    else if (y2 >= y1 && y2 > axisy.max) {
+                    } else if (y2 >= y1 && y2 > axisy.max) {
                         if (y1 > axisy.max)
                             continue;
                         x2 = (axisy.max - y1) / (y2 - y1) * (x2 - x1) + x1;
@@ -2829,8 +3009,7 @@ Licensed under the MIT license.
                             continue;
                         y1 = (axisx.min - x1) / (x2 - x1) * (y2 - y1) + y1;
                         x1 = axisx.min;
-                    }
-                    else if (x2 <= x1 && x2 < axisx.min) {
+                    } else if (x2 <= x1 && x2 < axisx.min) {
                         if (x1 < axisx.min)
                             continue;
                         y2 = (axisx.min - x1) / (x2 - x1) * (y2 - y1) + y1;
@@ -2843,8 +3022,7 @@ Licensed under the MIT license.
                             continue;
                         y1 = (axisx.max - x1) / (x2 - x1) * (y2 - y1) + y1;
                         x1 = axisx.max;
-                    }
-                    else if (x2 >= x1 && x2 > axisx.max) {
+                    } else if (x2 >= x1 && x2 > axisx.max) {
                         if (x1 > axisx.max)
                             continue;
                         y2 = (axisx.max - x1) / (x2 - x1) * (y2 - y1) + y1;
@@ -2865,8 +3043,11 @@ Licensed under the MIT license.
                 var points = datapoints.points,
                     ps = datapoints.pointsize,
                     bottom = Math.min(Math.max(0, axisy.min), axisy.max),
-                    i = 0, top, areaOpen = false,
-                    ypos = 1, segmentStart = 0, segmentEnd = 0;
+                    i = 0,
+                    top, areaOpen = false,
+                    ypos = 1,
+                    segmentStart = 0,
+                    segmentEnd = 0;
 
                 // we process each segment in two turns, first forward
                 // direction to sketch out top, then once we hit the
@@ -2879,7 +3060,8 @@ Licensed under the MIT license.
 
                     var x1 = points[i - ps],
                         y1 = points[i - ps + ypos],
-                        x2 = points[i], y2 = points[i + ypos];
+                        x2 = points[i],
+                        y2 = points[i + ypos];
 
                     if (areaOpen) {
                         if (ps > 0 && x1 != null && x2 == null) {
@@ -2912,8 +3094,7 @@ Licensed under the MIT license.
                             continue;
                         y1 = (axisx.min - x1) / (x2 - x1) * (y2 - y1) + y1;
                         x1 = axisx.min;
-                    }
-                    else if (x2 <= x1 && x2 < axisx.min) {
+                    } else if (x2 <= x1 && x2 < axisx.min) {
                         if (x1 < axisx.min)
                             continue;
                         y2 = (axisx.min - x1) / (x2 - x1) * (y2 - y1) + y1;
@@ -2926,8 +3107,7 @@ Licensed under the MIT license.
                             continue;
                         y1 = (axisx.max - x1) / (x2 - x1) * (y2 - y1) + y1;
                         x1 = axisx.max;
-                    }
-                    else if (x2 >= x1 && x2 > axisx.max) {
+                    } else if (x2 >= x1 && x2 > axisx.max) {
                         if (x1 > axisx.max)
                             continue;
                         y2 = (axisx.max - x1) / (x2 - x1) * (y2 - y1) + y1;
@@ -2946,8 +3126,7 @@ Licensed under the MIT license.
                         ctx.lineTo(axisx.p2c(x1), axisy.p2c(axisy.max));
                         ctx.lineTo(axisx.p2c(x2), axisy.p2c(axisy.max));
                         continue;
-                    }
-                    else if (y1 <= axisy.min && y2 <= axisy.min) {
+                    } else if (y1 <= axisy.min && y2 <= axisy.min) {
                         ctx.lineTo(axisx.p2c(x1), axisy.p2c(axisy.min));
                         ctx.lineTo(axisx.p2c(x2), axisy.p2c(axisy.min));
                         continue;
@@ -2957,7 +3136,8 @@ Licensed under the MIT license.
                     // be a flat maxed out rectangle first, then a
                     // triangular cutout or reverse; to find these
                     // keep track of the current x values
-                    var x1old = x1, x2old = x2;
+                    var x1old = x1,
+                        x2old = x2;
 
                     // clip the y values, without shortcutting, we
                     // go through all cases in turn
@@ -2966,8 +3146,7 @@ Licensed under the MIT license.
                     if (y1 <= y2 && y1 < axisy.min && y2 >= axisy.min) {
                         x1 = (axisy.min - y1) / (y2 - y1) * (x2 - x1) + x1;
                         y1 = axisy.min;
-                    }
-                    else if (y2 <= y1 && y2 < axisy.min && y1 >= axisy.min) {
+                    } else if (y2 <= y1 && y2 < axisy.min && y1 >= axisy.min) {
                         x2 = (axisy.min - y1) / (y2 - y1) * (x2 - x1) + x1;
                         y2 = axisy.min;
                     }
@@ -2976,8 +3155,7 @@ Licensed under the MIT license.
                     if (y1 >= y2 && y1 > axisy.max && y2 <= axisy.max) {
                         x1 = (axisy.max - y1) / (y2 - y1) * (x2 - x1) + x1;
                         y1 = axisy.max;
-                    }
-                    else if (y2 >= y1 && y2 > axisy.max && y1 <= axisy.max) {
+                    } else if (y2 >= y1 && y2 > axisy.max && y1 <= axisy.max) {
                         x2 = (axisy.max - y1) / (y2 - y1) * (x2 - x1) + x1;
                         y2 = axisy.max;
                     }
@@ -3015,10 +3193,10 @@ Licensed under the MIT license.
                 ctx.lineWidth = sw;
                 ctx.strokeStyle = "rgba(0,0,0,0.1)";
                 // position shadow at angle from the mid of line
-                var angle = Math.PI/18;
-                plotLine(series.datapoints, Math.sin(angle) * (lw/2 + sw/2), Math.cos(angle) * (lw/2 + sw/2), series.xaxis, series.yaxis);
-                ctx.lineWidth = sw/2;
-                plotLine(series.datapoints, Math.sin(angle) * (lw/2 + sw/4), Math.cos(angle) * (lw/2 + sw/4), series.xaxis, series.yaxis);
+                var angle = Math.PI / 18;
+                plotLine(series.datapoints, Math.sin(angle) * (lw / 2 + sw / 2), Math.cos(angle) * (lw / 2 + sw / 2), series.xaxis, series.yaxis);
+                ctx.lineWidth = sw / 2;
+                plotLine(series.datapoints, Math.sin(angle) * (lw / 2 + sw / 4), Math.cos(angle) * (lw / 2 + sw / 4), series.xaxis, series.yaxis);
             }
 
             ctx.lineWidth = lw;
@@ -3036,10 +3214,12 @@ Licensed under the MIT license.
 
         function drawSeriesPoints(series) {
             function plotPoints(datapoints, radius, fillStyle, offset, shadow, axisx, axisy, symbol) {
-                var points = datapoints.points, ps = datapoints.pointsize;
+                var points = datapoints.points,
+                    ps = datapoints.pointsize;
 
                 for (var i = 0; i < points.length; i += ps) {
-                    var x = points[i], y = points[i + 1];
+                    var x = points[i],
+                        y = points[i + 1];
                     if (x == null || x < axisx.min || x > axisx.max || y < axisy.min || y > axisy.max)
                         continue;
 
@@ -3073,7 +3253,7 @@ Licensed under the MIT license.
             // Doing the conditional here allows the shadow setting to still be
             // optional even with a lineWidth of 0.
 
-            if( lw == 0 )
+            if (lw == 0)
                 lw = 0.0001;
 
             if (lw > 0 && sw > 0) {
@@ -3081,19 +3261,19 @@ Licensed under the MIT license.
                 var w = sw / 2;
                 ctx.lineWidth = w;
                 ctx.strokeStyle = "rgba(0,0,0,0.1)";
-                plotPoints(series.datapoints, radius, null, w + w/2, true,
-                           series.xaxis, series.yaxis, symbol);
+                plotPoints(series.datapoints, radius, null, w + w / 2, true,
+                    series.xaxis, series.yaxis, symbol);
 
                 ctx.strokeStyle = "rgba(0,0,0,0.2)";
-                plotPoints(series.datapoints, radius, null, w/2, true,
-                           series.xaxis, series.yaxis, symbol);
+                plotPoints(series.datapoints, radius, null, w / 2, true,
+                    series.xaxis, series.yaxis, symbol);
             }
 
             ctx.lineWidth = lw;
             ctx.strokeStyle = series.color;
             plotPoints(series.datapoints, radius,
-                       getFillStyle(series.points, series.color), 0, false,
-                       series.xaxis, series.yaxis, symbol);
+                getFillStyle(series.points, series.color), 0, false,
+                series.xaxis, series.yaxis, symbol);
             ctx.restore();
         }
 
@@ -3121,8 +3301,7 @@ Licensed under the MIT license.
                     drawLeft = true;
                     drawRight = false;
                 }
-            }
-            else {
+            } else {
                 drawLeft = drawRight = drawTop = true;
                 drawBottom = false;
                 left = x + barLeft;
@@ -3204,7 +3383,8 @@ Licensed under the MIT license.
 
         function drawSeriesBars(series) {
             function plotBars(datapoints, barLeft, barRight, fillStyleCallback, axisx, axisy) {
-                var points = datapoints.points, ps = datapoints.pointsize;
+                var points = datapoints.points,
+                    ps = datapoints.pointsize;
 
                 for (var i = 0; i < points.length; i += ps) {
                     if (points[i] == null)
@@ -3233,7 +3413,7 @@ Licensed under the MIT license.
                     barLeft = -series.bars.barWidth / 2;
             }
 
-            var fillStyleCallback = series.bars.fill ? function (bottom, top) { return getFillStyle(series.bars, series.color, bottom, top); } : null;
+            var fillStyleCallback = series.bars.fill ? function(bottom, top) { return getFillStyle(series.bars, series.color, bottom, top); } : null;
             plotBars(series.datapoints, barLeft, barLeft + series.bars.barWidth, fillStyleCallback, series.xaxis, series.yaxis);
             ctx.restore();
         }
@@ -3264,8 +3444,11 @@ Licensed under the MIT license.
                 return;
             }
 
-            var fragments = [], entries = [], rowStarted = false,
-                lf = options.legend.labelFormatter, s, label;
+            var fragments = [],
+                entries = [],
+                rowStarted = false,
+                lf = options.legend.labelFormatter,
+                s, label;
 
             // Build a list of legend entries, with each having a label and a color
 
@@ -3288,12 +3471,12 @@ Licensed under the MIT license.
                 if ($.isFunction(options.legend.sorted)) {
                     entries.sort(options.legend.sorted);
                 } else if (options.legend.sorted == "reverse") {
-                	entries.reverse();
+                    entries.reverse();
                 } else {
                     var ascending = options.legend.sorted != "descending";
                     entries.sort(function(a, b) {
                         return a.label == b.label ? 0 : (
-                            (a.label < b.label) != ascending ? 1 : -1   // Logical XOR
+                            (a.label < b.label) != ascending ? 1 : -1 // Logical XOR
                         );
                     });
                 }
@@ -3341,7 +3524,7 @@ Licensed under the MIT license.
                     pos += 'right:' + (m[0] + plotOffset.right) + 'px;';
                 else if (p.charAt(1) == "w")
                     pos += 'left:' + (m[0] + plotOffset.left) + 'px;';
-                var legend = $('<div class="legend">' + table.replace('style="', 'style="position:absolute;' + pos +';') + '</div>').appendTo(feedviewer);
+                var legend = $('<div class="legend">' + table.replace('style="', 'style="position:absolute;' + pos + ';') + '</div>').appendTo(feedviewer);
                 if (options.legend.backgroundOpacity != 0.0) {
                     // put in the transparent background
                     // separately to avoid blended labels and
@@ -3357,7 +3540,7 @@ Licensed under the MIT license.
                         c = c.toString();
                     }
                     var div = legend.children();
-                    $('<div style="position:absolute;width:' + div.width() + 'px;height:' + div.height() + 'px;' + pos +'background-color:' + c + ';"> </div>').prependTo(legend).css('opacity', options.legend.backgroundOpacity);
+                    $('<div style="position:absolute;width:' + div.width() + 'px;height:' + div.height() + 'px;' + pos + 'background-color:' + c + ';"> </div>').prependTo(legend).css('opacity', options.legend.backgroundOpacity);
                 }
             }
         }
@@ -3372,7 +3555,9 @@ Licensed under the MIT license.
         function findNearbyItem(mouseX, mouseY, seriesFilter) {
             var maxDistance = options.grid.mouseActiveRadius,
                 smallestDistance = maxDistance * maxDistance + 1,
-                item = null, foundPoint = false, i, j, ps;
+                item = null,
+                foundPoint = false,
+                i, j, ps;
 
             for (i = series.length - 1; i >= 0; --i) {
                 if (!seriesFilter(series[i]))
@@ -3397,7 +3582,8 @@ Licensed under the MIT license.
 
                 if (s.lines.show || s.points.show) {
                     for (j = 0; j < points.length; j += ps) {
-                        var x = points[j], y = points[j + 1];
+                        var x = points[j],
+                            y = points[j + 1];
                         if (x == null)
                             continue;
 
@@ -3440,17 +3626,19 @@ Licensed under the MIT license.
                     barRight = barLeft + s.bars.barWidth;
 
                     for (j = 0; j < points.length; j += ps) {
-                        var x = points[j], y = points[j + 1], b = points[j + 2];
+                        var x = points[j],
+                            y = points[j + 1],
+                            b = points[j + 2];
                         if (x == null)
                             continue;
 
                         // for a bar graph, the cursor must be inside the bar
                         if (series[i].bars.horizontal ?
                             (mx <= Math.max(b, x) && mx >= Math.min(b, x) &&
-                             my >= y + barLeft && my <= y + barRight) :
+                                my >= y + barLeft && my <= y + barRight) :
                             (mx >= x + barLeft && mx <= x + barRight &&
-                             my >= Math.min(b, y) && my <= Math.max(b, y)))
-                                item = [i, j / ps];
+                                my >= Math.min(b, y) && my <= Math.max(b, y)))
+                            item = [i, j / ps];
                     }
                 }
             }
@@ -3460,10 +3648,12 @@ Licensed under the MIT license.
                 j = item[1];
                 ps = series[i].datapoints.pointsize;
 
-                return { datapoint: series[i].datapoints.points.slice(j * ps, (j + 1) * ps),
-                         dataIndex: j,
-                         series: series[i],
-                         seriesIndex: i };
+                return {
+                    datapoint: series[i].datapoints.points.slice(j * ps, (j + 1) * ps),
+                    dataIndex: j,
+                    series: series[i],
+                    seriesIndex: i
+                };
             }
 
             return null;
@@ -3472,18 +3662,18 @@ Licensed under the MIT license.
         function onMouseMove(e) {
             if (options.grid.hoverable)
                 triggerClickHoverEvent("plothover", e,
-                                       function (s) { return s["hoverable"] != false; });
+                    function(s) { return s["hoverable"] != false; });
         }
 
         function onMouseLeave(e) {
             if (options.grid.hoverable)
                 triggerClickHoverEvent("plothover", e,
-                                       function (s) { return false; });
+                    function(s) { return false; });
         }
 
         function onClick(e) {
             triggerClickHoverEvent("plotclick", e,
-                                   function (s) { return s["clickable"] != false; });
+                function(s) { return s["clickable"] != false; });
         }
 
         // trigger click or hover event (they send the same parameters
@@ -3492,7 +3682,7 @@ Licensed under the MIT license.
             var offset = eventHolder.offset(),
                 canvasX = event.pageX - offset.left - plotOffset.left,
                 canvasY = event.pageY - offset.top - plotOffset.top,
-            pos = canvasToAxisCoords({ left: canvasX, top: canvasY });
+                pos = canvasToAxisCoords({ left: canvasX, top: canvasY });
 
             pos.pageX = event.pageX;
             pos.pageY = event.pageY;
@@ -3511,8 +3701,8 @@ Licensed under the MIT license.
                     var h = highlights[i];
                     if (h.auto == eventname &&
                         !(item && h.series == item.series &&
-                          h.point[0] == item.datapoint[0] &&
-                          h.point[1] == item.datapoint[1]))
+                            h.point[0] == item.datapoint[0] &&
+                            h.point[1] == item.datapoint[1]))
                         unhighlight(h.series, h.point);
                 }
 
@@ -3520,12 +3710,12 @@ Licensed under the MIT license.
                     highlight(item.series, item.datapoint, eventname);
             }
 
-            feedviewer.trigger(eventname, [ pos, item ]);
+            feedviewer.trigger(eventname, [pos, item]);
         }
 
         function triggerRedrawOverlay() {
             var t = options.interaction.redrawOverlayInterval;
-            if (t == -1) {      // skip event queue
+            if (t == -1) { // skip event queue
                 drawOverlay();
                 return;
             }
@@ -3570,8 +3760,7 @@ Licensed under the MIT license.
                 highlights.push({ series: s, point: point, auto: auto });
 
                 triggerRedrawOverlay();
-            }
-            else if (!auto)
+            } else if (!auto)
                 highlights[i].auto = false;
         }
 
@@ -3601,16 +3790,18 @@ Licensed under the MIT license.
         function indexOfHighlight(s, p) {
             for (var i = 0; i < highlights.length; ++i) {
                 var h = highlights[i];
-                if (h.series == s && h.point[0] == p[0]
-                    && h.point[1] == p[1])
+                if (h.series == s && h.point[0] == p[0] &&
+                    h.point[1] == p[1])
                     return i;
             }
             return -1;
         }
 
         function drawPointHighlight(series, point) {
-            var x = point[0], y = point[1],
-                axisx = series.xaxis, axisy = series.yaxis,
+            var x = point[0],
+                y = point[1],
+                axisx = series.xaxis,
+                axisy = series.yaxis,
                 highlightColor = (typeof series.highlightColor === "string") ? series.highlightColor : $.color.parse(series.color).scale('a', 0.5).toString();
 
             if (x < axisx.min || x > axisx.max || y < axisy.min || y > axisy.max)
@@ -3652,7 +3843,7 @@ Licensed under the MIT license.
             octx.strokeStyle = highlightColor;
 
             drawBar(point[0], point[1], point[2] || 0, barLeft, barLeft + series.bars.barWidth,
-                    function () { return fillStyle; }, series.xaxis, series.yaxis, octx, series.bars.horizontal, series.bars.lineWidth);
+                function() { return fillStyle; }, series.xaxis, series.yaxis, octx, series.bars.horizontal, series.bars.lineWidth);
         }
 
         function getColorOrGradient(spec, bottom, top, defaultColor) {
@@ -3717,26 +3908,26 @@ Licensed under the MIT license.
 
 The symbols are accessed as strings through the standard symbol options:
 
-	series: {
-		points: {
-			symbol: "square" // or "diamond", "triangle", "cross"
-		}
-	}
+    series: {
+        points: {
+            symbol: "square" // or "diamond", "triangle", "cross"
+        }
+    }
 
 */
 
-(function ($) {
+(function($) {
     function processRawData(plot, series, datapoints) {
         // we normalize the area of each symbol so it is approximately the
         // same as a circle of the given radius
 
         var handlers = {
-            square: function (ctx, x, y, radius, shadow) {
+            square: function(ctx, x, y, radius, shadow) {
                 // pi * r^2 = (2s)^2  =>  s = r * sqrt(pi)/2
                 var size = radius * Math.sqrt(Math.PI) / 2;
                 ctx.rect(x - size, y - size, size + size, size + size);
             },
-            diamond: function (ctx, x, y, radius, shadow) {
+            diamond: function(ctx, x, y, radius, shadow) {
                 // pi * r^2 = 2s^2  =>  s = r * sqrt(pi/2)
                 var size = radius * Math.sqrt(Math.PI / 2);
                 ctx.moveTo(x - size, y);
@@ -3745,18 +3936,18 @@ The symbols are accessed as strings through the standard symbol options:
                 ctx.lineTo(x, y + size);
                 ctx.lineTo(x - size, y);
             },
-            triangle: function (ctx, x, y, radius, shadow) {
+            triangle: function(ctx, x, y, radius, shadow) {
                 // pi * r^2 = 1/2 * s^2 * sin (pi / 3)  =>  s = r * sqrt(2 * pi / sin(pi / 3))
                 var size = radius * Math.sqrt(2 * Math.PI / Math.sin(Math.PI / 3));
                 var height = size * Math.sin(Math.PI / 3);
-                ctx.moveTo(x - size/2, y + height/2);
-                ctx.lineTo(x + size/2, y + height/2);
+                ctx.moveTo(x - size / 2, y + height / 2);
+                ctx.lineTo(x + size / 2, y + height / 2);
                 if (!shadow) {
-                    ctx.lineTo(x, y - height/2);
-                    ctx.lineTo(x - size/2, y + height/2);
+                    ctx.lineTo(x, y - height / 2);
+                    ctx.lineTo(x - size / 2, y + height / 2);
                 }
             },
-            cross: function (ctx, x, y, radius, shadow) {
+            cross: function(ctx, x, y, radius, shadow) {
                 // pi * r^2 = (2s)^2  =>  s = r * sqrt(pi)/2
                 var size = radius * Math.sqrt(Math.PI) / 2;
                 ctx.moveTo(x - size, y - size);
@@ -3794,424 +3985,474 @@ API.txt for details.
 
 (function($) {
 
-	var options = {
-		xaxis: {
-			timezone: null,		// "browser" for local to the client or timezone for timezone-js
-			timeformat: null,	// format string to use
-			twelveHourClock: false,	// 12 or 24 time in time mode
-			monthNames: null	// list of names of months
-		}
-	};
-
-	// round to nearby lower multiple of base
-
-	function floorInBase(n, base) {
-		return base * Math.floor(n / base);
-	}
-
-	// Returns a string with the date d formatted according to fmt.
-	// A subset of the Open Group's strftime format is supported.
-
-	function formatDate(d, fmt, monthNames, dayNames) {
-
-		if (typeof d.strftime == "function") {
-			return d.strftime(fmt);
-		}
-
-		var leftPad = function(n, pad) {
-			n = "" + n;
-			pad = "" + (pad == null ? "0" : pad);
-			return n.length == 1 ? pad + n : n;
-		};
-
-		var r = [];
-		var escape = false;
-		var hours = d.getHours();
-		var isAM = hours < 12;
-
-		if (monthNames == null) {
-			monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-		}
-
-		if (dayNames == null) {
-			dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-		}
-
-		var hours12;
-
-		if (hours > 12) {
-			hours12 = hours - 12;
-		} else if (hours == 0) {
-			hours12 = 12;
-		} else {
-			hours12 = hours;
-		}
-
-		for (var i = 0; i < fmt.length; ++i) {
-
-			var c = fmt.charAt(i);
-
-			if (escape) {
-				switch (c) {
-					case 'a': c = "" + dayNames[d.getDay()]; break;
-					case 'b': c = "" + monthNames[d.getMonth()]; break;
-					case 'd': c = leftPad(d.getDate()); break;
-					case 'e': c = leftPad(d.getDate(), " "); break;
-					case 'h':	// For back-compat with 0.7; remove in 1.0
-					case 'H': c = leftPad(hours); break;
-					case 'I': c = leftPad(hours12); break;
-					case 'l': c = leftPad(hours12, " "); break;
-					case 'm': c = leftPad(d.getMonth() + 1); break;
-					case 'M': c = leftPad(d.getMinutes()); break;
-					// quarters not in Open Group's strftime specification
-					case 'q':
-						c = "" + (Math.floor(d.getMonth() / 3) + 1); break;
-					case 'S': c = leftPad(d.getSeconds()); break;
-					case 'y': c = leftPad(d.getFullYear() % 100); break;
-					case 'Y': c = "" + d.getFullYear(); break;
-					case 'p': c = (isAM) ? ("" + "am") : ("" + "pm"); break;
-					case 'P': c = (isAM) ? ("" + "AM") : ("" + "PM"); break;
-					case 'w': c = "" + d.getDay(); break;
-				}
-				r.push(c);
-				escape = false;
-			} else {
-				if (c == "%") {
-					escape = true;
-				} else {
-					r.push(c);
-				}
-			}
-		}
-
-		return r.join("");
-	}
-
-	// To have a consistent view of time-based data independent of which time
-	// zone the client happens to be in we need a date-like object independent
-	// of time zones.  This is done through a wrapper that only calls the UTC
-	// versions of the accessor methods.
-
-	function makeUtcWrapper(d) {
-
-		function addProxyMethod(sourceObj, sourceMethod, targetObj, targetMethod) {
-			sourceObj[sourceMethod] = function() {
-				return targetObj[targetMethod].apply(targetObj, arguments);
-			};
-		};
-
-		var utc = {
-			date: d
-		};
-
-		// support strftime, if found
-
-		if (d.strftime != undefined) {
-			addProxyMethod(utc, "strftime", d, "strftime");
-		}
-
-		addProxyMethod(utc, "getTime", d, "getTime");
-		addProxyMethod(utc, "setTime", d, "setTime");
-
-		var props = ["Date", "Day", "FullYear", "Hours", "Milliseconds", "Minutes", "Month", "Seconds"];
-
-		for (var p = 0; p < props.length; p++) {
-			addProxyMethod(utc, "get" + props[p], d, "getUTC" + props[p]);
-			addProxyMethod(utc, "set" + props[p], d, "setUTC" + props[p]);
-		}
-
-		return utc;
-	};
-
-	// select time zone strategy.  This returns a date-like object tied to the
-	// desired timezone
-
-	function dateGenerator(ts, opts) {
-		if (opts.timezone == "browser") {
-			return new Date(ts);
-		} else if (!opts.timezone || opts.timezone == "utc") {
-			return makeUtcWrapper(new Date(ts));
-		} else if (typeof timezoneJS != "undefined" && typeof timezoneJS.Date != "undefined") {
-			var d = new timezoneJS.Date();
-			// timezone-js is fickle, so be sure to set the time zone before
-			// setting the time.
-			d.setTimezone(opts.timezone);
-			d.setTime(ts);
-			return d;
-		} else {
-			return makeUtcWrapper(new Date(ts));
-		}
-	}
-
-	// map of app. size of time units in milliseconds
-
-	var timeUnitSize = {
-		"second": 1000,
-		"minute": 60 * 1000,
-		"hour": 60 * 60 * 1000,
-		"day": 24 * 60 * 60 * 1000,
-		"month": 30 * 24 * 60 * 60 * 1000,
-		"quarter": 3 * 30 * 24 * 60 * 60 * 1000,
-		"year": 365.2425 * 24 * 60 * 60 * 1000
-	};
-
-	// the allowed tick sizes, after 1 year we use
-	// an integer algorithm
-
-	var baseSpec = [
-		[1, "second"], [2, "second"], [5, "second"], [10, "second"],
-		[30, "second"],
-		[1, "minute"], [2, "minute"], [5, "minute"], [10, "minute"],
-		[30, "minute"],
-		[1, "hour"], [2, "hour"], [4, "hour"],
-		[8, "hour"], [12, "hour"],
-		[1, "day"], [2, "day"], [3, "day"],
-		[0.25, "month"], [0.5, "month"], [1, "month"],
-		[2, "month"]
-	];
-
-	// we don't know which variant(s) we'll need yet, but generating both is
-	// cheap
-
-	var specMonths = baseSpec.concat([[3, "month"], [6, "month"],
-		[1, "year"]]);
-	var specQuarters = baseSpec.concat([[1, "quarter"], [2, "quarter"],
-		[1, "year"]]);
-
-	function init(plot) {
-		plot.hooks.processOptions.push(function (plot, options) {
-			$.each(plot.getAxes(), function(axisName, axis) {
-
-				var opts = axis.options;
-
-				if (opts.mode == "time") {
-					axis.tickGenerator = function(axis) {
-
-						var ticks = [];
-						var d = dateGenerator(axis.min, opts);
-						var minSize = 0;
-
-						// make quarter use a possibility if quarters are
-						// mentioned in either of these options
-
-						var spec = (opts.tickSize && opts.tickSize[1] ===
-							"quarter") ||
-							(opts.minTickSize && opts.minTickSize[1] ===
-							"quarter") ? specQuarters : specMonths;
-
-						if (opts.minTickSize != null) {
-							if (typeof opts.tickSize == "number") {
-								minSize = opts.tickSize;
-							} else {
-								minSize = opts.minTickSize[0] * timeUnitSize[opts.minTickSize[1]];
-							}
-						}
-
-						for (var i = 0; i < spec.length - 1; ++i) {
-							if (axis.delta < (spec[i][0] * timeUnitSize[spec[i][1]]
-											  + spec[i + 1][0] * timeUnitSize[spec[i + 1][1]]) / 2
-								&& spec[i][0] * timeUnitSize[spec[i][1]] >= minSize) {
-								break;
-							}
-						}
-
-						var size = spec[i][0];
-						var unit = spec[i][1];
-
-						// special-case the possibility of several years
-
-						if (unit == "year") {
-
-							// if given a minTickSize in years, just use it,
-							// ensuring that it's an integer
-
-							if (opts.minTickSize != null && opts.minTickSize[1] == "year") {
-								size = Math.floor(opts.minTickSize[0]);
-							} else {
-
-								var magn = Math.pow(10, Math.floor(Math.log(axis.delta / timeUnitSize.year) / Math.LN10));
-								var norm = (axis.delta / timeUnitSize.year) / magn;
-
-								if (norm < 1.5) {
-									size = 1;
-								} else if (norm < 3) {
-									size = 2;
-								} else if (norm < 7.5) {
-									size = 5;
-								} else {
-									size = 10;
-								}
-
-								size *= magn;
-							}
-
-							// minimum size for years is 1
-
-							if (size < 1) {
-								size = 1;
-							}
-						}
-
-						axis.tickSize = opts.tickSize || [size, unit];
-						var tickSize = axis.tickSize[0];
-						unit = axis.tickSize[1];
-
-						var step = tickSize * timeUnitSize[unit];
-
-						if (unit == "second") {
-							d.setSeconds(floorInBase(d.getSeconds(), tickSize));
-						} else if (unit == "minute") {
-							d.setMinutes(floorInBase(d.getMinutes(), tickSize));
-						} else if (unit == "hour") {
-							d.setHours(floorInBase(d.getHours(), tickSize));
-						} else if (unit == "month") {
-							d.setMonth(floorInBase(d.getMonth(), tickSize));
-						} else if (unit == "quarter") {
-							d.setMonth(3 * floorInBase(d.getMonth() / 3,
-								tickSize));
-						} else if (unit == "year") {
-							d.setFullYear(floorInBase(d.getFullYear(), tickSize));
-						}
-
-						// reset smaller components
-
-						d.setMilliseconds(0);
-
-						if (step >= timeUnitSize.minute) {
-							d.setSeconds(0);
-						}
-						if (step >= timeUnitSize.hour) {
-							d.setMinutes(0);
-						}
-						if (step >= timeUnitSize.day) {
-							d.setHours(0);
-						}
-						if (step >= timeUnitSize.day * 4) {
-							d.setDate(1);
-						}
-						if (step >= timeUnitSize.month * 2) {
-							d.setMonth(floorInBase(d.getMonth(), 3));
-						}
-						if (step >= timeUnitSize.quarter * 2) {
-							d.setMonth(floorInBase(d.getMonth(), 6));
-						}
-						if (step >= timeUnitSize.year) {
-							d.setMonth(0);
-						}
-
-						var carry = 0;
-						var v = Number.NaN;
-						var prev;
-
-						do {
-
-							prev = v;
-							v = d.getTime();
-							ticks.push(v);
-
-							if (unit == "month" || unit == "quarter") {
-								if (tickSize < 1) {
-
-									// a bit complicated - we'll divide the
-									// month/quarter up but we need to take
-									// care of fractions so we don't end up in
-									// the middle of a day
-
-									d.setDate(1);
-									var start = d.getTime();
-									d.setMonth(d.getMonth() +
-										(unit == "quarter" ? 3 : 1));
-									var end = d.getTime();
-									d.setTime(v + carry * timeUnitSize.hour + (end - start) * tickSize);
-									carry = d.getHours();
-									d.setHours(0);
-								} else {
-									d.setMonth(d.getMonth() +
-										tickSize * (unit == "quarter" ? 3 : 1));
-								}
-							} else if (unit == "year") {
-								d.setFullYear(d.getFullYear() + tickSize);
-							} else {
-								d.setTime(v + step);
-							}
-						} while (v < axis.max && v != prev);
-
-						return ticks;
-					};
-
-					axis.tickFormatter = function (v, axis) {
-
-						var d = dateGenerator(v, axis.options);
-
-						// first check global format
-
-						if (opts.timeformat != null) {
-							return formatDate(d, opts.timeformat, opts.monthNames, opts.dayNames);
-						}
-
-						// possibly use quarters if quarters are mentioned in
-						// any of these places
-
-						var useQuarters = (axis.options.tickSize &&
-								axis.options.tickSize[1] == "quarter") ||
-							(axis.options.minTickSize &&
-								axis.options.minTickSize[1] == "quarter");
-
-						var t = axis.tickSize[0] * timeUnitSize[axis.tickSize[1]];
-						var span = axis.max - axis.min;
-						var suffix = (opts.twelveHourClock) ? " %p" : "";
-						var hourCode = (opts.twelveHourClock) ? "%I" : "%H";
-						var fmt;
-
-						if (t < timeUnitSize.minute) {
-							fmt = hourCode + ":%M:%S" + suffix;
-						} else if (t < timeUnitSize.day) {
-							if (span < 2 * timeUnitSize.day) {
-								fmt = hourCode + ":%M" + suffix;
-							} else {
-								fmt = "%b %d " + hourCode + ":%M" + suffix;
-							}
-						} else if (t < timeUnitSize.month) {
-							fmt = "%b %d";
-						} else if ((useQuarters && t < timeUnitSize.quarter) ||
-							(!useQuarters && t < timeUnitSize.year)) {
-							if (span < timeUnitSize.year) {
-								fmt = "%b";
-							} else {
-								fmt = "%b %Y";
-							}
-						} else if (useQuarters && t < timeUnitSize.year) {
-							if (span < timeUnitSize.year) {
-								fmt = "Q%q";
-							} else {
-								fmt = "Q%q %Y";
-							}
-						} else {
-							fmt = "%Y";
-						}
-
-						var rt = formatDate(d, fmt, opts.monthNames, opts.dayNames);
-
-						return rt;
-					};
-				}
-			});
-		});
-	}
-
-	$.plot.plugins.push({
-		init: init,
-		options: options,
-		name: 'time',
-		version: '1.0'
-	});
-
-	// Time-axis support used to be in Flot core, which exposed the
-	// formatDate function on the plot object.  Various plugins depend
-	// on the function, so we need to re-expose it here.
-
-	$.plot.formatDate = formatDate;
-	$.plot.dateGenerator = dateGenerator;
+    var options = {
+        xaxis: {
+            timezone: null, // "browser" for local to the client or timezone for timezone-js
+            timeformat: null, // format string to use
+            twelveHourClock: false, // 12 or 24 time in time mode
+            monthNames: null // list of names of months
+        }
+    };
+
+    // round to nearby lower multiple of base
+
+    function floorInBase(n, base) {
+        return base * Math.floor(n / base);
+    }
+
+    // Returns a string with the date d formatted according to fmt.
+    // A subset of the Open Group's strftime format is supported.
+
+    function formatDate(d, fmt, monthNames, dayNames) {
+
+        if (typeof d.strftime == "function") {
+            return d.strftime(fmt);
+        }
+
+        var leftPad = function(n, pad) {
+            n = "" + n;
+            pad = "" + (pad == null ? "0" : pad);
+            return n.length == 1 ? pad + n : n;
+        };
+
+        var r = [];
+        var escape = false;
+        var hours = d.getHours();
+        var isAM = hours < 12;
+
+        if (monthNames == null) {
+            monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        }
+
+        if (dayNames == null) {
+            dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        }
+
+        var hours12;
+
+        if (hours > 12) {
+            hours12 = hours - 12;
+        } else if (hours == 0) {
+            hours12 = 12;
+        } else {
+            hours12 = hours;
+        }
+
+        for (var i = 0; i < fmt.length; ++i) {
+
+            var c = fmt.charAt(i);
+
+            if (escape) {
+                switch (c) {
+                    case 'a':
+                        c = "" + dayNames[d.getDay()];
+                        break;
+                    case 'b':
+                        c = "" + monthNames[d.getMonth()];
+                        break;
+                    case 'd':
+                        c = leftPad(d.getDate());
+                        break;
+                    case 'e':
+                        c = leftPad(d.getDate(), " ");
+                        break;
+                    case 'h': // For back-compat with 0.7; remove in 1.0
+                    case 'H':
+                        c = leftPad(hours);
+                        break;
+                    case 'I':
+                        c = leftPad(hours12);
+                        break;
+                    case 'l':
+                        c = leftPad(hours12, " ");
+                        break;
+                    case 'm':
+                        c = leftPad(d.getMonth() + 1);
+                        break;
+                    case 'M':
+                        c = leftPad(d.getMinutes());
+                        break;
+                        // quarters not in Open Group's strftime specification
+                    case 'q':
+                        c = "" + (Math.floor(d.getMonth() / 3) + 1);
+                        break;
+                    case 'S':
+                        c = leftPad(d.getSeconds());
+                        break;
+                    case 'y':
+                        c = leftPad(d.getFullYear() % 100);
+                        break;
+                    case 'Y':
+                        c = "" + d.getFullYear();
+                        break;
+                    case 'p':
+                        c = (isAM) ? ("" + "am") : ("" + "pm");
+                        break;
+                    case 'P':
+                        c = (isAM) ? ("" + "AM") : ("" + "PM");
+                        break;
+                    case 'w':
+                        c = "" + d.getDay();
+                        break;
+                }
+                r.push(c);
+                escape = false;
+            } else {
+                if (c == "%") {
+                    escape = true;
+                } else {
+                    r.push(c);
+                }
+            }
+        }
+
+        return r.join("");
+    }
+
+    // To have a consistent view of time-based data independent of which time
+    // zone the client happens to be in we need a date-like object independent
+    // of time zones.  This is done through a wrapper that only calls the UTC
+    // versions of the accessor methods.
+
+    function makeUtcWrapper(d) {
+
+        function addProxyMethod(sourceObj, sourceMethod, targetObj, targetMethod) {
+            sourceObj[sourceMethod] = function() {
+                return targetObj[targetMethod].apply(targetObj, arguments);
+            };
+        };
+
+        var utc = {
+            date: d
+        };
+
+        // support strftime, if found
+
+        if (d.strftime != undefined) {
+            addProxyMethod(utc, "strftime", d, "strftime");
+        }
+
+        addProxyMethod(utc, "getTime", d, "getTime");
+        addProxyMethod(utc, "setTime", d, "setTime");
+
+        var props = ["Date", "Day", "FullYear", "Hours", "Milliseconds", "Minutes", "Month", "Seconds"];
+
+        for (var p = 0; p < props.length; p++) {
+            addProxyMethod(utc, "get" + props[p], d, "getUTC" + props[p]);
+            addProxyMethod(utc, "set" + props[p], d, "setUTC" + props[p]);
+        }
+
+        return utc;
+    };
+
+    // select time zone strategy.  This returns a date-like object tied to the
+    // desired timezone
+
+    function dateGenerator(ts, opts) {
+        if (opts.timezone == "browser") {
+            return new Date(ts);
+        } else if (!opts.timezone || opts.timezone == "utc") {
+            return makeUtcWrapper(new Date(ts));
+        } else if (typeof timezoneJS != "undefined" && typeof timezoneJS.Date != "undefined") {
+            var d = new timezoneJS.Date();
+            // timezone-js is fickle, so be sure to set the time zone before
+            // setting the time.
+            d.setTimezone(opts.timezone);
+            d.setTime(ts);
+            return d;
+        } else {
+            return makeUtcWrapper(new Date(ts));
+        }
+    }
+
+    // map of app. size of time units in milliseconds
+
+    var timeUnitSize = {
+        "second": 1000,
+        "minute": 60 * 1000,
+        "hour": 60 * 60 * 1000,
+        "day": 24 * 60 * 60 * 1000,
+        "month": 30 * 24 * 60 * 60 * 1000,
+        "quarter": 3 * 30 * 24 * 60 * 60 * 1000,
+        "year": 365.2425 * 24 * 60 * 60 * 1000
+    };
+
+    // the allowed tick sizes, after 1 year we use
+    // an integer algorithm
+
+    var baseSpec = [
+        [1, "second"],
+        [2, "second"],
+        [5, "second"],
+        [10, "second"],
+        [30, "second"],
+        [1, "minute"],
+        [2, "minute"],
+        [5, "minute"],
+        [10, "minute"],
+        [30, "minute"],
+        [1, "hour"],
+        [2, "hour"],
+        [4, "hour"],
+        [8, "hour"],
+        [12, "hour"],
+        [1, "day"],
+        [2, "day"],
+        [3, "day"],
+        [0.25, "month"],
+        [0.5, "month"],
+        [1, "month"],
+        [2, "month"]
+    ];
+
+    // we don't know which variant(s) we'll need yet, but generating both is
+    // cheap
+
+    var specMonths = baseSpec.concat([
+        [3, "month"],
+        [6, "month"],
+        [1, "year"]
+    ]);
+    var specQuarters = baseSpec.concat([
+        [1, "quarter"],
+        [2, "quarter"],
+        [1, "year"]
+    ]);
+
+    function init(plot) {
+        plot.hooks.processOptions.push(function(plot, options) {
+            $.each(plot.getAxes(), function(axisName, axis) {
+
+                var opts = axis.options;
+
+                if (opts.mode == "time") {
+                    axis.tickGenerator = function(axis) {
+
+                        var ticks = [];
+                        var d = dateGenerator(axis.min, opts);
+                        var minSize = 0;
+
+                        // make quarter use a possibility if quarters are
+                        // mentioned in either of these options
+
+                        var spec = (opts.tickSize && opts.tickSize[1] ===
+                                "quarter") ||
+                            (opts.minTickSize && opts.minTickSize[1] ===
+                                "quarter") ? specQuarters : specMonths;
+
+                        if (opts.minTickSize != null) {
+                            if (typeof opts.tickSize == "number") {
+                                minSize = opts.tickSize;
+                            } else {
+                                minSize = opts.minTickSize[0] * timeUnitSize[opts.minTickSize[1]];
+                            }
+                        }
+
+                        for (var i = 0; i < spec.length - 1; ++i) {
+                            if (axis.delta < (spec[i][0] * timeUnitSize[spec[i][1]] +
+                                    spec[i + 1][0] * timeUnitSize[spec[i + 1][1]]) / 2 &&
+                                spec[i][0] * timeUnitSize[spec[i][1]] >= minSize) {
+                                break;
+                            }
+                        }
+
+                        var size = spec[i][0];
+                        var unit = spec[i][1];
+
+                        // special-case the possibility of several years
+
+                        if (unit == "year") {
+
+                            // if given a minTickSize in years, just use it,
+                            // ensuring that it's an integer
+
+                            if (opts.minTickSize != null && opts.minTickSize[1] == "year") {
+                                size = Math.floor(opts.minTickSize[0]);
+                            } else {
+
+                                var magn = Math.pow(10, Math.floor(Math.log(axis.delta / timeUnitSize.year) / Math.LN10));
+                                var norm = (axis.delta / timeUnitSize.year) / magn;
+
+                                if (norm < 1.5) {
+                                    size = 1;
+                                } else if (norm < 3) {
+                                    size = 2;
+                                } else if (norm < 7.5) {
+                                    size = 5;
+                                } else {
+                                    size = 10;
+                                }
+
+                                size *= magn;
+                            }
+
+                            // minimum size for years is 1
+
+                            if (size < 1) {
+                                size = 1;
+                            }
+                        }
+
+                        axis.tickSize = opts.tickSize || [size, unit];
+                        var tickSize = axis.tickSize[0];
+                        unit = axis.tickSize[1];
+
+                        var step = tickSize * timeUnitSize[unit];
+
+                        if (unit == "second") {
+                            d.setSeconds(floorInBase(d.getSeconds(), tickSize));
+                        } else if (unit == "minute") {
+                            d.setMinutes(floorInBase(d.getMinutes(), tickSize));
+                        } else if (unit == "hour") {
+                            d.setHours(floorInBase(d.getHours(), tickSize));
+                        } else if (unit == "month") {
+                            d.setMonth(floorInBase(d.getMonth(), tickSize));
+                        } else if (unit == "quarter") {
+                            d.setMonth(3 * floorInBase(d.getMonth() / 3,
+                                tickSize));
+                        } else if (unit == "year") {
+                            d.setFullYear(floorInBase(d.getFullYear(), tickSize));
+                        }
+
+                        // reset smaller components
+
+                        d.setMilliseconds(0);
+
+                        if (step >= timeUnitSize.minute) {
+                            d.setSeconds(0);
+                        }
+                        if (step >= timeUnitSize.hour) {
+                            d.setMinutes(0);
+                        }
+                        if (step >= timeUnitSize.day) {
+                            d.setHours(0);
+                        }
+                        if (step >= timeUnitSize.day * 4) {
+                            d.setDate(1);
+                        }
+                        if (step >= timeUnitSize.month * 2) {
+                            d.setMonth(floorInBase(d.getMonth(), 3));
+                        }
+                        if (step >= timeUnitSize.quarter * 2) {
+                            d.setMonth(floorInBase(d.getMonth(), 6));
+                        }
+                        if (step >= timeUnitSize.year) {
+                            d.setMonth(0);
+                        }
+
+                        var carry = 0;
+                        var v = Number.NaN;
+                        var prev;
+
+                        do {
+
+                            prev = v;
+                            v = d.getTime();
+                            ticks.push(v);
+
+                            if (unit == "month" || unit == "quarter") {
+                                if (tickSize < 1) {
+
+                                    // a bit complicated - we'll divide the
+                                    // month/quarter up but we need to take
+                                    // care of fractions so we don't end up in
+                                    // the middle of a day
+
+                                    d.setDate(1);
+                                    var start = d.getTime();
+                                    d.setMonth(d.getMonth() +
+                                        (unit == "quarter" ? 3 : 1));
+                                    var end = d.getTime();
+                                    d.setTime(v + carry * timeUnitSize.hour + (end - start) * tickSize);
+                                    carry = d.getHours();
+                                    d.setHours(0);
+                                } else {
+                                    d.setMonth(d.getMonth() +
+                                        tickSize * (unit == "quarter" ? 3 : 1));
+                                }
+                            } else if (unit == "year") {
+                                d.setFullYear(d.getFullYear() + tickSize);
+                            } else {
+                                d.setTime(v + step);
+                            }
+                        } while (v < axis.max && v != prev);
+
+                        return ticks;
+                    };
+
+                    axis.tickFormatter = function(v, axis) {
+
+                        var d = dateGenerator(v, axis.options);
+
+                        // first check global format
+
+                        if (opts.timeformat != null) {
+                            return formatDate(d, opts.timeformat, opts.monthNames, opts.dayNames);
+                        }
+
+                        // possibly use quarters if quarters are mentioned in
+                        // any of these places
+
+                        var useQuarters = (axis.options.tickSize &&
+                                axis.options.tickSize[1] == "quarter") ||
+                            (axis.options.minTickSize &&
+                                axis.options.minTickSize[1] == "quarter");
+
+                        var t = axis.tickSize[0] * timeUnitSize[axis.tickSize[1]];
+                        var span = axis.max - axis.min;
+                        var suffix = (opts.twelveHourClock) ? " %p" : "";
+                        var hourCode = (opts.twelveHourClock) ? "%I" : "%H";
+                        var fmt;
+
+                        if (t < timeUnitSize.minute) {
+                            fmt = hourCode + ":%M:%S" + suffix;
+                        } else if (t < timeUnitSize.day) {
+                            if (span < 2 * timeUnitSize.day) {
+                                fmt = hourCode + ":%M" + suffix;
+                            } else {
+                                fmt = "%b %d " + hourCode + ":%M" + suffix;
+                            }
+                        } else if (t < timeUnitSize.month) {
+                            fmt = "%b %d";
+                        } else if ((useQuarters && t < timeUnitSize.quarter) ||
+                            (!useQuarters && t < timeUnitSize.year)) {
+                            if (span < timeUnitSize.year) {
+                                fmt = "%b";
+                            } else {
+                                fmt = "%b %Y";
+                            }
+                        } else if (useQuarters && t < timeUnitSize.year) {
+                            if (span < timeUnitSize.year) {
+                                fmt = "Q%q";
+                            } else {
+                                fmt = "Q%q %Y";
+                            }
+                        } else {
+                            fmt = "%Y";
+                        }
+
+                        var rt = formatDate(d, fmt, opts.monthNames, opts.dayNames);
+
+                        return rt;
+                    };
+                }
+            });
+        });
+    }
+
+    $.plot.plugins.push({
+        init: init,
+        options: options,
+        name: 'time',
+        version: '1.0'
+    });
+
+    // Time-axis support used to be in Flot core, which exposed the
+    // formatDate function on the plot object.  Various plugins depend
+    // on the function, so we need to re-expose it here.
+
+    $.plot.formatDate = formatDate;
+    $.plot.dateGenerator = dateGenerator;
 
 })(jQuery);
 
