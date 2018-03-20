@@ -63,6 +63,13 @@ if (typeof feedview === "undefined") {
                 type: "boolean",
             },
             {
+                name: "color",
+                display_name: "FeedLine Colors",
+                type: "text",
+                default_value: "",
+                "description": "enter the color set separated by comma e.g. #ff0000,#00ff00,#0000ff or leave blank for the default color set"
+            },
+            {
                 name: "baseline",
                 display_name: "Baseline",
                 type: "text",
@@ -70,8 +77,8 @@ if (typeof feedview === "undefined") {
                 "description": "enter the baseline set separated by comma e.g. 20,50 or leave blank"
             },
             {
-                name: "color",
-                display_name: "Line Colors",
+                name: "baselinecolor",
+                display_name: "Baseline Colors",
                 type: "text",
                 default_value: "",
                 "description": "enter the color set separated by comma e.g. #ff0000,#00ff00,#0000ff or leave blank for the default color set"
@@ -208,7 +215,9 @@ if (typeof feedview === "undefined") {
                     filter: currentSettings.filter,
                     autogap: currentSettings.autogap,
                     baseline: currentSettings.baseline,
-                    fill: currentSettings.fill,
+                    feedlinecolor: currentSettings.color,
+                    baselinecolor:currentSettings.baselinecolor,
+                    fill:currentSettings.fill
                 }
                 // jQuery(window).ready(function() {
                 updateChart('chart' + self.widgetID, self.valuejson, self.option);
