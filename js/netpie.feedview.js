@@ -87,7 +87,8 @@ function updateChart(chartDIV, datajson, option) {
     var yaxes = []
     var maxY = [];
     var minY = [];
-    var color;
+    var feedlinecolor;
+    var baselinecolor;
     var width = { "1": "300", "2": "620", "3": "940" }
     var curWidth = $("#" + chartDIV).parent().parent().parent().parent().attr('data-sizex');
     var curHeight = $("#" + chartDIV).parent().parent().parent().parent().attr('data-sizey');
@@ -149,16 +150,30 @@ function updateChart(chartDIV, datajson, option) {
                 radius: 2,
                 fillColor: colorpoint
             };
-            if (option.color.replace(/ /g, '').split(',').length != 0 && option.color.replace(/ /g, '').split(',')[0].trim() != "") {
-                color = option.color.replace(/ /g, '').split(',');
-            } else { color = DEFAULTCOLOR }
+            if (option.feedlinecolor !== undefined) {
+                if (option.feedlinecolor.replace(/ /g, '').split(',').length != 0 && option.feedlinecolor.replace(/ /g, '').split(',')[0].trim() != "") {
+                    feedlinecolor = option.feedlinecolor.replace(/ /g, '').split(',');
+                } else {
+                    feedlinecolor = DEFAULTCOLOR
+                }
+            } else {
+                feedlinecolor = DEFAULTCOLOR
+            }
             if (option.baseline !== undefined) {
                 if (option.baseline.replace(/ /g, '').split(',').length != 0 && option.baseline.replace(/ /g, '').split(',')[0].trim() != "") {
                     baseline = option.baseline.replace(/ /g, '').split(',');
                 }
             }
+            if (option.baselinecolor !== undefined) {
+                if (option.baselinecolor.replace(/ /g, '').split(',').length != 0 && option.baselinecolor.replace(/ /g, '').split(',')[0].trim() != "") {
+                    baselinecolor = option.baselinecolor.replace(/ /g, '').split(',');
+                } else {
+                    baselinecolor = DEFAULTCOLOR
+                }
+            } else {
+                baselinecolor = DEFAULTCOLOR
+            }
         }
-
         $('#' + chartDIV).css({
             width: widthDiv,
             position: "relative"
@@ -177,11 +192,11 @@ function updateChart(chartDIV, datajson, option) {
                 filter = option.filter.replace(/ /g, '').split(',');
             }
         }
-        var colori = [];
+        var feedlinecolori = [];
         var chartdata = [];
         var count = 0;
         if (datajson) {
-            var numcolor = color.length;
+            var numcolor = feedlinecolor.length;
             var fill = false;
             if (option.fill !== undefined) {
                 fill = option.fill ? true : false
@@ -191,7 +206,6 @@ function updateChart(chartDIV, datajson, option) {
                     unit[unit.length] = [datajson.data[i].attr, datajson.data[i].unit];
                     var maxi;
                     var mini;
-                    var test = 0;
                     var s = {};
 
                     if (option.type !== undefined) {
@@ -329,9 +343,9 @@ function updateChart(chartDIV, datajson, option) {
                             }
                             chartdata[count] = s;
                             if (count + 1 > numcolor) {
-                                colori[count] = color[i % numcolor];
+                                feedlinecolori[count] = feedlinecolor[i % numcolor];
                             } else {
-                                colori[count] = color[filter.indexOf(datajson.data[i].attr)]
+                                feedlinecolori[count] = feedlinecolor[filter.indexOf(datajson.data[i].attr)]
                             }
                             count = count + 1;
                         }
@@ -375,10 +389,10 @@ function updateChart(chartDIV, datajson, option) {
                             }
                         }
                         chartdata.push(s);
-                        if (count >= color.length) {
-                            colori[colori.length] = color[i % numcolor];
+                        if (count >= feedlinecolor.length) {
+                            feedlinecolori[feedlinecolori.length] = feedlinecolor[i % numcolor];
                         } else {
-                            colori[count] = color[count]
+                            feedlinecolori[count] = feedlinecolor[count]
                         }
                         count = count + 1;
                     }
@@ -390,23 +404,46 @@ function updateChart(chartDIV, datajson, option) {
                 count = count + 1;
             }
         }
-
         for (var i = 0; i < count; i++) {
             if (option !== undefined && option.multipleaxis !== undefined && option.multipleaxis != true) {
-                var minYi = (Math.min.apply(Math, minY)) - 1;
+                var minYi = (Math.min.apply(Math, minY.concat(baseline))) - 1;
                 if (option.yzero) {
-                    if ((Math.min.apply(Math, minY)) > 0) {
+                    if ((Math.min.apply(Math, minY.concat(baseline))) > 0) {
                         minYi = 0;
                     }
                 }
                 if (i + 1 == count) {
-                    yaxes[yaxes.length] = { font: { size: 11, style: "", weight: "bold", family: "sans-serif", variant: "small-caps", color: "black" }, max: Math.max.apply(Math, maxY) + 1, min: minYi, class: "oneyaxis" };
+                    yaxes[yaxes.length] = {
+                        font: {
+                            size: 11,
+                            style: "",
+                            weight: "normal",
+                            family: "Trebuchet, Arial, sans-serif",
+                            variant: "small-caps",
+                            color: "black"
+                        },
+                        max: Math.max.apply(Math, maxY.concat(baseline)) + 1,
+                        min: minYi,
+                        class: "oneyaxis"
+                    };
                 } else {
-                    yaxes[yaxes.length] = { show: false, min: minYi, max: Math.max.apply(Math, maxY) + 1 };
+                    yaxes[yaxes.length] = {
+                        show: false,
+                        min: minYi,
+                        max: Math.max.apply(Math, maxY.concat(baseline)) + 1
+                    };
                 }
-
             } else {
-                yaxes[yaxes.length] = { font: { size: 11, style: "", weight: "bold", family: "sans-serif", variant: "small-caps", color: colori[i] } };
+                yaxes[yaxes.length] = {
+                    font: {
+                        size: 11,
+                        style: "",
+                        weight: "normal",
+                        family: "Trebuchet, Arial, sans-serif",
+                        variant: "small-caps",
+                        color: feedlinecolori[i]
+                    }
+                };
                 if (count <= 1) {
                     if (np_theme == "default" || np_theme === "undefined") {
                         yaxes[yaxes.length - 1].font.color = "white";
@@ -415,7 +452,7 @@ function updateChart(chartDIV, datajson, option) {
                     }
                 }
                 if (option.yzero) {
-                    var minYi = Math.min.apply(Math, minY);
+                    var minYi = Math.min.apply(Math, minY.concat(baseline));
                     if (minYi > 0) {
                         minYi = 0;
                     }
@@ -440,6 +477,8 @@ function updateChart(chartDIV, datajson, option) {
             position: "absolute",
             textAlign: "center",
         }).appendTo("#" + chartDIV);
+        var baselinecolori = [];
+        var baselinecolorcount = 0;
         if (baseline.length != 0) {
             var first = chartdata[0]["data"][0][0];
             var last = chartdata[0]["data"][chartdata[0]["data"].length - 1][0];
@@ -451,6 +490,7 @@ function updateChart(chartDIV, datajson, option) {
                     last = chartdata[i]["data"][chartdata[0]["data"].length - 1][0];
                 }
             }
+            var numcolor = baselinecolor.length;
             for (var i = 0; i <= baseline.length - 1; i++) {
                 var baselinedata = {
                     data: [
@@ -460,14 +500,15 @@ function updateChart(chartDIV, datajson, option) {
                     lines: { show: true, fill: false }
                 }
                 chartdata.push(baselinedata)
-                if (count >= color.length) {
-                    colori[colori.length] = color[i % numcolor];
+                if (baselinecolorcount >= baselinecolor.length) {
+                    baselinecolori[baselinecolori.length] = baselinecolor[i % numcolor];
                 } else {
-                    colori[count] = color[count]
+                    baselinecolori[baselinecolorcount] = baselinecolor[baselinecolorcount]
                 }
-                count = count + 1;
+                baselinecolorcount = baselinecolorcount + 1;
             }
         }
+        var linecolor = feedlinecolori.concat(baselinecolori);
         var plot = $.plot("#" + chartDIV + "_graph", chartdata, {
             legend: {
                 show: true,
@@ -491,7 +532,7 @@ function updateChart(chartDIV, datajson, option) {
                 clickable: false
             },
             yaxes: yaxes,
-            color: colori,
+            color: linecolor,
             xaxis: {
                 mode: "time",
                 timezone: "browser",
