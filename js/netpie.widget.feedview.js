@@ -9,41 +9,39 @@ if (typeof feedview === "undefined") {
 (function() {
 
     freeboard.loadWidgetPlugin({
-        "type_name"   : "FeedView",
+        "type_name": "FeedView",
         "display_name": "FeedView",
-        "description" : "",
-        "fill_size" : true,
-        "external_scripts" : [
+        "description": "",
+        "fill_size": true,
+        "external_scripts": [
             "js/netpie.feedview.js"
         ],
-        "settings"  : [
-            {
-                 "name"        : "title",
-                 "display_name": "Title",
-                 "type"        : "text"
+        "settings": [{
+                "name": "title",
+                "display_name": "Title",
+                "type": "text"
             },
             {
-                "name"          : "datasource",
-                "display_name"  : "Data Source",
-                "type"          : "calculated",
-                "description"   : ""
+                "name": "datasource",
+                "display_name": "Data Source",
+                "type": "calculated",
+                "description": ""
             },
             {
                 name: "filter",
                 display_name: "Filter",
                 type: "text",
-                "description" : "Data fields separated with comma e.g. temp,humid,light. Blank means display all fields."
+                "description": "Data fields separated with comma e.g. temp,humid,light. Blank means display all fields."
             },
             {
                 name: "type",
                 display_name: "Type of Chart",
                 type: "option",
-                options:[
-                    {
+                options: [{
                         name: "Line",
                         value: "line"
                     },
-                     {
+                    {
                         name: "Step",
                         value: "step"
                     }
@@ -65,11 +63,24 @@ if (typeof feedview === "undefined") {
                 type: "boolean",
             },
             {
+                name: "baseline",
+                display_name: "Baseline",
+                type: "text",
+                default_value: "",
+                "description": "enter the baseline set separated by comma e.g. 20,50 or leave blank"
+            },
+            {
                 name: "color",
                 display_name: "Line Colors",
                 type: "text",
                 default_value: "",
                 "description": "enter the color set separated by comma e.g. #ff0000,#00ff00,#0000ff or leave blank for the default color set"
+            },
+            {
+                name: "fill",
+                display_name: "Fill",
+                type: "boolean",
+                default_value: false
             },
             {
                 name: "marker",
@@ -93,12 +104,11 @@ if (typeof feedview === "undefined") {
                 name: "height_block",
                 display_name: "Height Blocks",
                 type: "option",
-                options:[
-                    {
+                options: [{
                         name: "4",
                         value: "240"
                     },
-                     {
+                    {
                         name: "5",
                         value: "300"
                     },
@@ -126,27 +136,27 @@ if (typeof feedview === "undefined") {
             },
 
         ],
-        newInstance   : function(settings, newInstanceCallback) {
+        newInstance: function(settings, newInstanceCallback) {
             newInstanceCallback(new feedviewWidgetPlugin(settings));
         }
     });
 
     var feedviewWidgetPlugin = function(settings) {
         var self = this;
-        var sizeWidth = {"240":"4","300":"5","360":"6","420":"7","480":"8","540":"9","600":"10"};
+        var sizeWidth = { "240": "4", "300": "5", "360": "6", "420": "7", "480": "8", "540": "9", "600": "10" };
         self.widgetID = randomString(16);
         var currentSettings = settings;
-        var feedviewElement = $("<div id=\"chart"+self.widgetID+"\"></div>");
+        var feedviewElement = $("<div id=\"chart" + self.widgetID + "\"></div>");
         self.render = function(containerElement) {
             currentSettings.height = sizeWidth[currentSettings.height_block];
             $(containerElement).append(feedviewElement);
             feedviewElement.css({
-                height:currentSettings.height_block+"px",
+                height: currentSettings.height_block + "px",
             });
         }
 
-        this.getHeight = function () {
-            if(currentSettings.height===undefined){
+        this.getHeight = function() {
+            if (currentSettings.height === undefined) {
                 currentSettings.height = 4;
             }
             return Number(currentSettings.height);
@@ -164,44 +174,46 @@ if (typeof feedview === "undefined") {
 
         self.onDispose = function() {
             for (var i = feedview.length - 1; i >= 0; i--) {
-                if(self.widgetID==feedview[i].id){
+                if (self.widgetID == feedview[i].id) {
                     check = true;
                     index = i;
                 }
             }
-            if(!check){
+            if (!check) {
                 feedview.remove(i);
             }
         }
 
         //this.onSettingsChanged(settings);
 
-        freeboard.on('theme_changed',function() {
-            updateChart('chart'+self.widgetID,self.valuejson,self.option);
+        freeboard.on('theme_changed', function() {
+            updateChart('chart' + self.widgetID, self.valuejson, self.option);
         });
 
-        var insertFeedView =function() {
+        var insertFeedView = function() {
             currentSettings.height = sizeWidth[currentSettings.height_block];
-            $("#"+'chart'+self.widgetID).css({
-                height:currentSettings.height_block+"px",
+            $("#" + 'chart' + self.widgetID).css({
+                height: currentSettings.height_block + "px",
             });
-            if(self.valuejson!==undefined){
+            if (self.valuejson !== undefined) {
                 self.option = {
-                    title : currentSettings.title,
-                    xaxis : currentSettings.xaxis,
-                    yaxis : currentSettings.yaxis,
-                    multipleaxis : currentSettings.multipleaxis,
-                    yzero:currentSettings.yzero,
-                    color:currentSettings.color,
-                    type : currentSettings.type, //line,step
-                    marker : currentSettings.marker, //true,false
-                    filter : currentSettings.filter,
-                    autogap : currentSettings.autogap
+                    title: currentSettings.title,
+                    xaxis: currentSettings.xaxis,
+                    yaxis: currentSettings.yaxis,
+                    multipleaxis: currentSettings.multipleaxis,
+                    yzero: currentSettings.yzero,
+                    color: currentSettings.color,
+                    type: currentSettings.type, //line,step
+                    marker: currentSettings.marker, //true,false
+                    filter: currentSettings.filter,
+                    autogap: currentSettings.autogap,
+                    baseline: currentSettings.baseline,
+                    fill: currentSettings.fill,
                 }
                 // jQuery(window).ready(function() {
-                updateChart('chart'+self.widgetID,self.valuejson,self.option);
+                updateChart('chart' + self.widgetID, self.valuejson, self.option);
                 // });
             }
-        }        
+        }
     }
 }());
