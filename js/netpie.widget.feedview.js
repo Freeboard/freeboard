@@ -84,6 +84,20 @@ if (typeof feedview === "undefined") {
                 "description": "enter the color set separated by comma e.g. #ff0000,#00ff00,#0000ff or leave blank for the default color set"
             },
             {
+                name: "typebaseline",
+                display_name: "Type of Baseline",
+                type: "option",
+                options: [{
+                        name: "Solid",
+                        value: "solid"
+                    },
+                    {
+                        name: "Dash",
+                        value: "dash"
+                    }
+                ]
+            },
+            {
                 name: "fill",
                 display_name: "Fill",
                 type: "boolean",
@@ -216,8 +230,9 @@ if (typeof feedview === "undefined") {
                     autogap: currentSettings.autogap,
                     baseline: currentSettings.baseline,
                     feedlinecolor: currentSettings.color,
-                    baselinecolor:currentSettings.baselinecolor,
-                    fill:currentSettings.fill
+                    baselinecolor: currentSettings.baselinecolor,
+                    fill: currentSettings.fill,
+                    typebaseline: currentSettings.typebaseline
                 }
                 // jQuery(window).ready(function() {
                 updateChart('chart' + self.widgetID, self.valuejson, self.option);
