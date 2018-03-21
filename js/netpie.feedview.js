@@ -96,6 +96,7 @@ function updateChart(chartDIV, datajson, option) {
     var widthDiv = width[curWidth] + "px";
     var unit = [];
     var baseline = [];
+    var dash = false;
     if ($("#" + chartDIV).find("#" + chartDIV + "_graph").length > 0) {
         oldgraph = document.getElementById(chartDIV).innerHTML;
         $("#" + chartDIV).empty();
@@ -172,6 +173,11 @@ function updateChart(chartDIV, datajson, option) {
                 }
             } else {
                 baselinecolor = DEFAULTCOLOR
+            }
+            if (option.typebaseline !== undefined) {
+                if (option.typebaseline == "dash") {
+                    dash = true;
+                }
             }
         }
         $('#' + chartDIV).css({
@@ -497,7 +503,7 @@ function updateChart(chartDIV, datajson, option) {
                         [first, baseline[i]],
                         [last, baseline[i]]
                     ],
-                    lines: { show: true, fill: false }
+                    lines: { show: true, fill: false , dash:dash}
                 }
                 chartdata.push(baselinedata)
                 if (baselinecolorcount >= baselinecolor.length) {
@@ -3075,6 +3081,9 @@ Licensed under the MIT license.
 
                     prevx = x2;
                     prevy = y2;
+                    if(series.lines.dash){ 
+                        ctx.setLineDash([15, 15]);
+                    }
                     ctx.lineTo(axisx.p2c(x2) + xoffset, axisy.p2c(y2) + yoffset);
                 }
                 ctx.stroke();
