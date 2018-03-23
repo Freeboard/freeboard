@@ -74,7 +74,7 @@ if (typeof feedview === "undefined") {
                 display_name: "Baseline",
                 type: "text",
                 default_value: "",
-                "description": "enter the baseline set separated by comma e.g. 20,50 or leave blank"
+                "description": "enter the baseline set separated by comma e.g. 20,50 or leave blank. NOTE : Feedview will show Baseline when have only one y-axis"
             },
             {
                 name: "baselinecolor",
