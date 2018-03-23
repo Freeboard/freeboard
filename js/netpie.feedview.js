@@ -97,6 +97,8 @@ function updateChart(chartDIV, datajson, option) {
     var unit = [];
     var baseline = [];
     var dash = false;
+    var showbaseline = false;
+    var multipleaxis = false;
     if ($("#" + chartDIV).find("#" + chartDIV + "_graph").length > 0) {
         oldgraph = document.getElementById(chartDIV).innerHTML;
         $("#" + chartDIV).empty();
@@ -440,6 +442,7 @@ function updateChart(chartDIV, datajson, option) {
                     };
                 }
             } else {
+                multipleaxis = true;
                 yaxes[yaxes.length] = {
                     font: {
                         size: 11,
@@ -483,9 +486,12 @@ function updateChart(chartDIV, datajson, option) {
             position: "absolute",
             textAlign: "center",
         }).appendTo("#" + chartDIV);
+        if (multipleaxis == false || count==1) {
+            showbaseline = true;
+        }
         var baselinecolori = [];
         var baselinecolorcount = 0;
-        if (baseline.length != 0) {
+        if (baseline.length != 0 && showbaseline==true) {
             var first = chartdata[0]["data"][0][0];
             var last = chartdata[0]["data"][chartdata[0]["data"].length - 1][0];
             for (var i = 0; i <= chartdata.length - 1; i++) {
