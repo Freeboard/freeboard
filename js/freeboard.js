@@ -56,7 +56,7 @@ DatasourceModel = function(theFreeboardModel, datasourcePlugins) {
 			}
 
 			// Do we need to load any external scripts?
-			if(datasourceType.external_scripts)
+			if(datasourceType.external_scripts && datasourceType.external_scripts.length > 0)
 			{
 				head.js(datasourceType.external_scripts.slice(0), finishLoad); // Need to clone the array because head.js adds some weird functions to it
 			}
