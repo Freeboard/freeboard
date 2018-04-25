@@ -31,3 +31,4 @@
 00 01 * * 2,5  (. $HOME/.profile;/var/www/htdocs/sales/salesconnect/batch/RTC_35701/rtc_35701_master.ksh) >/var/log/httpd/rtc_35701.out 2>&1
 0,30 * * * * (. ~/.profile; umask 002; cd /var/www/htdocs/sales/salesconnect/batch/v10bulk/dse; php job.php ) > /var/log/httpd/v10bulk.log
 * * * * * /var/www/htdocs/sales/salesconnect/batch/RTC_32913/rtc_32913_master.ksh >> /var/log/httpd/espush.log 2>&1
+* * * * * (. $HOME/.profile; cd /var/www/htdocs/sales/salesconnect/custom/cli && php cli.php task=ESAPusher) > /dev/null 2>&1 # RTC_123001: Support ESA project Skyline with quick roadmap integration
