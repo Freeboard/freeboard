@@ -1,0 +1,287 @@
+{
+	"version": 1,
+	"allow_edit": true,
+	"plugins": [],
+	"panes": [
+		{
+			"title": "SVT6",
+			"width": 1,
+			"row": {
+				"3": 1,
+				"4": 1
+			},
+			"col": {
+				"3": 1,
+				"4": 3
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "html",
+					"settings": {
+						"html": "var last_update = '';\nvar bgcolor = \"green\";\nvar status = \"Unknown\";\nvar name = \"SVT6Data\";\nif (datasources[name][\"status\"] == 'NG' || datasources[name][\"status\"] == 'WARN' ) {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n} else if(datasources[name][\"data\"]) {\n    status = datasources[name][\"data\"][\"status\"];\n    last_update = datasources[name][\"last_update\"];\n} else {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n}\nif (status == 'Upgrading') {\n    bgcolor = 'GoldenRod';\n} else if (status != 'Normal') {\n    bgcolor = \"red\";\n}\nvar last_update = datasources[\"SVT6Data\"][\"last_update\"];\nvar body = '<div style=\"vertical-align: middle;color:white;text-align:center;background-color:'+bgcolor+';font-weight:999;font-size:30px;line-height:120px;height:240px;width:100%;\">';\nbody += \"<div style='margin:auto;'>\"+status+\"</div>\";\nbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:16px;line-height:20px;width:100%;\">';\nbody += datasources[\"SVT6Data\"][\"last_update\"];\nbody += '</div>'\nbody += '</div>';\nreturn body;",
+						"height": 3
+					}
+				},
+				{
+					"type": "gauge",
+					"settings": {
+						"title": "Progress",
+						"value": "datasources[\"SVT6Data\"][\"data\"][\"progress\"]",
+						"min_value": 0,
+						"max_value": 100
+					}
+				}
+			]
+		},
+		{
+			"title": "Optimizer",
+			"width": 1,
+			"row": {
+				"3": 1,
+				"4": 1
+			},
+			"col": {
+				"3": 2,
+				"4": 2
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "html",
+					"settings": {
+						"html": "var status = datasources[\"Optimizer\"][\"data\"][\"status\"];\nvar bgcolor = \"green\";\nif (datasources[\"Optimizer\"][\"status\"] == 'NG') {\n    bgcolor = \"red\";\n}\nif (status == 'Upgrading') {\n    bgcolor = 'GoldenRod';\n}\nif (status == 'Drifting') {\n    bgcolor = 'red';\n}\nvar last_update = datasources[\"Optimizer\"][\"last_update\"];\nvar body = '<div style=\"vertical-align: middle;color:white;text-align:center;background-color:'+bgcolor+';font-weight:999;font-size:30px;line-height:120px;height:240px;width:100%;\">';\nbody += \"<div style='margin:auto;'>\"+status+\"</div>\";\nbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:16px;line-height:20px;width:100%;\">';\nbody += datasources[\"Optimizer\"][\"last_update\"];\nbody += '</div>'\nbody += '</div>';\nreturn body;",
+						"height": 3
+					}
+				}
+			]
+		},
+		{
+			"title": "SVT5",
+			"width": 1,
+			"row": {
+				"3": 1,
+				"4": 1
+			},
+			"col": {
+				"3": 3,
+				"4": 4
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "html",
+					"settings": {
+						"html": "var last_update = '';\nvar bgcolor = \"green\";\nvar status = \"Unknown\";\nvar name = \"SVT5\";\nif (datasources[\"SVT5\"][\"status\"] == 'NG' || datasources[\"SVT5\"][\"status\"] == 'WARN' ) {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n} else if(datasources[\"SVT5\"][\"data\"]) {\n    status = datasources[\"SVT5\"][\"data\"][\"status\"];\n    last_update = datasources[\"SVT5\"][\"last_update\"];\n} else {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n}\nif (status == 'Upgrading') {\n    bgcolor = 'GoldenRod';\n} else if (status != 'Normal') {\n    bgcolor = \"red\";\n}\n\nvar body = '<div style=\"vertical-align: middle;color:white;text-align:center;background-color:'+bgcolor+';font-weight:999;font-size:30px;line-height:120px;height:240px;width:100%;\">';\nbody += \"<div style='margin:auto;'>\"+status+\"</div>\";\nbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:16px;line-height:20px;width:100%;\">';\nbody += last_update;\nbody += '</div>'\nbody += '</div>';\nreturn body;",
+						"height": 3
+					}
+				},
+				{
+					"type": "gauge",
+					"settings": {
+						"title": "Progress",
+						"value": "var progress = 0;\t\nif(datasources[\"SVT5\"][\"data\"] && datasources[\"SVT5\"][\"data\"][\"progress\"])\n{\n    progress=datasources[\"SVT5\"][\"data\"][\"progress\"];\n} \n\nif (datasources[\"SVT5\"][\"data\"] && datasources[\"SVT5\"][\"data\"][\"status\"] && datasources[\"SVT5\"][\"data\"][\"status\"] == 'Normal') {\n    progress = 100;\n}\nreturn progress;",
+						"min_value": 0,
+						"max_value": 100
+					}
+				}
+			]
+		},
+		{
+			"title": "SVT4 Status",
+			"width": 1,
+			"row": {
+				"3": 9,
+				"4": 9
+			},
+			"col": {
+				"3": 2,
+				"4": 2
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "html",
+					"settings": {
+						"html": "var last_update = '';\nvar bgcolor = \"green\";\nvar status = \"Unknown\";\nvar name = \"SVT4\";\nif (datasources[\"SVT4\"][\"status\"] == 'NG' || datasources[\"SVT4\"][\"status\"] == 'WARN' ) {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n} else if(datasources[\"SVT4\"][\"data\"]) {\n    status = datasources[\"SVT4\"][\"data\"][\"status\"];\n    last_update = datasources[\"SVT4\"][\"last_update\"];\n} else {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n}\nif (status == 'Upgrading') {\n    bgcolor = 'GoldenRod';\n} else if (status != 'Normal') {\n    bgcolor = \"red\";\n}\n\nvar body = '<div style=\"vertical-align: middle;color:white;text-align:center;background-color:'+bgcolor+';font-weight:999;font-size:30px;line-height:120px;height:240px;width:100%;\">';\nbody += \"<div style='margin:auto;'>\"+status+\"</div>\";\nbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:16px;line-height:20px;width:100%;\">';\nbody += last_update;\nbody += '</div>'\nbody += '</div>';\nreturn body;",
+						"height": 3
+					}
+				}
+			]
+		},
+		{
+			"title": "Upcoming release",
+			"width": 1,
+			"row": {
+				"3": 15,
+				"4": 5
+			},
+			"col": {
+				"3": 1,
+				"4": 1
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "html",
+					"settings": {
+						"html": "var next = datasources[\"Milestone\"][\"data\"][\"next\"];\nvar body = '<div style=\"vertical-align: middle;color:white;text-align:center;background-color:GoldenRod;font-weight:999;font-size:30px;line-height:60px;width:100%;\">';\nbody += next+\"</div>\";\nreturn body;",
+						"height": 1
+					}
+				}
+			]
+		},
+		{
+			"title": "RTC",
+			"width": 1,
+			"row": {
+				"3": 15,
+				"4": 9
+			},
+			"col": {
+				"3": 3,
+				"4": 1
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "html",
+					"settings": {
+						"html": "var blocker = datasources[\"RTC\"][\"data\"][\"blocker\"];\nvar critical = datasources[\"RTC\"][\"data\"][\"critical\"];\nvar normal = datasources[\"RTC\"][\"data\"][\"normal\"];\nvar body = '<div style=\"vertical-align: middle;color:white;text-align:left;background-color:FireBrick;font-weight:999;font-size:30px;line-height:60px;width:100%;\">';\nbody += '<div style=\"width:50%;padding-left:20px;float:left;\">Blockers:</div>';\nbody += '<div style=\"width:50%;display:inline;\">'+blocker+'</div>';\nbody += '</div>';\nbody += '<div style=\"vertical-align: middle;color:white;text-align:left;background-color:red;font-weight:999;font-size:25px;line-height:60px;width:100%;\">';\nbody += '<div style=\"width:50%;padding-left:20px;float:left;\">Criticals:</div>';\nbody += '<div style=\"width:50%;display:inline;\">'+critical+'</div>';\nbody += '</div>';\nbody += '<div style=\"vertical-align: middle;color:white;text-align:left;background-color:gray;font-weight:999;font-size:20px;line-height:60px;width:100%;\">';\nbody += '<div style=\"width:50%;padding-left:20px;float:left;\">Normal:</div>';\nbody += '<div style=\"width:50%;display:inline;\">'+normal+'</div>';\nbody += '</div>';\nreturn body;",
+						"height": 3
+					}
+				}
+			]
+		},
+		{
+			"title": "Ongoing release",
+			"width": 1,
+			"row": {
+				"3": 19,
+				"4": 1,
+				"5": 1
+			},
+			"col": {
+				"3": 1,
+				"4": 1,
+				"5": 1
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "html",
+					"settings": {
+						"html": "var current = datasources[\"Milestone\"][\"data\"][\"current\"];\nvar body = '<div style=\"vertical-align: middle;color:white;text-align:center;background-color:green;font-weight:999;font-size:30px;line-height:60px;width:100%;\">';\nbody += current+\"</div>\";\nreturn body;",
+						"height": 1
+					}
+				}
+			]
+		},
+		{
+			"title": "JOB STATUS",
+			"width": 1,
+			"row": {
+				"3": 23,
+				"4": 17
+			},
+			"col": {
+				"3": 1,
+				"4": 1
+			},
+			"col_width": 4,
+			"widgets": [
+				{
+					"type": "text_widget",
+					"settings": {
+						"title": "CURRENT TIME",
+						"size": "regular",
+						"value": "datasources[\"JOBS\"][\"GMTDT\"]",
+						"animate": true
+					}
+				},
+				{
+					"type": "html",
+					"settings": {
+						"html": "var last10MinsJobs = datasources[\"JOBS\"][\"last10MinsJobs\"];\nvar currentJobs  = datasources[\"JOBS\"][\"currentJobs\"];\nvar next10MinusJobs = datasources[\"JOBS\"][\"next10MinusJobs\"];\nvar attribute = \"\";\nvar display = \"<div style='padding: 5px 10px;'>\";\n\ndisplay += \"<div style='line-height:30px;font-size:20px;weight:999;background-color:green;color:white;'>Current jobs:</div>\";\ndisplay += \"<div style='line-height:30px;font-size:16px;background-color:green;color:white;'><ol>\";\nfor(attribute  in currentJobs){   \n    display += \"<li title='\"+currentJobs[attribute]+\"'>\" + currentJobs[attribute] + \"</li>\";\n}\ndisplay += \"</ol></div>\";\n\ndisplay += \"<div style='line-height:30px;font-size:20px;weight:999;'>Jobs in next 10 mins:</div>\";\ndisplay += \"<div style='line-height:30px;'><ol>\";\nfor(attribute  in next10MinusJobs){ \n    display += \"<li title='\"+next10MinusJobs[attribute]+\"'>\" + next10MinusJobs[attribute] + \"</li>\";\n}\ndisplay += \"</ol></div>\";\n\ndisplay += \"<div style='line-height:30px;font-size:20px;weight:999;'>Jobs in last 10 mins:</div>\";\ndisplay += \"<div style='line-height:30px;'><ol>\";\nfor(attribute  in last10MinsJobs){\n    display += \"<li title='\"+last10MinsJobs[attribute]+\"'>\" + last10MinsJobs[attribute] + \"</li>\";\n}\ndisplay += \"</ol></div>\";\n\ndisplay += \"</div>\";\nreturn display;",
+						"height": 10
+					}
+				}
+			]
+		}
+	],
+	"datasources": [
+		{
+			"name": "SVT6Data",
+			"type": "JSON",
+			"settings": {
+				"url": "http://scmonitor.rtp.raleigh.ibm.com:8000/api/data.php?name=SVT6",
+				"use_thingproxy": false,
+				"refresh": 60,
+				"method": "GET"
+			}
+		},
+		{
+			"name": "Optimizer",
+			"type": "JSON",
+			"settings": {
+				"url": "http://scmonitor.rtp.raleigh.ibm.com:8000/api/data.php?name=Optimizer",
+				"use_thingproxy": false,
+				"refresh": 5,
+				"method": "GET",
+				"name": "Optimizer"
+			}
+		},
+		{
+			"name": "SVT5",
+			"type": "JSON",
+			"settings": {
+				"url": "http://scmonitor.rtp.raleigh.ibm.com:8000/api/data.php?name=SVT5",
+				"use_thingproxy": false,
+				"refresh": 5,
+				"method": "GET"
+			}
+		},
+		{
+			"name": "Milestone",
+			"type": "JSON",
+			"settings": {
+				"url": "http://scmonitor.rtp.raleigh.ibm.com:8000/api/data.php?name=milestone",
+				"use_thingproxy": true,
+				"refresh": 3600,
+				"method": "GET"
+			}
+		},
+		{
+			"name": "RTC",
+			"type": "JSON",
+			"settings": {
+				"url": "http://scmonitor.rtp.raleigh.ibm.com:8000/api/data.php?name=RTC",
+				"use_thingproxy": true,
+				"refresh": 3600,
+				"method": "GET"
+			}
+		},
+		{
+			"name": "SVT4",
+			"type": "JSON",
+			"settings": {
+				"url": "http://scmonitor.rtp.raleigh.ibm.com:8000/api/data.php?name=SVT4",
+				"use_thingproxy": true,
+				"refresh": 5,
+				"method": "GET",
+				"name": "SVT4"
+			}
+		},
+		{
+			"name": "JOBS",
+			"type": "JSON",
+			"settings": {
+				"url": "http://scmonitor.rtp.raleigh.ibm.com:8000/api/job_status.php",
+				"use_thingproxy": true,
+				"refresh": 60,
+				"method": "GET"
+			}
+		}
+	],
+	"columns": 4
+}

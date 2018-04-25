@@ -10,8 +10,6 @@ services:
             WEBROOT: /usr/share/nginx/html
         volumes_from:
             - freeboard:ro
-        volumes:
-            - /Users/samuel.li/Documents/projects/freeboard/data:/data
     freeboard:
         image: freeboard
         build: .
