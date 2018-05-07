@@ -11,7 +11,7 @@ services:
         volumes_from:
             - freeboard:ro
         volumes:
-            - /Users/samuel.li/Documents/projects/freeboard/data:/data
+            - /home/docker/freeboard/data:/data
     freeboard:
         image: freeboard
         build: .
