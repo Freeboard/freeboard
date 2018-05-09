@@ -103,10 +103,12 @@
 			"title": "PROD DEFECT STATUS (2 Months)",
 			"width": 1,
 			"row": {
+				"3": 1,
 				"4": 9,
 				"6": 1
 			},
 			"col": {
+				"3": 1,
 				"4": 1,
 				"6": 1
 			},
@@ -184,6 +186,28 @@
 			]
 		},
 		{
+			"title": "CIP",
+			"width": 1,
+			"row": {
+				"3": 15,
+				"4": 15
+			},
+			"col": {
+				"3": 2,
+				"4": 2
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "html",
+					"settings": {
+						"html": "var last_update = '';\nvar bgcolor = \"green\";\nvar status = \"Unknown\";\nvar name = \"CIP\";\nif (datasources[name][\"status\"] == 'NG' || datasources[name][\"status\"] == 'WARN' ) {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n} else if(datasources[name][\"data\"]) {\n    status = datasources[name][\"data\"][\"status\"];\n    last_update = datasources[name][\"last_update\"];\n} else {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n}\nif (status == 'Upgrading') {\n    bgcolor = 'GoldenRod';\n} else if (status != 'Normal') {\n    bgcolor = \"red\";\n}\nvar last_update = datasources[\"CIP\"][\"last_update\"];\nvar body = '<div style=\"vertical-align: middle;color:white;text-align:center;background-color:'+bgcolor+';font-weight:999;font-size:30px;line-height:120px;height:240px;width:100%;\">';\nbody += \"<div style='margin:auto;'>\"+status+\"</div>\";\nbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:16px;line-height:20px;width:100%;\">';\nbody += datasources[\"SVT6Data\"][\"last_update\"];\nbody += '</div>'\nbody += '</div>';\nreturn body;",
+						"height": 3
+					}
+				}
+			]
+		},
+		{
 			"title": "Ongoing release",
 			"width": 1,
 			"row": {
@@ -249,12 +273,14 @@
 		{
 			"width": 1,
 			"row": {
-				"4": 23
+				"4": 23,
+				"5": 23
 			},
 			"col": {
-				"4": 2
+				"4": 3,
+				"5": 2
 			},
-			"col_width": 1,
+			"col_width": 2,
 			"widgets": [
 				{
 					"type": "picture",
@@ -268,38 +294,20 @@
 		{
 			"width": 1,
 			"row": {
-				"4": 23
+				"4": 23,
+				"6": 23
 			},
 			"col": {
-				"4": 3
+				"4": 1,
+				"6": 3
 			},
-			"col_width": 1,
+			"col_width": 2,
 			"widgets": [
 				{
 					"type": "picture",
 					"settings": {
 						"src": "http://sczabbix.rtp.raleigh.ibm.com/zabbix/chart2.php?graphid=5064&screenid=66&width=600&height=300&legend=1&updateProfile=1&profileIdx=web.screens&profileIdx2=66&period=10800&stime=20190509012428",
 						"refresh": 60
-					}
-				}
-			]
-		},
-		{
-			"title": "CIP",
-			"width": 1,
-			"row": {
-				"4": 15
-			},
-			"col": {
-				"4": 2
-			},
-			"col_width": 1,
-			"widgets": [
-				{
-					"type": "html",
-					"settings": {
-						"html": "var last_update = '';\nvar bgcolor = \"green\";\nvar status = \"Unknown\";\nvar name = \"CIP\";\nif (datasources[name][\"status\"] == 'NG' || datasources[name][\"status\"] == 'WARN' ) {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n} else if(datasources[name][\"data\"]) {\n    status = datasources[name][\"data\"][\"status\"];\n    last_update = datasources[name][\"last_update\"];\n} else {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n}\nif (status == 'Upgrading') {\n    bgcolor = 'GoldenRod';\n} else if (status != 'Normal') {\n    bgcolor = \"red\";\n}\nvar last_update = datasources[\"CIP\"][\"last_update\"];\nvar body = '<div style=\"vertical-align: middle;color:white;text-align:center;background-color:'+bgcolor+';font-weight:999;font-size:30px;line-height:120px;height:240px;width:100%;\">';\nbody += \"<div style='margin:auto;'>\"+status+\"</div>\";\nbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:16px;line-height:20px;width:100%;\">';\nbody += datasources[\"SVT6Data\"][\"last_update\"];\nbody += '</div>'\nbody += '</div>';\nreturn body;",
-						"height": 3
 					}
 				}
 			]
