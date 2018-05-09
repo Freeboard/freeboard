@@ -4,28 +4,6 @@
 	"plugins": [],
 	"panes": [
 		{
-			"title": "DEFECT STATUS DETAIL",
-			"width": 1,
-			"row": {
-				"3": 1,
-				"4": 43
-			},
-			"col": {
-				"3": 1,
-				"4": 1
-			},
-			"col_width": 4,
-			"widgets": [
-				{
-					"type": "html",
-					"settings": {
-						"html": "var ds = datasources[\"RTCDATA\"];\nvar htmlContent = \"\";\n\nfunction getValue(_ds, env, range, priority) {\n    if(typeof(_ds[env])!=\"undefined\"\n      && typeof(_ds[env][range])!=\"undefined\"\n      && typeof(_ds[env][range][priority])!=\"undefined\") {\n    \treturn _ds[env][range][priority];\n\t} else {\n        return 0;\n    }\n}\nhtmlContent += \"<style type='text/css'>\";\nhtmlContent += \".clr{clear:both;}\";\nhtmlContent += \".col{float:left;width:130px;} \";\nhtmlContent += \"</style>\";\nhtmlContent += \"<DIV class='clr'>\"+ds[\"summary\"]+\"</DIV>\";\nhtmlContent += \"<div class='clr'>Overall</div>\";\nhtmlContent += \"<div class='clr'>\";\nhtmlContent += \"<div class='col'>\"+\"Production\"+\"</div>\";\nhtmlContent += \"<div class='col'>\"+\"Total\"+\"</div>\";\nhtmlContent += \"<div class='col'>\"+getValue(ds['overall'], \"Production\", \"Total\", \"Blocker\")+\"</div>\";\nhtmlContent += \"<div class='col'>\"+getValue(ds['overall'], \"Production\", \"Total\", \"Critical\")+\"</div>\";\nhtmlContent += \"<div class='col'>\"+getValue(ds['overall'], \"Production\", \"Total\", \"Normal\")+\"</div>\";\nhtmlContent += \"</div>\";\nhtmlContent += \"<div class='clr'>\";\nhtmlContent += \"<div class='col'>&nbsp;</div>\";\nhtmlContent += \"<div class='col'>\"+\"Unresolved\"+\"</div>\";\nhtmlContent += \"<div class='col'>\"+getValue(ds['overall'], \"Production\", \"Unresolved\", \"Blocker\")+\"</div>\";\nhtmlContent += \"<div class='col'>\"+getValue(ds['overall'], \"Production\", \"Unresolved\", \"Critical\")+\"</div>\";\nhtmlContent += \"<div class='col'>\"+getValue(ds['overall'], \"Production\", \"Unresolved\", \"Normal\")+\"</div>\";\nhtmlContent += \"</div>\";\nhtmlContent += \"<div class='clr'>\";\nhtmlContent += \"<div class='col'>\"+\"Others\"+\"</div>\";\nhtmlContent += \"<div class='col'>\"+\"Total\"+\"</div>\";\nhtmlContent += \"<div class='col'>\"+getValue(ds['overall'], \"Others\", \"Total\", \"Blocker\")+\"</div>\";\nhtmlContent += \"<div class='col'>\"+getValue(ds['overall'], \"Others\", \"Total\", \"Critical\")+\"</div>\";\nhtmlContent += \"<div class='col'>\"+getValue(ds['overall'], \"Others\", \"Total\", \"Normal\")+\"</div>\";\nhtmlContent += \"</div>\";\nhtmlContent += \"<div class='clr'>\";\nhtmlContent += \"<div class='col'>&nbsp;</div>\";\nhtmlContent += \"<div class='col'>\"+\"Unresolved\"+\"</div>\";\nhtmlContent += \"<div class='col'>\"+getValue(ds['overall'], \"Others\", \"Unresolved\", \"Blocker\")+\"</div>\";\nhtmlContent += \"<div class='col'>\"+getValue(ds['overall'], \"Others\", \"Unresolved\", \"Critical\")+\"</div>\";\nhtmlContent += \"<div class='col'>\"+getValue(ds['overall'], \"Others\", \"Unresolved\", \"Normal\")+\"</div>\";\nhtmlContent += \"</div>\";\nvar dsSquad = ds[\"squads\"];\nhtmlContent += \"<div class='clr'>Defects on Prod by squads</div>\";\nhtmlContent += \"<div class='clr'>\";\nhtmlContent += \"<div class='col'>Sqaud Name</div>\";\nhtmlContent += \"<div class='col'>Found In</div>\";\nhtmlContent += \"<div class='col'>Range</div>\";\nhtmlContent += \"<div class='col'>Blocker</div>\";\nhtmlContent += \"<div class='col'>Critical</div>\";\nhtmlContent += \"<div class='col'>Other</div>\";\nhtmlContent += \"</div>\";\n\nfor (var squadName in dsSquad) {\n    htmlContent += \"<div class='clr'>\";\n    htmlContent += \"<div class='col'>\"+squadName+\"</div>\";\n    htmlContent += \"<div class='col'>\"+\"Production\"+\"</div>\";\n    htmlContent += \"<div class='col'>\"+\"Total\"+\"</div>\";\n    htmlContent += \"<div class='col'>\"+getValue(dsSquad[squadName], \"Production\", \"Total\", \"Blocker\")+\"</div>\";\n    htmlContent += \"<div class='col'>\"+getValue(dsSquad[squadName], \"Production\", \"Total\", \"Critical\")+\"</div>\";\n    htmlContent += \"<div class='col'>\"+getValue(dsSquad[squadName], \"Production\", \"Total\", \"Normal\")+\"</div>\";\n    htmlContent += \"</div>\";\n}\nhtmlContent += \"<div class='clr'>\";\nhtmlContent += \"<div class='col'>Found In</div><div class='col'>Range</div><div class='col'>Blocker</div><div class='col'>Critical</div><div class='col'>Other</div>\";\nhtmlContent += \"</div>\";\nreturn htmlContent;",
-						"height": 8
-					}
-				}
-			]
-		},
-		{
 			"title": "SVT6",
 			"width": 1,
 			"row": {
@@ -65,13 +43,13 @@
 			"width": 1,
 			"row": {
 				"3": 1,
-				"4": 1,
+				"4": 15,
 				"6": 11,
 				"7": 11
 			},
 			"col": {
 				"3": 2,
-				"4": 2,
+				"4": 3,
 				"6": 2,
 				"7": 2
 			},
@@ -122,7 +100,7 @@
 			]
 		},
 		{
-			"title": "PROD DEFECT STATUS (Created in current month)",
+			"title": "PROD DEFECT STATUS (2 Months)",
 			"width": 1,
 			"row": {
 				"4": 9,
@@ -148,7 +126,7 @@
 			"width": 1,
 			"row": {
 				"3": 9,
-				"4": 9,
+				"4": 1,
 				"5": 19,
 				"6": 19,
 				"7": 19
@@ -167,6 +145,14 @@
 					"settings": {
 						"html": "var last_update = '';\nvar bgcolor = \"green\";\nvar status = \"Unknown\";\nvar name = \"SVT4\";\nif (datasources[\"SVT4\"][\"status\"] == 'NG' || datasources[\"SVT4\"][\"status\"] == 'WARN' ) {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n} else if(datasources[\"SVT4\"][\"data\"]) {\n    status = datasources[\"SVT4\"][\"data\"][\"status\"];\n    last_update = datasources[\"SVT4\"][\"last_update\"];\n} else {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n}\nif (status == 'Upgrading') {\n    bgcolor = 'GoldenRod';\n} else if (status != 'Normal') {\n    bgcolor = \"red\";\n}\n\nvar body = '<div style=\"vertical-align: middle;color:white;text-align:center;background-color:'+bgcolor+';font-weight:999;font-size:30px;line-height:120px;height:240px;width:100%;\">';\nbody += \"<div style='margin:auto;'>\"+status+\"</div>\";\nbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:16px;line-height:20px;width:100%;\">';\nbody += last_update;\nbody += '</div>'\nbody += '</div>';\nreturn body;",
 						"height": 3
+					}
+				},
+				{
+					"type": "gauge",
+					"settings": {
+						"value": "var progress = 0;\t\nif(datasources[\"SVT4\"][\"data\"] && datasources[\"SVT4\"][\"data\"][\"progress\"])\n{\n    progress=datasources[\"SVT4\"][\"data\"][\"progress\"];\n} \n\nif (datasources[\"SVT4\"][\"data\"] && datasources[\"SVT4\"][\"data\"][\"status\"] && datasources[\"SVT4\"][\"data\"][\"status\"] == 'Normal') {\n    progress = 100;\n}\nreturn progress;",
+						"min_value": 0,
+						"max_value": 100
 					}
 				}
 			]
@@ -230,7 +216,7 @@
 			"width": 1,
 			"row": {
 				"3": 23,
-				"4": 19,
+				"4": 35,
 				"6": 27,
 				"7": 27
 			},
@@ -256,6 +242,101 @@
 					"settings": {
 						"html": "var last10MinsJobs = datasources[\"JOBS\"][\"last10MinsJobs\"];\nvar currentJobs  = datasources[\"JOBS\"][\"currentJobs\"];\nvar next10MinusJobs = datasources[\"JOBS\"][\"next10MinusJobs\"];\nvar attribute = \"\";\nvar display = \"<div style='padding: 5px 10px;'>\";\n\ndisplay += \"<div style='line-height:30px;font-size:20px;weight:999;background-color:green;color:white;'>Current jobs:</div>\";\ndisplay += \"<div style='line-height:30px;font-size:16px;background-color:green;color:white;'><ol>\";\nfor(attribute  in currentJobs){   \n    display += \"<li title='\"+currentJobs[attribute]+\"'>\" + currentJobs[attribute] + \"</li>\";\n}\ndisplay += \"</ol></div>\";\n\ndisplay += \"<div style='line-height:30px;font-size:20px;weight:999;'>Jobs in next 10 mins:</div>\";\ndisplay += \"<div style='line-height:30px;'><ol>\";\nfor(attribute  in next10MinusJobs){ \n    display += \"<li title='\"+next10MinusJobs[attribute]+\"'>\" + next10MinusJobs[attribute] + \"</li>\";\n}\ndisplay += \"</ol></div>\";\n\ndisplay += \"<div style='line-height:30px;font-size:20px;weight:999;'>Jobs in last 10 mins:</div>\";\ndisplay += \"<div style='line-height:30px;'><ol>\";\nfor(attribute  in last10MinsJobs){\n    display += \"<li title='\"+last10MinsJobs[attribute]+\"'>\" + last10MinsJobs[attribute] + \"</li>\";\n}\ndisplay += \"</ol></div>\";\n\ndisplay += \"</div>\";\nreturn display;",
 						"height": 10
+					}
+				}
+			]
+		},
+		{
+			"width": 1,
+			"row": {
+				"4": 25
+			},
+			"col": {
+				"4": 4
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "picture",
+					"settings": {
+						"src": "http://sczabbix.rtp.raleigh.ibm.com/zabbix/chart2.php?graphid=6230&screenid=29&width=600&height=200&legend=1&updateProfile=1&profileIdx=web.screens&profileIdx2=29&period=86400&stime=20190508041608&sid=f5870819c181a68c&curtime=1525854009173",
+						"refresh": 60
+					}
+				}
+			]
+		},
+		{
+			"width": 1,
+			"row": {
+				"4": 23
+			},
+			"col": {
+				"4": 3
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "picture",
+					"settings": {
+						"src": "http://sczabbix.rtp.raleigh.ibm.com/zabbix/chart2.php?graphid=6243&screenid=29&width=600&height=200&legend=1&updateProfile=1&profileIdx=web.screens&profileIdx2=29&period=86400&stime=20190508041608&sid=f5870819c181a68c&curtime=1525854194155",
+						"refresh": 300
+					}
+				}
+			]
+		},
+		{
+			"width": 1,
+			"row": {
+				"4": 15
+			},
+			"col": {
+				"4": 4
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "picture",
+					"settings": {
+						"src": "http://sczabbix.rtp.raleigh.ibm.com/zabbix/chart2.php?graphid=5064&screenid=66&width=600&height=300&legend=1&updateProfile=1&profileIdx=web.screens&profileIdx2=66&period=10800&stime=20190509012428",
+						"refresh": 60
+					}
+				}
+			]
+		},
+		{
+			"width": 1,
+			"row": {
+				"4": 23
+			},
+			"col": {
+				"4": 1
+			},
+			"col_width": 2,
+			"widgets": [
+				{
+					"type": "picture",
+					"settings": {
+						"src": "http://sczabbix.rtp.raleigh.ibm.com/zabbix/map.php?noedit=1&sysmapid=19&width=500&height=100&curtime=1525854386&severity_min=0",
+						"refresh": 300
+					}
+				}
+			]
+		},
+		{
+			"width": 1,
+			"row": {
+				"4": 15
+			},
+			"col": {
+				"4": 2
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "html",
+					"settings": {
+						"html": "var last_update = '';\nvar bgcolor = \"green\";\nvar status = \"Unknown\";\nvar name = \"CIP\";\nif (datasources[name][\"status\"] == 'NG' || datasources[name][\"status\"] == 'WARN' ) {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n} else if(datasources[name][\"data\"]) {\n    status = datasources[name][\"data\"][\"status\"];\n    last_update = datasources[name][\"last_update\"];\n} else {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n}\nif (status == 'Upgrading') {\n    bgcolor = 'GoldenRod';\n} else if (status != 'Normal') {\n    bgcolor = \"red\";\n}\nvar last_update = datasources[\"CIP\"][\"last_update\"];\nvar body = '<div style=\"vertical-align: middle;color:white;text-align:center;background-color:'+bgcolor+';font-weight:999;font-size:30px;line-height:120px;height:240px;width:100%;\">';\nbody += \"<div style='margin:auto;'>\"+status+\"</div>\";\nbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:16px;line-height:20px;width:100%;\">';\nbody += datasources[\"SVT6Data\"][\"last_update\"];\nbody += '</div>'\nbody += '</div>';\nreturn body;",
+						"height": 3
 					}
 				}
 			]
@@ -304,24 +385,13 @@
 			}
 		},
 		{
-			"name": "RTC",
-			"type": "JSON",
-			"settings": {
-				"url": "http://scmonitor.rtp.raleigh.ibm.com:8000/api/data.php?name=RTC",
-				"use_thingproxy": true,
-				"refresh": 3600,
-				"method": "GET"
-			}
-		},
-		{
 			"name": "SVT4",
 			"type": "JSON",
 			"settings": {
 				"url": "http://scmonitor.rtp.raleigh.ibm.com:8000/api/data.php?name=SVT4",
 				"use_thingproxy": true,
 				"refresh": 5,
-				"method": "GET",
-				"name": "SVT4"
+				"method": "GET"
 			}
 		},
 		{
@@ -341,6 +411,16 @@
 				"url": "http://scmonitor.rtp.raleigh.ibm.com:8000/api/grabrtc.php",
 				"use_thingproxy": true,
 				"refresh": 3600,
+				"method": "GET"
+			}
+		},
+		{
+			"name": "CIP",
+			"type": "JSON",
+			"settings": {
+				"url": "http://scmonitor.rtp.raleigh.ibm.com:8000/api/data.php?name=CIP",
+				"use_thingproxy": true,
+				"refresh": 30,
 				"method": "GET"
 			}
 		}
