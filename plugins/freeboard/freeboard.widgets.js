@@ -680,7 +680,7 @@
             $(element).css({
                 width : "100%",
                 height: "100%",
-                "background-size" : "cover",
+                "background-size" : "100% 100%", // cover
             });
 
             widgetElement = element;
