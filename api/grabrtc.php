@@ -2,8 +2,7 @@
 
 require_once("rtclib.php");
 
-// 2018-05-01
-$month = date("Y-m")."-01";
+$month = date('Y-m-d', strtotime("-2 monthes");
 
 $RTC_QUERY='https://swgjazz.ibm.com:8017/jazz/rpt/repository/workitem?fields=workitem/workItem[type/id=defect%20and%20creationDate%3E'.$month.'T00:00:00.000-0500]/(id|summary|type/id|state/name|priority/name|severity/name|category/name|teamArea/name|target/name|foundIn/name|allExtensions/(key|smallStringValue))';
 
@@ -148,7 +147,7 @@ Found in :Test
 }
 
 $data = array(
-    "summary" => "All defects were created after {$month}",
+    "summary" => "All defects created in recent 2 months.",
     "overall"=>$statisticGlobal,
     "squads"=>$statisticBySquad
 );

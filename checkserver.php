@@ -9,6 +9,9 @@ $rules = array(
 	"SVT6"=>array(
 		"data.status"=>array("expect"=>"Normal", "ignore"=>array("Upgrading"))
 	),
+	"CIP"=>array(
+		"data.status"=>array("expect"=>"Normal", "ignore"=>array("Upgrading"))
+	),
 	"Optimizer"=>array(
 		"data.status"=>array("expect"=>"Normal", "ignore"=>array("Upgrading"))
 	),
@@ -64,7 +67,12 @@ function validate_status($result, $rule) {
 }
 
 function beep() {
-	if (file_exists("/usr/bin/beep")) {
-		exec("/usr/bin/beep -f 300.7 -r 2 -d 100 -l 400");
+        if (file_exists("/root/Documents/music.sh")) {
+		exec("sh /root/Documents/music.sh");
+	} else if (file_exists("/root/Documents/beep.sh")) {
+		exec("sh /root/Documents/beep.sh");
+	} else if (file_exists("/usr/bin/beep")) {
+		exec("/usr/bin/beep -f 300.7 -r 5 -d 100 -l 400");
 	}
 }
+
