@@ -31,7 +31,7 @@
 					"type": "gauge",
 					"settings": {
 						"title": "Progress",
-						"value": "datasources[\"SVT6Data\"][\"data\"][\"progress\"]",
+						"value": "var progress = 0;\t\nif(datasources[\"SVT6\"][\"data\"] && datasources[\"SVT6\"][\"data\"][\"progress\"])\n{\n    progress=datasources[\"SVT6\"][\"data\"][\"progress\"];\n} \n\nif (datasources[\"SVT6\"][\"data\"] && datasources[\"SVT6\"][\"data\"][\"status\"] && datasources[\"SVT6\"][\"data\"][\"status\"] == 'Normal') {\n    progress = 100;\n}\nreturn progress;",
 						"min_value": 0,
 						"max_value": 100
 					}
@@ -115,14 +115,14 @@
 				{
 					"type": "html",
 					"settings": {
-						"html": "var ds = datasources[\"RTCDATA\"];\nvar htmlContent = \"\";\n\nfunction getValue(_ds, env, range, priority) {\n    if(typeof(_ds[env])!=\"undefined\"\n      && typeof(_ds[env][range])!=\"undefined\"\n      && typeof(_ds[env][range][priority])!=\"undefined\") {\n    \treturn _ds[env][range][priority];\n\t} else {\n        return 0;\n    }\n}\nhtmlContent += \"<style type='text/css'>\";\nhtmlContent += \".clr{clear:both;}\";\nhtmlContent += \".panel{padding:12px;color:white;}\";\nhtmlContent += \".row{font-size:16px;} \";\nhtmlContent += \".col{float:left;font-size:16px;} \";\nhtmlContent += \".col-red{background-color:red;font-size:20px;font-weight:999;} .col-pink{background-color:#FF00FF;font-size:18px;font-weight:999;}\";\nhtmlContent += \".comment{font-size:12px;font-weight:999;font-style:italic;} \";\nhtmlContent += \"</style>\";\nhtmlContent += \"<div class='clr panel'>\";\nhtmlContent += \"<div class='row'>\"+\"Unresolved\"+\"</div>\";\nhtmlContent += \"<div class='clr'><div class='col col-red'>Blocker</div><div class='row col-red'>\"+getValue(ds['overall'], \"Production\", \"Unresolved\", \"Blocker\")+\"</div></div>\";\nhtmlContent += \"<div class='clr'><div class='col col-pink'>Critical</div><div class='row col-pink'>\"+getValue(ds['overall'], \"Production\", \"Unresolved\", \"Critical\")+\"</div></div>\";\nhtmlContent += \"<div class='clr'><div class='col'>Others</div><div class='row'>\"+getValue(ds['overall'], \"Production\", \"Unresolved\", \"Normal\")+\"</div></div>\";\nhtmlContent += \"</div>\";\nhtmlContent += \"<div class='clr panel'>\";\nhtmlContent += \"<div class='row'>\"+\"Total\"+\"</div>\";\nhtmlContent += \"<div class='clr'><div class='col col-red'>Blocker</div><div class='row col-red'>\"+getValue(ds['overall'], \"Production\", \"Total\", \"Blocker\")+\"</div></div>\";\nhtmlContent += \"<div class='clr'><div class='col col-pink'>Critical</div><div class='row col-pink'>\"+getValue(ds['overall'], \"Production\", \"Total\", \"Critical\")+\"</div></div>\";\nhtmlContent += \"<div class='clr'><div class='col'>Others</div><div class='row'>\"+getValue(ds['overall'], \"Production\", \"Total\", \"Normal\")+\"</div></div>\";\nhtmlContent += \"</div>\";\nhtmlContent += \"<DIV class='clr panel comment'>\"+ds[\"summary\"]+\"</DIV>\";\nreturn htmlContent;",
+						"html": "var ds = datasources[\"RTCDATA\"];\nvar htmlContent = \"\";\n\nfunction getValue(_ds, env, range, priority) {\n    if(typeof(_ds[env])!=\"undefined\"\n      && typeof(_ds[env][range])!=\"undefined\"\n      && typeof(_ds[env][range][priority])!=\"undefined\") {\n    \treturn _ds[env][range][priority];\n\t} else {\n        return 0;\n    }\n}\nhtmlContent += \"<style type='text/css'>\";\nhtmlContent += \".clr{clear:both;}\";\nhtmlContent += \".panel{padding:12px;color:white;}\";\nhtmlContent += \".row{font-size:16px;} \";\nhtmlContent += \".col{float:left;font-size:16px;width:120px;} \";\nhtmlContent += \".col-red{background-color:red;font-size:20px;font-weight:bold;} .col-pink{background-color:#FF00FF;font-size:18px;font-weight:bold;}\";\nhtmlContent += \".comment{font-size:12px;font-weight:999;font-style:italic;} \";\nhtmlContent += \"</style>\";\nhtmlContent += \"<div class='clr panel'>\";\nhtmlContent += \"<div class='row'>\"+\"Unresolved\"+\"</div>\";\nhtmlContent += \"<div class='clr'><div class='col col-red'>Blocker</div><div class='row col-red'>\"+getValue(ds['overall'], \"Production\", \"Unresolved\", \"Blocker\")+\"</div></div>\";\nhtmlContent += \"<div class='clr'><div class='col col-pink'>Critical</div><div class='row col-pink'>\"+getValue(ds['overall'], \"Production\", \"Unresolved\", \"Critical\")+\"</div></div>\";\nhtmlContent += \"<div class='clr'><div class='col'>Others</div><div class='row'>\"+getValue(ds['overall'], \"Production\", \"Unresolved\", \"Normal\")+\"</div></div>\";\nhtmlContent += \"</div>\";\nhtmlContent += \"<div class='clr panel'>\";\nhtmlContent += \"<div class='row'>\"+\"Total\"+\"</div>\";\nhtmlContent += \"<div class='clr'><div class='col col-red'>Blocker</div><div class='row col-red'>\"+getValue(ds['overall'], \"Production\", \"Total\", \"Blocker\")+\"</div></div>\";\nhtmlContent += \"<div class='clr'><div class='col col-pink'>Critical</div><div class='row col-pink'>\"+getValue(ds['overall'], \"Production\", \"Total\", \"Critical\")+\"</div></div>\";\nhtmlContent += \"<div class='clr'><div class='col'>Others</div><div class='row'>\"+getValue(ds['overall'], \"Production\", \"Total\", \"Normal\")+\"</div></div>\";\nhtmlContent += \"</div>\";\nhtmlContent += \"<DIV class='clr panel comment'>\"+ds[\"summary\"]+\"</DIV>\";\nreturn htmlContent;",
 						"height": 4
 					}
 				}
 			]
 		},
 		{
-			"title": "SVT4 Status",
+			"title": "SVT4",
 			"width": 1,
 			"row": {
 				"3": 9,
@@ -216,7 +216,7 @@
 			"width": 1,
 			"row": {
 				"3": 23,
-				"4": 35,
+				"4": 33,
 				"6": 27,
 				"7": 27
 			},
@@ -249,18 +249,18 @@
 		{
 			"width": 1,
 			"row": {
-				"4": 25
+				"4": 23
 			},
 			"col": {
-				"4": 4
+				"4": 2
 			},
 			"col_width": 1,
 			"widgets": [
 				{
 					"type": "picture",
 					"settings": {
-						"src": "http://sczabbix.rtp.raleigh.ibm.com/zabbix/chart2.php?graphid=6230&screenid=29&width=600&height=200&legend=1&updateProfile=1&profileIdx=web.screens&profileIdx2=29&period=86400&stime=20190508041608&sid=f5870819c181a68c&curtime=1525854009173",
-						"refresh": 60
+						"src": "http://sczabbix.rtp.raleigh.ibm.com/zabbix/chart2.php?graphid=6243&screenid=29&width=600&height=200&legend=1&updateProfile=1&profileIdx=web.screens&profileIdx2=29&period=86400&stime=20190508041608&sid=f5870819c181a68c&curtime=1525854194155",
+						"refresh": 300
 					}
 				}
 			]
@@ -278,25 +278,6 @@
 				{
 					"type": "picture",
 					"settings": {
-						"src": "http://sczabbix.rtp.raleigh.ibm.com/zabbix/chart2.php?graphid=6243&screenid=29&width=600&height=200&legend=1&updateProfile=1&profileIdx=web.screens&profileIdx2=29&period=86400&stime=20190508041608&sid=f5870819c181a68c&curtime=1525854194155",
-						"refresh": 300
-					}
-				}
-			]
-		},
-		{
-			"width": 1,
-			"row": {
-				"4": 15
-			},
-			"col": {
-				"4": 4
-			},
-			"col_width": 1,
-			"widgets": [
-				{
-					"type": "picture",
-					"settings": {
 						"src": "http://sczabbix.rtp.raleigh.ibm.com/zabbix/chart2.php?graphid=5064&screenid=66&width=600&height=300&legend=1&updateProfile=1&profileIdx=web.screens&profileIdx2=66&period=10800&stime=20190509012428",
 						"refresh": 60
 					}
@@ -304,25 +285,7 @@
 			]
 		},
 		{
-			"width": 1,
-			"row": {
-				"4": 23
-			},
-			"col": {
-				"4": 1
-			},
-			"col_width": 2,
-			"widgets": [
-				{
-					"type": "picture",
-					"settings": {
-						"src": "http://sczabbix.rtp.raleigh.ibm.com/zabbix/map.php?noedit=1&sysmapid=19&width=500&height=100&curtime=1525854386&severity_min=0",
-						"refresh": 300
-					}
-				}
-			]
-		},
-		{
+			"title": "CIP",
 			"width": 1,
 			"row": {
 				"4": 15
