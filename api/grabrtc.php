@@ -2,9 +2,9 @@
 
 require_once("rtclib.php");
 
-$month = date('Y-m-d', strtotime("-2 monthes"));
+$month = date('Y-m-d', strtotime("-15 days"));
 
-$RTC_QUERY='https://swgjazz.ibm.com:8017/jazz/rpt/repository/workitem?fields=workitem/workItem[type/id=defect%20and%20creationDate%3E'.$month.'T00:00:00.000-0500]/(id|summary|type/id|state/name|priority/name|severity/name|category/name|teamArea/name|target/name|foundIn/name|allExtensions/(key|smallStringValue))';
+$RTC_QUERY='https://swgjazz.ibm.com:8017/jazz/rpt/repository/workitem?size=500&fields=workitem/workItem[type/id=defect%20and%20creationDate%3E'.$month.'T00:00:00.000-0500]/(id|summary|type/id|state/name|priority/name|severity/name|category/name|teamArea/name|target/name|foundIn/name|allExtensions/(key|smallStringValue))';
 
 
 $rtcHandler = new RTCLib();
