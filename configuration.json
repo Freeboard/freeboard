@@ -23,7 +23,7 @@
 				{
 					"type": "html",
 					"settings": {
-						"html": "var last_update = '';\nvar bgcolor = \"green\";\nvar status = \"Unknown\";\nvar name = \"SVT6Data\";\nvar build = \"\";\nif (datasources[name][\"status\"] == 'NG' || datasources[name][\"status\"] == 'WARN' ) {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n} else if(datasources[name][\"data\"]) {\n    status = datasources[name][\"data\"][\"status\"];\n    last_update = datasources[name][\"last_update\"];\n    if (datasources[name][\"data\"][\"build\"]) {\n        build = datasources[name][\"data\"][\"build\"];\n    } \n} else {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n}\nif (status == 'Upgrading') {\n    bgcolor = 'GoldenRod';\n} else if (status != 'Normal') {\n    bgcolor = \"red\";\n}\nvar last_update = datasources[name][\"last_update\"];\nvar body = '<div style=\"vertical-align: middle;color:white;text-align:center;background-color:'+bgcolor+';font-weight:999;font-size:30px;line-height:100px;height:240px;width:100%;\">';\nbody += \"<div style='margin:auto;'>\"+status+\"</div>\";\nif (build.length > 0) {\n\tbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:20px;line-height:20px;width:100%;\">Version: ' + build + '</div>';\n}\nbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:14px;line-height:20px;width:100%;\">';\nbody += datasources[name][\"last_update\"];\nbody += '</div>'\nbody += '</div>';\nreturn body;",
+						"html": "var last_update = '';\nvar bgcolor = \"green\";\nvar status = \"Unknown\";\nvar name = \"SVT6Data\";\nvar build = \"\";\nif (datasources[name][\"status\"] == 'NG' || datasources[name][\"status\"] == 'WARN' ) {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n} else if(datasources[name][\"data\"]) {\n    status = datasources[\"SVT6Data\"][\"data\"][\"status\"];\n    last_update = datasources[name][\"last_update\"];\n    if (datasources[name][\"data\"][\"build\"]) {\n        build = datasources[name][\"data\"][\"build\"];\n    } \n} else {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n}\nif (status == 'Upgrading') {\n    bgcolor = 'GoldenRod';\n} else if (status != 'Normal') {\n    bgcolor = \"red\";\n}\nvar last_update = datasources[name][\"last_update\"];\nvar body = '<div style=\"vertical-align: middle;color:white;text-align:center;background-color:'+bgcolor+';font-weight:999;font-size:30px;line-height:100px;height:240px;width:100%;\">';\nbody += \"<div style='margin:auto;'>\"+status+\"</div>\";\nif (build.length > 0) {\n\tbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:20px;line-height:20px;width:100%;\">Version: ' + build + '</div>';\n}\nbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:14px;line-height:20px;width:100%;\">';\nbody += datasources[name][\"last_update\"];\nbody += '</div>'\nbody += '</div>';\nreturn body;",
 						"height": 3
 					}
 				},
@@ -84,7 +84,7 @@
 				{
 					"type": "html",
 					"settings": {
-						"html": "var last_update = '';\nvar bgcolor = \"green\";\nvar status = \"Unknown\";\nvar name = \"SVT5\";\nvar build = \"\";\nif (datasources[name][\"status\"] == 'NG' || datasources[name][\"status\"] == 'WARN' ) {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n} else if(datasources[name][\"data\"]) {\n    status = datasources[name][\"data\"][\"status\"];\n    last_update = datasources[name][\"last_update\"];\n    if (datasources[name][\"data\"][\"build\"]) {\n        build = datasources[name][\"data\"][\"build\"];\n    } \n} else {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n}\nif (status == 'Upgrading') {\n    bgcolor = 'GoldenRod';\n} else if (status != 'Normal') {\n    bgcolor = \"red\";\n}\nvar last_update = datasources[name][\"last_update\"];\nvar body = '<div style=\"vertical-align: middle;color:white;text-align:center;background-color:'+bgcolor+';font-weight:999;font-size:30px;line-height:100px;height:240px;width:100%;\">';\nbody += \"<div style='margin:auto;'>\"+status+\"</div>\";\nif (build.length > 0) {\n\tbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:20px;line-height:20px;width:100%;\">Version: ' + build + '</div>';\n}\nbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:14px;line-height:20px;width:100%;\">';\nbody += datasources[name][\"last_update\"];\nbody += '</div>'\nbody += '</div>';\nreturn body;",
+						"html": "var last_update = '';\nvar bgcolor = \"green\";\nvar status = \"Unknown\";\nvar name = \"SVT5\";\nvar build = \"\";\nif (datasources[name][\"status\"] == 'NG' || datasources[name][\"status\"] == 'WARN' ) {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n} else if(datasources[name][\"data\"]) {\n    status = datasources[\"SVT5\"][\"data\"][\"status\"];\n    last_update = datasources[name][\"last_update\"];\n    if (datasources[name][\"data\"][\"build\"]) {\n        build = datasources[name][\"data\"][\"build\"];\n    } \n} else {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n}\nif (status == 'Upgrading') {\n    bgcolor = 'GoldenRod';\n} else if (status != 'Normal') {\n    bgcolor = \"red\";\n}\nvar last_update = datasources[name][\"last_update\"];\nvar body = '<div style=\"vertical-align: middle;color:white;text-align:center;background-color:'+bgcolor+';font-weight:999;font-size:30px;line-height:100px;height:240px;width:100%;\">';\nbody += \"<div style='margin:auto;'>\"+status+\"</div>\";\nif (build.length > 0) {\n\tbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:20px;line-height:20px;width:100%;\">Version: ' + build + '</div>';\n}\nbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:14px;line-height:20px;width:100%;\">';\nbody += datasources[name][\"last_update\"];\nbody += '</div>'\nbody += '</div>';\nreturn body;",
 						"height": 3
 					}
 				},
@@ -145,7 +145,7 @@
 				{
 					"type": "html",
 					"settings": {
-						"html": "var last_update = '';\nvar bgcolor = \"green\";\nvar status = \"Unknown\";\nvar name = \"SVT4\";\nvar build = \"\";\nif (datasources[name][\"status\"] == 'NG' || datasources[name][\"status\"] == 'WARN' ) {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n} else if(datasources[name][\"data\"]) {\n    status = datasources[name][\"data\"][\"status\"];\n    last_update = datasources[name][\"last_update\"];\n    if (datasources[name][\"data\"][\"build\"]) {\n        build = datasources[name][\"data\"][\"build\"];\n    } \n} else {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n}\nif (status == 'Upgrading') {\n    bgcolor = 'GoldenRod';\n} else if (status != 'Normal') {\n    bgcolor = \"red\";\n}\nvar last_update = datasources[name][\"last_update\"];\nvar body = '<div style=\"vertical-align: middle;color:white;text-align:center;background-color:'+bgcolor+';font-weight:999;font-size:30px;line-height:100px;height:240px;width:100%;\">';\nbody += \"<div style='margin:auto;'>\"+status+\"</div>\";\nif (build.length > 0) {\n\tbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:20px;line-height:20px;width:100%;\">Version: ' + build + '</div>';\n}\nbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:14px;line-height:20px;width:100%;\">';\nbody += datasources[name][\"last_update\"];\nbody += '</div>'\nbody += '</div>';\nreturn body;",
+						"html": "var last_update = '';\nvar bgcolor = \"green\";\nvar status = \"Unknown\";\nvar name = \"SVT4\";\nvar build = \"\";\nif (datasources[name][\"status\"] == 'NG' || datasources[name][\"status\"] == 'WARN' ) {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n} else if(datasources[name][\"data\"]) {\n    status = datasources[\"SVT4\"][\"data\"][\"status\"];\n    last_update = datasources[name][\"last_update\"];\n    if (datasources[name][\"data\"][\"build\"]) {\n        build = datasources[name][\"data\"][\"build\"];\n    } \n} else {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n}\nif (status == 'Upgrading') {\n    bgcolor = 'GoldenRod';\n} else if (status != 'Normal') {\n    bgcolor = \"red\";\n}\nvar last_update = datasources[name][\"last_update\"];\nvar body = '<div style=\"vertical-align: middle;color:white;text-align:center;background-color:'+bgcolor+';font-weight:999;font-size:30px;line-height:100px;height:240px;width:100%;\">';\nbody += \"<div style='margin:auto;'>\"+status+\"</div>\";\nif (build.length > 0) {\n\tbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:20px;line-height:20px;width:100%;\">Version: ' + build + '</div>';\n}\nbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:14px;line-height:20px;width:100%;\">';\nbody += datasources[name][\"last_update\"];\nbody += '</div>'\nbody += '</div>';\nreturn body;",
 						"height": 3
 					}
 				},
@@ -322,7 +322,7 @@
 			"settings": {
 				"url": "http://scmonitor.rtp.raleigh.ibm.com:8000/api/data.php?name=SVT6",
 				"use_thingproxy": false,
-				"refresh": 60,
+				"refresh": 10,
 				"method": "GET"
 			}
 		},
@@ -332,9 +332,8 @@
 			"settings": {
 				"url": "http://scmonitor.rtp.raleigh.ibm.com:8000/api/data.php?name=Optimizer",
 				"use_thingproxy": false,
-				"refresh": 5,
-				"method": "GET",
-				"name": "Optimizer"
+				"refresh": 10,
+				"method": "GET"
 			}
 		},
 		{
@@ -343,7 +342,7 @@
 			"settings": {
 				"url": "http://scmonitor.rtp.raleigh.ibm.com:8000/api/data.php?name=SVT5",
 				"use_thingproxy": false,
-				"refresh": 5,
+				"refresh": 10,
 				"method": "GET"
 			}
 		},
@@ -363,7 +362,7 @@
 			"settings": {
 				"url": "http://scmonitor.rtp.raleigh.ibm.com:8000/api/data.php?name=SVT4",
 				"use_thingproxy": true,
-				"refresh": 5,
+				"refresh": 10,
 				"method": "GET"
 			}
 		},
