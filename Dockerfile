@@ -1,10 +1,12 @@
 FROM node:6
 
 RUN mkdir -p /usr/share/nginx/html
+RUN mkdir -p /data
 
 COPY . /usr/share/nginx/html/
 
 RUN chown -R node:node /usr/share/nginx/html
+RUN chown -R node:node /data
 
 USER node
 
@@ -16,5 +18,6 @@ RUN npm install; \
 RUN ./node_modules/.bin/grunt
 
 VOLUME ["/usr/share/nginx/html"]
+VOLUME ["/data"]
 
 CMD ["bash"]

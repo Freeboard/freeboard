@@ -1,0 +1,34 @@
+00,10,20,30,40,50 * * * * /home/apache/sctgsaid_gce.sh /home/apache/sctgsaid_gce.dat > /dev/null 2>&1
+0 0,4,8,12,16,20 * * * /var/www/htdocs/sales/salesconnect/custom/service/IBMSanityCheck/sanity.sh; # Sanity Zabbix reports run every 4 hours 
+00 00 * * *  /home/apache/cronback_apache.ksh
+00,10,20,30,40,50 * * * * /home/apache/sctgsaid_gce.sh /home/apache/sctgsaid_gce.dat > /dev/null 2>&1
+40 * * * * (cat /home/apache/sctgsaid_pwd.txt | gsa_login -p -c a01gsa -h 9.57.171.104,9.57.171.105,9.57.171.106,9.57.171.107,9.57.171.109 -u 64500 sctgsaid) > /home/apache/logs/sctgsaid_auth.log 2>&1
+21 01,05,09,13,17,21 * * * /gsa/a01gsa-p1/01/sctgsa/scripts/health-check/sc_health_check_main.ksh PROD 2>&1
+00 00,06,12,18 * * * /gsa/a01gsa-p1/01/sctgsa/scripts/health-check/elasticsearch_health_check.ksh PROD 2>&1
+00,30 * * * * /gsa/a01gsa-p1/01/sctgsa/scripts/health-check/gpfs1fschk.ksh 2>&1
+00 11 * * * /gsa/a01gsa-p1/01/sctgsa/scripts/health-check/SC_sugarlog_chk.ksh 2>&1
+00,15,30,45 * * * * /gsa/a01gsa-p1/01/sctgsa/scripts/health-check/checkdbconn.main.ksh 2>&1
+00,15,30,45 * * * * /gsa/a01gsa-p1/01/sctgsa/scripts/health-check/sc_hadr_status_check_main.ksh PROD 2>&1 
+00 01 * * * (. $HOME/.profile ; /var/www/htdocs/sales/salesconnect/batch/RTC_8392/rtc_8392_master.ksh) >/dev/null 2>&1
+00 21 * * 4  (. $HOME/.profile;cd /var/www/htdocs/sales/salesconnect/batch/RTC_2450; ./rtc_2450_master.ksh) >/dev/null 2>&1
+5,20,35,50 * * * * (. $HOME/.profile ; php /var/www/htdocs/sales/salesconnect/custom/cli/cli.php task=EmailQueueSend ) > /var/log/httpd/EmailQueueSend.log 2>&1
+00,5,10,15,20,25,30,35,40,45,50,55 * * * * (. $HOME/.profile; /var/www/htdocs/sales/salesconnect/batch/RTC_26167/rtc_26167_master.ksh) > /dev/null 2>&1
+00,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48 * * * * (. $HOME/.profile; /var/www/htdocs/sales/salesconnect/batch/RTC_30016/rtc_30016_master.ksh) > /dev/null 2>&1
+00 09 * * * (. $HOME/.profile;cd /var/www/htdocs/sales/salesconnect/batch/RTC_32214; ./rtc_32214_master.ksh ) >/dev/null 2>&1
+30 01 * * 5 (. $HOME/.profile;cd /var/www/htdocs/sales/salesconnect/batch/RTC_37705; ./rtc_37705_master.ksh) >/dev/null 2>&1
+00 00 * * 1,5 (. $HOME/.profile;cd /var/www/htdocs/sales/salesconnect/batch/RTC_5570_initial; ./rtc_5570_initial_master.ksh ) >/dev/null 2>&1
+40 00 * * 1,5 (. $HOME/.profile;cd /var/www/htdocs/sales/salesconnect/batch/RTC_5570_sync; ./rtc_5570_sync_master.ksh ) >/dev/null 2>&1 
+00 21 * * 1,5 (. $HOME/.profile;cd /var/www/htdocs/sales/salesconnect/batch/RTC_5570; ./rtc_5570_master.ksh ) >/dev/null 2>&1
+00 09 * * * (. $HOME/.profile;/var/www/htdocs/sales/salesconnect/batch/RTC_47991/rtc_47991_master.ksh) >/var/log/httpd/rtc_47991.out 2>&1 
+00 0,12 * * * (. $HOME/.profile;/var/www/htdocs/sales/salesconnect/batch/RTC_48086/rtc_48086_master.ksh) > /dev/null 2>&1 
+00 07 * * 4 (. $HOME/.profile;/var/www/htdocs/sales/salesconnect/batch/RTC_54897/rtc_54897_master.ksh) >/var/log/httpd/rtc_54897.out 2>&1
+00 0 * * * (. $HOME/.profile; cd /var/www/htdocs/sales/salesconnect/custom/cli && php cli.php task=RoadmapLoadStatusCalculation func=run_main) > /dev/null 2>&1
+0 0,4,8,12,16,20 * * * /var/www/htdocs/sales/salesconnect/custom/service/IBMSanityCheck/sanity.sh; # Sanity Zabbix reports run every 4 hours 
+00 02 * * * (. $HOME/.profile;/var/www/htdocs/sales/salesconnect/batch/RTC_57489/rtc_57489_master.ksh) >/var/log/httpd/rtc_57489.out 2>&1
+00 04 * * 0-5  (. $HOME/.profile;/var/www/htdocs/sales/salesconnect/batch/RTC_68985/rtc_68985_orchestrate_master.ksh) >/var/log/httpd/rtc_autoclaim_orchestration.out 2>&1
+00 18 * * 4 (. $HOME/.profile;cd /var/www/htdocs/sales/salesconnect/batch/RTC_24968; ./rtc_24968_master.ksh) >/var/log/httpd/rtc_24968.out 2>&1 
+00 1 * * * (. $HOME/.profile; cd /var/www/htdocs/sales/salesconnect/custom/cli && php cli.php task=CleanupRoadmapWhenSellerChangeRole) > /dev/null 2>&1 
+00 01 * * 2,5  (. $HOME/.profile;/var/www/htdocs/sales/salesconnect/batch/RTC_35701/rtc_35701_master.ksh) >/var/log/httpd/rtc_35701.out 2>&1
+0,30 * * * * (. ~/.profile; umask 002; cd /var/www/htdocs/sales/salesconnect/batch/v10bulk/dse; php job.php ) > /var/log/httpd/v10bulk.log
+* * * * * /var/www/htdocs/sales/salesconnect/batch/RTC_32913/rtc_32913_master.ksh >> /var/log/httpd/espush.log 2>&1
+* * * * * (. $HOME/.profile; cd /var/www/htdocs/sales/salesconnect/custom/cli && php cli.php task=ESAPusher) > /dev/null 2>&1 # RTC_123001: Support ESA project Skyline with quick roadmap integration

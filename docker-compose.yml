@@ -1,12 +1,17 @@
 version: "2"
 
 services:
-    nginx:
-        image: nginx:1.13
+    nginx-php-fpm:
+        image: richarvey/nginx-php-fpm:latest
+        restart: always
         ports:
-            - "8003:80"
+            - "8000:80"
+        environment:
+            WEBROOT: /usr/share/nginx/html
         volumes_from:
             - freeboard:ro
+        volumes:
+            - /home/docker/freeboard/data:/data
     freeboard:
         image: freeboard
         build: .

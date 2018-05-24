@@ -1,0 +1,15 @@
+version: "2"
+
+services:
+    nginx-php-fpm:
+        image: richarvey/nginx-php-fpm:latest
+        restart: always
+        ports:
+            - "8000:80"
+        environment:
+            WEBROOT: /usr/share/nginx/html
+        volumes_from:
+            - freeboard:ro
+    freeboard:
+        image: freeboard
+        build: .

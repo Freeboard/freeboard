@@ -1,3 +1,35 @@
+SalesConnect Dashboard provided by freeboard
+=========================
+###Demo Link
+http://scmonitor.rtp.raleigh.ibm.com:8000/index.html#source=configuration.json
+
+**UPDATE SERVER STATUS:**
+>curl -kX POST -H 'Content-type: application/json' --data '{"status":"Normal","progress":"10"}' http://scmonitor.rtp.raleigh.ibm.com:8000/api/report.php?name=SVT4
+
+
+**UPDATE RTC INFO:**
+>curl -kX POST -H 'Content-type: application/json' --data {"blocker":"1","critical":"10","normal":"13"} http://scmonitor.rtp.raleigh.ibm.com:8000/api/report.php?name=RTC
+
+**UPDATE Release information:**
+>curl -kX POST -H 'Content-type: application/json' --data {"current":"R4.5 - June, 2018","next":"R4.5-SEV1"} http://scmonitor.rtp.raleigh.ibm.com:8000/api/report.php?name=milestone
+
+
+###Build and run with Docker
+**Compile docker image**
+>cd freeboard
+
+>docker build -t freeboard .
+
+**Start docker image by docker composer**
+>docker-compose up -d
+
+###Additional scripts for server status monitoring
+**checkserver.php (Change the alarm setting in the script)**
+>* * * * * php /root/Documents/checkserver.php >/tmp/checkserver.log 2>&1
+
+**checkLdap.sh (Check if LDAP service is up)**
+>* * * * * sh /root/Documents/checkLdap.sh scldap02.rtp.raleigh.ibm.com 389 >/tmp/scldap02.log 2>&1
+
 freeboard
 ==========
 
