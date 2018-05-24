@@ -23,6 +23,12 @@ http://scmonitor.rtp.raleigh.ibm.com:8000/index.html#source=configuration.json
 **Start docker image by docker composer**
 >docker-compose up -d
 
+###Additional scripts for server status monitoring
+**checkserver.php (Change the alarm setting in the script)**
+>* * * * * php /root/Documents/checkserver.php >/tmp/checkserver.log 2>&1
+
+**checkLdap.sh (Check if LDAP service is up)**
+>* * * * * sh /root/Documents/checkLdap.sh scldap02.rtp.raleigh.ibm.com 389 >/tmp/scldap02.log 2>&1
 
 freeboard
 ==========

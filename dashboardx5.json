@@ -235,7 +235,7 @@
 				{
 					"type": "html",
 					"settings": {
-						"html": "var last_update = '';\nvar bgcolor = \"green\";\nvar status = \"Unknown\";\nvar name = \"CIP\";\nif (datasources[name][\"status\"] == 'NG' || datasources[name][\"status\"] == 'WARN' ) {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n} else if(datasources[name][\"data\"]) {\n    status = datasources[name][\"data\"][\"status\"];\n    last_update = datasources[name][\"last_update\"];\n} else {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n}\nif (status == 'Upgrading') {\n    bgcolor = 'GoldenRod';\n} else if (status != 'Normal') {\n    bgcolor = \"red\";\n}\nvar last_update = datasources[\"CIP\"][\"last_update\"];\nvar body = '<div style=\"vertical-align: middle;color:white;text-align:center;background-color:'+bgcolor+';font-weight:999;font-size:30px;line-height:120px;height:240px;width:100%;\">';\nbody += \"<div style='margin:auto;'>\"+status+\"</div>\";\nbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:16px;line-height:20px;width:100%;\">';\nbody += datasources[\"SVT6Data\"][\"last_update\"];\nbody += '</div>'\nbody += '</div>';\nreturn body;",
+						"html": "var last_update = '';\nvar bgcolor = \"green\";\nvar status = \"Unknown\";\nvar name = \"CIP\";\nif (datasources[name][\"status\"] == 'NG' || datasources[name][\"status\"] == 'WARN' ) {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n} else if(datasources[name][\"data\"]) {\n    status = datasources[name][\"data\"][\"status\"];\n    last_update = datasources[name][\"last_update\"];\n} else {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n}\nif (status == 'Upgrading') {\n    bgcolor = 'GoldenRod';\n} else if (status != 'Normal') {\n    bgcolor = \"red\";\n}\nvar last_update = datasources[\"CIP\"][\"last_update\"];\nvar body = '<div style=\"vertical-align: middle;color:white;text-align:center;background-color:'+bgcolor+';font-weight:999;font-size:30px;line-height:120px;height:240px;width:100%;\">';\nbody += \"<div style='margin:auto;'>\"+status+\"</div>\";\nbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:16px;line-height:20px;width:100%;\">';\nbody += datasources[\"CIP\"][\"last_update\"];\nbody += '</div>'\nbody += '</div>';\nreturn body;",
 						"height": 2
 					}
 				}
@@ -330,6 +330,26 @@
 					}
 				}
 			]
+		},
+		{
+			"title": "SCLDAP02-LDAP SERVICE",
+			"width": 1,
+			"row": {
+				"5": 19
+			},
+			"col": {
+				"5": 1
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "html",
+					"settings": {
+						"html": "var last_update = '';\nvar bgcolor = \"green\";\nvar status = \"Unknown\";\nvar name = \"scldap02\";\nif (datasources[name][\"status\"] == 'NG' || datasources[name][\"status\"] == 'WARN' ) {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n} else if(datasources[name][\"data\"]) {\n    status = datasources[name][\"data\"][\"status\"];\n    last_update = datasources[name][\"last_update\"];\n} else {\n    status = \"Unknown\";\n    bgcolor = \"red\";\n}\nif (status == 'Upgrading') {\n    bgcolor = 'GoldenRod';\n} else if (status != 'Normal') {\n    bgcolor = \"red\";\n}\nvar last_update = datasources[\"CIP\"][\"last_update\"];\nvar body = '<div style=\"vertical-align: middle;color:white;text-align:center;background-color:'+bgcolor+';font-weight:999;font-size:30px;line-height:120px;height:240px;width:100%;\">';\nbody += \"<div style='margin:auto;'>\"+status+\"</div>\";\nbody += '<div style=\"color:white;text-align:center;font-weight:999;font-size:16px;line-height:20px;width:100%;\">';\nbody += datasources[\"scldap02\"][\"last_update\"];\nbody += '</div>'\nbody += '</div>';\nreturn body;",
+						"height": 3
+					}
+				}
+			]
 		}
 	],
 	"datasources": [
@@ -405,6 +425,16 @@
 		},
 		{
 			"name": "CIP",
+			"type": "JSON",
+			"settings": {
+				"url": "http://scmonitor.rtp.raleigh.ibm.com:8000/api/data.php?name=CIP",
+				"use_thingproxy": true,
+				"refresh": 30,
+				"method": "GET"
+			}
+		},
+		{
+			"name": "scldap02",
 			"type": "JSON",
 			"settings": {
 				"url": "http://scmonitor.rtp.raleigh.ibm.com:8000/api/data.php?name=CIP",
