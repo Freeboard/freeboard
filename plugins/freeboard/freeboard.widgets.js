@@ -831,6 +831,141 @@
         }
     });
 
+        freeboard.addStyle('.traffic-light-red', "border-radius:50%;width:22px;height:22px;border:2px solid #3d3d3d;margin-top:5px;float:left;background-color:#222;margin-right:10px;float:left");
+        freeboard.addStyle('.traffic-light-yellow', "border-radius:50%;width:22px;height:22px;border:2px solid #3d3d3d;margin-top:5px;float:left;background-color:#222;margin-right:10px;float:left");
+        freeboard.addStyle('.traffic-light-green', "border-radius:50%;width:22px;height:22px;border:2px solid #3d3d3d;margin-top:5px;float:left;background-color:#222;margin-right:10px;float:left");
+        freeboard.addStyle('.traffic-light-red.on', "background-color:#aa0000;box-shadow: 0px 0px 15px #aa0000;border-color:#FDF1DF;");
+        freeboard.addStyle('.traffic-light-yellow.on', "background-color:#aaaa00;box-shadow: 0px 0px 15px #aaaa00;border-color:#FDF1DF;");
+        freeboard.addStyle('.traffic-light-green.on', "background-color:#009900;box-shadow: 0px 0px 15px #009900;border-color:#FDF1DF;");
+	freeboard.addStyle('.traffic-text', "margin-top:10px;");
+
+    var trafficWidget = function (settings) {
+        var self = this;
+        var titleElement = $('<h2 class="section-title"></h2>');
+        var stateElement = $('<div class="traffic-text"></div>');
+        var trafficRedElement = $('<div class="traffic-light-red"></div>');
+        var trafficYellowElement = $('<div class="traffic-light-yellow"></div>');
+        var trafficGreenElement = $('<div class="traffic-light-green"></div>');
+        var currentSettings = settings;
+        var redOn = false;
+        var yellowOn = false;
+        var greenOn = false;
+
+        var redText;
+        var yellowText;
+        var greenText;
+
+        function updateState() {
+            trafficRedElement.toggleClass("on", redOn);
+            trafficYellowElement.toggleClass("on", yellowOn);
+            trafficGreenElement.toggleClass("on", greenOn);
+
+            var text = "";
+            if (redOn) {
+                text += _.isUndefined(redText) ? (_.isUndefined(currentSettings.red_text) ? "" : currentSettings.red_text) : redText;
+                text += " ";
+            }
+            if (yellowOn) {
+                text += _.isUndefined(yellowText) ? (_.isUndefined(currentSettings.yellow_text) ? "" : currentSettings.yellow_text) : yellowText;
+                text += " ";
+            }
+            if (greenOn) {
+                text += _.isUndefined(greenText) ? (_.isUndefined(currentSettings.green_text) ? "" : currentSettings.green_text) : greenText;
+                text += " ";
+            }
+            stateElement.text(text);
+        }
+
+        this.render = function (element) {
+            $(element).append(titleElement).append(trafficGreenElement).append(trafficYellowElement).append(trafficRedElement).append(stateElement);
+        };
+
+        this.onSettingsChanged = function (newSettings) {
+            currentSettings = newSettings;
+            titleElement.html((_.isUndefined(newSettings.title) ? "" : newSettings.title));
+            updateState();
+        };
+
+        this.onCalculatedValueChanged = function (settingName, newValue) {
+            if (settingName === "red_value") {
+                redOn = Boolean(newValue);
+            }
+            if (settingName === "red_text") {
+                redText = newValue;
+            }
+
+            if (settingName === "yellow_value") {
+                yellowOn = Boolean(newValue);
+            }
+            if (settingName === "yellow_text") {
+                yellowText = newValue;
+            }
+
+            if (settingName === "green_value") {
+                greenOn = Boolean(newValue);
+            }
+            if (settingName === "green_text") {
+                greenText = newValue;
+            }
+
+            updateState();
+        };
+
+        this.onDispose = function () {
+        };
+
+        this.getHeight = function () {
+            return 1;
+        };
+
+        this.onSettingsChanged(settings);
+    };
+
+    freeboard.loadWidgetPlugin({
+        type_name: "traffic",
+        display_name: "Traffic Light",
+        settings: [
+	        {
+	            name: "title",
+	            display_name: "Title",
+	            type: "text"
+	        },
+	        {
+	            name: "red_value",
+	            display_name: "Red Value",
+	            type: "calculated"
+	        },
+	        {
+	            name: "red_text",
+	            display_name: "Red Text",
+	            type: "calculated"
+	        },
+                {
+	            name: "yellow_value",
+	            display_name: "Yellow Value",
+	            type: "calculated"
+	        },
+	        {
+	            name: "yellow_text",
+	            display_name: "Yellow Text",
+	            type: "calculated"
+	        },
+                {
+	            name: "green_value",
+	            display_name: "Green Value",
+	            type: "calculated"
+	        },
+	        {
+	            name: "green_text",
+	            display_name: "Green Text",
+	            type: "calculated"
+	        }
+        ],
+        newInstance: function (settings, newInstanceCallback) {
+            newInstanceCallback(new trafficWidget(settings));
+        }
+    });
+
     freeboard.addStyle('.gm-style-cc a', "text-shadow:none;");
 
     var googleMapWidget = function (settings) {
