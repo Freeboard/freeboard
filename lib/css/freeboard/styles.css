@@ -8,6 +8,10 @@
  * Correct `block` display not defined in IE 8/9.
  */
 
+:root{
+	color-scheme: light dark;
+}
+
 article,
 aside,
 details,
@@ -413,14 +417,13 @@ freeboard
 ============*/
 
 html {
-	background-color: #101214;
+	/*background-color: #101214;*/
+
 	height: 100%;
 	overflow: hidden;
 }
 
-body {
-	background-color: #101214;
-	color: #8b8b8b;
+body { 
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-size: 14px;
 	line-height: 20px;
@@ -428,6 +431,8 @@ body {
 	overflow-x: hidden;
 	overflow-y: auto;
 }
+
+
 
 .modal {
 	position: absolute;
@@ -768,7 +773,8 @@ a:focus {
 }
 
 .gridster header {
-	background-color: #272727;
+	/*background-color: #272727;*/
+	background-color: #ddd;
 	height: 30px;
 	margin: 0;
 	padding: 0 10px 0 10px;
@@ -811,7 +817,8 @@ header h1 {
 }
 
 #admin-bar {
-	background-color: #313131;
+	/*background-color: #313131;*/
+	background-color: #fff;		
 	width: 100%;
 	height: 200px;
 	position: relative;
@@ -824,7 +831,7 @@ header h1 {
 	left: 0;
 	right: 0;
 	width: 50px;
-	background-color: #313131;
+	/*background-color: #313131;*/
 	text-align: center;
 	cursor: pointer;
 }
@@ -885,7 +892,7 @@ header h1 {
 
 .table td {
 	border-top: solid 1px #3d3d3d;
-	color: #d3d4d4;
+	/*color: #d3d4d4;*/
 }
 
 #datasources {
@@ -923,7 +930,9 @@ header h1 {
 
 .sub-section {
 	padding: 0;
-	border-bottom: solid 1px #363636;
+	/*border-bottom: solid 1px #363636;*/
+
+	border-bottom: solid 1px #eeeeee;
 	position: relative;
 	overflow: hidden;
 }
@@ -1005,7 +1014,8 @@ ul, ol {
 
 .column-icon {
 	display: inline-block;
-	background-color: white;
+/*	background-color: white;*/
+	background-color: #000;
 	width: 5px;
 	height: 100%;
 }
@@ -1027,7 +1037,7 @@ ul, ol {
 }
 
 .gridster .gs_w {
-	background: #2a2a2a;
+	/*background: #2a2a2a;*/
 	padding: 0px;
 	margin: 0px;
 	overflow: hidden;
@@ -1047,7 +1057,7 @@ ul, ol {
 }
 
 [class^="icon-"],
-[class*=" icon-"] {
+[class*=" icon-"], .icon-prefer {
 	display: inline-block;
 	width: 14px;
 	height: 14px;
@@ -1908,11 +1918,12 @@ ul.datasource-input-suffix {
 	vertical-align: baseline;
 	-webkit-font-smoothing: antialiased;
 	font-style: normal;
-	color: #d3d4d4;
+	/*color: #d3d4d4;*/
 }
 
 .title.bordered {
-	border: solid 3px #d3d4d4;
+	/*border: solid 3px #d3d4d4;*/
+	border: solid 3px #000; 
 	display: inline-block;
 	padding: 2px 17px 2px 17px;
 	line-height: 39px;
@@ -2378,3 +2389,58 @@ input:-moz-placeholder, textarea:-moz-placeholder {
 	height: 100% !important;
 }
 
+/* Use OS dark mode preference */
+@media (prefers-color-scheme: dark){
+	body{
+		background-color: #101214;
+		color: #8b8b8b;
+	}
+
+	.title{
+		color: #d3d4d4;
+	}
+
+	.title.bordered{
+		border: solid 3px #d3d4d4;
+	}
+
+	.table td{
+		color: #d3d4d4;
+	}
+
+	.column-icon{
+		background-color: white;
+	}
+
+	.gridster .gs_w {
+		background: #2a2a2a;	
+	}
+
+	.gridster header {
+		background-color: #272727;	 
+	}
+
+	.sub-section {
+		border-bottom: solid 1px #363636;	
+	}
+
+	.tw-value{
+		color: #d3d4d4;
+	}
+
+	#admin-bar{
+		background-color: #313131;		
+	}
+
+	#toggle-header{
+		background-color: #313131;
+	}
+
+	.icon-prefer{
+		background-image: url("../../../img/glyphicons-halflings-white.png");
+	}
+
+	.mode-toggle{
+		background-image: url('../../../img/lightbulb-on.png');
+	}
+}
