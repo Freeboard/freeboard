@@ -59,12 +59,13 @@
 		element.empty().append(legendElt);
 
 		freeboard.addStyle('.sparkline-legend', "margin:5px;");
-		freeboard.addStyle('.sparkline-legend-value',
-			'color:white; font:10px arial,san serif; float:left; overflow:hidden; width:50%;');
-		freeboard.addStyle('.sparkline-legend-value span',
-			'font-weight:bold; padding-right:5px;');
-	}
 
+        // Use OS dark mode preference
+		freeboard.addStyle('.sparkline-legend-value','color:#000; font:10px arial,san serif; float:left; overflow:hidden; width:50%;');
+        freeboard.addStyle('@media (prefers-color-scheme: dark)',".sparkline-legend-value{color:#fff;}"
+        );
+	}
+ 
 	function addValueToSparkline(element, value, legend) {
 		var values = $(element).data().values;
 		var valueMin = $(element).data().valueMin;
