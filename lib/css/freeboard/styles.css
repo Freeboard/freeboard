@@ -817,6 +817,7 @@ header h1 {
 	position: relative;
 	-webkit-box-shadow: 0 0 5px #000;
 	box-shadow: 0 0 5px #000;
+	overflow:scroll;
 }
 
 #toggle-header {
